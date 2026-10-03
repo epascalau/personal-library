@@ -1,0 +1,16 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/main/frontend/types.ts",
+    "src/main/frontend/services/backend/types.ts",
+    "src/main/frontend/services/backend/RestBackendAdapter.ts",
+    "src/main/frontend/services/backend/MockBackendAdapter.ts",
+    "src/main/frontend/services/backend/events.ts",
+    "src/main/frontend/services/backend/BackendGateway.ts"
+  ],
+  "out": "docs/typescript",
+  "name": "Personal Library - TypeScript API Reference",
+  "readme": "none",
+  "githubPages": false,
+  "cleanOutputDir": true
+}

@@ -1,0 +1,627 @@
+openapi: 3.0.3
+info:
+  title: Personal Library API
+  version: 1.0.0
+  description: >
+    Enterprise-grade AI-driven document management system API. Supports document uploads,
+    BibTeX metadata auto-extraction, vector-powered semantic search, dual-model AI summarization
+    (Llama and Mistral via Spring AI & Ollama), and document RAG conversational chat.
+  contact:
+    name: Personal Library Architecture Team
+    email: support@personallibrary.io
+servers:
+  - url: /api/v1
+    description: Current Environment API Server
+  - url: https://api.personallibrary.enterprise/v1
+    description: Production Enterprise Gateway
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Keycloak / OIDC User Authentication
+      description: Authenticates user credentials or exchanges OIDC tokens with Keycloak.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: emilian.pascalau@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: "••••••••"
+                realm:
+                  type: string
+                  default: personal-library-realm
+                  example: personal-library-realm
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Unauthorized / Invalid credentials
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Terminate user session
+      security:
+        - KeycloakBearerAuth: []
+      responses:
+        '200':
+          description: Session terminated successfully
+
+  /auth/userinfo:
+    get:
+      tags:
+        - Authentication
+      summary: Get authenticated user profile and roles
+      security:
+        - KeycloakBearerAuth: []
+      responses:
+        '200':
+          description: User profile details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /documents:
+    get:
+      tags:
+        - Documents
+      summary: Retrieve and filter paginated document list (List Report Floorplan)
+      description: Queries the document catalog in MongoDB and Qdrant with multiple combined filters.
+      parameters:
+        - name: fileName
+          in: query
+          description: Filter by original file name
+          required: false
+          schema:
+            type: string
+        - name: title
+          in: query
+          description: Filter by document title
+          required: false
+          schema:
+            type: string
+        - name: author
+          in: query
+          description: Filter by author name
+          required: false
+          schema:
+            type: string
+        - name: edition
+          in: query
+          description: Filter by publication edition
+          required: false
+          schema:
+            type: string
+        - name: format
+          in: query
+          description: Filter by document format
+          required: false
+          schema:
+            type: string
+            enum: [all, pdf, docx, doc, md, txt, xls, xlsx, ppt, pptx]
+        - name: content
+          in: query
+          description: Semantic content search term executed against Qdrant vector database
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number (1-indexed)
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: Items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sortBy
+          in: query
+          description: Column field to sort by
+          required: false
+          schema:
+            type: string
+            enum: [fileName, title, author, edition, format, fileSize, uploadDate, editDate]
+            default: uploadDate
+        - name: sortOrder
+          in: query
+          description: Sort direction
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Paginated document list with metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentListResponse'
+
+    post:
+      tags:
+        - Documents
+      summary: Upload document and trigger automated processing pipeline
+      description: >
+        Uploads a physical file asset, automatically extracts BibTeX metadata using Spring AI,
+        indexes text embeddings into Qdrant, and triggers dual-model summaries (Llama and Mistral).
+        Generates a new independent GUID record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadRequest'
+      responses:
+        '201':
+          description: Document processed and stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDetail'
+        '400':
+          description: Invalid file format or missing required fields
+
+  /documents/extract-metadata:
+    post:
+      tags:
+        - Documents
+      summary: Auto-extract BibTeX metadata from document preview
+      description: Utilizes Spring AI & LLM to infer document type, authors, journal, dates, and BibTeX schema fields.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fileName
+              properties:
+                fileName:
+                  type: string
+                  example: attention_is_all_you_need.pdf
+                contentSample:
+                  type: string
+                  description: Initial text excerpt or preview extracted from document
+      responses:
+        '200':
+          description: Auto-extracted BibTeX metadata suggestions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BibTeXMetadata'
+
+  /documents/{guid}:
+    get:
+      tags:
+        - Documents
+      summary: Retrieve document details (Object Page Floorplan)
+      description: Returns full metadata, BibTeX formatted representation, dual summaries, and version lineage.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          description: Unique identifier of the document
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Document details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDetail'
+        '404':
+          description: Document not found
+
+    put:
+      tags:
+        - Documents
+      summary: Update document metadata or upload replacement version
+      description: >
+        From end-user perspective, overwrites the active document view.
+        From backend system perspective, creates a new independent GUID record with lineage tracking.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          description: GUID of the document being edited / overwritten
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdateRequest'
+      responses:
+        '200':
+          description: Document updated or new version created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDetail'
+        '404':
+          description: Document not found
+
+    delete:
+      tags:
+        - Documents
+      summary: Delete document record, file asset, and Qdrant vector embeddings
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          description: GUID of document to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Document successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Document and vector embeddings removed
+
+  /documents/{guid}/summarize:
+    post:
+      tags:
+        - AI Services
+      summary: Trigger summary regeneration for a specific model (Llama or Mistral)
+      description: Re-computes analytical summary, updates generation duration (minutes and seconds), and saves timestamp.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+              properties:
+                model:
+                  type: string
+                  enum: [llama, mistral]
+                  example: llama
+      responses:
+        '200':
+          description: Summary generated and updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SummaryRecord'
+
+  /documents/{guid}/chat:
+    post:
+      tags:
+        - AI Services
+      summary: Submit a conversational query to the document RAG assistant
+      description: Retrieves semantic context from Qdrant vector store and generates answer using the Llama model.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+              properties:
+                question:
+                  type: string
+                  example: What are the primary experimental results reported?
+                chatHistory:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum: [user, assistant]
+                      text:
+                        type: string
+      responses:
+        '200':
+          description: RAG response with model metadata and document citations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+
+components:
+  securitySchemes:
+    KeycloakBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Keycloak OIDC Bearer Token
+
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          example: 3600
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+          example: emilian.pascalau
+        email:
+          type: string
+          example: emilian.pascalau@gmail.com
+        name:
+          type: string
+          example: Emilian Pascalau
+        roles:
+          type: array
+          items:
+            type: string
+          example: [LIBRARY_ADMIN, RESEARCHER]
+        realm:
+          type: string
+          example: personal-library-realm
+
+    BibTeXMetadata:
+      type: object
+      required:
+        - entryType
+        - bibKey
+        - title
+        - author
+        - year
+      properties:
+        entryType:
+          type: string
+          enum: [article, book, inproceedings, techreport, phdthesis, misc]
+          example: article
+        bibKey:
+          type: string
+          example: vaswani2017attention
+        title:
+          type: string
+          example: Attention Is All You Need
+        author:
+          type: string
+          example: Vaswani, Ashish and Shazeer, Noam and Parmar, Niki
+        year:
+          type: string
+          example: "2017"
+        month:
+          type: string
+          example: "December"
+        journal:
+          type: string
+          example: Advances in Neural Information Processing Systems
+        booktitle:
+          type: string
+        volume:
+          type: string
+          example: "30"
+        number:
+          type: string
+        pages:
+          type: string
+          example: "5998--6008"
+        publisher:
+          type: string
+        edition:
+          type: string
+        institution:
+          type: string
+        school:
+          type: string
+        doi:
+          type: string
+          example: 10.48550/arXiv.1706.03762
+        url:
+          type: string
+          example: https://arxiv.org/abs/1706.03762
+        abstract:
+          type: string
+        keywords:
+          type: string
+          example: Attention, Transformer, Deep Learning, NLP
+
+    SummaryRecord:
+      type: object
+      properties:
+        modelName:
+          type: string
+          example: Ollama Llama 3.3 (70B)
+        modelKey:
+          type: string
+          enum: [llama, mistral]
+        summaryText:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-30T05:35:48.000Z"
+        durationSeconds:
+          type: number
+          example: 4.2
+        durationFormatted:
+          type: string
+          example: 0 min 4.2 sec
+
+    DocumentDetail:
+      type: object
+      properties:
+        guid:
+          type: string
+          format: uuid
+        previousVersionGuid:
+          type: string
+          nullable: true
+        versionNumber:
+          type: integer
+          example: 1
+        fileName:
+          type: string
+          example: attention_is_all_you_need.pdf
+        fileSize:
+          type: integer
+          description: Size in bytes
+          example: 2215264
+        fileSizeFormatted:
+          type: string
+          example: 2.1 MB
+        format:
+          type: string
+          enum: [md, docx, pdf, txt, doc, xls, xlsx, ppt, pptx]
+          example: pdf
+        uploadDate:
+          type: string
+          format: date-time
+        editDate:
+          type: string
+          format: date-time
+        bibtex:
+          $ref: '#/components/schemas/BibTeXMetadata'
+        bibtexRaw:
+          type: string
+          description: Pre-formatted LaTeX/BibTeX block string
+        summaries:
+          type: object
+          properties:
+            llama:
+              $ref: '#/components/schemas/SummaryRecord'
+            mistral:
+              $ref: '#/components/schemas/SummaryRecord'
+        contentExcerpt:
+          type: string
+        downloadUrl:
+          type: string
+
+    DocumentListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentDetail'
+        totalCount:
+          type: integer
+          example: 42
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 10
+        totalPages:
+          type: integer
+          example: 5
+
+    DocumentUploadRequest:
+      type: object
+      required:
+        - fileName
+        - fileFormat
+        - fileSize
+      properties:
+        fileName:
+          type: string
+        fileFormat:
+          type: string
+        fileSize:
+          type: integer
+        fileContent:
+          type: string
+          description: Text content or base64 encoded document body
+        bibtex:
+          $ref: '#/components/schemas/BibTeXMetadata'
+
+    DocumentUpdateRequest:
+      type: object
+      properties:
+        isNewVersion:
+          type: boolean
+          description: If true, creates a new independent GUID record representing the updated file
+        fileName:
+          type: string
+        fileFormat:
+          type: string
+        fileSize:
+          type: integer
+        fileContent:
+          type: string
+        bibtex:
+          $ref: '#/components/schemas/BibTeXMetadata'
+
+    ChatResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        modelUsed:
+          type: string
+          example: Llama 3.3 (70B) via Spring AI & Qdrant RAG
+        citations:
+          type: array
+          items:
+            type: object
+            properties:
+              chunkIndex:
+                type: integer
+              score:
+                type: number
+              snippet:
+                type: string

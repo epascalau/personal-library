@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+:root, [data-sap-theme="sap_horizon"] {
+  --sap-bg: #f5f6f8;
+  --sap-shell-bg: #354a5f;
+  --sap-shell-text: #ffffff;
+  --sap-surface: #ffffff;
+  --sap-surface-secondary: #f8fafc;
+  --sap-surface-hover: #f1f5f9;
+  --sap-border: #e2e8f0;
+  --sap-border-subtle: #edf2f7;
+  --sap-text-primary: #1d2d3e;
+  --sap-text-secondary: #475569;
+  --sap-text-muted: #64748b;
+  --sap-brand: #0070f2;
+  --sap-brand-hover: #0854a0;
+  --sap-brand-light: #ebf8ff;
+  --sap-input-bg: #ffffff;
+  --sap-input-border: #cbd5e1;
+  --sap-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  color-scheme: light;
+}
+
+.dark, [data-sap-theme="sap_horizon_dark"] {
+  --sap-bg: #12171c;
+  --sap-shell-bg: #161f28;
+  --sap-shell-text: #f0f4f8;
+  --sap-surface: #1c232b;
+  --sap-surface-secondary: #232c37;
+  --sap-surface-hover: #293543;
+  --sap-border: #2e3b4a;
+  --sap-border-subtle: #25303c;
+  --sap-text-primary: #f0f4f8;
+  --sap-text-secondary: #9cb0c5;
+  --sap-text-muted: #75879a;
+  --sap-brand: #4796ff;
+  --sap-brand-hover: #68a9ff;
+  --sap-brand-light: rgba(71, 150, 255, 0.15);
+  --sap-input-bg: #161c22;
+  --sap-input-border: #354353;
+  --sap-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+@layer base {
+  body {
+    background-color: var(--sap-bg);
+    color: var(--sap-text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+}
+
+/* ========================================================================= */
+/* SAP Evening Horizon (Dark Theme) Utility Harmonization                     */
+/* ========================================================================= */
+
+.dark .bg-white {
+  background-color: #1c232b !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-gray-50,
+.dark .bg-\[\#f8fafc\] {
+  background-color: #232c37 !important;
+}
+
+.dark .bg-slate-100,
+.dark .bg-gray-100,
+.dark .bg-\[\#f1f5f9\] {
+  background-color: #26313e !important;
+}
+
+.dark .bg-slate-200,
+.dark .bg-gray-200 {
+  background-color: #2f3d4d !important;
+}
+
+.dark .border-gray-200,
+.dark .border-slate-200,
+.dark .border-\[\#e2e8f0\] {
+  border-color: #2e3b4a !important;
+}
+
+.dark .border-gray-100,
+.dark .border-slate-100,
+.dark .border-\[\#edf2f7\] {
+  border-color: #25303c !important;
+}
+
+.dark .border-gray-300,
+.dark .border-slate-300 {
+  border-color: #3b4b5d !important;
+}
+
+.dark .text-gray-900,
+.dark .text-slate-900,
+.dark .text-gray-800,
+.dark .text-slate-800,
+.dark .text-\[\#1d2d3e\] {
+  color: #f0f4f8 !important;
+}
+
+.dark .text-gray-700,
+.dark .text-slate-700,
+.dark .text-gray-600,
+.dark .text-slate-600 {
+  color: #9cb0c5 !important;
+}
+
+.dark .text-gray-500,
+.dark .text-slate-500,
+.dark .text-gray-400,
+.dark .text-slate-400 {
+  color: #75879a !important;
+}
+
+/* Hover States in Evening Horizon */
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-slate-50:hover {
+  background-color: #242e39 !important;
+}
+
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-slate-100:hover {
+  background-color: #293543 !important;
+}
+
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #2e3b4a !important;
+}
+
+/* Input Fields and Selects */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.dark select,
+.dark textarea {
+  background-color: #161c22 !important;
+  color: #f0f4f8 !important;
+  border-color: #354353 !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #4796ff !important;
+  outline-color: #4796ff !important;
+}
+
+/* Code & Pre Blocks in Dark Mode */
+.dark pre,
+.dark code {
+  background-color: #161c22;
+  color: #93c5fd;
+}
+
+/* SAP Evening Horizon ShellBar */
+.dark .sap-shellbar {
+  background-color: #161f28 !important;
+  border-bottom-color: #4796ff !important;
+}
+
+/* Modals Overlay */
+.dark .bg-black\/40,
+.dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Custom Scrollbars for Fiori UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sap-scrollbar-track, #f1f3f5);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #151a20;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #354353;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #485b70;
+}

@@ -1,0 +1,256 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Personal Library - clean rebuild & redeploy routine
+#
+# Wipes generated artifacts, rebuilds the frontend bundle, the Spring Boot JAR
+# and the container image, then redeploys the full stack and verifies it.
+#
+# Data safety: persistent volumes are PRESERVED unless explicitly purged.
+# The downloaded Ollama models (~7 GB) are kept even by --purge-data, because
+# re-pulling them through a corporate TLS proxy is slow and failure prone;
+# removing them requires the separate --purge-models opt-in.
+#
+# Usage: ./scripts/rebuild.sh [options]   (see --help)
+# =============================================================================
+set -Eeuo pipefail
+
+readonly PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+# --- Options ----------------------------------------------------------------
+DEEP=false            # also drop node_modules and generated documentation
+PURGE_DATA=false      # drop mongodb / qdrant / uploaded-file volumes
+PURGE_MODELS=false    # drop the Ollama model cache as well
+NO_CACHE=false        # build the image without the Docker layer cache
+CLEAN_ONLY=false      # stop after the cleaning phase
+SKIP_VERIFY=false     # skip the post-deploy verification phase
+PULL=false            # refresh third-party base/service images
+
+readonly UI_URL="http://localhost:3000/"
+readonly API_URL="http://localhost:8080/api/v1/documents"
+readonly HEALTH_URL="http://localhost:8080/actuator/health"
+
+usage() {
+  cat <<'USAGE'
+Clean rebuild & redeploy for Personal Library.
+
+Usage: ./scripts/rebuild.sh [options]
+
+Cleaning scope
+  --deep            Also remove node_modules/ and generated documentation, forcing a
+                    dependency reinstall and a documentation rebuild.
+  --purge-data      Remove the MongoDB, Qdrant and uploaded-file volumes.
+                    DESTROYS all stored documents. Ollama models are kept.
+  --purge-models    Also remove the Ollama model cache (~7 GB re-download).
+  --purge-all       Shorthand for --deep --purge-data --purge-models.
+
+Build & deploy
+  --no-cache        Build the image without the Docker layer cache.
+  --pull            Pull newer base and third-party service images.
+  --clean-only      Clean, then stop (no build, no deploy).
+  --skip-verify     Do not run the post-deploy verification.
+
+  -h, --help        Show this help.
+
+Always removed: dist/, target/, server.js, and the project's containers/image.
+Always kept unless purged: MongoDB data, Qdrant vectors, uploaded files, models.
+
+Examples
+  ./scripts/rebuild.sh                     # routine clean rebuild + redeploy
+  ./scripts/rebuild.sh --deep --no-cache   # fully reproducible rebuild
+  ./scripts/rebuild.sh --purge-all         # factory reset (re-pulls models)
+USAGE
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --deep)          DEEP=true ;;
+    --purge-data)    PURGE_DATA=true ;;
+    --purge-models)  PURGE_MODELS=true ;;
+    --purge-all)     DEEP=true; PURGE_DATA=true; PURGE_MODELS=true ;;
+    --no-cache)      NO_CACHE=true ;;
+    --pull)          PULL=true ;;
+    --clean-only)    CLEAN_ONLY=true ;;
+    --skip-verify)   SKIP_VERIFY=true ;;
+    -h|--help)       usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; echo >&2; usage >&2; exit 2 ;;
+  esac
+  shift
+done
+
+# --- Output helpers ---------------------------------------------------------
+if [[ -t 1 ]]; then
+  C_RESET=$'\033[0m'; C_BOLD=$'\033[1m'; C_DIM=$'\033[2m'
+  C_RED=$'\033[31m'; C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_BLUE=$'\033[34m'
+else
+  C_RESET=''; C_BOLD=''; C_DIM=''; C_RED=''; C_GREEN=''; C_YELLOW=''; C_BLUE=''
+fi
+
+STEP=0
+step() { STEP=$((STEP + 1)); printf '\n%s==> [%d] %s%s\n' "$C_BOLD$C_BLUE" "$STEP" "$1" "$C_RESET"; }
+info() { printf '    %s\n' "$1"; }
+note() { printf '    %s%s%s\n' "$C_DIM" "$1" "$C_RESET"; }
+ok()   { printf '    %s✓%s %s\n' "$C_GREEN" "$C_RESET" "$1"; }
+warn() { printf '    %s!%s %s\n' "$C_YELLOW" "$C_RESET" "$1"; }
+fail() { printf '\n%s✗ %s%s\n' "$C_RED$C_BOLD" "$1" "$C_RESET" >&2; exit 1; }
+
+trap 'fail "Rebuild aborted at step ${STEP} (line ${LINENO})."' ERR
+
+readonly START_TS=$SECONDS
+
+# --- Phase 1: preflight -----------------------------------------------------
+step "Preflight checks"
+command -v docker >/dev/null 2>&1 || fail "docker is required but not installed."
+docker compose version >/dev/null 2>&1 || fail "the 'docker compose' plugin is required."
+docker info >/dev/null 2>&1 || fail "the Docker daemon is not reachable. Is it running?"
+ok "Docker $(docker version --format '{{.Server.Version}}') and Compose $(docker compose version --short)"
+
+if $PURGE_DATA || $PURGE_MODELS; then
+  targets=""
+  $PURGE_DATA   && targets="documents, vectors and uploaded files"
+  $PURGE_MODELS && targets="${targets:+$targets plus }the Ollama model cache (~7 GB re-download)"
+  warn "This will permanently delete ${targets}."
+  if [[ -t 0 ]]; then
+    read -r -p "    Type 'yes' to continue: " confirm
+    [[ "$confirm" == "yes" ]] || fail "Aborted by user."
+  else
+    note "Non-interactive shell detected; proceeding without confirmation."
+  fi
+fi
+
+# --- Phase 2: clean ---------------------------------------------------------
+step "Removing the running stack"
+# --remove-orphans also clears containers left behind by earlier compose files.
+compose_down=(docker compose down --remove-orphans)
+if $PURGE_DATA && $PURGE_MODELS; then
+  compose_down+=(--volumes)
+fi
+"${compose_down[@]}"
+ok "Containers and network removed."
+
+if $PURGE_DATA && ! $PURGE_MODELS; then
+  # Selective purge: drop the data volumes but keep the expensive model cache.
+  for volume in personal-library-mongodb-data personal-library-qdrant-data personal-library-file-storage; do
+    if docker volume inspect "$volume" >/dev/null 2>&1; then
+      docker volume rm "$volume" >/dev/null
+      ok "Volume '$volume' removed."
+    fi
+  done
+  note "Ollama model cache preserved (use --purge-models to drop it)."
+elif $PURGE_MODELS && ! $PURGE_DATA; then
+  if docker volume inspect personal-library-ollama-models >/dev/null 2>&1; then
+    docker volume rm personal-library-ollama-models >/dev/null
+    ok "Ollama model cache removed; models will be re-pulled on start."
+  fi
+elif ! $PURGE_DATA; then
+  note "Persistent volumes kept (documents, vectors, files, models)."
+fi
+
+step "Deleting build artifacts"
+artifacts=(dist target server.js)
+$DEEP && artifacts+=(docs node_modules)
+for artifact in "${artifacts[@]}"; do
+  if [[ -e "$artifact" ]]; then
+    rm -rf -- "${PROJECT_ROOT:?}/$artifact"
+    ok "Removed $artifact"
+  else
+    note "Skipped $artifact (absent)"
+  fi
+done
+
+# Drop the application image so the next build cannot silently reuse it.
+app_image="$(docker compose config --images 2>/dev/null | grep -- '-personal-library-app$' || true)"
+if [[ -n "$app_image" ]] && docker image inspect "$app_image" >/dev/null 2>&1; then
+  docker image rm -f "$app_image" >/dev/null
+  ok "Application image '$app_image' removed."
+fi
+
+if $CLEAN_ONLY; then
+  printf '\n%s✓ Clean complete in %ds. Build and deploy skipped (--clean-only).%s\n' \
+    "$C_GREEN$C_BOLD" "$((SECONDS - START_TS))" "$C_RESET"
+  exit 0
+fi
+
+# --- Phase 3: host-side quality gate ----------------------------------------
+# Catching type errors here is far cheaper than failing inside a Docker layer.
+step "Type-checking the frontend"
+if command -v npm >/dev/null 2>&1; then
+  if [[ ! -d node_modules ]]; then
+    info "Installing dependencies (npm ci)..."
+    npm_flags=()
+    # Some workstations enforce a machine-wide npm policy that blocks remote
+    # fetches. Relax it for this invocation only; project config is untouched.
+    [[ "$(npm config get allow-remote 2>/dev/null)" == "none" ]] && npm_flags+=(--allow-remote=all)
+    if ! npm ci "${npm_flags[@]}"; then
+      warn "npm ci failed on the host; the Docker build will install its own copy."
+    fi
+  fi
+  if [[ -d node_modules ]]; then
+    npm run --silent lint || fail "Type-check failed. Fix the errors above and re-run."
+    ok "tsc --noEmit reported no errors."
+  fi
+else
+  warn "npm not found on the host; relying on the in-container build."
+fi
+
+# --- Phase 4: build ---------------------------------------------------------
+step "Building the container image (frontend bundle + Spring Boot JAR)"
+build_cmd=(docker compose build)
+$NO_CACHE && build_cmd+=(--no-cache)
+$PULL     && build_cmd+=(--pull)
+"${build_cmd[@]}" || fail "Image build failed."
+ok "Image built."
+
+# --- Phase 5: deploy --------------------------------------------------------
+step "Deploying the stack"
+up_cmd=(docker compose up -d --wait)
+$PULL && up_cmd+=(--pull always)
+# --wait blocks until every service with a healthcheck reports healthy, so a
+# failure here means a service genuinely did not come up.
+if ! "${up_cmd[@]}"; then
+  warn "Services did not all become healthy. Recent application logs:"
+  docker compose logs --tail=40 personal-library-app || true
+  fail "Deployment failed."
+fi
+ok "All services report healthy."
+docker compose ps --format 'table {{.Service}}\t{{.Status}}'
+
+# --- Phase 6: verify --------------------------------------------------------
+if $SKIP_VERIFY; then
+  note "Post-deploy verification skipped (--skip-verify)."
+else
+  step "Verifying the deployment"
+
+  check_http() {
+    local label="$1" url="$2" code
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || echo 000)"
+    if [[ "$code" == "200" ]]; then
+      ok "$label → HTTP 200"
+    else
+      warn "$label → HTTP $code (expected 200)"
+      return 1
+    fi
+  }
+
+  verify_failed=false
+  check_http "Frontend (UI)          " "$UI_URL"     || verify_failed=true
+  check_http "Spring Boot health     " "$HEALTH_URL" || verify_failed=true
+  check_http "Documents API          " "$API_URL"    || verify_failed=true
+
+  # The AI features are unusable without the language and embedding models.
+  models="$(docker compose exec -T ollama ollama list 2>/dev/null | tail -n +2 | awk '{print $1}' | paste -sd' ' - || true)"
+  if [[ -n "$models" ]]; then
+    ok "Ollama models ready: $models"
+  else
+    warn "No Ollama models present yet; they may still be downloading."
+    note "Follow progress: docker compose logs -f ollama | grep ollama-entrypoint"
+  fi
+
+  $verify_failed && fail "Deployment verification failed; see the warnings above."
+fi
+
+printf '\n%s✓ Clean rebuild and deploy completed in %ds.%s\n' \
+  "$C_GREEN$C_BOLD" "$((SECONDS - START_TS))" "$C_RESET"
+printf '    UI          %s\n' "$UI_URL"
+printf '    Spring Boot %s\n' "http://localhost:8080/api/v1"
+printf '    Logs        %s\n' "docker compose logs -f personal-library-app"

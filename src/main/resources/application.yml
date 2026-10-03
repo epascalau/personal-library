@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: personal-library-backend
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_USER:root}:${MONGODB_PASSWORD:librarypass}@${MONGODB_HOST:localhost}:${MONGODB_PORT:27017}/personal_library?authSource=admin
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # Spring Security / Keycloak OAuth2 Resource Server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/personal-library-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/personal-library-realm/protocol/openid-connect/certs}
+
+  # Spring AI Configuration for Ollama & Qdrant
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          temperature: 0.3
+      embedding:
+        options:
+          model: nomic-embed-text
+    vectorstore:
+      qdrant:
+        host: ${QDRANT_HOST:localhost}
+        port: ${QDRANT_PORT:6334}
+        collection-name: personal_library_embeddings
+        use-tls: false
+        initialize-schema: true
+
+# Physical storage configuration for original file assets
+app:
+  storage:
+    upload-dir: ${STORAGE_DIR:./storage/documents}
+  models:
+    llama: ${OLLAMA_LLAMA_MODEL:llama3.2}
+    mistral: ${OLLAMA_MISTRAL_MODEL:mistral}
+
+# SpringDoc OpenAPI Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    com.personallibrary: DEBUG
+    org.springframework.ai: INFO
+    org.springframework.security: INFO

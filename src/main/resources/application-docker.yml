@@ -1,0 +1,24 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/personal-library-realm
+          jwk-set-uri: http://keycloak:8080/realms/personal-library-realm/protocol/openid-connect/certs
+
+  ai:
+    ollama:
+      base-url: http://ollama:11434
+    vectorstore:
+      qdrant:
+        host: qdrant
+        port: 6334
+        initialize-schema: false
+
+app:
+  storage:
+    upload-dir: /app/storage/documents

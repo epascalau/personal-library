@@ -1,0 +1,6 @@
+{
+  "name": "Personal Library",
+  "description": "Enterprise-grade AI document management web application featuring SAP Fiori List Report and Object Page floorplans, BibTeX extraction, dual-model summaries (Llama and Mistral), and RAG chat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
