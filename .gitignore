@@ -8,3 +8,4 @@ coverage/
 !.env.example
 *.iml
 package-lock.json
+.idea
