@@ -1,0 +1,206 @@
+@prefix : <https://personallibrary.io/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<https://personallibrary.io/ontology> a owl:Ontology ;
+    dc:title "Personal Library & Enterprise Multi-Model RAG Research Engine Ontology"@en ;
+    dc:description "Formal semantic domain ontology modeling scholarly documents, dense vector representations, dual LLM inference, grounded RAG citations, and immutable audit provenance."@en ;
+    owl:versionInfo "1.0.0" .
+
+### Classes - Core Document & Information Entities
+
+:DocumentAsset a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Document Asset"@en ;
+    rdfs:comment "The primary digital asset ingested into the enterprise personal library."@en .
+
+:ScholarlyPublication a owl:Class ;
+    rdfs:subClassOf :DocumentAsset , bibo:Document ;
+    rdfs:label "Scholarly Publication"@en .
+
+:AcademicArticle a owl:Class ;
+    rdfs:subClassOf :ScholarlyPublication , bibo:AcademicArticle ;
+    rdfs:label "Academic Article"@en .
+
+:BookPublication a owl:Class ;
+    rdfs:subClassOf :ScholarlyPublication , bibo:Book ;
+    rdfs:label "Book Publication"@en .
+
+:ConferenceProceedings a owl:Class ;
+    rdfs:subClassOf :ScholarlyPublication , bibo:Proceedings ;
+    rdfs:label "Conference Proceedings"@en .
+
+:TechnicalReport a owl:Class ;
+    rdfs:subClassOf :ScholarlyPublication , bibo:Report ;
+    rdfs:label "Technical Report"@en .
+
+### Classes - Bibliographic & Metadata Entities
+
+:BibliographicMetadata a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Bibliographic Metadata"@en .
+
+:BibTeXRecord a owl:Class ;
+    rdfs:subClassOf :BibliographicMetadata ;
+    rdfs:label "BibTeX Record"@en .
+
+:AuthorAgent a owl:Class ;
+    rdfs:subClassOf foaf:Person , prov:Agent ;
+    rdfs:label "Author Agent"@en .
+
+:PublisherAgent a owl:Class ;
+    rdfs:subClassOf foaf:Organization , prov:Agent ;
+    rdfs:label "Publisher Organization"@en .
+
+### Classes - Vector & Semantic Search Entities
+
+:TextPassageChunk a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Text Passage Chunk"@en ;
+    rdfs:comment "A paragraph-bounded sliding-window text segment extracted for embedding."@en .
+
+:DenseVectorEmbedding a owl:Class ;
+    rdfs:label "Dense Vector Embedding"@en ;
+    rdfs:comment "A 768-dimensional mathematical vector representation of semantic passage meaning."@en .
+
+:VectorSpaceCollection a owl:Class ;
+    rdfs:label "Vector Space Collection"@en ;
+    rdfs:comment "Qdrant HNSW vector index collection partitioned by document GUID."@en .
+
+### Classes - AI, Models & Inference
+
+:ComputationalModel a owl:Class ;
+    rdfs:subClassOf prov:Agent ;
+    rdfs:label "Computational Model"@en .
+
+:EmbeddingModel a owl:Class ;
+    rdfs:subClassOf :ComputationalModel ;
+    rdfs:label "Dense Embedding Model"@en .
+
+:GenerativeLLM a owl:Class ;
+    rdfs:subClassOf :ComputationalModel ;
+    rdfs:label "Generative Large Language Model"@en .
+
+:Llama3Model a owl:Class ;
+    rdfs:subClassOf :GenerativeLLM ;
+    rdfs:label "Meta Llama 3.3 (70B Instruct)"@en .
+
+:MistralLargeModel a owl:Class ;
+    rdfs:subClassOf :GenerativeLLM ;
+    rdfs:label "Mistral Large (2411)"@en .
+
+:AnalyticalSummary a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Analytical Summary"@en .
+
+:ExecutiveTakeawaySummary a owl:Class ;
+    rdfs:subClassOf :AnalyticalSummary ;
+    rdfs:label "Executive Takeaway Summary (Llama)"@en .
+
+:MethodologicalCritiqueSummary a owl:Class ;
+    rdfs:subClassOf :AnalyticalSummary ;
+    rdfs:label "Methodological Critique Summary (Mistral)"@en .
+
+### Classes - Conversational RAG & Grounded Citations
+
+:ConversationalSession a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "RAG Conversational Session"@en .
+
+:UserQuery a owl:Class ;
+    rdfs:label "User Query"@en .
+
+:AssistantResponse a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Grounded Assistant Response"@en .
+
+:GroundedCitation a owl:Class ;
+    rdfs:label "Grounded Citation Evidence"@en ;
+    rdfs:comment "Verifiable evidence passage linking answer claims to exact chunk offsets."@en .
+
+### Classes - Provenance, Versioning & Security
+
+:AuditSnapshot a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Audit Snapshot"@en ;
+    rdfs:comment "Immutable state snapshot captured prior to overwrite or rollback."@en .
+
+:SecurityPrincipal a owl:Class ;
+    rdfs:subClassOf prov:Agent ;
+    rdfs:label "Security Principal"@en .
+
+:UserAccount a owl:Class ;
+    rdfs:subClassOf :SecurityPrincipal , foaf:Person ;
+    rdfs:label "Keycloak Authenticated User"@en .
+
+:BPMNWorkflowProcess a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Camunda BPMN Ingestion Workflow"@en .
+
+### Object Properties
+
+:describesDocument a owl:ObjectProperty ;
+    rdfs:domain :BibliographicMetadata ;
+    rdfs:range :DocumentAsset .
+
+:authoredBy a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :AuthorAgent .
+
+:publishedBy a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :PublisherAgent .
+
+:partitionedInto a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :TextPassageChunk .
+
+:representedBy a owl:ObjectProperty ;
+    rdfs:domain :TextPassageChunk ;
+    rdfs:range :DenseVectorEmbedding .
+
+:encodedByModel a owl:ObjectProperty ;
+    rdfs:domain :DenseVectorEmbedding ;
+    rdfs:range :EmbeddingModel .
+
+:indexedIn a owl:ObjectProperty ;
+    rdfs:domain :DenseVectorEmbedding ;
+    rdfs:range :VectorSpaceCollection .
+
+:summarizedAs a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :AnalyticalSummary .
+
+:synthesizedBy a owl:ObjectProperty ;
+    rdfs:domain :AnalyticalSummary ;
+    rdfs:range :GenerativeLLM .
+
+:hasHistoricalSnapshot a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :AuditSnapshot .
+
+:previousVersion a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :DocumentAsset .
+
+:orchestratedByWorkflow a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :BPMNWorkflowProcess .
+
+:grounds a owl:ObjectProperty ;
+    rdfs:domain :TextPassageChunk ;
+    rdfs:range :GroundedCitation .
+
+:citesEvidence a owl:ObjectProperty ;
+    rdfs:domain :AssistantResponse ;
+    rdfs:range :GroundedCitation .
+
+:managedBy a owl:ObjectProperty ;
+    rdfs:domain :DocumentAsset ;
+    rdfs:range :UserAccount .

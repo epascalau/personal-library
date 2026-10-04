@@ -1,0 +1,144 @@
+classDiagram
+    direction TB
+
+    class DocumentAsset {
+      <<prov:Entity>>
+      +UUID guid
+      +string fileName
+      +string format
+      +instant uploadDate
+    }
+
+    class ScholarlyPublication {
+      <<bibo:Document>>
+    }
+    class AcademicArticle
+    class BookPublication
+    class ConferenceProceedings
+    class TechnicalReport
+
+    ScholarlyPublication --|> DocumentAsset : subClassOf
+    AcademicArticle --|> ScholarlyPublication : subClassOf
+    BookPublication --|> ScholarlyPublication : subClassOf
+    ConferenceProceedings --|> ScholarlyPublication : subClassOf
+    TechnicalReport --|> ScholarlyPublication : subClassOf
+
+    class BibliographicMetadata {
+      <<prov:Entity>>
+      +string bibKey
+      +string title
+      +string year
+      +string doi
+    }
+    class AuthorAgent {
+      <<prov:Agent>>
+      +string name
+    }
+    class PublisherAgent {
+      <<prov:Agent>>
+      +string publisherName
+    }
+
+    BibliographicMetadata --> DocumentAsset : describesDocument
+    DocumentAsset --> AuthorAgent : authoredBy
+    DocumentAsset --> PublisherAgent : publishedBy
+
+    class TextPassageChunk {
+      <<prov:Entity>>
+      +int chunkIndex
+      +string text
+      +int pageNumber
+    }
+
+    class DenseVectorEmbedding {
+      <<owl:Class>>
+      +float32[768] vector
+      +string metric = Cosine
+    }
+
+    class VectorSpaceCollection {
+      <<Qdrant>>
+      +string collectionName
+      +int HNSW_M = 16
+    }
+
+    class EmbeddingModel {
+      <<prov:Agent>>
+      +string model = nomic-embed-text
+    }
+
+    DocumentAsset --> TextPassageChunk : partitionedInto
+    TextPassageChunk --> DenseVectorEmbedding : representedBy
+    DenseVectorEmbedding --> EmbeddingModel : encodedByModel
+    DenseVectorEmbedding --> VectorSpaceCollection : indexedIn
+
+    class AnalyticalSummary {
+      <<prov:Entity>>
+      +decimal latencySeconds
+      +string markdownText
+    }
+    class ExecutiveTakeawaySummary
+    class MethodologicalCritiqueSummary
+    AnalyticalSummary <|-- ExecutiveTakeawaySummary
+    AnalyticalSummary <|-- MethodologicalCritiqueSummary
+
+    class GenerativeLLM {
+      <<prov:Agent>>
+    }
+    class Llama3Model {
+      <<Ollama>>
+      +string model = Llama-3.3-70B
+      +float temp = 0.2
+    }
+    class MistralLargeModel {
+      <<Ollama>>
+      +string model = Mistral-Large-2411
+      +float temp = 0.3
+    }
+    GenerativeLLM <|-- Llama3Model
+    GenerativeLLM <|-- MistralLargeModel
+
+    DocumentAsset --> AnalyticalSummary : summarizedAs
+    ExecutiveTakeawaySummary --> Llama3Model : synthesizedBy
+    MethodologicalCritiqueSummary --> MistralLargeModel : synthesizedBy
+
+    class ConversationalSession {
+      <<prov:Activity>>
+      +UUID sessionId
+      +string userQuery
+    }
+    class AssistantResponse {
+      <<prov:Entity>>
+      +string answerText
+    }
+    class GroundedCitation {
+      <<owl:Class>>
+      +float similarityScore
+      +string sourceSnippet
+    }
+
+    ConversationalSession --> DocumentAsset : scopedTo
+    ConversationalSession --> AssistantResponse : generates
+    AssistantResponse --> GroundedCitation : citesEvidence
+    TextPassageChunk --> GroundedCitation : grounds
+
+    class AuditSnapshot {
+      <<prov:Entity>>
+      +UUID snapshotGuid
+      +int versionNumber
+      +string sha256Digest
+    }
+    class SecurityPrincipal {
+      <<Keycloak>>
+      +UUID userId
+      +set roles
+    }
+    class BPMNWorkflowProcess {
+      <<Camunda>>
+      +string processId
+    }
+
+    DocumentAsset --> AuditSnapshot : hasHistoricalSnapshot
+    DocumentAsset --> DocumentAsset : previousVersionLineage
+    DocumentAsset --> BPMNWorkflowProcess : orchestratedBy
+    DocumentAsset --> SecurityPrincipal : governedBy

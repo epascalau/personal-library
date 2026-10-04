@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Entity Relationship Diagram (ERD) - Personal Library</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+      --accent: #3b82f6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --code-bg: #0f172a;
+        --accent: #60a5fa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .nav-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-bar a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+
+    .hero h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 850px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    .viewer-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      background: #0b1120;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .diagram-container img, .diagram-container svg {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+      margin: 1.25rem 0;
+    }
+
+    th {
+      border-bottom: 2px solid var(--border);
+      padding: 0.75rem 0.85rem;
+      color: var(--accent);
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    td {
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      vertical-align: top;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">&larr; Back to Documentation Hub</a>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">
+      Domain Entity Relationship Diagram (ERD) &bull; <a href="ENTITY_RELATIONSHIP_SPEC.md" style="color: var(--primary);">View Spec (.md) &rarr;</a>
+    </span>
+    <a href="diagrams/entity_relationship_diagram.svg" download="entity_relationship_diagram.svg">Download SVG &darr;</a>
+  </div>
+
+  <div class="hero">
+    <h1>Domain Entity Relationship Model &amp; Database ERD</h1>
+    <p>Complete data architecture capturing MongoDB BSON documents, Qdrant high-dimensional vector points, Keycloak security identities, and immutable version snapshot chains.</p>
+    <div class="badges">
+      <span class="badge">MongoDB 7.0 BSON</span>
+      <span class="badge">Qdrant 768-dim Vectors</span>
+      <span class="badge">Keycloak OIDC JWT</span>
+      <span class="badge">Immutable Lineage</span>
+      <span class="badge">Clean Hexagonal Domain</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Diagram Card -->
+    <div class="card">
+      <div class="viewer-toolbar">
+        <div>
+          <h2 style="font-size: 1.35rem; color: var(--accent);">Visual Entity-Relationship Diagram (ERD)</h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Orthogonal 90-degree vector relationships connecting aggregates, value objects, and vector collections</p>
+        </div>
+        <div class="btn-group">
+          <a href="diagrams/entity_relationship_diagram.svg" target="_blank" class="btn">Open Full SVG &nearr;</a>
+          <a href="diagrams/entity_relationship_diagram.png" download class="btn btn-secondary">Download 3600px PNG &darr;</a>
+          <a href="diagrams/entity_relationship_diagram.pdf" download class="btn btn-secondary">Download PDF &darr;</a>
+          <a href="diagrams/entity_relationship_diagram.puml" download class="btn btn-secondary">PlantUML (.puml) &darr;</a>
+          <a href="diagrams/entity_relationship_diagram.mmd" download class="btn btn-secondary">Mermaid (.mmd) &darr;</a>
+        </div>
+      </div>
+
+      <div class="diagram-container">
+        <img src="diagrams/entity_relationship_diagram.svg" alt="Personal Library Entity Relationship Diagram" style="min-width: 1000px;" />
+      </div>
+    </div>
+
+    <!-- Data Dictionary Summary -->
+    <div class="card">
+      <h2 style="font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent);">Entity Catalog &amp; Storage Engine Mapping</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Entity / Model</th>
+              <th>Category</th>
+              <th>Primary Key</th>
+              <th>Storage Engine</th>
+              <th>Key Relationships</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>DocumentEntity</strong></td>
+              <td>Aggregate Root</td>
+              <td><code>guid (UUID)</code></td>
+              <td>MongoDB (<code>documents</code>)</td>
+              <td>1:1 BibTeX, 1:2 Summaries, 1:N Chunks, 1:N VersionSnapshots, 0..1:1 Lineage</td>
+            </tr>
+            <tr>
+              <td><strong>BibTeXMetadata</strong></td>
+              <td>Value Object</td>
+              <td><code>bibKey (String)</code></td>
+              <td>Embedded in Document</td>
+              <td>1:1 Composition with DocumentEntity; generated via AST lexer</td>
+            </tr>
+            <tr>
+              <td><strong>SummaryRecord</strong></td>
+              <td>Value Object</td>
+              <td><code>modelKey + documentGuid</code></td>
+              <td>Embedded in Document</td>
+              <td>1:2 Dual-Model composition: Llama 3.3 (70B) &amp; Mistral Large (2411)</td>
+            </tr>
+            <tr>
+              <td><strong>DocumentChunk</strong></td>
+              <td>Vector Point</td>
+              <td><code>id (guid-c{idx})</code></td>
+              <td>Qdrant Vector DB (<code>personal_library_embeddings</code>)</td>
+              <td>1:N Partitions from DocumentEntity; Cosine metric with HNSW indexing</td>
+            </tr>
+            <tr>
+              <td><strong>DocumentVersionSnapshot</strong></td>
+              <td>Audit Lineage</td>
+              <td><code>snapshotGuid (UUID)</code></td>
+              <td>Embedded Array</td>
+              <td>1:N Historical snapshots for non-destructive rollback without data loss</td>
+            </tr>
+            <tr>
+              <td><strong>UserProfile</strong></td>
+              <td>Security Principal</td>
+              <td><code>id (Keycloak Sub UUID)</code></td>
+              <td>Keycloak 24/25 OIDC</td>
+              <td>1:N Document ownership and audit logging (<code>uploadedBy</code>, <code>modifiedBy</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>RAGConversation</strong></td>
+              <td>Session State</td>
+              <td><code>conversationId (UUID)</code></td>
+              <td>Ephemeral REST Payload</td>
+              <td>1:N Scoped to DocumentEntity; 1:N CitationReference links</td>
+            </tr>
+            <tr>
+              <td><strong>CitationReference</strong></td>
+              <td>Grounding Evidence</td>
+              <td><code>id (UUID)</code></td>
+              <td>Ephemeral REST Payload</td>
+              <td>References <code>DocumentChunk.id</code> with similarity score and verbatim quote</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

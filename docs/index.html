@@ -217,6 +217,26 @@
 
   <div class="container">
     <div class="grid">
+      <!-- 0A. Software Requirements Specification (SRS) -->
+      <div class="card" style="border-color: #0284c7; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(2, 132, 199, 0.04) 100%);">
+        <div>
+          <div class="card-icon">📋</div>
+          <h2>Software Requirements Specification (SRS)</h2>
+          <p>
+            Formal technical requirements baseline and system architecture contract: Functional Requirements (FR-1 through FR-8),
+            Non-Functional Requirements (NFR-1 through NFR-9), MongoDB BSON document schemas, Qdrant HNSW vector collection specifications,
+            and contract-first OpenAPI 3.0.3 endpoint mappings.
+          </p>
+        </div>
+        <div class="card-meta">
+          Enterprise Baseline &bull; 8 Functional Clusters &bull; 9 NFR Constraints &bull; Full Schemas
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="technical-requirements.html" class="btn" style="flex: 1; background: #0284c7;">Explore Technical SRS &rarr;</a>
+          <a href="technical-requirements.md" download="technical-requirements.md" class="btn btn-secondary" style="flex: 1;">Markdown (.md) &rarr;</a>
+        </div>
+      </div>
+
       <!-- 0. Key Learning Topics & Architecture Concepts -->
       <div class="card" style="border-color: #3b82f6; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.04) 100%);">
         <div>
@@ -229,7 +249,7 @@
           </p>
         </div>
         <div class="card-meta">
-          10 In-Depth Modules &bull; Formats: Interactive Web &amp; Markdown
+          10 In-Depth Modules + Annotated Bibliography &bull; Formats: Interactive Web &amp; Markdown
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a href="learning-topics.html" class="btn" style="flex: 1; background: #2563eb;">Explore Learning Guide &rarr;</a>
@@ -292,6 +312,26 @@
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a href="unified-financial-ledger-roi.html" class="btn" style="flex: 1; background: #059669;">Financial &amp; ROI Ledger &rarr;</a>
           <a href="unified_financial_ledger_roi_key_takeaways.md" download="unified_financial_ledger_roi_key_takeaways.md" class="btn btn-secondary" style="flex: 1;">Markdown (.md) &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 0E. Communication Protocols & Event Architecture Specification (ADR-004) -->
+      <div class="card" style="border-color: #0284c7; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(2, 132, 199, 0.04) 100%);">
+        <div>
+          <div class="card-icon">📡</div>
+          <h2>Communication Protocols &amp; Event Architecture (ADR-004)</h2>
+          <p>
+            Architectural decision record evaluating stateless HTTP/REST versus persistent WebSockets.
+            Details why stateless REST was chosen for horizontal scalability and OIDC security, how the detached-DOM <code>TypedEventBus</code> delivers
+            in-browser reactivity, and how the Camunda BPMN Send Task notification aligns with client runtime state.
+          </p>
+        </div>
+        <div class="card-meta">
+          ADR-004 &bull; Stateless HTTP/REST &bull; Zero WebSocket Overhead &bull; Detached DOM Comment EventBus
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="COMMUNICATION_ARCHITECTURE.md" download="COMMUNICATION_ARCHITECTURE.md" class="btn" style="flex: 1; background: #0284c7;">Read Architecture ADR (.md) &rarr;</a>
+          <a href="learning-topics.html#topic-3" class="btn btn-secondary" style="flex: 1;">Explore in Learning Guide &rarr;</a>
         </div>
       </div>
 
@@ -442,6 +482,51 @@
           <a href="diagrams/typescript_uml_class_diagram.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
           <a href="diagrams/typescript_uml_class_diagram.puml" download="typescript_uml_class_diagram.puml" class="btn" style="flex: 1; background: #0284c7;">PlantUML &rarr;</a>
           <a href="diagrams/typescript_uml_class_diagram.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 9. Domain Entity Relationship Diagram (ERD) & Database Schemas -->
+      <div class="card" style="border-color: #38bdf8; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(56, 189, 248, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🗄️</div>
+          <h2>Domain Entity Relationship Diagram (ERD)</h2>
+          <p>
+            Complete entity model and database schemas: MongoDB <code>documents</code> collection BSON schema,
+            Qdrant 768-dimensional vector collection (<code>personal_library_embeddings</code>), BibTeX metadata AST value objects,
+            dual-model AI summary records, Keycloak OIDC security principals, and immutable version snapshot chains.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Interactive Web &bull; Vector SVG &bull; 3600px PNG &bull; PDF &bull; PlantUML &bull; Mermaid
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="entity-diagrams.html" class="btn" style="flex: 1; background: #0284c7;">Interactive ERD Viewer &rarr;</a>
+          <a href="ENTITY_RELATIONSHIP_SPEC.md" download="ENTITY_RELATIONSHIP_SPEC.md" class="btn btn-secondary" style="flex: 1;">Schema Spec (.md) &rarr;</a>
+          <a href="diagrams/entity_relationship_diagram.pdf" target="_blank" class="btn btn-secondary" style="flex: 1;">PDF &rarr;</a>
+          <a href="diagrams/entity_relationship_diagram.svg" target="_blank" class="btn btn-secondary" style="flex: 1;">SVG &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 10. System Ontology & Semantic Knowledge Graph -->
+      <div class="card" style="border-color: #8b5cf6; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🧠</div>
+          <h2>System Ontology &amp; Semantic Knowledge Graph</h2>
+          <p>
+            Formal domain ontology aligned with W3C OWL 2, PROV-O, BIBO, Dublin Core, and FOAF standards:
+            Scholarly publications, dense vector mathematical spaces, dual-model LLM inference, grounded citation evidence,
+            and non-destructive audit lineage.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Interactive Web &bull; W3C RDF Turtle (.ttl) &bull; Vector SVG &bull; 3600px PNG &bull; PDF &bull; PlantUML &bull; Mermaid
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="ontology-diagram.html" class="btn" style="flex: 1; background: #7c3aed;">Interactive Ontology Viewer &rarr;</a>
+          <a href="ONTOLOGY_SPECIFICATION.md" download="ONTOLOGY_SPECIFICATION.md" class="btn btn-secondary" style="flex: 1;">Ontology Spec (.md) &rarr;</a>
+          <a href="diagrams/system_ontology.ttl" download="system_ontology.ttl" class="btn btn-secondary" style="flex: 1; color: #7c3aed; border-color: #7c3aed;">Turtle (.ttl) &rarr;</a>
+          <a href="diagrams/system_ontology_diagram.pdf" target="_blank" class="btn btn-secondary" style="flex: 1;">PDF &rarr;</a>
+          <a href="diagrams/system_ontology_diagram.svg" target="_blank" class="btn btn-secondary" style="flex: 1;">SVG &rarr;</a>
         </div>
       </div>
     </div>

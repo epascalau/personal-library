@@ -1,0 +1,147 @@
+@startuml Personal_Library_Entity_Relationship_Diagram
+!theme plain
+skinparam roundCorner 8
+skinparam defaultFontName Inter
+skinparam linetype ortho
+skinparam shadowing false
+
+title Personal Library & AI Research Engine - Entity Relationship Diagram (ERD)
+
+entity "DocumentEntity" as Document {
+  * guid : UUID <<PK, Indexed>>
+  --
+  previousVersionGuid : UUID <<FK, Self-Ref>>
+  versionNumber : Integer
+  fileName : String
+  fileSize : Long
+  fileSizeFormatted : String
+  format : String <<pdf|docx|txt|md|pptx>>
+  uploadDate : Instant
+  editDate : Instant
+  contentExcerpt : String
+  fullContent : Text
+  chunkCount : Integer
+  tags : List<String>
+  sha256Hash : String
+  uploadedBy : String <<FK>>
+}
+
+entity "BibTeXMetadata" as BibTeX {
+  * bibKey : String <<PK, Synthetic>>
+  --
+  entryType : Enum <<article|book|inproceedings|techreport|misc>>
+  title : String
+  author : String
+  year : String
+  month : String
+  journal : String
+  booktitle : String
+  volume : String
+  number : String
+  pages : String
+  publisher : String
+  edition : String
+  institution : String
+  school : String
+  doi : String <<Indexed>>
+  isbn : String
+  issn : String
+  url : String
+  abstract : Text
+  keywords : String
+  rawBibTeX : Text
+}
+
+entity "SummaryRecord" as Summary {
+  * modelKey : String <<PK: llama | mistral>>
+  * documentGuid : UUID <<PK, FK>>
+  --
+  modelName : String
+  summaryText : Text (Markdown)
+  generatedAt : Instant
+  durationSeconds : Double
+  durationFormatted : String
+  promptTokens : Integer
+  completionTokens : Integer
+  temperature : Double
+}
+
+entity "DocumentChunk" as Chunk {
+  * id : String <<PK: guid-c{index}>>
+  --
+  documentGuid : UUID <<FK, Payload Filter>>
+  chunkIndex : Integer
+  text : Text (~500 tokens)
+  pageNumber : Integer
+  tokenCount : Integer
+  startOffset : Integer
+  endOffset : Integer
+  denseVector : float32[768] <<HNSW Cosine>>
+}
+
+entity "DocumentVersionSnapshot" as Snapshot {
+  * snapshotGuid : UUID <<PK>>
+  --
+  documentGuid : UUID <<FK>>
+  versionNumber : Integer
+  fileName : String
+  fileSize : Long
+  fileSizeFormatted : String
+  format : String
+  savedAt : Instant
+  sha256Hash : String
+  bibtexRaw : Text
+  contentExcerpt : String
+  fullContent : Text
+  chunksCount : Integer
+  changeLogNote : String
+  modifiedBy : String <<FK>>
+}
+
+entity "UserProfile" as User {
+  * id : UUID <<PK, Keycloak Sub>>
+  --
+  username : String <<Unique>>
+  email : String
+  firstName : String
+  lastName : String
+  realm : String
+  roles : Set<String> <<ADMIN|RESEARCHER|VIEWER>>
+}
+
+entity "RAGConversation" as Conversation {
+  * conversationId : UUID <<PK>>
+  --
+  documentGuid : UUID <<FK>>
+  userQuery : String
+  answerText : Text
+  timestamp : Instant
+}
+
+entity "CitationReference" as Citation {
+  * id : UUID <<PK>>
+  --
+  conversationId : UUID <<FK>>
+  chunkId : String <<FK>>
+  citationIndex : Integer <<[1], [2]>>
+  similarityScore : Float (0.0-1.0)
+  sourceSnippet : Text
+  pageNumber : Integer
+  charOffset : Integer
+}
+
+' Relationships & Cardinalities
+Document ||--|| BibTeX : "embedded composition (1:1)"
+Document ||--|{ Summary : "dual model summaries (1:2)"
+Document ||--o{ Chunk : "partitions into (1:N)"
+Document ||--o{ Snapshot : "archives history (1:N)"
+Document }o--|| Document : "previous version lineage (0..1:1)"
+
+User ||--o{ Document : "uploads (1:N)"
+User ||--o{ Snapshot : "commits mutation (1:N)"
+
+Document ||--o{ Conversation : "scoped Q&A context (1:N)"
+Conversation ||--o{ Citation : "contains grounded (1:N)"
+Chunk ||--o{ Citation : "verifiable evidence (1:N)"
+
+@enduml

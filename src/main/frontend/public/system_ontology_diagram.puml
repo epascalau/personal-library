@@ -1,0 +1,132 @@
+@startuml System_Ontology_Knowledge_Graph
+!theme plain
+skinparam roundCorner 8
+skinparam defaultFontName Inter
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+title Personal Library & AI Research Engine - Formal Domain Ontology
+
+package "Document & Scholarly Domain" #0369a1 {
+  class DocumentAsset <<owl:Class>> {
+    + guid: xsd:string
+    + fileName: xsd:string
+    + format: xsd:string
+    + uploadDate: xsd:dateTime
+  }
+  
+  class ScholarlyPublication <<owl:Class>>
+  class AcademicArticle <<owl:Class>>
+  class BookPublication <<owl:Class>>
+  class ConferenceProceedings <<owl:Class>>
+  class TechnicalReport <<owl:Class>>
+  
+  ScholarlyPublication -up-|> DocumentAsset
+  AcademicArticle -up-|> ScholarlyPublication
+  BookPublication -up-|> ScholarlyPublication
+  ConferenceProceedings -up-|> ScholarlyPublication
+  TechnicalReport -up-|> ScholarlyPublication
+}
+
+package "Bibliographic Knowledge Domain" #0284c7 {
+  class BibliographicMetadata <<owl:Class>> {
+    + bibKey: xsd:string
+    + entryType: xsd:string
+    + title: xsd:string
+    + year: xsd:string
+    + doi: xsd:string
+  }
+  class AuthorAgent <<prov:Agent>>
+  class PublisherAgent <<prov:Agent>>
+}
+
+package "Vector & Embedding Domain" #047857 {
+  class TextPassageChunk <<owl:Class>> {
+    + chunkIndex: xsd:integer
+    + text: xsd:string
+    + pageNumber: xsd:integer
+  }
+  
+  class DenseVectorEmbedding <<owl:Class>> {
+    + dimensions: xsd:integer = 768
+    + metric: xsd:string = "Cosine"
+  }
+  
+  class VectorSpaceCollection <<owl:Class>> {
+    + collectionName: "personal_library_embeddings"
+  }
+  
+  class EmbeddingModel <<prov:Agent>> {
+    + modelName: "nomic-embed-text"
+  }
+}
+
+package "Inference & Multi-Model AI Domain" #7e22ce {
+  abstract class GenerativeLLM <<prov:Agent>>
+  class Llama3Model <<prov:Agent>> {
+    + modelName: "Llama 3.3 (70B Instruct)"
+    + temperature: 0.2
+  }
+  class MistralLargeModel <<prov:Agent>> {
+    + modelName: "Mistral Large (2411)"
+    + temperature: 0.3
+  }
+  
+  abstract class AnalyticalSummary <<prov:Entity>> {
+    + latencySeconds: xsd:decimal
+    + summaryText: xsd:string
+  }
+  class ExecutiveTakeawaySummary <<prov:Entity>>
+  class MethodologicalCritiqueSummary <<prov:Entity>>
+  
+  Llama3Model -up-|> GenerativeLLM
+  MistralLargeModel -up-|> GenerativeLLM
+  ExecutiveTakeawaySummary -up-|> AnalyticalSummary
+  MethodologicalCritiqueSummary -up-|> AnalyticalSummary
+}
+
+package "Conversational RAG Domain" #0891b2 {
+  class ConversationalSession <<prov:Activity>>
+  class AssistantResponse <<prov:Entity>>
+  class GroundedCitation <<owl:Class>> {
+    + similarityScore: xsd:float
+    + verbatimQuote: xsd:string
+  }
+}
+
+package "Governance & Audit Lineage" #b45309 {
+  class AuditSnapshot <<prov:Entity>> {
+    + snapshotGuid: xsd:string
+    + versionNumber: xsd:integer
+    + sha256Digest: xsd:string
+  }
+  class SecurityPrincipal <<prov:Agent>>
+  class BPMNWorkflowProcess <<prov:Activity>>
+}
+
+' Ontological Properties & Semantic Relationships
+BibliographicMetadata --> DocumentAsset : ":describesDocument"
+DocumentAsset --> AuthorAgent : ":authoredBy"
+DocumentAsset --> PublisherAgent : ":publishedBy"
+
+DocumentAsset --> TextPassageChunk : ":partitionedInto (1:N)"
+TextPassageChunk --> DenseVectorEmbedding : ":representedBy"
+DenseVectorEmbedding --> EmbeddingModel : ":encodedByModel"
+DenseVectorEmbedding --> VectorSpaceCollection : ":indexedIn"
+
+DocumentAsset --> AnalyticalSummary : ":summarizedAs (1:2)"
+ExecutiveTakeawaySummary --> Llama3Model : ":synthesizedBy"
+MethodologicalCritiqueSummary --> MistralLargeModel : ":synthesizedBy"
+
+ConversationalSession --> DocumentAsset : ":scopedTo"
+ConversationalSession --> AssistantResponse : ":generates"
+AssistantResponse --> GroundedCitation : ":citesEvidence"
+TextPassageChunk --> GroundedCitation : ":grounds"
+
+DocumentAsset --> AuditSnapshot : ":hasHistoricalSnapshot"
+DocumentAsset --> DocumentAsset : ":previousVersionLineage"
+DocumentAsset --> BPMNWorkflowProcess : ":orchestratedBy"
+DocumentAsset --> SecurityPrincipal : ":governedBy"
+
+@enduml

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Ontology &amp; Semantic Knowledge Graph - Personal Library</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+      --accent: #3b82f6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --code-bg: #0f172a;
+        --accent: #60a5fa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .nav-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-bar a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+
+    .hero h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 850px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    .viewer-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      background: #0b1120;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .diagram-container img, .diagram-container svg {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+      margin: 1.25rem 0;
+    }
+
+    th {
+      border-bottom: 2px solid var(--border);
+      padding: 0.75rem 0.85rem;
+      color: var(--accent);
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    td {
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      vertical-align: top;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88em;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">&larr; Back to Documentation Hub</a>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">
+      System Ontology &amp; Semantic Knowledge Graph &bull; <a href="ONTOLOGY_SPECIFICATION.md" style="color: var(--primary);">View Spec (.md) &rarr;</a>
+    </span>
+    <a href="diagrams/system_ontology.ttl" download="system_ontology.ttl">Download Turtle (.ttl) &darr;</a>
+  </div>
+
+  <div class="hero">
+    <h1>System Ontology &amp; Semantic Knowledge Graph</h1>
+    <p>Formal W3C OWL 2 and RDF domain ontology capturing Scholarly Document Assets, Dense Vector Embeddings, Dual-Model LLMs, Grounded Citations, and PROV-O Governance.</p>
+    <div class="badges">
+      <span class="badge">W3C OWL 2 / RDF</span>
+      <span class="badge">W3C PROV-O</span>
+      <span class="badge">BIBO Ontology</span>
+      <span class="badge">Dublin Core (DCMI)</span>
+      <span class="badge">FOAF Agents</span>
+      <span class="badge">Turtle (.ttl)</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Visual Diagram Viewer -->
+    <div class="card">
+      <div class="viewer-toolbar">
+        <div>
+          <h2 style="font-size: 1.35rem; color: var(--accent);">Visual System Ontology &amp; Semantic Triples</h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">5 Color-Coded Ontological Domains linked via formal W3C object properties (rdfs:domain &amp; rdfs:range)</p>
+        </div>
+        <div class="btn-group">
+          <a href="diagrams/system_ontology_diagram.svg" target="_blank" class="btn">Open Full SVG &nearr;</a>
+          <a href="diagrams/system_ontology_diagram.png" download class="btn btn-secondary">Download 3600px PNG &darr;</a>
+          <a href="diagrams/system_ontology_diagram.pdf" download class="btn btn-secondary">Download PDF &darr;</a>
+          <a href="diagrams/system_ontology.ttl" download class="btn btn-secondary" style="border-color: #0284c7; color: #0284c7;">RDF Turtle (.ttl) &darr;</a>
+          <a href="diagrams/system_ontology_diagram.puml" download class="btn btn-secondary">PlantUML &darr;</a>
+          <a href="diagrams/system_ontology_diagram.mmd" download class="btn btn-secondary">Mermaid &darr;</a>
+        </div>
+      </div>
+
+      <div class="diagram-container">
+        <img src="diagrams/system_ontology_diagram.svg" alt="Personal Library System Ontology Diagram" style="min-width: 1000px;" />
+      </div>
+    </div>
+
+    <!-- 5 Ontological Domains Breakdown -->
+    <div class="card">
+      <h2 style="font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent);">The 5 Ontological Domains &amp; Semantic Vocabularies</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Primary Classes</th>
+              <th>Standards Alignment</th>
+              <th>Key Semantic Properties</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Scholarly Asset &amp; Metadata</strong></td>
+              <td><code>:DocumentAsset</code>, <code>:ScholarlyPublication</code>, <code>:AcademicArticle</code>, <code>:BookPublication</code>, <code>:BibliographicMetadata</code>, <code>:AuthorAgent</code></td>
+              <td><code>bibo:Document</code>, <code>bibo:Article</code>, <code>dc:creator</code>, <code>foaf:Person</code></td>
+              <td><code>:describesDocument</code>, <code>:authoredBy</code>, <code>:publishedBy</code></td>
+            </tr>
+            <tr>
+              <td><strong>2. Dense Vector Semantic Space</strong></td>
+              <td><code>:TextPassageChunk</code>, <code>:DenseVectorEmbedding</code>, <code>:VectorSpaceCollection</code>, <code>:EmbeddingModel</code></td>
+              <td>Mathematical Metric Space, <code>Qdrant HNSW Graph</code></td>
+              <td><code>:partitionedInto (1:N)</code>, <code>:representedBy</code>, <code>:encodedByModel</code>, <code>:indexedIn</code></td>
+            </tr>
+            <tr>
+              <td><strong>3. Multi-Model AI Inference</strong></td>
+              <td><code>:GenerativeLLM</code>, <code>:Llama3Model</code>, <code>:MistralLargeModel</code>, <code>:AnalyticalSummary</code>, <code>:ExecutiveTakeawaySummary</code>, <code>:MethodologicalCritiqueSummary</code></td>
+              <td><code>prov:Agent</code>, <code>prov:wasGeneratedBy</code></td>
+              <td><code>:summarizedAs (Dual 1:2)</code>, <code>:synthesizedBy</code> (Epistemic triangulation)</td>
+            </tr>
+            <tr>
+              <td><strong>4. Conversational RAG &amp; Citations</strong></td>
+              <td><code>:ConversationalSession</code>, <code>:UserQuery</code>, <code>:AssistantResponse</code>, <code>:GroundedCitation</code></td>
+              <td><code>prov:Activity</code>, <code>prov:wasDerivedFrom</code></td>
+              <td><code>:scopedTo (Context)</code>, <code>:grounds (Evidence)</code>, <code>:citesEvidence</code></td>
+            </tr>
+            <tr>
+              <td><strong>5. Governance &amp; Audit Lineage</strong></td>
+              <td><code>:AuditSnapshot</code>, <code>:BPMNWorkflowProcess</code>, <code>:SecurityPrincipal</code>, <code>:UserAccount</code></td>
+              <td><code>prov:Entity</code>, <code>Camunda 2.0</code>, <code>Keycloak OIDC</code></td>
+              <td><code>:hasHistoricalSnapshot</code>, <code>:previousVersionLineage</code>, <code>:orchestratedBy</code>, <code>:governedBy</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Turtle RDF Sample Block -->
+    <div class="card">
+      <h2 style="font-size: 1.35rem; margin-bottom: 0.75rem; color: var(--accent);">W3C RDF Turtle (.ttl) Triples Sample</h2>
+      <p style="margin-bottom: 1rem; color: var(--text-muted);">
+        The ontology is published as fully valid RDF Turtle triples for integration with knowledge graphs (Apache Jena, Protege, GraphDB, Neo4j):
+      </p>
+      <pre><code>@prefix : &lt;https://personallibrary.io/ontology#&gt; .
+@prefix bibo: &lt;http://purl.org/ontology/bibo/&gt; .
+@prefix prov: &lt;http://www.w3.org/ns/prov#&gt; .
+
+:doc_550e8400 a :AcademicArticle , prov:Entity ;
+    :guid "550e8400-e29b-41d4-a716-446655440000" ;
+    :fileName "attention_is_all_you_need.pdf" ;
+    :partitionedInto :chunk_0 , :chunk_1 ;
+    :summarizedAs :summary_llama , :summary_mistral ;
+    :hasHistoricalSnapshot :snapshot_v1 .
+
+:chunk_0 a :TextPassageChunk , prov:Entity ;
+    :representedBy :vec_chunk_0 .
+
+:vec_chunk_0 a :DenseVectorEmbedding ;
+    :dimensions 768 ;
+    :metric "Cosine" ;
+    :encodedByModel :model_nomic ;
+    :indexedIn :qdrant_collection .
+
+:summary_llama a :ExecutiveTakeawaySummary ;
+    :synthesizedBy :model_llama_3_3 ;
+    :durationSeconds 14.2 .</code></pre>
+    </div>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

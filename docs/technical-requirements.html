@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software Requirements Specification (SRS) - Personal Library</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+      --accent: #3b82f6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --code-bg: #0f172a;
+        --accent: #60a5fa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+
+    .hero h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 800px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .nav-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-bar a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .nav-bar a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .toc {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    .toc h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .toc ol {
+      padding-left: 1.25rem;
+    }
+
+    .toc li {
+      margin-bottom: 0.4rem;
+    }
+
+    .toc a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    .section-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-card h3 {
+      font-size: 1.2rem;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    .req-item {
+      border-left: 3px solid var(--primary);
+      padding: 0.75rem 1rem;
+      background: var(--code-bg);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1rem;
+    }
+
+    .req-item strong {
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+      margin: 1.25rem 0;
+    }
+
+    th {
+      border-bottom: 2px solid var(--border);
+      padding: 0.75rem 0.85rem;
+      color: var(--accent);
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    td {
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      vertical-align: top;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88em;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">&larr; Back to Documentation Hub</a>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">Software Requirements Specification (SRS)</span>
+    <a href="technical-requirements.md" download="technical-requirements.md">Download Markdown &darr;</a>
+  </div>
+
+  <div class="hero">
+    <h1>Software Requirements Specification (SRS)</h1>
+    <p>Personal Library &amp; Enterprise Multi-Model RAG Research Assistant &bull; Technical Architecture &amp; System Functional Specifications</p>
+    <div class="badges">
+      <span class="badge">SAP Fiori 3 (Horizon)</span>
+      <span class="badge">Pure TypeScript UI5 Web Components</span>
+      <span class="badge">Spring Boot 3.3.4 (Java 21)</span>
+      <span class="badge">Qdrant Vector DB</span>
+      <span class="badge">Camunda BPMN 2.0</span>
+      <span class="badge">Keycloak OIDC</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#sec-1">1. System Scope &amp; Objectives</a></li>
+        <li><a href="#sec-2">2. Functional Requirements (FR-1 through FR-8)</a></li>
+        <li><a href="#sec-3">3. Non-Functional Requirements (NFR-1 through NFR-9)</a></li>
+        <li><a href="#sec-4">4. Data Schemas (MongoDB, Qdrant &amp; OpenAPI REST Endpoints)</a></li>
+      </ol>
+    </div>
+
+    <!-- Section 1 -->
+    <section id="sec-1" class="section-card">
+      <h2>1. System Scope &amp; Objectives</h2>
+      <h3>1.1 Purpose</h3>
+      <p>
+        This Software Requirements Specification (SRS) defines the functional, non-functional, data, and interface requirements for the
+        <strong>Personal Library &amp; Enterprise Multi-Model RAG Research Assistant</strong>. The system delivers an enterprise-grade document intelligence,
+        bibliographic indexing, and conversational retrieval platform adhering strictly to <strong>SAP Fiori 3 (Horizon)</strong> design standards and Clean Hexagonal Architecture.
+      </p>
+
+      <h3>1.2 System Scope</h3>
+      <p>The platform provides an end-to-end, decoupled enterprise topology featuring:</p>
+      <ul style="margin: 0.75rem 0 1rem 1.5rem;">
+        <li><strong>Multi-Format Ingestion:</strong> Ingesting <code>.pdf</code>, <code>.docx</code>, <code>.doc</code>, <code>.txt</code>, <code>.md</code>, <code>.pptx</code>, <code>.ppt</code>, <code>.xls</code>, and <code>.xlsx</code> files up to 50 MB.</li>
+        <li><strong>Workflow Orchestration:</strong> Camunda BPMN 2.0 workflow orchestration governing asynchronous multi-stage ingestion with retry boundaries (<code>R3/PT10S</code>).</li>
+        <li><strong>Domain-Specific BibTeX Extraction:</strong> AST lexer/tokenizer extracting 14 standard LaTeX BibTeX publication fields with dynamic schema generation.</li>
+        <li><strong>Dual-Model Parallel AI Summarization:</strong> Concurrent, comparative summarization via open-weights models (<strong>Meta Llama 3.3 70B Instruct</strong> and <strong>Mistral Large 2411</strong>) deployed on Ollama and Spring AI.</li>
+        <li><strong>Conversational RAG with Verifiable Grounding:</strong> 768-dimensional dense vector embeddings using local <strong>Nomic Embed Text</strong> with <strong>Google text-embedding-004</strong> cloud fallback, stored in <strong>Qdrant</strong> with Cosine similarity and interactive citation inspection.</li>
+        <li><strong>Enterprise Document Lifecycle &amp; Immutable Rollback:</strong> Non-destructive versioning preserving full snapshot history and cryptographic audit logs.</li>
+        <li><strong>Decoupled Architecture:</strong> Pure TypeScript + SAP <code>@ui5/webcomponents</code> v2 (W3C Custom Elements) SPA, Node/Express gateway (<code>:3000</code>), Spring Boot 3.3.4 microservice (<code>:8080</code>), Qdrant Vector Store (<code>:6333/:6334</code>), MongoDB 7.0 (<code>:27017</code>), and Keycloak 24/25 OIDC Identity Provider (<code>:8180</code>).</li>
+      </ul>
+    </section>
+
+    <!-- Section 2 -->
+    <section id="sec-2" class="section-card">
+      <h2>2. Functional Requirements (FR)</h2>
+
+      <h3>FR-1: Document Ingestion &amp; Multi-Format Parsing</h3>
+      <div class="req-item"><strong>FR-1.1 (File Formats):</strong> The system shall support uploading files in <code>.pdf</code>, <code>.docx</code>, <code>.doc</code>, <code>.txt</code>, <code>.md</code>, <code>.pptx</code>, <code>.ppt</code>, <code>.xls</code>, and <code>.xlsx</code> formats with file sizes up to 50 MB.</div>
+      <div class="req-item"><strong>FR-1.2 (Text Extraction):</strong> Upon upload, the backend text extraction pipeline shall extract raw text, document structure, page breaks, and character counts using <code>pdf-parse</code> and dedicated format parsers.</div>
+      <div class="req-item"><strong>FR-1.3 (Boundary-Aware Chunking):</strong> Ingested text shall be split into paragraph-aligned, sliding-window sub-word chunks (default: ~400–500 tokens with 50-token overlap) to preserve semantic coherence across sentence boundaries.</div>
+      <div class="req-item"><strong>FR-1.4 (BPMN 2.0 Ingestion Workflow):</strong> Ingestion tasks shall be orchestrated via Camunda BPMN 2.0 (<code>camunda-ingestion-flow.bpmn</code>), ensuring asynchronous state persistence, retry policies (<code>R3/PT10S</code>), and compensating transaction handling.</div>
+
+      <h3>FR-2: Automated BibTeX Bibliographic Metadata Extraction</h3>
+      <div class="req-item"><strong>FR-2.1 (Schema Extraction):</strong> The system shall parse and infer 14 standard LaTeX BibTeX publication fields: Entry Type (<code>@article</code>, <code>@book</code>, <code>@inproceedings</code>, <code>@techreport</code>, <code>@misc</code>), <code>title</code>, <code>author</code>, <code>journal</code>, <code>booktitle</code>, <code>year</code>, <code>volume</code>, <code>number</code>, <code>pages</code>, <code>publisher</code>, <code>institution</code>, <code>organization</code>, <code>school</code>, <code>doi</code>, <code>isbn</code>, and <code>issn</code>.</div>
+      <div class="req-item"><strong>FR-2.2 (Citation Key Synthesis):</strong> The system shall synthesize a standard BibTeX citation key formatted as <code>AuthorYearKeyword</code> (e.g., <code>Vaswani2017Attention</code>).</div>
+      <div class="req-item"><strong>FR-2.3 (Interactive BibTeX Management):</strong> Users shall be able to view, edit in a syntax-highlighted editor, copy to clipboard, and export raw BibTeX definitions with one click.</div>
+      <div class="req-item"><strong>FR-2.4 (AST Metadata Preview):</strong> An explicit endpoint (<code>POST /api/v1/documents/extract-metadata</code>) shall extract candidate bibliographic metadata from previews prior to final persistence.</div>
+
+      <h3>FR-3: Dual-Model Parallel AI Summarization</h3>
+      <div class="req-item"><strong>FR-3.1 (Multi-Model Architecture):</strong> The system shall support simultaneous parallel summarization using two distinct foundational LLM architectures:
+        <ul style="margin: 0.5rem 0 0 1.5rem;">
+          <li><strong>Meta Llama 3.3 (70B Instruct):</strong> Low temperature (0.2) for rigorous analytical reasoning, structured executive takeaways, and strict factual fidelity.</li>
+          <li><strong>Mistral Large (2411):</strong> Temperature (0.3) for high-fluency executive synthesis, cross-lingual appraisal, and methodology review.</li>
+        </ul>
+      </div>
+      <div class="req-item"><strong>FR-3.2 (Comparative Presentation):</strong> Summaries shall be presented in parallel side-by-side cards on the Object Page to eliminate single-model cognitive bias.</div>
+      <div class="req-item"><strong>FR-3.3 (Performance Telemetry):</strong> The system shall record and display the model version, generation timestamp, latency in milliseconds, prompt tokens, and completion tokens.</div>
+
+      <h3>FR-4: Conversational Retrieval-Augmented Generation (RAG)</h3>
+      <div class="req-item"><strong>FR-4.1 (Interactive Q&amp;A):</strong> Users shall be able to converse interactively with any ingested document via a dedicated RAG conversational drawer.</div>
+      <div class="req-item"><strong>FR-4.2 (Dense Vector Embeddings):</strong> Local sovereign model: <strong>Nomic Embed Text</strong> (768-dim, 8k context, asymmetric prefixing). Cloud reference baseline: <strong>Google text-embedding-004</strong> (768-dim with Matryoshka Representation Learning).</div>
+      <div class="req-item"><strong>FR-4.3 (Qdrant Vector Retrieval):</strong> Vectors shall be matched in Qdrant using Cosine Similarity, scoped strictly by <code>documentGuid</code> to prevent cross-document context leaks.</div>
+      <div class="req-item"><strong>FR-4.4 (Verifiable Citations):</strong> Responses must provide interactive grounding citations displaying source chunk IDs, page offsets, similarity relevance percentages (e.g. <code>91.8% Match</code>), and click-to-highlight source passages.</div>
+
+      <h3>FR-5: Document Versioning &amp; Immutable Rollback Architecture</h3>
+      <div class="req-item"><strong>FR-5.1 (In-Place Version Overwrite):</strong> Users shall be able to upload updated revisions of an existing document via an in-place overwrite modal with minor (<code>v1.1</code>) or major (<code>v2.0</code>) bump options and mandatory change summaries.</div>
+      <div class="req-item"><strong>FR-5.2 (Immutable Lineage Chain):</strong> Historical versions shall be preserved as immutable snapshots (<code>DocumentVersionSnapshot</code>) recording version numbers, timestamps, uploader identity, file size, and SHA256 checksums.</div>
+      <div class="req-item"><strong>FR-5.3 (Historical Asset Retrieval):</strong> Users shall be able to inspect previous versions, review change logs, and download historical binary file assets.</div>
+      <div class="req-item"><strong>FR-5.4 (Non-Destructive Rollback):</strong> Rolling back to version $N$ restores historical snapshot $N$ into a newly incremented version $M = \max(\text{versions}) + 1$, logging a rollback audit trail and re-indexing vectors under version $M$.</div>
+
+      <h3>FR-6: SAP Fiori 3 / Horizon Enterprise User Interface</h3>
+      <div class="req-item"><strong>FR-6.1 (SAP Fiori Floorplans):</strong> The UI shall implement official SAP Fiori enterprise floorplans: Analytical List Report and Adaptive Object Page.</div>
+      <div class="req-item"><strong>FR-6.2 (W3C Web Components Standard):</strong> The frontend shall be implemented using pure TypeScript and official SAP <code>@ui5/webcomponents</code> v2. React, Angular, and external widget libraries are strictly avoided.</div>
+      <div class="req-item"><strong>FR-6.3 (Dynamic Theming):</strong> The ShellBar shall support seamless runtime switching between SAP Horizon Light (<code>sap_horizon</code>) and SAP Horizon Dark (<code>sap_horizon_dark</code>).</div>
+
+      <h3>FR-7: Internationalization (i18n)</h3>
+      <div class="req-item"><strong>FR-7.1 (5 Enterprise Locales):</strong> English (<code>en</code>), German (<code>de</code>), French (<code>fr</code>), Spanish (<code>es</code>), and Romanian (<code>ro</code>). Real-time switching via reactive store with vector SVG flags.</div>
+
+      <h3>FR-8: Decoupled Multi-Tier Backend Gateway (Hexagonal Driver Adapters)</h3>
+      <div class="req-item"><strong>FR-8.1 (Spring Boot REST Backend):</strong> Java 21 Virtual Threads on Port 8080 with 23 domain classes.</div>
+      <div class="req-item"><strong>FR-8.2 (Integrated Node/Express Gateway):</strong> Express 4 gateway on Port 3000 handling frontend routing, local file parsing, and proxying.</div>
+      <div class="req-item"><strong>FR-8.3 (Standalone In-Browser Mock Adapter):</strong> Zero-infrastructure operation via <code>MockBackendAdapter</code> with pre-seeded literature and in-memory search.</div>
+    </section>
+
+    <!-- Section 3 -->
+    <section id="sec-3" class="section-card">
+      <h2>3. Non-Functional Requirements (NFR)</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Category</th>
+              <th>Requirement Specification</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>NFR-1</strong></td>
+              <td><strong>Performance</strong></td>
+              <td>List Report table queries shall render in &lt; 150 ms for catalogs up to 10,000 documents. Vector retrieval top-K search in Qdrant shall complete in &lt; 50 ms.</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-2</strong></td>
+              <td><strong>Scalability</strong></td>
+              <td>The Qdrant collection shall support HNSW graph indexing for up to 1,000,000 document chunks with sub-millisecond gRPC retrieval on Port 6334.</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-3</strong></td>
+              <td><strong>Security &amp; Auth</strong></td>
+              <td>The enterprise backend shall enforce JWT Bearer token validation against Keycloak 24/25 OIDC realm with Role-Based Access Control (<code>LIBRARY_ADMIN</code>, <code>CHIEF_RESEARCHER</code>, <code>VIEWER</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-4</strong></td>
+              <td><strong>Resilience &amp; Fallback</strong></td>
+              <td>The frontend <code>BackendGateway</code> shall implement graceful fallback: if the live Spring Boot service is unavailable, users can switch to the local mock adapter with zero downtime.</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-5</strong></td>
+              <td><strong>Zero Framework Lock-in</strong></td>
+              <td>Pure TypeScript + W3C Web Components implementation adhering to SAP Horizon typographic rhythm (<code>72</code> font family), high contrast, and WCAG 2.1 Level AA accessibility.</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-6</strong></td>
+              <td><strong>Containerization</strong></td>
+              <td>All services (<code>app</code>, <code>mongodb:7.0</code>, <code>qdrant:v1.11.0</code>, <code>ollama:latest</code>, <code>keycloak:24.0.5</code>) shall be fully orchestrated via a single, idempotent <code>docker-compose.yml</code> file.</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-7</strong></td>
+              <td><strong>Documentation</strong></td>
+              <td>100% of REST APIs specified via OpenAPI 3.0.3 (<code>openapi.yaml</code>), all 23 Java classes documented via Javadoc, client modules documented via TypeDoc, and an annotated 6-domain bibliographic curriculum.</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-8</strong></td>
+              <td><strong>Architecture-as-Code</strong></td>
+              <td>6 synchronized architectural diagram suites generated in Mermaid (<code>.mmd</code>), PlantUML C4 (<code>.puml</code>), vector PDF (<code>.pdf</code>), retina PNG (<code>.png</code>), SVG (<code>.svg</code>), and Draw.io (<code>.drawio</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>NFR-9</strong></td>
+              <td><strong>Corporate Proxy Readiness</strong></td>
+              <td>The container stack (<code>ollama-entrypoint.sh</code>) shall dynamically mount and register enterprise root CAs from <code>./certs/</code> to enable model pulling through TLS-inspecting proxies (Zscaler).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4 -->
+    <section id="sec-4" class="section-card">
+      <h2>4. Data &amp; Interface Requirements</h2>
+
+      <h3>4.1 MongoDB Document Schema</h3>
+      <p>Collection: <code>documents</code> &bull; Primary Key: <code>guid</code> (UUID v4 string)</p>
+      <pre><code>{
+  "guid": "550e8400-e29b-41d4-a716-446655440000",
+  "fileName": "attention_is_all_you_need.pdf",
+  "title": "Attention Is All You Need",
+  "author": "Ashish Vaswani et al.",
+  "edition": "1st Edition",
+  "format": "pdf",
+  "fileSize": 2211840,
+  "uploadDate": "2026-09-30T12:00:00Z",
+  "version": 1,
+  "tags": ["Deep Learning", "Transformers", "NLP"],
+  "bibtex": {
+    "entryType": "article",
+    "citationKey": "Vaswani2017Attention",
+    "title": "Attention Is All You Need",
+    "author": "Vaswani, Ashish and Shazeer, Noam",
+    "year": "2017",
+    "raw": "@article{Vaswani2017Attention,\n  title={Attention Is All You Need}...\n}"
+  },
+  "summaries": {
+    "llamaSummary": { "text": "...", "durationSeconds": 14, "model": "llama3.3" },
+    "mistralSummary": { "text": "...", "durationSeconds": 11, "model": "mistral" }
+  },
+  "chunkCount": 24,
+  "versionHistory": []
+}</code></pre>
+
+      <h3>4.2 Qdrant Vector Collection Schema</h3>
+      <p>Collection: <code>personal_library_embeddings</code> &bull; Dimensions: <code>768</code> &bull; Metric: <code>Cosine</code> &bull; HNSW: <code>M=16, efConstruct=100</code></p>
+      <pre><code>{
+  "id": "550e8400-e29b-41d4-a716-446655440000-c0",
+  "vector": [0.0412, -0.0781, 0.0194, "... 768 float numbers ..."],
+  "payload": {
+    "documentGuid": "550e8400-e29b-41d4-a716-446655440000",
+    "chunkIndex": 0,
+    "text": "The dominant sequence transduction models are based on complex recurrent...",
+    "pageNumber": 1,
+    "tokenCount": 420
+  }
+}</code></pre>
+
+      <h3>4.3 REST API Endpoints Specification (Contract-First OpenAPI 3.0.3)</h3>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Endpoint</th>
+              <th>Description</th>
+              <th>Request Parameters</th>
+              <th>Response Payload</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/auth/login</code></td>
+              <td>OIDC User Authentication</td>
+              <td><code>{ username, password, realm }</code></td>
+              <td><code>AuthResponse</code></td>
+            </tr>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/auth/logout</code></td>
+              <td>Terminate User Session</td>
+              <td>Bearer Token</td>
+              <td><code>{ success: true }</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/api/v1/auth/userinfo</code></td>
+              <td>Get Authenticated Profile</td>
+              <td>Bearer Token</td>
+              <td><code>UserProfile</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/api/v1/documents</code></td>
+              <td>List Report Catalog Search</td>
+              <td><code>fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder</code></td>
+              <td><code>PaginatedResponse&lt;DocumentDetail&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/documents</code></td>
+              <td>Upload &amp; Process Document</td>
+              <td>Multipart: <code>file, title, author, bibtex</code></td>
+              <td><code>DocumentDetail</code></td>
+            </tr>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/documents/extract-metadata</code></td>
+              <td>Extract BibTeX from Preview</td>
+              <td><code>{ fileName, contentSample }</code></td>
+              <td><code>BibTeXMetadata</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/api/v1/documents/{guid}</code></td>
+              <td>Object Page Entity Details</td>
+              <td>Path: <code>guid</code></td>
+              <td><code>DocumentDetail</code></td>
+            </tr>
+            <tr>
+              <td><code>PUT</code></td>
+              <td><code>/api/v1/documents/{guid}</code></td>
+              <td>In-Place Metadata Update</td>
+              <td><code>{ title, author, bibtex, tags }</code></td>
+              <td><code>DocumentDetail</code></td>
+            </tr>
+            <tr>
+              <td><code>DELETE</code></td>
+              <td><code>/api/v1/documents/{guid}</code></td>
+              <td>Purge Document &amp; Vectors</td>
+              <td>Path: <code>guid</code></td>
+              <td><code>{ success: true, message }</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/api/v1/documents/{guid}/versions</code></td>
+              <td>Historical Snapshot Lineage</td>
+              <td>Path: <code>guid</code></td>
+              <td><code>List&lt;DocumentVersionSnapshot&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/api/v1/documents/{guid}/versions/{v}/download</code></td>
+              <td>Download Historical Asset</td>
+              <td>Path: <code>guid, version</code></td>
+              <td>Binary file stream</td>
+            </tr>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/documents/{guid}/rollback/{v}</code></td>
+              <td>Non-Destructive Rollback</td>
+              <td>Path: <code>guid, version</code></td>
+              <td><code>DocumentDetail</code></td>
+            </tr>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/documents/{guid}/summarize</code></td>
+              <td>Trigger AI Summarization</td>
+              <td><code>{ model: "llama" | "mistral" }</code></td>
+              <td><code>SummaryRecord</code></td>
+            </tr>
+            <tr>
+              <td><code>POST</code></td>
+              <td><code>/api/v1/documents/{guid}/chat</code></td>
+              <td>RAG Conversational Query</td>
+              <td><code>{ question, chatHistory[] }</code></td>
+              <td><code>ChatResponse</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/api/v1/documents/{guid}/bibtex</code></td>
+              <td>Export Formatted BibTeX</td>
+              <td>Path: <code>guid</code></td>
+              <td><code>text/plain</code></td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td><code>/export.zip</code></td>
+              <td>Standalone Project ZIP Export</td>
+              <td>None</td>
+              <td>In-memory ZIP archive</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

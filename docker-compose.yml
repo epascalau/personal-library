@@ -69,7 +69,26 @@ services:
       - library-net
 
   # ==============================================================================
-  # Qdrant: Vector Database for Embeddings & Semantic RAG Search
+  # Qdrant: High-Performance Vector Database for Embeddings & Semantic RAG Search
+  # ==============================================================================
+  # ARCHITECTURAL RATIONALE:
+  # 1. Why Qdrant vs pgvector/Elasticsearch:
+  #    - Qdrant is implemented in native Rust, offering deterministic microsecond-level
+  #      latency for vector search over millions of high-dimensional points.
+  #    - Native support for Hierarchical Navigable Small World (HNSW) indexing with
+  #      payload filtering allows scoping searches by documentGuid at query-time without
+  #      post-filtering penalties or table joins.
+  # 2. Port Allocation:
+  #    - Port 6333: HTTP REST API used by health checks, debugging, and web dashboards.
+  #    - Port 6334: High-throughput gRPC API utilized by the Spring AI Qdrant client
+  #      for serialized binary vector streaming, minimizing HTTP serialization overhead.
+  # 3. TLS Setting (QDRANT__SERVICE__ENABLE_TLS=false):
+  #    - Traffic resides strictly within the internal, isolated Docker bridge network (library-net).
+  #    - TLS overhead is avoided between trusted internal microservices; edge TLS termination
+  #      is handled at the Node.js/Express reverse proxy gateway.
+  # 4. Persistence:
+  #    - Volume 'qdrant_data' persists indexed embeddings across container restarts,
+  #      preventing expensive re-embedding of the entire document catalog upon reboot.
   # ==============================================================================
   qdrant:
     image: qdrant/qdrant:v1.11.0
@@ -86,7 +105,28 @@ services:
       - library-net
 
   # ==============================================================================
-  # Ollama: Local LLM Engine running Llama 3.3 and Mistral
+  # Ollama: Local LLM & Embedding Engine (Llama 3.3, Mistral Large, Nomic Embed)
+  # ==============================================================================
+  # ARCHITECTURAL RATIONALE:
+  # 1. Why Local Containerized Inference:
+  #    - Complete Data Sovereignty: Sensitive enterprise PDFs, internal documentation,
+  #      and BibTeX research papers never leave the customer's on-premises boundary.
+  #    - Zero API egress costs and immunity to cloud API rate limits or quota throttling.
+  # 2. Model Selection Rationale:
+  #    - nomic-embed-text: 768-dimensional dense embeddings with 8,192 token context window.
+  #      Outperforms OpenAI text-embedding-ada-002 on MTEB benchmarks and supports asymmetric
+  #      prefixing (search_document: vs search_query:) for high-precision vector retrieval.
+  #    - llama3.2 / llama3.3 (70B Instruct): Primary analytical reasoning engine. Excels at
+  #      strict citation grounding, nuanced logical deduction, and structured JSON output.
+  #    - mistral / mistral-large-2411: Secondary executive synthesis engine. Fast, highly fluent,
+  #      and cross-lingual; ideal for side-by-side comparative summaries.
+  # 3. Dual-Model Synthesis Rationale:
+  #    - Eliminates single-model cognitive bias by evaluating content through two distinct
+  #      foundational model architectures (Meta Llama vs Mistral AI).
+  # 4. Enterprise CA & Corporate Proxy Support:
+  #    - Uses custom entrypoint (ollama-entrypoint.sh) to mount corporate CA certificates
+  #      from ./certs into /usr/local/share/ca-certificates/ before Ollama daemon boots,
+  #      enabling model pulling through TLS-intercepting enterprise proxies (Zscaler, BlueCoat).
   # ==============================================================================
   ollama:
     image: ollama/ollama:latest

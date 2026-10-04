@@ -215,13 +215,15 @@
 <body>
   <div class="nav-bar">
     <a href="index.html">&larr; Back to Documentation Hub</a>
-    <span style="font-size: 0.85rem; color: var(--text-muted);">Personal Library Architecture Guide</span>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">
+      Personal Library Architecture Guide &bull; <a href="technical-requirements.html" style="color: var(--primary);">View SRS &rarr;</a>
+    </span>
     <a href="LEARNING_TOPICS.md" download="LEARNING_TOPICS.md">Download Markdown &darr;</a>
   </div>
 
   <div class="hero">
     <h1>Key Learning Topics &amp; Architectural Concepts</h1>
-    <p>Comprehensive educational breakdown of the 10 core architectural patterns, design decisions, and engineering principles implemented in the Personal Library &amp; AI Research Engine.</p>
+    <p>Comprehensive educational breakdown of the core architectural patterns, engineering principles, and annotated bibliographic literature implemented in the Personal Library &amp; AI Research Engine.</p>
   </div>
 
   <div class="container">
@@ -239,6 +241,7 @@
         <li><a href="#topic-9">9. Production-Grade Microservices Topology, Keycloak OIDC (OpenID Connect) &amp; Security</a></li>
         <li><a href="#topic-10">10. Architecture-as-Code &amp; Automated Visual Documentation Tooling</a></li>
         <li><a href="#topic-11">11. Glossary of Acronyms &amp; Terminology</a></li>
+        <li><a href="#topic-12">12. Comprehensive Bibliographic Material &amp; Recommended Reading</a></li>
       </ol>
     </div>
 
@@ -327,6 +330,13 @@ export interface BackendAdapter {
   chat(payload: ChatRequestPayload): Promise&lt;ChatResponseResult&gt;;
   getHealth(): Promise&lt;HealthStatusResult&gt;;
 }</code></pre>
+      <h3>Communication Protocol Architecture: Why HTTP/REST Over WebSockets (ADR-004)</h3>
+      <p>
+        The platform deliberately uses <strong>stateless HTTP/REST (JSON &amp; Multipart)</strong> for client-to-backend communication, coupled with a client-side <strong><code>TypedEventBus</code></strong> (anchored to a detached DOM <code>Comment</code> node).
+        Persistent WebSockets are omitted by design: stateless HTTP avoids persistent socket overhead, eliminates sticky load balancing requirements, and handles Keycloak OIDC bearer token injection natively per request.
+        The Send Task in the Camunda BPMN workflow (<em>Broadcast Ingestion Status</em>) is fulfilled directly on the client through the in-memory event bus and reactive <code>appStore</code>.
+        (<a href="COMMUNICATION_ARCHITECTURE.md" style="color: var(--primary); font-weight: 600;">Read Full Communication Architecture ADR-004 &rarr;</a>)
+      </p>
       <div class="takeaway-box">
         <strong>Key Takeaway:</strong> Abstracting backend access behind a typed adapter contract makes applications testable, resilient to network outages, and easy to run in standalone environments.
       </div>
@@ -470,6 +480,8 @@ export interface DocumentVersionSnapshot {
           </ul>
         </li>
         <li><strong>Contract-First OpenAPI:</strong> Complete REST API documentation maintained in <code>openapi.yaml</code> with interactive Swagger UI support.</li>
+        <li><strong>Domain Entity Models (ERD):</strong> Dedicated Entity-Relationship diagrams and data dictionaries maintained in <code>scripts/generate-entity-diagrams.ts</code> (<a href="entity-diagrams.html" style="color: var(--primary);">View Interactive ERD &rarr;</a>).</li>
+        <li><strong>System Ontology &amp; Semantic Knowledge Graph:</strong> Formal W3C OWL 2, PROV-O, and BIBO ontology with RDF Turtle serialization maintained in <code>scripts/generate-ontology-diagrams.ts</code> (<a href="ontology-diagram.html" style="color: var(--primary);">View Interactive Ontology &rarr;</a>).</li>
       </ul>
       <div class="takeaway-box">
         <strong>Key Takeaway:</strong> Programmatic visual diagram generation keeps documentation evergreen and synchronized with production code.
@@ -508,6 +520,129 @@ export interface DocumentVersionSnapshot {
             <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>AGPL</strong></td><td style="padding: 0.5rem 0.8rem;">Affero General Public License (v3.0)</td><td style="padding: 0.5rem 0.8rem;">Strong copyleft open-source license protecting network user freedoms for SaaS deployments.</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- 12: BIBLIOGRAPHIC MATERIAL -->
+    <section id="topic-12" class="topic-section">
+      <h2>12. Comprehensive Bibliographic Material &amp; Recommended Reading</h2>
+      <p>An annotated curriculum of seminal academic papers, architectural engineering textbooks, and international standards directly informing every layer of the Personal Library &amp; AI Research Engine:</p>
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem;">
+        
+        <!-- Category 1 -->
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; background: var(--card-bg);">
+          <h3 style="color: var(--accent); margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🔬</span> 12.1 Retrieval-Augmented Generation (RAG) &amp; Vector Search
+          </h3>
+          <ul style="list-style-type: none; margin-left: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+            <li style="border-left: 3px solid var(--primary); padding-left: 0.75rem;">
+              <strong>Lewis, P., Perez, E., et al. (2020)</strong>. <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</em>. NeurIPS 2020. 
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Formalized parametric/non-parametric memory pairing to eliminate hallucination. <strong>Code:</strong> Informs Spring AI <code>VectorRagService</code>.</small>
+            </li>
+            <li style="border-left: 3px solid var(--primary); padding-left: 0.75rem;">
+              <strong>Gao, Y., Xiong, Y., et al. (2024)</strong>. <em>Retrieval-Augmented Generation for Large Language Models: A Survey</em>. arXiv:2312.10997.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Canonical taxonomy of Naive, Advanced, and Modular RAG architectures. <strong>Code:</strong> Theoretical framework for <code>RAG_ARCHITECTURE_COMPARISON.md</code>.</small>
+            </li>
+            <li style="border-left: 3px solid var(--primary); padding-left: 0.75rem;">
+              <strong>Malkov, Y. A., &amp; Yashunin, D. A. (2018)</strong>. <em>Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs</em>. IEEE TPAMI.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> O(log N) vector space navigation via multi-layer skip-graphs. <strong>Code:</strong> Core algorithmic engine executed by Qdrant (port 6334).</small>
+            </li>
+            <li style="border-left: 3px solid var(--primary); padding-left: 0.75rem;">
+              <strong>Kusupati, A., Bhatt, G., et al. (2022)</strong>. <em>Matryoshka Representation Learning</em>. NeurIPS 2022.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Nested dimension embeddings for loss-free truncation. <strong>Code:</strong> Explains Google <code>text-embedding-004</code> compression.</small>
+            </li>
+            <li style="border-left: 3px solid var(--primary); padding-left: 0.75rem;">
+              <strong>Nussbaum, Z., Morris, J. X., et al. (2024)</strong>. <em>Nomic Embed: Training a Reproducible Long Context Text Embedder</em>. arXiv:2402.01613.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> 8k-token embeddings with task prefixes. <strong>Code:</strong> Local Ollama <code>nomic-embed-text</code> configuration.</small>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Category 2 -->
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; background: var(--card-bg);">
+          <h3 style="color: var(--accent); margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚡</span> 12.2 Transformer Architectures, Attention &amp; LLMs
+          </h3>
+          <ul style="list-style-type: none; margin-left: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+            <li style="border-left: 3px solid #10b981; padding-left: 0.75rem;">
+              <strong>Vaswani, A., Shazeer, N., et al. (2017)</strong>. <em>Attention Is All You Need</em>. NeurIPS 2017.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Scaled dot-product self-attention foundation. <strong>Code:</strong> Backbone of Llama 3.3 and Mistral Large models.</small>
+            </li>
+            <li style="border-left: 3px solid #10b981; padding-left: 0.75rem;">
+              <strong>Su, J., Ahmed, M., et al. (2024)</strong>. <em>RoFormer: Enhanced Transformer with Rotary Position Embedding</em>. Neurocomputing.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Relative rotary matrix transformations (RoPE). <strong>Code:</strong> Long-context window encoding in Llama and Nomic.</small>
+            </li>
+            <li style="border-left: 3px solid #10b981; padding-left: 0.75rem;">
+              <strong>Dubey, A. et al. / Meta AI (2024)</strong>. <em>The Llama 3 Herd of Models</em>. arXiv:2407.21783.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Grouped-Query Attention (GQA) &amp; dense alignment. <strong>Code:</strong> Primary analytical engine in <code>OllamaConfig.java</code>.</small>
+            </li>
+            <li style="border-left: 3px solid #10b981; padding-left: 0.75rem;">
+              <strong>Mistral AI Team (2023/2024)</strong>. <em>Mistral 7B &amp; Mistral Large Technical Report</em>.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Sliding Window Attention (SWA) for low inference latency. <strong>Code:</strong> Secondary executive summarization engine.</small>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Category 3 -->
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; background: var(--card-bg);">
+          <h3 style="color: var(--accent); margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🏛️</span> 12.3 Enterprise Clean Architecture, DDD &amp; Visual Modeling
+          </h3>
+          <ul style="list-style-type: none; margin-left: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+            <li style="border-left: 3px solid #8b5cf6; padding-left: 0.75rem;">
+              <strong>Martin, Robert C. (2017)</strong>. <em>Clean Architecture: A Craftsman's Guide to Software Structure and Design</em>. Prentice Hall.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Dependency Inversion Principle. <strong>Code:</strong> Hexagonal boundaries isolating UI5, services, and backend adapters.</small>
+            </li>
+            <li style="border-left: 3px solid #8b5cf6; padding-left: 0.75rem;">
+              <strong>Evans, Eric (2003)</strong>. <em>Domain-Driven Design: Tackling Complexity in the Heart of Software</em>. Addison-Wesley.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Ubiquitous Language, Aggregates, and Value Objects. <strong>Code:</strong> <code>DocumentEntity.java</code> and BibTeX aggregate roots.</small>
+            </li>
+            <li style="border-left: 3px solid #8b5cf6; padding-left: 0.75rem;">
+              <strong>Brown, Simon (2018)</strong>. <em>Software Architecture for Developers: The C4 Model</em>. Leanpub.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Context, Containers, Components, Code zoom tiers. <strong>Code:</strong> <code>scripts/generate-architecture-from-mmd.ts</code>.</small>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Category 4 -->
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; background: var(--card-bg);">
+          <h3 style="color: var(--accent); margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🔄</span> 12.4 Business Process Automation &amp; BPMN 2.0
+          </h3>
+          <ul style="list-style-type: none; margin-left: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+            <li style="border-left: 3px solid #f59e0b; padding-left: 0.75rem;">
+              <strong>Object Management Group (OMG) (2011)</strong>. <em>Business Process Model and Notation (BPMN) Version 2.0.2</em>.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Standardized process execution grammar. <strong>Code:</strong> <code>docs/diagrams/camunda-ingestion-flow.bpmn</code>.</small>
+            </li>
+            <li style="border-left: 3px solid #f59e0b; padding-left: 0.75rem;">
+              <strong>Freund, Jakob, &amp; Rücker, Bernd (2016)</strong>. <em>Real-Life BPMN: Using BPMN 2.0</em> (3rd ed.). Camunda.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Resilient asynchronous tasks &amp; compensation. <strong>Code:</strong> Retry boundary timers (<code>R3/PT10S</code>) in Spring Boot.</small>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Category 5 -->
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; background: var(--card-bg);">
+          <h3 style="color: var(--accent); margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🎨</span> 12.5 W3C Web Components, Design Systems &amp; Distributed Security
+          </h3>
+          <ul style="list-style-type: none; margin-left: 0; display: flex; flex-direction: column; gap: 0.85rem;">
+            <li style="border-left: 3px solid #ec4899; padding-left: 0.75rem;">
+              <strong>W3C (2018/2024)</strong>. <em>Web Components Standards &amp; WCAG 2.1 Level AA Specifications</em>.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Encapsulated Shadow DOM &amp; accessibility requirements. <strong>Code:</strong> Zero-framework <code>@ui5/webcomponents</code> UI.</small>
+            </li>
+            <li style="border-left: 3px solid #ec4899; padding-left: 0.75rem;">
+              <strong>Kleppmann, Martin (2017)</strong>. <em>Designing Data-Intensive Applications</em>. O'Reilly Media.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Fault-tolerant consensus &amp; polyglot persistence. <strong>Code:</strong> MongoDB metadata store alongside Qdrant vector store.</small>
+            </li>
+            <li style="border-left: 3px solid #ec4899; padding-left: 0.75rem;">
+              <strong>IETF (RFC 6749, RFC 7519) &amp; OpenID Foundation (2014)</strong>. <em>OAuth 2.0, JWT &amp; OIDC Core 1.0</em>.
+              <br><small style="color: var(--text-muted);"><strong>Theory:</strong> Cryptographic token claims and delegated identity. <strong>Code:</strong> Keycloak authentication &amp; Spring Security JWT filters.</small>
+            </li>
+          </ul>
+        </div>
+
       </div>
     </section>
   </div>

@@ -1,0 +1,105 @@
+erDiagram
+    DocumentEntity ||--|| BibTeXMetadata : "has 1:1"
+    DocumentEntity ||--|{ SummaryRecord : "contains 1:2"
+    DocumentEntity ||--o{ DocumentChunk : "splits into 1:N"
+    DocumentEntity ||--o{ DocumentVersionSnapshot : "archives 1:N"
+    DocumentEntity }o--|| DocumentEntity : "lineage previousVersion"
+    UserProfile ||--o{ DocumentEntity : "owns 1:N"
+    UserProfile ||--o{ DocumentVersionSnapshot : "authors 1:N"
+    DocumentEntity ||--o{ RAGConversation : "grounds 1:N"
+    RAGConversation ||--o{ CitationReference : "cites 1:N"
+    DocumentChunk ||--o{ CitationReference : "sourced from 1:N"
+
+    DocumentEntity {
+        UUID guid PK "Unique document identity"
+        UUID previousVersionGuid FK "Predecessor version pointer"
+        int versionNumber "Active revision counter"
+        string fileName "Physical file asset name"
+        long fileSize "Payload size in bytes"
+        string format "pdf, docx, txt, md, pptx"
+        instant uploadDate "Initial ingestion timestamp"
+        instant editDate "Latest modification timestamp"
+        string contentExcerpt "Search preview excerpt"
+        text fullContent "Full extracted text stream"
+        int chunkCount "Total partitioned chunks"
+        string sha256Hash "Cryptographic integrity digest"
+        string uploadedBy FK "User identity"
+    }
+
+    BibTeXMetadata {
+        string bibKey PK "Synthesized AuthorYearKey"
+        string entryType "article, book, inproceedings"
+        string title "Primary publication title"
+        string author "Standard author list"
+        string year "Publication year"
+        string journal "Academic journal"
+        string booktitle "Conference title"
+        string volume "Volume number"
+        string number "Issue number"
+        string pages "Page range"
+        string publisher "Publishing house"
+        string doi "Digital Object Identifier"
+        string isbn "International Standard Book No"
+        text rawBibTeX "Complete formatted LaTeX entry"
+    }
+
+    SummaryRecord {
+        string modelKey PK "llama or mistral"
+        UUID documentGuid PK,FK "Owning document GUID"
+        string modelName "Full model descriptor"
+        text summaryText "Executive / Technical Markdown"
+        instant generatedAt "Inference timestamp"
+        double durationSeconds "Latency metric"
+        int promptTokens "Token telemetry"
+        int completionTokens "Completion telemetry"
+    }
+
+    DocumentChunk {
+        string id PK "guid-c{index}"
+        UUID documentGuid FK "Qdrant payload filter"
+        int chunkIndex "Sequential sequence index"
+        text text "Paragraph text (400-500 chars)"
+        int pageNumber "Source document page"
+        int tokenCount "Token length"
+        vector denseVector "768-dim float32 Cosine embedding"
+    }
+
+    DocumentVersionSnapshot {
+        UUID snapshotGuid PK "Historical archive ID"
+        UUID documentGuid FK "Document parent reference"
+        int versionNumber "Archived version sequence"
+        string fileName "Historical asset name"
+        long fileSize "Historical byte size"
+        instant savedAt "Snapshot timestamp"
+        string sha256Hash "Snapshot digest"
+        text bibtexRaw "Preserved BibTeX entry"
+        text fullContent "Archived text stream"
+        string changeLogNote "User mutation description"
+        string modifiedBy FK "Committer user"
+    }
+
+    UserProfile {
+        UUID id PK "Keycloak sub ID"
+        string username "Unique login username"
+        string email "Primary contact email"
+        string realm "personal-library-realm"
+        string roles "LIBRARY_ADMIN, RESEARCHER, VIEWER"
+    }
+
+    RAGConversation {
+        UUID conversationId PK "Chat session ID"
+        UUID documentGuid FK "Context document GUID"
+        string userQuery "User natural language prompt"
+        text answerText "Synthesized assistant answer"
+        instant timestamp "Message timestamp"
+    }
+
+    CitationReference {
+        UUID id PK "Citation entry ID"
+        UUID conversationId FK "Parent conversation ID"
+        string chunkId FK "Referenced Qdrant chunk"
+        int citationIndex "Citation badge [1], [2]"
+        float similarityScore "Cosine similarity 0-100%"
+        text sourceSnippet "Verbatim grounding passage"
+        int pageNumber "Source page number"
+    }

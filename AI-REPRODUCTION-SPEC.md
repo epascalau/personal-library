@@ -2,6 +2,7 @@
 
 **Status:** Authoritative Production Specification  
 **Version:** 2.0.0 (Synchronized with Codebase)  
+**SRS Reference:** `docs/technical-requirements.md` / `docs/technical-requirements.html`  
 **Purpose:** Provide an AI coding agent, autonomous system, or human engineer with complete, deterministic context to reproduce, build, verify, and operate the entire Personal Library application without requiring conversation history.
 
 ---
@@ -17,7 +18,7 @@ Personal Library is an enterprise-grade document intelligence, cataloging, and c
 2. **Dual-Model AI Engine**:
    - Independent summarization cards comparing **Ollama Llama 3.3 (70B Instruct)** and **Ollama Mistral Large (2411)** with latency metrics, token efficiency statistics, and prompt inspections.
 3. **Conversational RAG with Verifiable Citations**:
-   - Vector similarity search powered by **Qdrant** (Hierarchical Navigable Small World - HNSW indexing with cosine distance) and **Nomic Embed Text** embeddings.
+   - Vector similarity search powered by **Qdrant** (Hierarchical Navigable Small World - HNSW indexing with cosine distance) using local **Nomic Embed Text** (`nomic-embed-text`, 768 dims) and cloud **Google `text-embedding-004`** (768 dims with Matryoshka compression).
    - Grounded conversational responses providing interactive chunk citations with source offset boundaries and similarity confidence scores.
 4. **Enterprise Document Lifecycle & Versioning**:
    - Immutable version lineage chain (`versionNumber`, `previousVersionGuid`).
@@ -235,6 +236,8 @@ personal-library/
 
 #### 3. `EventBus<Events>` (`core/eventBus.ts`)
 - **Responsibility**: Decoupled, strongly typed asynchronous pub/sub messaging hub.
+- **Implementation**: Built upon a detached DOM `Comment` node acting as an isolated browser-native `EventTarget`, ensuring zero event bubbling or global window pollution.
+- **Protocol Decision (ADR-004)**: Eliminates persistent WebSocket overhead by pairing client-side event bus dispatching with stateless HTTP/REST network requests (`COMMUNICATION_ARCHITECTURE.md`).
 - **Key Methods**:
   - `publish<K>(event, payload)`: Emits an event with typed arguments to all listeners.
   - `subscribe<K>(event, handler)`: Registers listener for event key, returns unsubscribe function.
@@ -344,6 +347,26 @@ personal-library/
 #### 4. Versioning & Non-Destructive Rollback (`DocumentService.java`)
 - **Version Increment**: Every update creates an immutable `DocumentVersionSnapshot` stored in `versionHistory[]`.
 - **Rollback Mechanics**: Selecting version $N$ for rollback does NOT delete versions $> N$. Instead, the system retrieves snapshot $N$, creates a new version $M = \max(\text{versions}) + 1$ with the content of $N$, logs a rollback audit entry, and re-indexes vectors under version $M$.
+
+---
+
+### 5.5 Configuration Decisions & Architectural Rationale
+
+| Component | Configuration Parameter | Setting / Value | Architectural Rationale |
+| :--- | :--- | :--- | :--- |
+| **Qdrant** | gRPC Port Binding | `6334:6334` | High-throughput binary protocol used by the Spring AI client to stream high-dimensional vectors with minimal serialization latency compared to HTTP/JSON. |
+| **Qdrant** | HTTP REST Port Binding | `6333:6333` | Used for health checks, cluster debugging, snapshot management, and web administrative tooling. |
+| **Qdrant** | Distance Metric | `Cosine` | Normalized dot-product distance measuring semantic orientation independent of document passage length. Essential for asymmetric chunk comparison. |
+| **Qdrant** | HNSW Graph Indexing | `M=16, efConstruct=100` | Hierarchical Navigable Small World graphs provide logarithmic search time ($\mathcal{O}(\log N)$) with fast index updates during real-time document ingestion. |
+| **Qdrant** | Schema Auto-Initialization | `true` (local) / `false` (Docker) | Local development auto-provisions collection schemas on cold start; Docker disables it to eliminate schema race conditions across container startup dependencies. |
+| **Qdrant** | Volume Persistence | `qdrant_data:/qdrant/storage` | Preserves vector embeddings and HNSW graphs across container restarts, avoiding costly re-embedding of the entire catalog upon reboot. |
+| **Ollama** | Primary Model (`app.models.llama`) | `llama3.2` / `llama3.3` | State-of-the-art instruction-following and deductive reasoning. Ideal for conversational Q&A, structured citation extraction, and strict context adherence. |
+| **Ollama** | Primary Temperature | `0.2` | Deliberately low temperature suppresses hallucination, forcing the model to adhere strictly to retrieved context passages and cite verbatim evidence. |
+| **Ollama** | Secondary Model (`app.models.mistral`) | `mistral` / `mistral-large-2411` | High-fluency, cross-lingual synthesis engine. Ideal for executive summaries, high-level takeaways, and contrasting stylistic viewpoints. |
+| **Ollama** | Secondary Temperature | `0.3` | Slightly higher temperature enables natural, flowing abstractive prose while maintaining high factual fidelity for executive briefings. |
+| **Ollama** | Dual-Model Paradigm | Simultaneous Llama & Mistral | Eliminates single-model cognitive bias by providing side-by-side comparative summaries from distinct model architectures. |
+| **Ollama** | Embedding Model | `nomic-embed-text` | 768-dimensional dense vectors with an 8,192 token context window. Outperforms older 384-dim models on MTEB benchmarks while running 100% locally. |
+| **Ollama** | Dynamic CA Injection | `ollama-entrypoint.sh` | Automatically registers corporate PEM certificates before pulling models, enabling seamless operation behind enterprise TLS proxies (Zscaler). |
 
 ---
 
@@ -467,3 +490,6 @@ To guarantee 100% reproduction parity with the authoritative codebase, verify ea
 - [ ] **Version Overwrite & Rollback**: Performing an in-place version bump increments the version number, creates an audit log, and rollback restores past state in a new version.
 - [ ] **Docker Health Checks**: All containers (`app`, `frontend-gateway`, `mongodb`, `qdrant`, `ollama`, `keycloak`) report `healthy` in `docker compose ps`.
 - [ ] **Ollama Model Cache**: `docker compose exec ollama ollama list` shows `nomic-embed-text`, `llama3.2`, and `mistral`.
+- [ ] **Bibliographic & Architecture Curriculum**: `docs/LEARNING_TOPICS.md` Section 12 and `docs/learning-topics.html` contain the complete annotated bibliography covering RAG, Transformers, Clean Architecture, BPMN, W3C Web Components, and OIDC Security.
+- [ ] **Entity-Relationship Model (ERD)**: `docs/diagrams/entity_relationship_diagram.*` generated in 5 formats (.svg, .png, .pdf, .puml, .mmd) and documented in `docs/ENTITY_RELATIONSHIP_SPEC.md` and `docs/entity-diagrams.html`.
+- [ ] **System Ontology & Semantic Knowledge Graph**: `docs/diagrams/system_ontology_diagram.*` and `docs/diagrams/system_ontology.ttl` compiled in 6 formats (.svg, .png, .pdf, .puml, .mmd, .ttl) aligned with W3C OWL 2, PROV-O, and BIBO standards, documented in `docs/ONTOLOGY_SPECIFICATION.md` and `docs/ontology-diagram.html`.

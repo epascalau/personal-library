@@ -12,11 +12,14 @@ spring:
 
   ai:
     ollama:
+      # Connects to the containerized Ollama instance on the shared Docker bridge network
       base-url: http://ollama:11434
     vectorstore:
       qdrant:
         host: qdrant
         port: 6334
+        # Schema initialization is disabled in Docker to prevent DDL collisions during
+        # concurrent multi-instance orchestration; collection is provisioned beforehand.
         initialize-schema: false
 
 app:

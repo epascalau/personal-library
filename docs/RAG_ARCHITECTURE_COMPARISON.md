@@ -120,6 +120,24 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
 
 ### Stage 3: Embedding & Vector Indexing (Qdrant)
 * **Reference Pattern**: Uses dense vector embeddings (384 to 1536 dimensions) indexed via HNSW graphs in a specialized vector engine, partitioned with tenant and metadata payload filters.
+* **Embedding Model Topologies & `text-embedding-004`**:
+  The system supports a dual-tier embedding topology spanning local edge-native models and enterprise cloud models:
+
+  | Embedding Dimension / Metric | **Google `text-embedding-004`** (Cloud Bridge) | **Nomic `nomic-embed-text`** (Local Ollama) | **Sentence-Transformers `all-MiniLM-L6-v2`** (Spring AI / CPU) |
+  | :--- | :--- | :--- | :--- |
+  | **Embedding Dimensions** | **768** (Matryoshka support down to 256/128) | **768** | **384** |
+  | **Context Window** | **8,192 tokens** | **8,192 tokens** | **256 – 512 tokens** |
+  | **Architecture** | Transformer Encoder with Matryoshka Representation Learning (MRL) | Bidirectional BERT with Rotary Position Embeddings (RoPE) | 6-layer Siamese BERT encoder |
+  | **Task-Specific Prefixing** | `RETRIEVAL_DOCUMENT`, `RETRIEVAL_QUERY`, `SEMANTIC_SIMILARITY` | `search_document: `, `search_query: ` | Symmetric pairwise encoding |
+  | **Deployment Target** | Serverless Google Cloud API via `@google/genai` | Containerized Ollama instance (Port 11434) | Embedded Spring Boot runtime (In-memory/CPU) |
+  | **Operational Cost** | \$0.00002 / 1k chars (tracked in Financial Ledger ROI) | $0.00 (Self-hosted on local hardware) | $0.00 (Self-hosted on local JVM) |
+  | **MTEB Benchmark Rank** | Top-tier (>55.0 retrieval score) | High open-source (>52.0 retrieval score) | Lightweight baseline (~41.9 retrieval score) |
+
+  #### Why `text-embedding-004` Matters:
+  1. **Matryoshka Representation Learning (MRL)**: Unlike conventional models where all 768 dimensions must be stored, `text-embedding-004` is trained such that the first $d \in \{128, 256, 512\}$ dimensions maintain near-optimal representational fidelity. This allows high-throughput Qdrant vector indexing with up to 66% vector storage memory reduction.
+  2. **Task-Specific Asymmetry**: For document chunks, the model applies document-passage embeddings; for user search questions, it applies query-specific prefix weights, improving recall over symmetric bi-encoders.
+  3. **Cost Accounting Baseline**: As detailed in `docs/unified_financial_ledger_roi_key_takeaways.md`, `text-embedding-004` provides the deterministic token cost baseline for calculating the return on investment of local vs. cloud enterprise RAG pipelines.
+
 * **Current App Implementation**:
   Uses Qdrant 1.11.0 in `docker-compose.yml`. Spring AI initializes `library_embeddings` with `VectorParams(size=384, distance=Cosine)`. Every point stores:
   ```json
@@ -129,7 +147,7 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
     "payload": { "documentGuid": "doc-123", "chunkIndex": 0, "text": "..." }
   }
   ```
-* **Comparison**: Fully matches the reference design. Document scoping via payload filters prevents cross-document context leaks.
+* **Comparison**: Fully matches the reference design. Document scoping via payload filters prevents cross-document context leaks. Supported by local Ollama `nomic-embed-text` and cloud `text-embedding-004`.
 
 ---
 
