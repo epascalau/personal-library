@@ -46,6 +46,11 @@
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="constructorstore"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">Store</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#constructorstores">S</a> <span class="tsd-signature-keyword">extends</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">initialState</span><span class="tsd-signature-symbol">:</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">Store</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span><a href="#constructorstore" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Initializes the store with its root state record.</p>
+<p>WHAT: Sets the initial state payload.
+WHY: Requires an explicit initial state to ensure TypeScript subscribers always observe
+a fully initialized, non-undefined state object without needing null assertions.</p>
+</div>
 <section class="tsd-panel">
 <h4>Type Parameters</h4>
 <ul class="tsd-type-parameter-list">
@@ -53,10 +58,12 @@
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
-<li><span><span class="tsd-kind-parameter">initialState</span>: <a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a></span></li></ul></div>
+<li><span><span class="tsd-kind-parameter">initialState</span>: <a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a></span>
+<div class="tsd-comment tsd-typography"><p>The initial immutable state object.</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">Store</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in core/store.ts:26</li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in core/store.ts:35</li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Accessors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="accessors-1">Accessors<a href="#accessors-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -66,9 +73,14 @@
 <li>
 <div class="tsd-signature" id="statestate"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">state</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a read-only snapshot of the current state.</p>
+<p>WHAT: Readonly state accessor.
+WHY: Enforces unidirectional data flow by preventing callers from mutating state properties
+directly; state updates must be dispatched exclusively via <code>setState()</code> so subscribers are notified.</p>
+</div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in core/store.ts:30</li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in core/store.ts:46</li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -78,54 +90,82 @@
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="flush-1"><span class="tsd-kind-call-signature">flush</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#flush-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Flushes any pending notification synchronously.</p>
+<div class="tsd-comment tsd-typography"><p>Flushes any pending notification immediately and synchronously.</p>
+<p>WHAT: Cancels the microtask flag and immediately executes all listener callbacks with the latest state.
+WHY: Critical for unit tests and imperative transitions where downstream DOM assertions or
+sequential synchronous steps require guaranteed DOM convergence before the next line of code executes.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in core/store.ts:87</li></ul></aside></div></li></ul></section>
+<li>Defined in core/store.ts:135</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-protected">
 <h3 class="tsd-anchor-link" id="notify"><code class="tsd-tag">Protected</code><span>notify</span><a href="#notify" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-protected">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="notify-1"><span class="tsd-kind-call-signature">notify</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#notify-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Coalesces bursts of <code>setState</code> calls into a single notification per
-microtask so a handler that updates several fields renders only once.</p>
+<div class="tsd-comment tsd-typography"><p>Dispatches state change notifications to all registered listeners asynchronously.</p>
+<p>WHAT: Schedules listener dispatch in <code>queueMicrotask</code> if a notification is not already pending.
+WHY: Coalescing notifications within the microtask queue prevents redundant render cascades
+when multiple state updates are issued consecutively within the same synchronous call stack
+(e.g., setting loading flag, clearing active error, and populating search results).</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in core/store.ts:72</li></ul></aside></div></li></ul></section>
+<li>Defined in core/store.ts:114</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setstate"><span>set<wbr/>State</span><a href="#setstate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="setstate-1"><span class="tsd-kind-call-signature">setState</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">patch</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span> <span class="tsd-signature-symbol">|</span> (<span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">prev</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span>)<span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#setstate-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Merges a partial update into the state and notifies subscribers.
-No-ops when every supplied value is already identical, which keeps the
-30s backend health poll from re-rendering the whole shell.</p>
+<div class="tsd-comment tsd-typography"><p>Merges a partial state update or reducer result into the active state and schedules subscriber notification.</p>
+<p>WHAT: Evaluates the patch, compares updated keys against current values via <code>Object.is</code>,
+merges changed properties into a new immutable object, and triggers microtask notification.
+WHY:</p>
+<ol>
+<li>Equality short-circuiting: If none of the patched fields have changed (e.g., periodic
+30-second background health checks returning the same status), the method no-ops immediately.
+This prevents unwanted re-renders, input blurs, and popover dismissals across the UI.</li>
+<li>Immutable shallow merge: Creating a new object reference allows selectors and <code>watch()</code>
+comparators to detect changes reliably via fast reference comparisons.</li>
+</ol>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
-<li><span><span class="tsd-kind-parameter">patch</span>: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span> <span class="tsd-signature-symbol">|</span> (<span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">prev</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span>)</span></li></ul></div>
+<li><span><span class="tsd-kind-parameter">patch</span>: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span> <span class="tsd-signature-symbol">|</span> (<span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">prev</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Readonly</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span>)</span>
+<div class="tsd-comment tsd-typography"><p>Partial state slice or reducer function returning a partial state slice.</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in core/store.ts:39</li></ul></aside></div></li></ul></section>
+<li>Defined in core/store.ts:64</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="subscribe"><span>subscribe</span><a href="#subscribe" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="subscribe-1"><span class="tsd-kind-call-signature">subscribe</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">listener</span><span class="tsd-signature-symbol">:</span> <a href="../types/core_store.Listener.html" class="tsd-signature-type tsd-kind-type-alias">Listener</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/core_store.SubscribeOptions.html" class="tsd-signature-type tsd-kind-interface">SubscribeOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../types/core_store.Unsubscribe.html" class="tsd-signature-type tsd-kind-type-alias">Unsubscribe</a><a href="#subscribe-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Registers a subscriber listener to receive state updates whenever state changes.</p>
+<p>WHAT: Adds <code>listener</code> to the internal listener Set, optionally invokes it immediately with
+the current state, and returns an idempotent unsubscribe function.
+WHY: Returning an unsubscribe closure directly adheres to standard reactive disposer patterns,
+making it trivial for views to register store listeners inside <code>this.track(store.subscribe(...))</code>
+for automatic teardown during unmount.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
-<li><span><span class="tsd-kind-parameter">listener</span>: <a href="../types/core_store.Listener.html" class="tsd-signature-type tsd-kind-type-alias">Listener</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span></span></li>
-<li><span><span class="tsd-kind-parameter">options</span>: <a href="../interfaces/core_store.SubscribeOptions.html" class="tsd-signature-type tsd-kind-interface">SubscribeOptions</a><span class="tsd-signature-symbol"> = {}</span></span></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="../types/core_store.Unsubscribe.html" class="tsd-signature-type tsd-kind-type-alias">Unsubscribe</a></h4><aside class="tsd-sources">
+<li><span><span class="tsd-kind-parameter">listener</span>: <a href="../types/core_store.Listener.html" class="tsd-signature-type tsd-kind-type-alias">Listener</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span></span>
+<div class="tsd-comment tsd-typography"><p>Callback function receiving the updated state.</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">options</span>: <a href="../interfaces/core_store.SubscribeOptions.html" class="tsd-signature-type tsd-kind-interface">SubscribeOptions</a><span class="tsd-signature-symbol"> = {}</span></span>
+<div class="tsd-comment tsd-typography"><p>Configuration options (e.g. <code>immediate: true</code> to trigger on registration).</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../types/core_store.Unsubscribe.html" class="tsd-signature-type tsd-kind-type-alias">Unsubscribe</a></h4><p>Unsubscribe function that removes the listener.</p>
+<aside class="tsd-sources">
 <ul>
-<li>Defined in core/store.ts:58</li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in core/store.ts:96</li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

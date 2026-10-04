@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 780" width="1600" height="780" style="background:#0b1120; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="rag-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <marker id="flow-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" />
+    </marker>
+    <filter id="rag-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <rect width="1600" height="780" fill="url(#rag-bg)" />
+
+  <!-- Header -->
+  <rect x="40" y="20" width="1520" height="65" rx="10" fill="#1f2937" stroke="#374151" stroke-width="1.5" />
+  <text x="70" y="55" font-size="20" font-weight="800" fill="#f9fafb">Dual-Model Summarization &amp; Conversational RAG Data Flow</text>
+  <text x="70" y="74" font-size="11" font-weight="500" fill="#9ca3af">Ingestion • Text Extraction • Semantic Chunking • Parallel Inference • Qdrant Vector Retrieval</text>
+
+  <!-- Step 1: Upload & Format Detection -->
+  <rect x="50" y="120" width="260" height="240" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1.8" filter="url(#rag-shadow)" />
+  <rect x="50" y="120" width="260" height="34" rx="10" fill="#2563eb" />
+  <text x="180" y="142" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1. UPLOAD &amp; DETECT</text>
+  <text x="70" y="180" font-size="12" font-weight="600" fill="#e2e8f0">Input Document</text>
+  <text x="70" y="200" font-size="11" fill="#94a3b8">• Multi-format: PDF, DOCX, MD, TXT</text>
+  <text x="70" y="220" font-size="11" fill="#94a3b8">• Base64 Payload or File Upload</text>
+  <text x="70" y="240" font-size="11" fill="#94a3b8">• Header magic byte detection</text>
+  <text x="70" y="270" font-size="12" font-weight="600" fill="#e2e8f0">Binary Text Extractor</text>
+  <text x="70" y="290" font-size="11" fill="#94a3b8">• pdf-parse streams text buffers</text>
+  <text x="70" y="310" font-size="11" fill="#94a3b8">• Preserves paragraph breaks</text>
+  <text x="70" y="330" font-size="10" font-family="monospace" fill="#60a5fa">Output: Full Clean Plaintext</text>
+
+  <!-- Arrow 1 -> 2 -->
+  <path d="M 310 240 L 360 240" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#flow-arrow)" />
+
+  <!-- Step 2: BibTeX Extraction & Chunking -->
+  <rect x="360" y="120" width="280" height="240" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="1.8" filter="url(#rag-shadow)" />
+  <rect x="360" y="120" width="280" height="34" rx="10" fill="#4f46e5" />
+  <text x="500" y="142" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">2. BIBTEX &amp; CHUNKING</text>
+  <text x="380" y="180" font-size="12" font-weight="600" fill="#e2e8f0">BibTeX Inferencing</text>
+  <text x="380" y="200" font-size="11" fill="#94a3b8">• Title, Authors, Year, DOI, Keywords</text>
+  <text x="380" y="220" font-size="11" fill="#94a3b8">• Academic Citation Key Generation</text>
+  <text x="380" y="240" font-size="11" fill="#94a3b8">• Formats LaTeX compliant entry</text>
+  <text x="380" y="270" font-size="12" font-weight="600" fill="#e2e8f0">Semantic Paragraph Chunking</text>
+  <text x="380" y="290" font-size="11" fill="#94a3b8">• Target chunk size: ~350 characters</text>
+  <text x="380" y="310" font-size="11" fill="#94a3b8">• Natural line &amp; sentence boundaries</text>
+  <text x="380" y="330" font-size="10" font-family="monospace" fill="#a5b4fc">Output: DocumentChunk[] List</text>
+
+  <!-- Arrow 2 -> Parallel Branching -->
+  <path d="M 640 240 L 710 240" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#flow-arrow)" />
+
+  <!-- Step 3: Parallel Inference & Vectorization -->
+  <rect x="710" y="100" width="440" height="280" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="1.8" filter="url(#rag-shadow)" />
+  <rect x="710" y="100" width="440" height="34" rx="10" fill="#059669" />
+  <text x="930" y="122" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">3. CONCURRENT INFERENCE &amp; INDEXING</text>
+  
+  <!-- Branch A -->
+  <rect x="730" y="145" width="400" height="65" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="745" y="165" font-size="11" font-weight="700" fill="#a7f3d0">Branch A: Ollama Llama 3.3 (70B Instruct)</text>
+  <text x="745" y="183" font-size="10" fill="#d1fae5">• Analytical breakdown, methodology, quantitative benchmarks</text>
+  <text x="745" y="198" font-size="9" font-family="monospace" fill="#6ee7b7">Latency tracking: ~4.2s recorded in SummaryRecord</text>
+
+  <!-- Branch B -->
+  <rect x="730" y="220" width="400" height="65" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="745" y="240" font-size="11" font-weight="700" fill="#a7f3d0">Branch B: Ollama Mistral Large (2411)</text>
+  <text x="745" y="258" font-size="10" fill="#d1fae5">• Executive summary, key takeaways, recommended audience</text>
+  <text x="745" y="273" font-size="9" font-family="monospace" fill="#6ee7b7">Latency tracking: ~3.5s recorded in SummaryRecord</text>
+
+  <!-- Branch C -->
+  <rect x="730" y="295" width="400" height="65" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="745" y="315" font-size="11" font-weight="700" fill="#a7f3d0">Branch C: Qdrant Vector Upsert</text>
+  <text x="745" y="333" font-size="10" fill="#d1fae5">• Vector embedding calculation &amp; payload indexing</text>
+  <text x="745" y="348" font-size="9" font-family="monospace" fill="#6ee7b7">Collection: library_embeddings (GUID document scoped)</text>
+
+  <!-- Arrow 3 -> Storage -->
+  <path d="M 1150 240 L 1210 240" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#flow-arrow)" />
+
+  <!-- Step 4: Atomic Persistence -->
+  <rect x="1210" y="120" width="340" height="240" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8" filter="url(#rag-shadow)" />
+  <rect x="1210" y="120" width="340" height="34" rx="10" fill="#d97706" />
+  <text x="1380" y="142" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">4. ATOMIC PERSISTENCE &amp; NOTIFY</text>
+  <text x="1230" y="180" font-size="12" font-weight="600" fill="#e2e8f0">MongoDB Storage</text>
+  <text x="1230" y="200" font-size="11" fill="#94a3b8">• DocumentEntity with Dual Summaries</text>
+  <text x="1230" y="220" font-size="11" fill="#94a3b8">• Version history (guid, previousVersionGuid)</text>
+  <text x="1230" y="240" font-size="11" fill="#94a3b8">• Raw &amp; formatted BibTeX entry strings</text>
+  <text x="1230" y="270" font-size="12" font-weight="600" fill="#e2e8f0">Reactive Broadcast</text>
+  <text x="1230" y="290" font-size="11" fill="#94a3b8">• Dispatches ingestion event to UI5 EventBus</text>
+  <text x="1230" y="310" font-size="11" fill="#94a3b8">• Auto-updates List Report table &amp; Object Page</text>
+  <text x="1230" y="330" font-size="10" font-family="monospace" fill="#fcd34d">Status: DOCUMENT_INDEXED</text>
+
+  <!-- Lower Panel: Interactive RAG Query Cycle -->
+  <rect x="50" y="420" width="1500" height="320" rx="12" fill="#111827" stroke="#374151" stroke-width="1.5" />
+  <rect x="50" y="420" width="1500" height="36" rx="12" fill="#1f2937" />
+  <text x="75" y="444" font-size="13" font-weight="700" fill="#38bdf8">INTERACTIVE CONVERSATIONAL RAG QUERY LIFECYCLE (Object Page Chat)</text>
+
+  <!-- Query Box 1: User Prompt -->
+  <rect x="80" y="480" width="300" height="220" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2" />
+  <text x="95" y="510" font-size="12" font-weight="700" fill="#ffffff">A. Researcher Question</text>
+  <text x="95" y="535" font-size="11" fill="#94a3b8">Patron types query into Object Page:</text>
+  <text x="95" y="560" font-size="11" font-style="italic" fill="#bae6fd">"Who are the characters and what is the Scarecrow seeking?"</text>
+  <text x="95" y="600" font-size="11" fill="#94a3b8">Payload transmitted to:</text>
+  <text x="95" y="620" font-size="10" font-family="monospace" fill="#38bdf8">POST /api/v1/chat</text>
+  <text x="95" y="640" font-size="10" font-family="monospace" fill="#94a3b8">{ guid, question, topK: 3 }</text>
+
+  <!-- Arrow A -> B -->
+  <path d="M 380 590 L 450 590" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arrow)" />
+
+  <!-- Query Box 2: Qdrant Search -->
+  <rect x="450" y="480" width="340" height="220" rx="8" fill="#1e293b" stroke="#a855f7" stroke-width="1.2" />
+  <text x="465" y="510" font-size="12" font-weight="700" fill="#ffffff">B. Qdrant Similarity Search</text>
+  <text x="465" y="535" font-size="11" fill="#94a3b8">Dense Vector Cosine Distance Matching:</text>
+  <text x="465" y="560" font-size="10" font-family="monospace" fill="#d8b4fe">• Scopes search to doc.guid</text>
+  <text x="465" y="580" font-size="10" font-family="monospace" fill="#d8b4fe">• Computes similarity against all chunks</text>
+  <text x="465" y="600" font-size="10" font-family="monospace" fill="#d8b4fe">• Retrieves Top 3 most relevant passages</text>
+  <text x="465" y="635" font-size="11" font-weight="600" fill="#e2e8f0">Ranked Excerpts Retrieved:</text>
+  <text x="465" y="655" font-size="10" fill="#94a3b8">"Dorothy met the Scarecrow on a pole..."</text>
+
+  <!-- Arrow B -> C -->
+  <path d="M 790 590 L 860 590" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arrow)" />
+
+  <!-- Query Box 3: Context Assembly -->
+  <rect x="860" y="480" width="320" height="220" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.2" />
+  <text x="875" y="510" font-size="12" font-weight="700" fill="#ffffff">C. Grounded Context Prompt</text>
+  <text x="875" y="535" font-size="11" fill="#94a3b8">Prompt Injection with Grounding Excerpts:</text>
+  <text x="875" y="565" font-size="10" font-family="monospace" fill="#6ee7b7">System: You are an expert RAG analyst.</text>
+  <text x="875" y="585" font-size="10" font-family="monospace" fill="#6ee7b7">Context Excerpts: [Excerpt 1], [Excerpt 2]</text>
+  <text x="875" y="605" font-size="10" font-family="monospace" fill="#6ee7b7">Question: "Who are the characters..."</text>
+  <text x="875" y="640" font-size="11" fill="#94a3b8">Guarantees zero hallucinations and grounds every claim in source excerpts.</text>
+
+  <!-- Arrow C -> D -->
+  <path d="M 1180 590 L 1240 590" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arrow)" />
+
+  <!-- Query Box 4: Response Synthesis -->
+  <rect x="1240" y="480" width="280" height="220" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="1255" y="510" font-size="12" font-weight="700" fill="#ffffff">D. Synthesized Answer</text>
+  <text x="1255" y="535" font-size="11" fill="#94a3b8">Formatted Markdown Output with Inline Excerpt Citations:</text>
+  <text x="1255" y="570" font-size="10" font-family="monospace" fill="#fde68a">• Structured Travelers List</text>
+  <text x="1255" y="590" font-size="10" font-family="monospace" fill="#fde68a">• Detailed character motivations</text>
+  <text x="1255" y="610" font-size="10" font-family="monospace" fill="#fde68a">• Clickable [Excerpt 1] Citations</text>
+  <text x="1255" y="645" font-size="10" font-family="monospace" fill="#38bdf8">Model: Ollama Llama 3.3 (70B)</text>
+</svg>

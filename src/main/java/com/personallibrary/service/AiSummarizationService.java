@@ -57,7 +57,7 @@ public class AiSummarizationService {
      *
      * WHAT: Consecutively calls `generateSummaryForModel` for both "llama" and "mistral" and returns a composite map.
      * WHY: Produces both analytical and executive viewpoints in a single pipeline run during document upload,
-     * ensuring immediate availability of dual summaries when opening the SAP Horizon Object Page.
+     * ensuring immediate availability of dual summaries when opening the SAP Fiori Object Page.
      *
      * @param title   Document title.
      * @param content Raw extracted text content.

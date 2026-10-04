@@ -14,6 +14,7 @@ import { createEventBus } from '../../core/eventBus';
 import {
   BibTeXMetadata,
   DocumentRecord,
+  DocumentVersionSnapshot,
   FilterState,
   SummaryRecord,
   UserProfile
@@ -78,6 +79,16 @@ export interface BackendOperations {
   deleteDocument: {
     request: { guid: string };
     response: { success: boolean; message: string };
+  };
+
+  getVersionHistory: {
+    request: { guid: string };
+    response: DocumentVersionSnapshot[];
+  };
+
+  rollbackVersion: {
+    request: { guid: string; targetVersion: number };
+    response: DocumentRecord;
   };
 
   regenerateSummary: {

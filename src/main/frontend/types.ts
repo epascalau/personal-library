@@ -91,6 +91,43 @@ export interface DocumentChunk {
 }
 
 /**
+ * Preserved immutable snapshot of a prior document version for auditing and rollback.
+ */
+export interface DocumentVersionSnapshot {
+  /** Unique snapshot identifier */
+  snapshotGuid: string;
+  /** Historical version number */
+  versionNumber: number;
+  /** Historical file name with extension */
+  fileName: string;
+  /** Historical file size in bytes */
+  fileSize: number;
+  /** Formatted file size string */
+  fileSizeFormatted: string;
+  /** Historical file format */
+  format: string;
+  /** Timestamp when this version was archived */
+  savedAt: string;
+  /** Bibliographic metadata preserved at this version */
+  bibtex: BibTeXMetadata;
+  /** Raw BibTeX entry */
+  bibtexRaw: string;
+  /** Dual-model summaries preserved at this version */
+  summaries: {
+    llama?: SummaryRecord;
+    mistral?: SummaryRecord;
+  };
+  /** Short text excerpt */
+  contentExcerpt: string;
+  /** Full text content */
+  fullContent?: string;
+  /** Chunks count at time of snapshot */
+  chunksCount?: number;
+  /** Contextual note describing the snapshot or rollback */
+  note?: string;
+}
+
+/**
  * Core enterprise document record representing an ingested asset with
  * bibliographic metadata, multi-model summaries, and vector index fragments.
  */
@@ -128,6 +165,8 @@ export interface DocumentRecord {
   fullContent?: string;
   /** Segmented document chunks for Qdrant vector retrieval */
   chunks: DocumentChunk[];
+  /** Historical version snapshots preserved prior to in-place overwrites or rollbacks */
+  versionHistory?: DocumentVersionSnapshot[];
 }
 
 /**
@@ -151,7 +190,7 @@ export interface UserProfile {
 }
 
 /**
- * Filter state parameters applied in the SAP Horizon List Report floorplan.
+ * Filter state parameters applied in the SAP Fiori List Report floorplan.
  */
 export interface FilterState {
   /** Partial match on physical file name */

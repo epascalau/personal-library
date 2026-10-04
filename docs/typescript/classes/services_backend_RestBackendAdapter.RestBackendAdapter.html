@@ -20,7 +20,7 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/services_backend_types.BackendAdapter.html" class="tsd-signature-type tsd-kind-interface">BackendAdapter</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:10</li></ul></aside>
+<li>Defined in services/backend/RestBackendAdapter.ts:20</li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -44,11 +44,14 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <a href="#getdocument" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Document</span></a>
 <a href="#getdocuments" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Documents</span></a>
 <a href="#getdownloadurl" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Download<wbr/>Url</span></a>
+<a href="#gethistoricaldownloadurl" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Historical<wbr/>Download<wbr/>Url</span></a>
 <a href="#getopenapispec" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Open<wbr/>Api<wbr/>Spec</span></a>
+<a href="#getversionhistory" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Version<wbr/>History</span></a>
 <a href="#login" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>login</span></a>
 <a href="#logout" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>logout</span></a>
 <a href="#overwriteversion" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>overwrite<wbr/>Version</span></a>
 <a href="#regeneratesummary" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>regenerate<wbr/>Summary</span></a>
+<a href="#rollbackversion" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>rollback<wbr/>Version</span></a>
 <a href="#testhealth" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>test<wbr/>Health</span></a>
 <a href="#uploaddocument" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>upload<wbr/>Document</span></a>
 </div></section></div></details></section></section>
@@ -61,13 +64,20 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="constructorrestbackendadapter"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">RestBackendAdapter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">config</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/services_backend_types.BackendConfig.html" class="tsd-signature-type tsd-kind-interface">BackendConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">RestBackendAdapter</a><a href="#constructorrestbackendadapter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Initializes the REST adapter with endpoint configuration and timeout defaults.</p>
+<p>WHAT: Merges user config with default 120-second timeout and strips trailing slashes from baseUrl.
+WHY: Normalizing baseUrl avoids double-slash errors (<code>//documents</code>) when building resource paths,
+while a default 120s timeout accommodates long-running LLM and RAG vector operations.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
-<li><span><span class="tsd-kind-parameter">config</span>: <a href="../interfaces/services_backend_types.BackendConfig.html" class="tsd-signature-type tsd-kind-interface">BackendConfig</a></span></li></ul></div>
+<li><span><span class="tsd-kind-parameter">config</span>: <a href="../interfaces/services_backend_types.BackendConfig.html" class="tsd-signature-type tsd-kind-interface">BackendConfig</a></span>
+<div class="tsd-comment tsd-typography"><p>The backend configuration record.</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">RestBackendAdapter</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:15</li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in services/backend/RestBackendAdapter.ts:34</li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -78,7 +88,7 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 </div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#config">config</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:13</li></ul></aside></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:23</li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="id"><code class="tsd-tag">Readonly</code><span>id</span><a href="#id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -86,7 +96,7 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 </div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#id">id</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:11</li></ul></aside></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:21</li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="name"><code class="tsd-tag">Readonly</code><span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -94,7 +104,7 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 </div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#name">name</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:12</li></ul></aside></section></section></details>
+<li>Defined in services/backend/RestBackendAdapter.ts:22</li></ul></aside></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -104,25 +114,28 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="chatwithdocument-1"><span class="tsd-kind-call-signature">chatWithDocument</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">question</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">chatHistory</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">role</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">text</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.ChatResponseResult.html" class="tsd-signature-type tsd-kind-interface">ChatResponseResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#chatwithdocument-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Dispatches a user query to the RAG chat engine with vector retrieval.</p>
+<div class="tsd-comment tsd-typography"><p>Executes a conversational RAG question-and-answer exchange grounded in the document's indexed content.</p>
+<p>WHAT: Issues a POST to <code>/documents/{guid}/chat</code> with the question and prior conversation history.
+WHY: Queries Qdrant vectors to find the most relevant document chunks, constructs an augmented prompt,
+and invokes the LLM to generate an accurate, grounded answer with cited context chunks.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Document identifier context.</p>
+<div class="tsd-comment tsd-typography"><p>Target document GUID.</p>
 </div></li>
 <li><span><span class="tsd-kind-parameter">question</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>User question prompt.</p>
+<div class="tsd-comment tsd-typography"><p>User question.</p>
 </div></li>
 <li><span><span class="tsd-kind-parameter">chatHistory</span>: <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">role</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">text</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">[]</span></span>
-<div class="tsd-comment tsd-typography"><p>Dialogue history turns.</p>
+<div class="tsd-comment tsd-typography"><p>Prior chat turns for multi-turn conversational context.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.ChatResponseResult.html" class="tsd-signature-type tsd-kind-interface">ChatResponseResult</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to the model answer with vector citations.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.ChatResponseResult.html" class="tsd-signature-type tsd-kind-interface">ChatResponseResult</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Answer text, execution duration, and context chunk references.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#chatwithdocument">chatWithDocument</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:242</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:366</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="deletedocument"><span>delete<wbr/>Document</span><a href="#deletedocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -130,228 +143,312 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <div class="tsd-signature tsd-anchor-link" id="deletedocument-1"><span class="tsd-kind-call-signature">deleteDocument</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">success</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#deletedocument-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Permanently deletes a document and its associated vector embeddings.</p>
+<p>WHAT: Issues a DELETE to <code>/documents/{guid}</code>.
+WHY: Purges MongoDB entities, physical storage assets, and Qdrant vector index collections.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Unique document identifier.</p>
+<div class="tsd-comment tsd-typography"><p>GUID of the document to remove.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">success</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to operation status.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">success</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Confirmation record.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#deletedocument">deleteDocument</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:220</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:321</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="extractmetadata"><span>extract<wbr/>Metadata</span><a href="#extractmetadata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="extractmetadata-1"><span class="tsd-kind-call-signature">extractMetadata</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">fileName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">sampleContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a> <span class="tsd-signature-symbol">&amp;</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">extractedText</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#extractmetadata-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Analyzes document text and filename to suggest extracted BibTeX metadata.</p>
+<div class="tsd-comment tsd-typography"><p>Extracts structured BibTeX bibliographic metadata from a file or sample content.</p>
+<p>WHAT: Issues a POST to <code>/documents/extract-metadata</code> with file name, sample text, or binary data.
+WHY: Pre-fills upload dialogs with automatically resolved title, author, year, and entry type,
+saving researcher time and reducing cataloging errors.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">fileName</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Name of the document file.</p>
+<div class="tsd-comment tsd-typography"><p>File name.</p>
 </div></li>
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">sampleContent</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Optional text content sample.</p>
+<div class="tsd-comment tsd-typography"><p>Optional sample text snippet.</p>
 </div></li>
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">fileData</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Optional base64-encoded raw file bytes.</p>
+<div class="tsd-comment tsd-typography"><p>Optional base64 file data.</p>
 </div></li>
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">mimeType</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Optional file MIME type.</p>
+<div class="tsd-comment tsd-typography"><p>Optional MIME type.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a> <span class="tsd-signature-symbol">&amp;</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">extractedText</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to inferred BibTeX metadata and text.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a> <span class="tsd-signature-symbol">&amp;</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">extractedText</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Extracted BibTeX metadata record and full extracted text.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#extractmetadata">extractMetadata</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:259</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:396</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getdocument"><span>get<wbr/>Document</span><a href="#getdocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="getdocument-1"><span class="tsd-kind-call-signature">getDocument</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#getdocument-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Retrieves an individual document record by its persistent GUID.</p>
+<div class="tsd-comment tsd-typography"><p>Fetches the complete document entity including raw text content, chunks, and summaries.</p>
+<p>WHAT: Issues a GET to <code>/documents/{guid}</code>.
+WHY: Object Page views require complete document representation for RAG chat and summary analysis.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Unique document identifier.</p>
+<div class="tsd-comment tsd-typography"><p>Unique document GUID.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to the requested document record.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Complete DocumentRecord.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getdocument">getDocument</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:152</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:220</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getdocuments"><span>get<wbr/>Documents</span><a href="#getdocuments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="getdocuments-1"><span class="tsd-kind-call-signature">getDocuments</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">params</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">filters</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.FilterState.html" class="tsd-signature-type tsd-kind-interface">FilterState</a><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">page</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">pageSize</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">sortBy</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">sortOrder</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;desc&quot;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">&quot;asc&quot;</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.DocumentListResult.html" class="tsd-signature-type tsd-kind-interface">DocumentListResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#getdocuments-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Retrieves a paginated list of documents filtered by user query criteria.</p>
+<div class="tsd-comment tsd-typography"><p>Queries the document catalog matching pagination, sort criteria, and multi-attribute filters.</p>
+<p>WHAT: Serializes filter parameters into query string attributes and issues a GET to <code>/documents</code>.
+WHY: Sending query parameters over standard URL search strings allows server-side MongoDB
+indexes and custom regex queries to filter records without transferring entire collections over the wire.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">params</span>: <span class="tsd-signature-symbol">{</span><br/>    <span class="tsd-kind-property">filters</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.FilterState.html" class="tsd-signature-type tsd-kind-interface">FilterState</a><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">page</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">pageSize</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">sortBy</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">sortOrder</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;desc&quot;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">&quot;asc&quot;</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></span>
-<div class="tsd-comment tsd-typography"><p>Query parameters including pagination, sorting, and filter fields.</p>
+<div class="tsd-comment tsd-typography"><p>Pagination, sorting, and filter state.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.DocumentListResult.html" class="tsd-signature-type tsd-kind-interface">DocumentListResult</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to a paginated list of documents with total match count.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.DocumentListResult.html" class="tsd-signature-type tsd-kind-interface">DocumentListResult</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Paginated document records and total count.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getdocuments">getDocuments</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:116</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:175</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getdownloadurl"><span>get<wbr/>Download<wbr/>Url</span><a href="#getdownloadurl" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="getdownloadurl-1"><span class="tsd-kind-call-signature">getDownloadUrl</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><a href="#getdownloadurl-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Generates download URL for document asset.</p>
+<div class="tsd-comment tsd-typography"><p>Generates the direct download URL for a document's physical file asset.</p>
+<p>WHAT: Constructs the full <code>/documents/{guid}/download</code> URL.
+WHY: Allows native browser anchor tags and download managers to stream binary attachments.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Unique document identifier.</p>
+<div class="tsd-comment tsd-typography"><p>Unique document GUID.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><p>Download link URL.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><p>Complete download URL string.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getdownloadurl">getDownloadUrl</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:301</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:464</li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="gethistoricaldownloadurl"><span>get<wbr/>Historical<wbr/>Download<wbr/>Url</span><a href="#gethistoricaldownloadurl" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="gethistoricaldownloadurl-1"><span class="tsd-kind-call-signature">getHistoricalDownloadUrl</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">versionNumber</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><a href="#gethistoricaldownloadurl-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Generates a download URL for a specific historical version asset.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">versionNumber</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#gethistoricaldownloadurl">getHistoricalDownloadUrl</a></p>
+<ul>
+<li>Defined in services/backend/RestBackendAdapter.ts:495</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getopenapispec"><span>get<wbr/>Open<wbr/>Api<wbr/>Spec</span><a href="#getopenapispec" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="getopenapispec-1"><span class="tsd-kind-call-signature">getOpenApiSpec</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#getopenapispec-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Retrieves raw OpenAPI 3.0.3 specification YAML document.</p>
+<div class="tsd-comment tsd-typography"><p>Retrieves the raw OpenAPI 3.0 specification in YAML format.</p>
+<p>WHAT: Fetches <code>/openapi.yaml</code>.
+WHY: Powers the interactive OpenAPI schema viewer and developer documentation modals.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to YAML string.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Raw OpenAPI YAML string.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getopenapispec">getOpenApiSpec</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:305</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:507</li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="getversionhistory"><span>get<wbr/>Version<wbr/>History</span><a href="#getversionhistory" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="getversionhistory-1"><span class="tsd-kind-call-signature">getVersionHistory</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentVersionSnapshot.html" class="tsd-signature-type tsd-kind-interface">DocumentVersionSnapshot</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#getversionhistory-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Retrieves the historical version snapshot list for a document.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentVersionSnapshot.html" class="tsd-signature-type tsd-kind-interface">DocumentVersionSnapshot</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getversionhistory">getVersionHistory</a></p>
+<ul>
+<li>Defined in services/backend/RestBackendAdapter.ts:471</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="login"><span>login</span><a href="#login" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="login-1"><span class="tsd-kind-call-signature">login</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">username</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">password</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">realm</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">accessToken</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">user</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.UserProfile.html" class="tsd-signature-type tsd-kind-interface">UserProfile</a> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#login-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Authenticates the user with Keycloak OIDC.</p>
+<div class="tsd-comment tsd-typography"><p>Authenticates user credentials with Keycloak / OIDC identity provider.</p>
+<p>WHAT: Issues a POST to <code>/auth/login</code> and receives Bearer access token and user profile.
+WHY: Establishes security principal and roles for Role-Based Access Control (RBAC).</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">username</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>User credentials username.</p>
+<div class="tsd-comment tsd-typography"><p>Username or email.</p>
 </div></li>
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">password</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Optional password.</p>
+<div class="tsd-comment tsd-typography"><p>Password.</p>
 </div></li>
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">realm</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Optional tenant realm.</p>
+<div class="tsd-comment tsd-typography"><p>Target Keycloak realm.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">accessToken</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">user</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.UserProfile.html" class="tsd-signature-type tsd-kind-interface">UserProfile</a> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to access token and decoded user profile.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">accessToken</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">user</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.UserProfile.html" class="tsd-signature-type tsd-kind-interface">UserProfile</a> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Access token and UserProfile.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#login">login</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:277</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:425</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="logout"><span>logout</span><a href="#logout" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="logout-1"><span class="tsd-kind-call-signature">logout</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#logout-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Terminates active Keycloak session.</p>
+<div class="tsd-comment tsd-typography"><p>Terminates active authentication session.</p>
+<p>WHAT: Issues a POST to <code>/auth/logout</code>.
+WHY: Informs Keycloak session manager to invalidate the server-side session token.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving once logout complete.</p>
-<aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#logout">logout</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:293</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:447</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="overwriteversion"><span>overwrite<wbr/>Version</span><a href="#overwriteversion" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="overwriteversion-1"><span class="tsd-kind-call-signature">overwriteVersion</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">bibtex</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">File</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileFormat</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileName</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileSize</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#overwriteversion-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Overwrites the content and metadata of an existing document while preserving its GUID.</p>
+<div class="tsd-comment tsd-typography"><p>Overwrites the physical content and metadata of an existing document while preserving its persistent GUID.</p>
+<p>WHAT: Issues a PUT to <code>/documents/{guid}</code> with <code>isNewVersion: true</code>.
+WHY: Preserving the persistent GUID across version updates maintains citation stability,
+permalinks, and bookmark references while updating physical file contents, re-indexing vector embeddings,
+and regenerating summaries.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Unique identifier of the document to overwrite.</p>
+<div class="tsd-comment tsd-typography"><p>Persistent GUID of the document being updated.</p>
 </div></li>
 <li><span><span class="tsd-kind-parameter">payload</span>: <span class="tsd-signature-symbol">{</span><br/>    <span class="tsd-kind-property">bibtex</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">File</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileFormat</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileName</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileSize</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></span>
-<div class="tsd-comment tsd-typography"><p>Updated content, file, or metadata.</p>
+<div class="tsd-comment tsd-typography"><p>Updated file data and metadata.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to the updated document record.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Updated DocumentRecord.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#overwriteversion">overwriteVersion</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:186</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:278</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="regeneratesummary"><span>regenerate<wbr/>Summary</span><a href="#regeneratesummary" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="regeneratesummary-1"><span class="tsd-kind-call-signature">regenerateSummary</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">model</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;llama&quot;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">&quot;mistral&quot;</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.SummaryRecord.html" class="tsd-signature-type tsd-kind-interface">SummaryRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#regeneratesummary-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Triggers re-computation of a summary for a specific Spring AI model.</p>
+<div class="tsd-comment tsd-typography"><p>Triggers an on-demand re-summarization of a document using a specific LLM model.</p>
+<p>WHAT: Issues a POST to <code>/documents/{guid}/summarize</code> specifying the model key.
+WHY: Allows researchers to independently re-evaluate summaries with newer prompt instructions
+or alternative models (Llama 3.3 vs Mistral Large) without re-uploading the document.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span>
-<div class="tsd-comment tsd-typography"><p>Document identifier.</p>
+<div class="tsd-comment tsd-typography"><p>Document GUID.</p>
 </div></li>
-<li><span><span class="tsd-kind-parameter">model</span>: <span class="tsd-signature-type">&quot;llama&quot;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">&quot;mistral&quot;</span></span></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.SummaryRecord.html" class="tsd-signature-type tsd-kind-interface">SummaryRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to the newly computed summary record.</p>
+<li><span><span class="tsd-kind-parameter">model</span>: <span class="tsd-signature-type">&quot;llama&quot;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">&quot;mistral&quot;</span></span>
+<div class="tsd-comment tsd-typography"><p>'llama' or 'mistral'.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.SummaryRecord.html" class="tsd-signature-type tsd-kind-interface">SummaryRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Generated SummaryRecord with execution duration and timestamp.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#regeneratesummary">regenerateSummary</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:229</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:341</li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="rollbackversion"><span>rollback<wbr/>Version</span><a href="#rollbackversion" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="rollbackversion-1"><span class="tsd-kind-call-signature">rollbackVersion</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">targetVersion</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#rollbackversion-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Rolls back the document to a specific historical version snapshot.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">guid</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">targetVersion</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#rollbackversion">rollbackVersion</a></p>
+<ul>
+<li>Defined in services/backend/RestBackendAdapter.ts:483</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="testhealth"><span>test<wbr/>Health</span><a href="#testhealth" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="testhealth-1"><span class="tsd-kind-call-signature">testHealth</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.BackendHealthResult.html" class="tsd-signature-type tsd-kind-interface">BackendHealthResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#testhealth-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Probes the backend endpoint to evaluate connection status and latency.</p>
+<div class="tsd-comment tsd-typography"><p>Performs a comprehensive latency and availability health check against the backend.</p>
+<p>WHAT: Probes <code>/health</code> first; if unavailable, probes <code>/documents?pageSize=1</code>, measuring roundtrip ms.
+WHY: Dual-level probing ensures that even if custom health endpoints are unavailable,
+basic REST database query functionality is tested, giving researchers an accurate status pill.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.BackendHealthResult.html" class="tsd-signature-type tsd-kind-interface">BackendHealthResult</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to health diagnostic details.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/services_backend_types.BackendHealthResult.html" class="tsd-signature-type tsd-kind-interface">BackendHealthResult</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Measured BackendHealthResult.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#testhealth">testHealth</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:309</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/RestBackendAdapter.ts:520</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="uploaddocument"><span>upload<wbr/>Document</span><a href="#uploaddocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="uploaddocument-1"><span class="tsd-kind-call-signature">uploadDocument</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">bibtex</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">File</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileFormat</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileSize</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#uploaddocument-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Ingests a new document asset with metadata and trigger dual-model summaries.</p>
+<div class="tsd-comment tsd-typography"><p>Ingests a new document into the library with automated BibTeX extraction and dual-model AI summarization.</p>
+<p>WHAT: Issues a POST to <code>/documents</code> with file payload, base64 data, and metadata.
+WHY: Ingestion is a computationally intensive pipeline involving file storage, text extraction,
+chunk vectorization into Qdrant, and dual LLM synthesis (Llama 3.3 and Mistral Large).
+A generous 180-second timeout prevents premature disconnection, while 0 retries ensures
+that documents are never accidentally ingested twice.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">payload</span>: <span class="tsd-signature-symbol">{</span><br/>    <span class="tsd-kind-property">bibtex</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">File</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileFormat</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">fileSize</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></span>
-<div class="tsd-comment tsd-typography"><p>Upload bundle containing physical asset or content with BibTeX info.</p>
+<div class="tsd-comment tsd-typography"><p>Upload payload including file metadata and contents.</p>
 </div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise resolving to the newly created document record.</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><p>Newly created DocumentRecord.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#uploaddocument">uploadDocument</a></p>
 <ul>
-<li>Defined in services/backend/RestBackendAdapter.ts:156</li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in services/backend/RestBackendAdapter.ts:236</li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -372,7 +469,7 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
 <div><a href="#config"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>config</span></a><a href="#id"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>id</span></a><a href="#name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>name</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
-<div><a href="#chatwithdocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>chat<wbr/>With<wbr/>Document</span></a><a href="#deletedocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>delete<wbr/>Document</span></a><a href="#extractmetadata"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>extract<wbr/>Metadata</span></a><a href="#getdocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Document</span></a><a href="#getdocuments"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Documents</span></a><a href="#getdownloadurl"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Download<wbr/>Url</span></a><a href="#getopenapispec"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Open<wbr/>Api<wbr/>Spec</span></a><a href="#login"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>login</span></a><a href="#logout"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>logout</span></a><a href="#overwriteversion"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>overwrite<wbr/>Version</span></a><a href="#regeneratesummary"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>regenerate<wbr/>Summary</span></a><a href="#testhealth"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>test<wbr/>Health</span></a><a href="#uploaddocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>upload<wbr/>Document</span></a></div></details></div></details></div>
+<div><a href="#chatwithdocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>chat<wbr/>With<wbr/>Document</span></a><a href="#deletedocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>delete<wbr/>Document</span></a><a href="#extractmetadata"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>extract<wbr/>Metadata</span></a><a href="#getdocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Document</span></a><a href="#getdocuments"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Documents</span></a><a href="#getdownloadurl"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Download<wbr/>Url</span></a><a href="#gethistoricaldownloadurl"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Historical<wbr/>Download<wbr/>Url</span></a><a href="#getopenapispec"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Open<wbr/>Api<wbr/>Spec</span></a><a href="#getversionhistory"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Version<wbr/>History</span></a><a href="#login"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>login</span></a><a href="#logout"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>logout</span></a><a href="#overwriteversion"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>overwrite<wbr/>Version</span></a><a href="#regeneratesummary"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>regenerate<wbr/>Summary</span></a><a href="#rollbackversion"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>rollback<wbr/>Version</span></a><a href="#testhealth"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>test<wbr/>Health</span></a><a href="#uploaddocument"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>upload<wbr/>Document</span></a></div></details></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html">Personal Library - TypeScript API Reference</a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container">

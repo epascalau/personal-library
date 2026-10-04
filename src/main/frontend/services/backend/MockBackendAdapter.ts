@@ -14,7 +14,7 @@ import {
   DocumentListResult,
   ChatResponseResult
 } from './types';
-import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile } from '../../types';
+import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile, DocumentVersionSnapshot } from '../../types';
 
 const INITIAL_MOCK_DOCUMENTS: DocumentRecord[] = [
   {
@@ -359,10 +359,33 @@ export class MockBackendAdapter implements BackendAdapter {
     const existing = this.documents[existingIndex];
     const now = new Date().toISOString();
 
+    const snapshotGuid = `snapshot-${existing.guid}-v${existing.versionNumber || 1}-${Date.now()}`;
+    const previousSnapshot: DocumentVersionSnapshot = {
+      snapshotGuid,
+      versionNumber: existing.versionNumber || 1,
+      fileName: existing.fileName,
+      fileSize: existing.fileSize,
+      fileSizeFormatted: existing.fileSizeFormatted,
+      format: existing.format,
+      savedAt: existing.editDate || existing.uploadDate || now,
+      bibtex: JSON.parse(JSON.stringify(existing.bibtex)),
+      bibtexRaw: existing.bibtexRaw,
+      summaries: JSON.parse(JSON.stringify(existing.summaries)),
+      contentExcerpt: existing.contentExcerpt,
+      fullContent: existing.fullContent,
+      chunksCount: existing.chunks ? existing.chunks.length : 0,
+      note: `Archived prior to version ${(existing.versionNumber || 1) + 1} overwrite`
+    };
+
+    const updatedHistory: DocumentVersionSnapshot[] = [
+      previousSnapshot,
+      ...(existing.versionHistory || [])
+    ];
+
     const updatedDoc: DocumentRecord = {
       ...existing,
       guid: existing.guid, // Retain existing GUID; do not create a new GUID
-      previousVersionGuid: existing.previousVersionGuid || null,
+      previousVersionGuid: snapshotGuid,
       versionNumber: (existing.versionNumber || 1) + 1,
       fileName: payload.fileName || existing.fileName,
       format: payload.fileFormat || existing.format,
@@ -371,12 +394,90 @@ export class MockBackendAdapter implements BackendAdapter {
       editDate: now,
       bibtex: payload.bibtex || existing.bibtex,
       fullContent: payload.fileContent || existing.fullContent,
-      contentExcerpt: (payload.fileContent || existing.fullContent || '').slice(0, 300)
+      contentExcerpt: (payload.fileContent || existing.fullContent || '').slice(0, 300),
+      versionHistory: updatedHistory
     };
 
     this.documents[existingIndex] = updatedDoc;
     this.save();
     return updatedDoc;
+  }
+
+  /**
+   * Retrieves the version history and snapshots for a document.
+   */
+  async getVersionHistory(guid: string): Promise<DocumentVersionSnapshot[]> {
+    const doc = this.documents.find(d => d.guid === guid);
+    return doc?.versionHistory || [];
+  }
+
+  /**
+   * Rolls back the document to a specific historical version snapshot.
+   */
+  async rollbackVersion(guid: string, targetVersion: number): Promise<DocumentRecord> {
+    const existingIndex = this.documents.findIndex(d => d.guid === guid);
+    if (existingIndex === -1) {
+      throw new Error(`Document with GUID ${guid} not found`);
+    }
+
+    const existing = this.documents[existingIndex];
+    const snapshotIndex = (existing.versionHistory || []).findIndex(v => v.versionNumber === targetVersion);
+    if (snapshotIndex === -1) {
+      throw new Error(`Historical version ${targetVersion} not found`);
+    }
+
+    const targetSnapshot = existing.versionHistory![snapshotIndex];
+    const currentSnapshotGuid = `snapshot-${existing.guid}-v${existing.versionNumber}-${Date.now()}`;
+    const currentSnapshot: DocumentVersionSnapshot = {
+      snapshotGuid: currentSnapshotGuid,
+      versionNumber: existing.versionNumber,
+      fileName: existing.fileName,
+      fileSize: existing.fileSize,
+      fileSizeFormatted: existing.fileSizeFormatted,
+      format: existing.format,
+      savedAt: existing.editDate || new Date().toISOString(),
+      bibtex: JSON.parse(JSON.stringify(existing.bibtex)),
+      bibtexRaw: existing.bibtexRaw,
+      summaries: JSON.parse(JSON.stringify(existing.summaries)),
+      contentExcerpt: existing.contentExcerpt,
+      fullContent: existing.fullContent,
+      chunksCount: existing.chunks ? existing.chunks.length : 0,
+      note: `Archived prior to rollback to version ${targetVersion}`
+    };
+
+    const newVersionNumber = (existing.versionNumber || 1) + 1;
+    const updatedHistory: DocumentVersionSnapshot[] = [
+      currentSnapshot,
+      ...(existing.versionHistory || [])
+    ];
+
+    const restoredDoc: DocumentRecord = {
+      ...existing,
+      previousVersionGuid: targetSnapshot.snapshotGuid,
+      versionNumber: newVersionNumber,
+      fileName: targetSnapshot.fileName,
+      format: targetSnapshot.format,
+      fileSize: targetSnapshot.fileSize,
+      fileSizeFormatted: targetSnapshot.fileSizeFormatted,
+      editDate: new Date().toISOString(),
+      bibtex: JSON.parse(JSON.stringify(targetSnapshot.bibtex)),
+      bibtexRaw: targetSnapshot.bibtexRaw,
+      summaries: JSON.parse(JSON.stringify(targetSnapshot.summaries)),
+      fullContent: targetSnapshot.fullContent || targetSnapshot.contentExcerpt,
+      contentExcerpt: targetSnapshot.contentExcerpt,
+      versionHistory: updatedHistory
+    };
+
+    this.documents[existingIndex] = restoredDoc;
+    this.save();
+    return restoredDoc;
+  }
+
+  /**
+   * Generates a download URL for a historical version asset.
+   */
+  getHistoricalDownloadUrl(guid: string, versionNumber: number): string {
+    return `/api/v1/documents/${guid}/versions/${versionNumber}/download`;
   }
 
   /**

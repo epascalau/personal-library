@@ -16,10 +16,10 @@ import { DialogView } from './DialogView';
 
 const COPIED_RESET_MS = 2000;
 
-type BpmnTab = 'diagram' | 'pipeline' | 'xml' | 'deployment';
+type BpmnTab = 'mindmap' | 'diagram' | 'pipeline' | 'xml' | 'deployment';
 
 export class BpmnModalView extends DialogView {
-  private activeTab: BpmnTab = 'diagram';
+  private activeTab: BpmnTab = 'mindmap';
 
   private xmlContent = '';
 
@@ -197,12 +197,21 @@ export class BpmnModalView extends DialogView {
           <div class="flex flex-wrap items-center gap-1 bg-white dark:bg-[#182029] p-1 rounded-lg border border-gray-200 dark:border-[#2e3b4a]">
             <button
               type="button"
+              data-action="tab-mindmap"
+              class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'mindmap'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
+            >
+              🧠 Full Functionality Mindmap
+            </button>
+            <button
+              type="button"
               data-action="tab-diagram"
               class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'diagram'
                 ? 'bg-teal-600 text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
             >
-              Visual BPMN Diagram (Image &amp; PDF)
+              BPMN Diagram
             </button>
             <button
               type="button"
@@ -211,7 +220,7 @@ export class BpmnModalView extends DialogView {
                 ? 'bg-teal-600 text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
             >
-              Pipeline Task Breakdown
+              Task Breakdown
             </button>
             <button
               type="button"
@@ -220,7 +229,7 @@ export class BpmnModalView extends DialogView {
                 ? 'bg-teal-600 text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
             >
-              BPMN 2.0 XML (Camunda Modeler)
+              BPMN 2.0 XML
             </button>
             <button
               type="button"
@@ -229,58 +238,366 @@ export class BpmnModalView extends DialogView {
                 ? 'bg-teal-600 text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
             >
-              Camunda 7 &amp; 8 Guide
+              Camunda Guide
             </button>
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5">
-            <a
-              href="/api/v1/diagrams/bpmn.png?download=true"
-              download="document_ingestion_rag.png"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-              title="Download high-resolution 2x PNG image (3480px)"
-            >
-              ${icon('Download', { className: 'w-3 h-3' })}
-              PNG Image
-            </a>
-            <a
-              href="/api/v1/diagrams/bpmn.pdf?download=true"
-              download="document_ingestion_rag.pdf"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-              title="Download 4-page architectural specification PDF"
-            >
-              ${icon('Download', { className: 'w-3 h-3' })}
-              PDF Spec
-            </a>
-            <a
-              href="/api/v1/bpmn/document-ingestion.bpmn?download=true"
-              download="document-ingestion-rag.bpmn"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-              title="Download executable BPMN 2.0 XML for Camunda Modeler"
-            >
-              ${icon('Download', { className: 'w-3 h-3' })}
-              BPMN Model
-            </a>
-            <ui5-button
-              class="plib-button"
-              design="Default"
-              icon="${this.copied ? 'accept' : 'copy'}"
-              data-action="copy-bpmn"
-            >
-              ${this.copied ? 'Copied XML!' : 'Copy XML'}
-            </ui5-button>
+            ${this.activeTab === 'mindmap'
+              ? html`
+                  <a
+                    href="/api/v1/diagrams/mindmap.png?download=true"
+                    download="personal-library-mindmap.png"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download 4K Ultra-HD Mindmap PNG (3840px)"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    4K PNG
+                  </a>
+                  <a
+                    href="/api/v1/diagrams/mindmap.pdf?download=true"
+                    download="personal-library-mindmap.pdf"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download 2-Page Architectural Vector Mindmap PDF"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    PDF Spec
+                  </a>
+                  <a
+                    href="/api/v1/diagrams/mindmap.svg?download=true"
+                    download="personal-library-mindmap.svg"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download Infinitely Scalable Vector SVG"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    Vector SVG
+                  </a>
+                  <a
+                    href="/api/v1/diagrams/mindmap.mmd?download=true"
+                    download="personal-library-mindmap.mmd"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download Mermaid Mindmap Markup"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    Mermaid
+                  </a>
+                `
+              : html`
+                  <a
+                    href="/api/v1/diagrams/bpmn.png?download=true"
+                    download="document_ingestion_rag.png"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download high-resolution 2x PNG image (3480px)"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    PNG Image
+                  </a>
+                  <a
+                    href="/api/v1/diagrams/bpmn.pdf?download=true"
+                    download="document_ingestion_rag.pdf"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download 4-page architectural specification PDF"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    PDF Spec
+                  </a>
+                  <a
+                    href="/api/v1/bpmn/document-ingestion.bpmn?download=true"
+                    download="document-ingestion-rag.bpmn"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    title="Download executable BPMN 2.0 XML for Camunda Modeler"
+                  >
+                    ${icon('Download', { className: 'w-3 h-3' })}
+                    BPMN Model
+                  </a>
+                  <ui5-button
+                    class="plib-button"
+                    design="Default"
+                    icon="${this.copied ? 'accept' : 'copy'}"
+                    data-action="copy-bpmn"
+                  >
+                    ${this.copied ? 'Copied XML!' : 'Copy XML'}
+                  </ui5-button>
+                `}
           </div>
         </div>
 
         <!-- Content Area -->
         <div class="flex-1 overflow-y-auto p-5 bg-[#fafbfc] dark:bg-[#151c24]">
-          ${this.activeTab === 'diagram'
+          ${this.activeTab === 'mindmap'
+            ? this.renderMindmapView()
+            : this.activeTab === 'diagram'
             ? this.renderDiagramView()
             : this.activeTab === 'pipeline'
             ? this.renderPipelineView()
             : this.activeTab === 'xml'
             ? this.renderXmlView()
             : this.renderDeploymentView()}
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Renders the Full Functionality Mindmap viewer with image, download links, and 8-pillar capability catalog.
+   */
+  private renderMindmapView(): RawHtml {
+    return html`
+      <div class="space-y-5">
+        <!-- Quick Stats Banner -->
+        <div class="p-3.5 bg-linear-to-r from-blue-900/40 via-indigo-900/30 to-purple-900/40 rounded-xl border border-blue-500/30 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-600/30 border border-blue-400/50 flex items-center justify-center text-lg">
+              🧠
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm">Personal Library &amp; AI Research Engine — Capability Mindmap</div>
+              <div class="text-xs text-blue-200">100% Comprehensive Functional Architecture: Ingestion, BibTeX, Dual AI, Qdrant RAG, UI5, Security &amp; Tooling</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold">8 Strategic Pillars</span>
+            <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[11px] font-bold">32 Functional Modules</span>
+          </div>
+        </div>
+
+        <!-- Format & Download Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-gray-200 dark:border-[#2e3b4a] shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                ${icon('FileText', { className: 'w-3.5 h-3.5 text-blue-600' })}
+                Ultra-HD 4K PNG
+              </div>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">3840 × 2400 px · High DPI</p>
+            </div>
+            <a
+              href="/api/v1/diagrams/mindmap.png"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-300 rounded text-[11px] font-medium hover:underline flex items-center gap-1"
+            >
+              <span>View</span>
+              ${icon('ExternalLink', { className: 'w-3 h-3' })}
+            </a>
+          </div>
+
+          <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-gray-200 dark:border-[#2e3b4a] shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                ${icon('BookOpen', { className: 'w-3.5 h-3.5 text-purple-600' })}
+                Archival Vector PDF
+              </div>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">2 Pages · Spread + Catalog</p>
+            </div>
+            <a
+              href="/api/v1/diagrams/mindmap.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-2 py-1 bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 rounded text-[11px] font-medium hover:underline flex items-center gap-1"
+            >
+              <span>View</span>
+              ${icon('ExternalLink', { className: 'w-3 h-3' })}
+            </a>
+          </div>
+
+          <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-gray-200 dark:border-[#2e3b4a] shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                ${icon('Layers', { className: 'w-3.5 h-3.5 text-teal-600' })}
+                Scalable Vector SVG
+              </div>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">Infinite Zoom · Crisp Text</p>
+            </div>
+            <a
+              href="/api/v1/diagrams/mindmap.svg"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-2 py-1 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-300 rounded text-[11px] font-medium hover:underline flex items-center gap-1"
+            >
+              <span>View</span>
+              ${icon('ExternalLink', { className: 'w-3 h-3' })}
+            </a>
+          </div>
+
+          <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-gray-200 dark:border-[#2e3b4a] shadow-xs flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                ${icon('FileCode2', { className: 'w-3.5 h-3.5 text-amber-600' })}
+                Mermaid &amp; PlantUML
+              </div>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">Source .mmd &amp; .puml markup</p>
+            </div>
+            <a
+              href="/api/v1/diagrams/mindmap.mmd"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-2 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-300 rounded text-[11px] font-medium hover:underline flex items-center gap-1"
+            >
+              <span>View</span>
+              ${icon('ExternalLink', { className: 'w-3 h-3' })}
+            </a>
+          </div>
+        </div>
+
+        <!-- Embedded Interactive Mindmap Visual Container -->
+        <div class="rounded-xl border border-gray-200 dark:border-[#2e3b4a] bg-[#090d16] overflow-hidden shadow-md">
+          <div class="px-4 py-2.5 bg-[#0f172a] border-b border-gray-800 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 text-gray-300 font-semibold">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Interactive Mindmap Canvas (Click Image to View Full 4K Resolution)
+            </div>
+            <div class="flex items-center gap-3">
+              <a
+                href="/api/v1/diagrams/mindmap.svg"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-[11px]"
+              >
+                <span>Open Vector SVG</span>
+                ${icon('ExternalLink', { className: 'w-3 h-3' })}
+              </a>
+            </div>
+          </div>
+          <div class="p-3 flex justify-center items-center overflow-x-auto bg-[#070b13]">
+            <a href="/api/v1/diagrams/mindmap.png" target="_blank" rel="noopener noreferrer" class="block cursor-zoom-in" title="Click to view ultra-high-resolution 4K mindmap">
+              <img
+                src="/api/v1/diagrams/mindmap.svg"
+                alt="Personal Library Full Functionality Mindmap"
+                class="w-full max-w-[1280px] h-auto rounded-lg border border-gray-800 hover:border-blue-500/60 transition-colors shadow-2xl"
+              />
+            </a>
+          </div>
+        </div>
+
+        <!-- 8 Core Pillars Matrix Table -->
+        <div class="space-y-3">
+          <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            ${icon('Layers', { className: 'w-4 h-4 text-blue-500' })}
+            8 Strategic Pillars &amp; Capability Catalog
+          </h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <!-- Pillar 1 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-emerald-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>1. Ingestion &amp; Document Pipeline</span>
+                <span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">Camunda BPMN</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Automated multi-format document ingestion, tokenization and storage pipeline.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• Formats: PDF, DOCX, Markdown, LaTeX, Plain Text with MIME validation</li>
+                <li>• Drag-and-drop file upload with client-side BibTeX extraction preview</li>
+                <li>• Camunda BPMN 2.0 7-task process with human validation gateway loop</li>
+                <li>• SHA-256 fingerprinting for de-duplication and versioned disk archiving</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-amber-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>2. BibTeX &amp; LaTeX Metadata Engine</span>
+                <span class="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px]">AST Lexer</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Academic citation analysis, regex AST lexing and LaTeX accent sanitization.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• Parses @article, @book, @inproceedings, @techreport, @phdthesis, @misc</li>
+                <li>• 14 structured attributes: title, author, year, month, DOI, URL, abstract, etc.</li>
+                <li>• LaTeX accent sanitization (converting {\"a}, {\'e} to standard UTF-8 characters)</li>
+                <li>• In-browser BibTeX editor, clipboard citation copy and faceted filtering</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-blue-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>3. Dual AI Models &amp; Benchmarking</span>
+                <span class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px]">Spring AI</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Simultaneous multi-model comparative synthesis and benchmark telemetry.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• Ollama Llama 3.3 (70B Instruct): Deep academic synthesis and methodology critique</li>
+                <li>• Ollama Mistral Large (2411): Rapid executive summary and core bullet takeaways</li>
+                <li>• Google Gemini API cloud integration for multimodal processing fallback</li>
+                <li>• Synchronized side-by-side comparator UI with latency/duration telemetry</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 4 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-purple-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>4. Vector RAG &amp; Conversational Chat</span>
+                <span class="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[10px]">Qdrant Vector</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Semantic search, dense vector embeddings and multi-turn grounded conversation.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• Semantic chunking: 500-token chunks with 50-token contextual overlap</li>
+                <li>• Qdrant library_embeddings collection with Cosine distance metric &amp; HNSW</li>
+                <li>• Multi-turn conversational document chat assistant with context memory</li>
+                <li>• Grounded citation drawer with exact excerpt quotes and confidence scores</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 5 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-rose-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>5. Version Control &amp; Lineage Tracking</span>
+                <span class="px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 text-[10px]">Audit Immutable</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Non-destructive version overwriting with persistent root lineage and rollbacks.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• In-place multipart version overwrite preserving root document GUID</li>
+                <li>• Version lineage pointer chain (versionNumber, previousVersionGuid, rootGuid)</li>
+                <li>• Mutation audit trail logging user identity, timestamps, and edited fields</li>
+                <li>• Instant rollback capability and raw binary asset download for any prior version</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 6 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-teal-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>6. Enterprise UI5 Frontend Experience</span>
+                <span class="px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-400 text-[10px]">SAP Fiori</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Enterprise-grade UI5 Web Components, reactive stores and internationalization.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• ListReport with multi-field FilterBar and adaptive ObjectPage with KPI header</li>
+                <li>• Dual theme support: Light and Dark theme</li>
+                <li>• 5 Localized languages: English, German, French, Spanish, Romanian</li>
+                <li>• Observable reactive stores &amp; gateway facade with REST/Mock driver switching</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 7 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-red-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>7. Security, Identity &amp; Governance</span>
+                <span class="px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px]">Keycloak OIDC</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">OAuth2/OIDC authentication, role-based access control and copyleft licensing.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• Keycloak 24+ integration with JWT Bearer tokens and SSO session lifecycle</li>
+                <li>• RBAC roles: LIBRARY_ADMIN (Full Write), CHIEF_RESEARCHER (AI &amp; RAG)</li>
+                <li>• Security audit logging, path traversal blocking and sanitized filenames</li>
+                <li>• GNU AGPL-3.0-or-later license protecting open-source research integrity</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 8 -->
+            <div class="p-3 bg-white dark:bg-[#1c232b] rounded-lg border border-l-4 border-gray-200 dark:border-[#2e3b4a] border-l-indigo-500">
+              <div class="font-bold text-gray-900 dark:text-white flex items-center justify-between mb-1">
+                <span>8. Architecture, API &amp; Tooling Ecosystem</span>
+                <span class="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[10px]">Full Stack</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Standards-compliant specifications, diagrams and export automation.</p>
+              <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
+                <li>• OpenAPI 3.1 REST API specification and interactive Swagger schema viewer</li>
+                <li>• Complete C4 diagrams and technology-specific Java + TS UML Class diagrams</li>
+                <li>• Automated multi-format export engine: SVG, 4K PNG, Archival PDF, Draw.io</li>
+                <li>• Complete repository ZIP exporter and interactive TypeDoc/Javadoc code docs</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -714,6 +1031,10 @@ public class QdrantVectorizationWorker {
    * WHY: Delegated event binding ensures handlers remain attached across template renders without manual DOM queries.
    */
   protected bind(): void {
+    this.on('[data-action="tab-mindmap"]', 'click', () => {
+      this.switchTab('mindmap');
+    });
+
     this.on('[data-action="tab-diagram"]', 'click', () => {
       this.switchTab('diagram');
     });

@@ -4,7 +4,7 @@
 > contains the current architecture, implementation constraints, reproduction
 > procedure, and acceptance checklist for rebuilding this project.
 
-Personal Library is an enterprise-grade document management and research platform built with SAP Fiori Web Components following SAP UI5 floorplans (List Report and Object Page), automated BibTeX metadata extraction, vector-based semantic retrieval via Qdrant, dual-model AI summarization (Llama and Mistral), and an interactive RAG chat pipeline.
+Personal Library is an enterprise-grade document management and research platform built with SAP Fiori Web Components following SAP UI5 floorplans (List Report and Object Page), automated BibTeX metadata extraction, vector-based semantic retrieval via Qdrant, dual-model Artificial Intelligence (AI) summarization using Large Language Models (LLMs: Llama and Mistral), and an interactive Retrieval-Augmented Generation (RAG) conversational research pipeline.
 
 ---
 
@@ -19,7 +19,7 @@ Personal Library is an enterprise-grade document management and research platfor
                                                  ▼
 ┌─────────────────────────┐         ┌─────────────────────────────┐
 │  Personal Library Web   │ ◄─────► │  API Gateway / Spring Boot  │
-│  (SAP Horizon Floorplans│  HTTP   │  Document Pipeline & RAG    │
+│  (SAP Fiori Floorplans: │  HTTP   │  Document Pipeline & RAG    │
 │   List Report & Object) │         └──────────────┬──────────────┘
 └─────────────────────────┘                        │
                                    ┌───────────────┼───────────────┐
@@ -32,15 +32,77 @@ Personal Library is an enterprise-grade document management and research platfor
 ```
 
 ### Technical Stack
-* **Frontend:** Vanilla TypeScript, Vite, SAP Fiori / UI5 Horizon Theme (`sap_horizon`).
+* **Frontend:** Vanilla TypeScript, Vite, SAP Fiori / UI5 Web Components with light and dark themes.
 * **UI Patterns:** SAP Fiori List Report Floorplan & SAP Fiori Object Page Floorplan.
-* **Authentication:** Keycloak / OpenID Connect (OIDC) client.
-* **AI & Embeddings:** Spring AI, Ollama (`llama` and `mistral` models) / Gemini 2.5/3.8 engine.
-* **Databases:**
+* **Authentication & IAM:** Keycloak / OpenID Connect (OIDC) & OAuth 2.0 (Open Authorization) client.
+* **AI & Embeddings:** Spring AI, Ollama Large Language Models (LLMs: `llama` and `mistral` models) / Google Gemini 2.5/3.8 engine.
+* **Databases & Vector Stores:**
   * **MongoDB:** Document records, BibTeX properties, version histories, audit logs.
-  * **Qdrant Vector Database:** Embedding index for high-precision semantic content search and RAG retrieval.
+  * **Qdrant Vector Database:** Embedding index with HNSW (Hierarchical Navigable Small World) graphs for high-precision semantic content search and Retrieval-Augmented Generation (RAG).
   * **Local File Storage:** Encrypted physical document assets (`md`, `docx`, `pdf`, `txt`, `doc`, `xls`, `xlsx`, `ppt`, `pptx`).
-* **API Documentation:** OpenAPI 3.0.3 (`/openapi.yaml` and interactive viewer).
+* **API Documentation:** OpenAPI 3.0.3 REST specification (`/openapi.yaml` and interactive viewer).
+* **Architectural Learning Guide:** Detailed engineering breakdown of 10 core architectural patterns in [docs/LEARNING_TOPICS.md](docs/LEARNING_TOPICS.md) ([Web Portal](docs/learning-topics.html)).
+* **Illustrated AI Explainer:** Plain English & mathematical breakdown of Tokens, Qdrant HNSW graphs, and Summarization using *The Wizard of Oz* in [docs/EXPLAINER_WIZARD_OF_OZ.md](docs/EXPLAINER_WIZARD_OF_OZ.md) ([Interactive Portal](docs/wizard-of-oz-explainer.html)).
+* **RAG Architecture Comparison:** Deep-dive gap analysis evaluating this codebase against canonical modular Reference RAG architectures in [docs/RAG_ARCHITECTURE_COMPARISON.md](docs/RAG_ARCHITECTURE_COMPARISON.md) ([Web Portal](docs/rag-architecture-comparison.html)).
+* **Financial Ledger & Commercial ROI Analysis:** Comprehensive financial ledger, commercial market valuation ($118.31 compute vs. $16,500 traditional build), and cost driver takeaways in [docs/unified_financial_ledger_roi_key_takeaways.md](docs/unified_financial_ledger_roi_key_takeaways.md) ([Web Portal](docs/unified-financial-ledger-roi.html)).
+
+---
+
+## 🎓 Architecture & Engineering Learning Guide
+
+For engineers, architects, and researchers studying this codebase, a comprehensive deep-dive guide is available at **[`docs/LEARNING_TOPICS.md`](docs/LEARNING_TOPICS.md)** (or view the interactive guide at **[`docs/learning-topics.html`](docs/learning-topics.html)**). It details 10 foundational enterprise patterns implemented across the project:
+
+| # | Topic | Key Concepts Demonstrated | Code Locations |
+|---|---|---|---|
+| **1** | [SAP Fiori UI5 Architecture](docs/LEARNING_TOPICS.md#1-enterprise-ui-architecture-with-sap-fiori--ui5-web-components) | Framework-free W3C Web Components (`@ui5/webcomponents` v2), List Report & Object Page floorplans, dynamic Light/Dark theming | `src/main/frontend/views/`, `styles.css` |
+| **2** | [Reactive State Management](docs/LEARNING_TOPICS.md#2-reactive-state-management--decoupled-frontend-patterns) | Observable `Store<T>` micro-framework, fine-grained subscriptions, component lifecycle (`track`, `unmount`), typed `EventBus`, client-side i18n engine | `src/main/frontend/core/`, `stores/`, `i18n/` |
+| **3** | [Pluggable Backend Gateway](docs/LEARNING_TOPICS.md#3-pluggable-backend-gateway--driver-adapter-pattern) | Gateway Facade & Driver Adapter pattern, production REST vs. standalone mock driver, zero-downtime hot-swapping at runtime | `src/main/frontend/services/backend/` |
+| **4** | [Multi-Model LLM Orchestration](docs/LEARNING_TOPICS.md#4-multi-model-llm-orchestration--comparative-benchmarking) | Specialized dual personas (Llama 3.3 70B analytical vs. Mistral Large 2411 executive), Google Gemini cloud fallback, race-condition-safe parallel execution | `src/main/java/.../AiSummarizationService.java`, `server.ts` |
+| **5** | [Vector RAG Architecture](docs/LEARNING_TOPICS.md#5-retrieval-augmented-generation-rag--vector-database-architecture) | Sliding-window semantic chunking (500 tokens / 50 overlap), Qdrant HNSW cosine indexing, grounded retrieval, anti-hallucination citation drawer | `src/main/java/.../VectorRagService.java`, `ObjectPageView.ts` |
+| **6** | [Camunda BPMN 2.0 Workflows](docs/LEARNING_TOPICS.md#6-camunda-bpmn-20-workflow-orchestration) | Long-running asynchronous orchestration, service tasks, retry boundaries (`R3/PT10S`), human-in-the-loop review gateway, in-app BPMN viewer | `document-ingestion-rag.bpmn`, `BpmnDialog.ts` |
+| **7** | [Domain Parsing (LaTeX / BibTeX)](docs/LEARNING_TOPICS.md#7-domain-specific-parsing--metadata-engineering-latex--bibtex) | AST lexing/tokenization, 14 standard publication attributes, dynamic schema-driven form generation, bidirectional LaTeX BNF formatting | `src/main/frontend/utils/bibtexParser.ts` |
+| **8** | [Versioning & Immutable Rollback](docs/LEARNING_TOPICS.md#8-document-versioning-lineage--immutable-rollback-architecture) | Stable GUID continuity, immutable snapshot archiving (`DocumentVersionSnapshot`), non-destructive append-only rollback, historical asset download | `DocumentService.java`, `mockBackendAdapter.ts`, `ObjectPageView.ts` |
+| **9** | [Microservices Topology & Security](docs/LEARNING_TOPICS.md#9-production-grade-microservices-topology--security) | Multi-container Docker Compose topology, Keycloak OIDC/OAuth2 JWT bearer validation, granular RBAC, GNU AGPLv3 network copyleft | `docker-compose.yml`, `SecurityConfig.java` |
+| **10** | [Architecture-as-Code Tooling](docs/LEARNING_TOPICS.md#10-architecture-as-code--automated-visual-documentation-tooling) | Programmatic diagram generation (SVG, 4K PNG via Resvg, archival PDFs via PDFKit, Draw.io XML), dual-stack Java/TypeScript UML, OpenAPI 3.0 | `scripts/generate-*.ts`, `docs/diagrams/` |
+
+---
+
+## 📖 Glossary of Acronyms & Terminology
+
+To assist developers, researchers, and students, all acronyms used throughout this project and its documentation are defined below:
+
+| Acronym | Full Expansion | Architectural Definition & Role in Project |
+|---|---|---|
+| **RAG** | **Retrieval-Augmented Generation** | An AI architecture that combines information retrieval (querying a vector database for relevant text chunks) with generative language modeling, eliminating model hallucinations by grounding answers in verbatim document sources. |
+| **LLM** | **Large Language Model** | Deep learning neural networks trained on extensive text data (e.g., Llama 3.3 70B, Mistral Large 2411, Google Gemini Flash) capable of natural language understanding, synthesis, and summarization. |
+| **BPMN** | **Business Process Model and Notation (BPMN 2.0)** | An ISO/IEC 19510 standard graphical notation for modeling end-to-end enterprise workflows in an executable XML format. Used by Camunda 7/8 Zeebe engines to orchestrate document ingestion pipelines. |
+| **HNSW** | **Hierarchical Navigable Small World** | A state-of-the-art graph algorithm for Approximate Nearest Neighbor (ANN) vector search used in Qdrant, providing logarithmic $\mathcal{O}(\log N)$ retrieval speed across high-dimensional embedding spaces. |
+| **AST** | **Abstract Syntax Tree** | A hierarchical tree structure representing the abstract syntactic structure of source code or markup. Used in this codebase to parse, validate, and serialize LaTeX BibTeX entries. |
+| **BPE** | **Byte-Pair Encoding** | A subword tokenization algorithm that iteratively merges the most frequent pairs of adjacent bytes/characters to represent open-vocabulary human language using a compact token dictionary. |
+| **OIDC** | **OpenID Connect** | An identity authentication protocol built on top of the OAuth 2.0 framework that allows client applications to verify the identity of an end-user based on authentication by an authorization server (Keycloak). |
+| **OAuth** | **Open Authorization (OAuth 2.0)** | The industry-standard authorization framework that enables third-party applications to obtain delegated, scoped HTTP access to protected resources. |
+| **JWT** | **JSON Web Token** | An open, industry-standard (RFC 7519) method for representing claims securely between two parties as digitally signed, cryptographically verified tokens. |
+| **RBAC** | **Role-Based Access Control** | An authorization security approach that restricts system operations based on assigned business roles (`LIBRARY_ADMIN`, `CHIEF_RESEARCHER`, `VIEWER`). |
+| **API** | **Application Programming Interface** | A defined specification of rules and protocols enabling software applications to communicate and exchange data. |
+| **REST** | **Representational State Transfer** | A stateless, hypermedia-driven architectural style for networked distributed software applications operating over standard HTTP protocols (`GET`, `POST`, `PUT`, `DELETE`). |
+| **JSON** | **JavaScript Object Notation** | A lightweight, language-independent, human-readable data-interchange format. |
+| **YAML** | **YAML Ain't Markup Language** | A human-friendly data serialization standard commonly used for configuration files and OpenAPI contract specifications. |
+| **W3C** | **World Wide Web Consortium** | The primary international standards organization developing foundational specifications for the World Wide Web, including W3C Web Components. |
+| **WCAG** | **Web Content Accessibility Guidelines** | Global accessibility benchmark standards developed by the W3C. This application implements SAP UI5 components compliant with WCAG 2.1 Level AA. |
+| **ARIA** | **Accessible Rich Internet Applications** | A W3C specification defining semantic HTML attributes to ensure web applications are fully navigable by assistive screen readers. |
+| **SPA** | **Single Page Application** | A web application architecture that dynamically updates the Document Object Model (DOM) without triggering traditional full-page browser refreshes. |
+| **DOM** | **Document Object Model** | The language-agnostic tree interface representing the nodes and objects in an HTML or XML document. |
+| **BNF** | **Backus–Naur Form** | A formal metasyntax notation used to describe the syntax of context-free grammars, utilized here for LaTeX/BibTeX formatting and sanitization. |
+| **DOI** | **Digital Object Identifier** | A persistent alphanumeric string assigned by the International DOI Foundation to uniquely identify academic journals, papers, and books. |
+| **GUID / UUID** | **Globally / Universally Unique Identifier** | A 128-bit label used in software systems to guarantee global uniqueness across distributed databases without central coordination. |
+| **AGPL** | **Affero General Public License (GNU AGPLv3)** | A strong copyleft open-source license ensuring that network-deployed SaaS and cloud services provide their full corresponding source code to connected users. |
+| **C4** | **Context, Containers, Components, and Code** | A standardized architectural modeling framework for software systems designed to visualize architecture across 4 hierarchical zoom levels. |
+| **OCR** | **Optical Character Recognition** | Electronic or mechanical conversion of scanned or digital document images into editable, machine-readable text. |
+| **IAM** | **Identity and Access Management** | The framework of policies and technologies ensuring that authorized personnel have the appropriate access to technology resources (implemented via Keycloak). |
+| **SSL / TLS** | **Secure Sockets Layer / Transport Layer Security** | Cryptographic network protocols designed to provide end-to-end communication security, privacy, and data integrity over the Internet. |
+| **CA** | **Certificate Authority** | A trusted entity that issues digital certificates validating the cryptographic authenticity and ownership of public keys. |
+| **CRUD** | **Create, Read, Update, Delete** | The four foundational operations of persistent digital storage. |
+| **RoPE** | **Rotary Position Embedding** | A transformer position encoding mechanism that represents token position information through complex-plane rotation matrices. |
 
 ---
 
@@ -239,16 +301,165 @@ below show how to install and verify one.
 
 ---
 
-## 🧹 Docker Maintenance & Cleanup Commands
+## 🐳 Docker Inspection: Storage Volumes, Databases & Keycloak Administration
+
+The application stack orchestrates 5 container services bound to persistent Docker volumes. The commands below provide direct visibility into uploaded files, database contents, vector indexes, and Keycloak identity management.
+
+### 1. Uploaded File Storage & Volume Inspection
+
+All uploaded binary documents (`.pdf`, `.docx`, `.md`, `.txt`, `.pptx`, `.xlsx`) and their historical version archives are stored in the persistent volume `personal-library-file-storage`, mounted inside the app container at `/app/storage/documents`.
+
+* **List all uploaded files in the storage volume:**
+  ```bash
+  docker exec -it personal-library-app ls -lah /app/storage/documents
+  ```
+
+* **Inspect file details, disk usage, and historical version archives:**
+  ```bash
+  docker exec -it personal-library-app find /app/storage/documents -type f -exec ls -lh {} +
+  ```
+
+* **Check the Docker volume mountpoint on the host filesystem:**
+  ```bash
+  docker volume inspect personal-library-file-storage
+  
+  # On Linux host systems with root/sudo:
+  sudo ls -la $(docker volume inspect personal-library-file-storage --format '{{ .Mountpoint }}')
+  ```
+
+* **Copy uploaded files from the container to your local machine for backup:**
+  ```bash
+  mkdir -p ./local_document_backup
+  docker cp personal-library-app:/app/storage/documents/. ./local_document_backup/
+  ```
+
+---
+
+### 2. MongoDB Document Database Inspection
+
+MongoDB stores document metadata, LaTeX BibTeX properties, version lineages, and AI summaries.
+
+* **Database Connection Parameters:**
+  * **Host / Port:** `localhost:27017`
+  * **Database Name:** `personal_library`
+  * **Root Username:** `root`
+  * **Root Password:** `librarypass`
+  * **Authentication Database:** `admin`
+
+* **Launch the interactive MongoDB Shell (`mongosh`):**
+  ```bash
+  docker exec -it personal-library-mongodb mongosh -u root -p librarypass --authenticationDatabase admin personal_library
+  ```
+
+* **Inspect documents directly from your terminal (One-Liner Queries):**
+  ```bash
+  # 1. List all documents (GUID, Title, Version Number, File Name)
+  docker exec -it personal-library-mongodb mongosh -u root -p librarypass --authenticationDatabase admin personal_library \
+    --eval 'db.documents.find({}, {guid: 1, title: 1, versionNumber: 1, fileName: 1, _id: 0}).pretty()'
+
+  # 2. View full document record with dual AI summaries (Llama & Mistral)
+  docker exec -it personal-library-mongodb mongosh -u root -p librarypass --authenticationDatabase admin personal_library \
+    --eval 'db.documents.findOne({}, {guid: 1, title: 1, summaries: 1, _id: 0}).pretty()'
+
+  # 3. View immutable version history snapshots and rollback audit logs
+  docker exec -it personal-library-mongodb mongosh -u root -p librarypass --authenticationDatabase admin personal_library \
+    --eval 'db.documents.find({}, {guid: 1, versionNumber: 1, versionHistory: 1, _id: 0}).pretty()'
+
+  # 4. Count total documents in collection
+  docker exec -it personal-library-mongodb mongosh -u root -p librarypass --authenticationDatabase admin personal_library \
+    --eval 'print("Total Documents: " + db.documents.countDocuments())'
+  ```
+
+---
+
+### 3. Qdrant Vector Database Inspection
+
+Qdrant stores dense vector embeddings and text chunks in the `library_embeddings` collection for RAG semantic search.
+
+* **Qdrant Connection Ports:**
+  * **HTTP REST API:** `http://localhost:6333`
+  * **Internal gRPC Port:** `localhost:6334`
+
+* **Query Qdrant via HTTP REST API (from host terminal):**
+  ```bash
+  # 1. View all Qdrant collections
+  curl -s http://localhost:6333/collections | jq .
+
+  # 2. View 'library_embeddings' configuration (vector size, distance metric, HNSW parameters, points count)
+  curl -s http://localhost:6333/collections/library_embeddings | jq .
+
+  # 3. Scroll through indexed document chunks and payloads (text excerpts, document GUIDs)
+  curl -s -X POST http://localhost:6333/collections/library_embeddings/points/scroll \
+    -H 'Content-Type: application/json' \
+    -d '{"limit": 5, "with_payload": true, "with_vector": false}' | jq .
+  ```
+
+* **Inspect Qdrant collection directly inside the container:**
+  ```bash
+  docker exec -it personal-library-qdrant curl -s http://localhost:6333/collections/library_embeddings
+  ```
+
+---
+
+### 4. Keycloak Identity Provider, Users & Passwords
+
+Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer tokens, and Role-Based Access Control (RBAC).
+
+* **Keycloak Web Admin Console:**
+  * **URL:** [http://localhost:8180](http://localhost:8180) (or `http://localhost:8180/admin`)
+  * **Admin Username:** `admin`
+  * **Admin Password:** `admin`
+  * **Active Realm:** `personal-library-realm`
+  * **Client ID:** `personal-library-client`
+  * **Client Secret:** `enterprise-library-secret`
+
+* **Pre-Configured Realm User Accounts:**
+
+  | Username | Password | Email | Assigned Realm Roles | Capabilities |
+  |---|---|---|---|---|
+  | `admin` | `admin` | `admin@personallibrary.local` | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` | Full CRUD, rollback, deletion, and system administration |
+  | `researcher` | `researcher123` | `researcher@personallibrary.local` | `CHIEF_RESEARCHER` | Document upload, version overwrite, AI summarization, RAG chat |
+  | `viewer` | `viewer123` | `viewer@personallibrary.local` | `VIEWER` | Read-only discovery, BibTeX citation export, asset download |
+
+* **Acquire a test JWT Bearer Token via CLI:**
+  ```bash
+  # Request an access token for user 'admin'
+  curl -s -X POST http://localhost:8180/realms/personal-library-realm/protocol/openid-connect/token \
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    -d 'client_id=personal-library-client' \
+    -d 'client_secret=enterprise-library-secret' \
+    -d 'grant_type=password' \
+    -d 'username=admin' \
+    -d 'password=admin' | jq .
+  ```
+
+---
+
+### 5. Ollama LLM Container Inspection
+
+* **List preloaded and cached models in Ollama:**
+  ```bash
+  docker exec -it personal-library-ollama ollama list
+  ```
+
+* **Test model inference directly inside the container:**
+  ```bash
+  docker exec -it personal-library-ollama ollama run llama3.2 "Explain the purpose of a cyclone cellar in Kansas."
+  ```
+
+---
+
+### 6. Docker Maintenance & Lifecycle Commands
 
 | Command | Purpose |
 |---|---|
-| `docker compose down` | Stops and removes all containers while preserving database volumes. |
-| `docker compose down -v` | **Full Reset**: Stops containers and destroys all persistent data volumes (MongoDB data, Qdrant vectors, Ollama models). |
-| `docker volume prune -f` | Deletes dangling, unused Docker volumes. |
-| `docker compose logs -f personal-library-app` | Streams real-time application logs. |
+| `docker compose ps` | Displays status and health checks for all 5 services. |
+| `docker compose logs -f personal-library-app` | Streams real-time application and Spring Boot gateway logs. |
 | `docker compose restart personal-library-app` | Safely restarts the web and API gateway service. |
-| `docker exec -it personal-library-mongodb mongosh -u root -p librarypass` | Connects to interactive MongoDB shell. |
+| `docker compose down` | Stops and removes all containers while **preserving** database volumes. |
+| `docker compose down -v` | **Full Reset**: Stops containers and **destroys all persistent volumes** (MongoDB, Qdrant vectors, Ollama models, uploaded documents). |
+| `docker volume ls` | Lists all volumes managed by the Personal Library stack. |
+| `docker volume prune -f` | Deletes dangling, unused Docker volumes. |
 
 ---
 
@@ -272,10 +483,34 @@ below show how to install and verify one.
 - **Semantic Search:** In the List Report filter bar, enter content terms. The system queries Qdrant vector space for conceptual matches across full text chunks.
 - **Object Page RAG Chat:** Ask natural language questions regarding the document. The Llama model retrieves relevant excerpts from Qdrant and responds with cited evidence.
 
-### 4. In-Place Version Overwrite & Lineage
-- Uploading a new physical file version or updated BibTeX metadata from the Object Page overwrites document content and summaries in-place, retaining the document GUID and incrementing the version number (e.g. `v1` -> `v2`).
+### 4. In-Place Version Overwrite, Snapshot Archival & Instant Rollback
+- **In-Place Overwrite:** Uploading a new physical file version or updated BibTeX metadata from the Object Page overwrites document content and summaries in-place, retaining the document GUID and incrementing the version sequence (e.g. `v1` -> `v2`).
+- **Immutable Snapshot Archival:** Prior to any overwrite or rollback mutation, the system captures an immutable snapshot (`DocumentVersionSnapshot`) containing the complete document state, raw LaTeX BibTeX, text chunks, dual summaries, and physical asset archive.
+- **Historical Asset Download:** Users can download physical document files preserved at any historical revision directly from the **Version History & Rollback** tab in the Object Page (`/api/v1/documents/{guid}/versions/{version}/download`).
+- **One-Click Non-Destructive Rollback:** Reverting to any past version snapshot restores its metadata, content excerpt, and summaries, archives the current state into version history, and advances the version sequence counter without data loss (`POST /api/v1/documents/{guid}/rollback/{version}`).
 - Brand new documents uploaded from the List Report always generate a fresh unique GUID.
 - Lineage, version history, and audit timestamps are tracked across iterations.
+
+---
+
+## 🔌 REST API Specification
+
+The Personal Library exposes an enterprise OpenAPI 3.0.3 contract (`/openapi.yaml`):
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/documents` | Multi-criteria paginated document query and search |
+| `POST` | `/api/v1/documents` | Upload new document with file payload and BibTeX metadata |
+| `GET` | `/api/v1/documents/{guid}` | Retrieve full document details, metadata, and summaries |
+| `PUT` | `/api/v1/documents/{guid}` | In-place version overwrite and metadata update |
+| `DELETE` | `/api/v1/documents/{guid}` | Delete document entity, asset file, and vector embeddings |
+| `GET` | `/api/v1/documents/{guid}/download` | Stream active physical document file asset |
+| `GET` | `/api/v1/documents/{guid}/versions` | Retrieve historical version snapshots list |
+| `GET` | `/api/v1/documents/{guid}/versions/{version}/download` | Download preserved asset file for a specific historical version |
+| `POST` | `/api/v1/documents/{guid}/rollback/{version}` | Roll back document state to a designated historical version |
+| `POST` | `/api/v1/documents/{guid}/summarize` | Trigger dual-model AI summary regeneration (Llama / Mistral) |
+| `POST` | `/api/v1/chat` | Conversational RAG chat query with citation evidence |
+| `GET` | `/api/v1/health` | Comprehensive multi-system health check |
 
 ---
 

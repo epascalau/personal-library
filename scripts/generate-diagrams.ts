@@ -38,13 +38,13 @@ export function generateBpmnSvg(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1740 820" width="1740" height="820" style="background:#f8fafc; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
   <defs>
-    <!-- Arrow Marker -->
-    <marker id="bpmn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#334155" />
+    <!-- Arrow Marker (Strict perpendicular auto orientation with tip at box border) -->
+    <marker id="bpmn-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#334155" />
     </marker>
     <!-- Highlight Arrow Marker -->
-    <marker id="bpmn-arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#0070f2" />
+    <marker id="bpmn-arrow-blue" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#0070f2" />
     </marker>
     <!-- Subtle Box Shadow -->
     <filter id="task-shadow" x="-5%" y="-5%" width="115%" height="120%" filterUnits="userSpaceOnUse">
@@ -242,26 +242,26 @@ export function generateBpmnSvg(): string {
   <path d="M 590 315 L 590 190" fill="none" stroke="#dc2626" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
   <text x="605" y="255" font-size="9.5" font-weight="600" fill="#dc2626">[isValid == false]</text>
 
-  <!-- Review User Task -> Validate (Loop back) -->
+  <!-- Review User Task -> Validate (Loop back, enters perpendicularly from above at x=450, y=300) -->
   <path d="M 520 150 L 450 150 L 450 300" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#bpmn-arrow)" />
 
-  <!-- Fork -> Llama (Branch A) -->
+  <!-- Fork -> Llama (Branch A, perpendicular horizontal entry into x=760, y=502) -->
   <path d="M 690 365 L 690 502 L 760 502" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
 
-  <!-- Fork -> Mistral (Branch B) -->
+  <!-- Fork -> Mistral (Branch B, perpendicular horizontal entry into x=760, y=592) -->
   <path d="M 690 365 L 690 592 L 760 592" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
 
-  <!-- Fork -> Qdrant (Branch C) -->
+  <!-- Fork -> Qdrant (Branch C, perpendicular horizontal entry into x=760, y=722) -->
   <path d="M 690 365 L 690 722 L 760 722" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
 
-  <!-- Llama -> Join -->
-  <path d="M 930 502 L 1010 502 L 1010 365" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
+  <!-- Llama -> Join (Branch A enters left vertex of Join diamond perpendicularly at x=985, y=340) -->
+  <path d="M 930 502 L 965 502 L 965 340 L 985 340" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
 
-  <!-- Mistral -> Join -->
+  <!-- Mistral -> Join (Branch B enters bottom vertex of Join diamond perpendicularly at x=1010, y=365) -->
   <path d="M 930 592 L 1010 592 L 1010 365" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
 
-  <!-- Qdrant -> Join -->
-  <path d="M 930 722 L 1010 722 L 1010 365" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />
+  <!-- Qdrant -> Join (Branch C joins return trunk orthogonally at x=1010, y=657 then flows up to Join) -->
+  <path d="M 930 722 L 1010 722 L 1010 592" fill="none" stroke="#7c3aed" stroke-width="1.8" />
 
   <!-- Join -> Persist -->
   <path d="M 1035 340 L 1080 340" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#bpmn-arrow)" />

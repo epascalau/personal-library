@@ -122,10 +122,16 @@ public class DocumentEntity {
     private List<DocumentChunk> chunks = new ArrayList<>();
 
     /**
+     * Historical version snapshots preserved prior to in-place overwrites or rollbacks.
+     */
+    @Builder.Default
+    private List<DocumentVersionSnapshot> versionHistory = new ArrayList<>();
+
+    /**
      * Converts a raw byte count into a readable binary string (B, KB, MB).
      *
      * WHAT: Formats raw byte count into human-readable B, KB, or MB units formatted to one decimal place.
-     * WHY: Standardizes byte formatting for consistent display in both the SAP Horizon List Report and Object Page
+     * WHY: Standardizes byte formatting for consistent display in both the SAP Fiori List Report and Object Page
      * without duplicating conversion algorithms across client and server layers.
      *
      * @param bytes Number of bytes.

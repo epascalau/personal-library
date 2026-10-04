@@ -57,7 +57,7 @@ export class AppView extends Component {
    * Initializes the root application view with full-height flex column layout.
    *
    * WHAT: Sets up host element styling with min-height and theme transitions.
-   * WHY: Provides the full-viewport scaffold for SAP Horizon applications.
+   * WHY: Provides the full-viewport scaffold for SAP Fiori applications.
    */
   constructor() {
     super(

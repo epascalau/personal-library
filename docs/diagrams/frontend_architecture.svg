@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" width="1600" height="700" style="background:#0f172a; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <marker id="ui-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" />
+    </marker>
+    <marker id="ui-arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+    <marker id="ui-arrow-purple" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#c084fc" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <rect x="40" y="20" width="1520" height="60" rx="8" fill="#1e293b" stroke="#334155" />
+  <text x="70" y="55" font-size="20" font-weight="800" fill="#ffffff">SAP Fiori UI5 Frontend Component &amp; State Architecture</text>
+  <text x="720" y="55" font-size="12" font-weight="500" fill="#94a3b8">Decoupled Web Component Hierarchy • Observable Reactive Stores • EventBus Driver</text>
+
+  <!-- Top Layer: Views -->
+  <rect x="50" y="105" width="1500" height="150" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" />
+  <text x="75" y="130" font-size="13" font-weight="700" fill="#60a5fa">VIEW &amp; FLOORPLAN LAYER (core/component.ts subclasses)</text>
+
+  <rect x="75" y="145" width="260" height="90" rx="6" fill="#172554" stroke="#3b82f6" />
+  <text x="90" y="170" font-size="12" font-weight="700" fill="#ffffff">ShellBarView &amp; Footer</text>
+  <text x="90" y="190" font-size="10" fill="#93c5fd">• Branding &amp; Mode Switcher</text>
+  <text x="90" y="205" font-size="10" fill="#93c5fd">• Keycloak User Profile Session</text>
+  <text x="90" y="220" font-size="10" fill="#93c5fd">• Global Toast notifications</text>
+
+  <rect x="360" y="145" width="340" height="90" rx="6" fill="#172554" stroke="#3b82f6" />
+  <text x="375" y="170" font-size="12" font-weight="700" fill="#ffffff">ListReportView (Floorplan)</text>
+  <text x="375" y="190" font-size="10" fill="#93c5fd">• Multi-field FilterBar (Search, Year, Format)</text>
+  <text x="375" y="205" font-size="10" fill="#93c5fd">• Paginated Document Table &amp; Sorting</text>
+  <text x="375" y="220" font-size="10" fill="#93c5fd">• Selection &amp; Line-Item Action Handlers</text>
+
+  <rect x="725" y="145" width="370" height="90" rx="6" fill="#172554" stroke="#3b82f6" />
+  <text x="740" y="170" font-size="12" font-weight="700" fill="#ffffff">ObjectPageView (Floorplan)</text>
+  <text x="740" y="190" font-size="10" fill="#93c5fd">• Sticky Header with KPIs, Edit &amp; Overwrite</text>
+  <text x="740" y="205" font-size="10" fill="#93c5fd">• Dual AI Benchmark Cards (Llama &amp; Mistral)</text>
+  <text x="740" y="220" font-size="10" fill="#93c5fd">• Interactive RAG Chat with Citation Drawer</text>
+
+  <rect x="1120" y="145" width="410" height="90" rx="6" fill="#172554" stroke="#3b82f6" />
+  <text x="1135" y="170" font-size="12" font-weight="700" fill="#ffffff">Modal Dialogs Hierarchy</text>
+  <text x="1135" y="190" font-size="10" fill="#93c5fd">• UploadDialogView (Multi-file pipeline)</text>
+  <text x="1135" y="205" font-size="10" fill="#93c5fd">• BpmnModalView (Camunda Visual Flow &amp; XML)</text>
+  <text x="1135" y="220" font-size="10" fill="#93c5fd">• OpenApiModalView &amp; BackendSettings</text>
+
+  <!-- Mid Layer: Observable Stores -->
+  <rect x="50" y="285" width="1500" height="150" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="1.5" />
+  <text x="75" y="310" font-size="13" font-weight="700" fill="#34d399">OBSERVABLE REACTIVE STORES (core/store.ts)</text>
+
+  <rect x="75" y="325" width="330" height="90" rx="6" fill="#064e3b" stroke="#10b981" />
+  <text x="90" y="350" font-size="12" font-weight="700" fill="#ffffff">appStore</text>
+  <text x="90" y="370" font-size="10" fill="#a7f3d0">• documents[], activeDocument, activeView</text>
+  <text x="90" y="385" font-size="10" fill="#a7f3d0">• filters (search, format, year, sortField)</text>
+  <text x="90" y="400" font-size="10" fill="#a7f3d0">• pagination (page, pageSize, totalPages)</text>
+
+  <rect x="430" y="325" width="330" height="90" rx="6" fill="#064e3b" stroke="#10b981" />
+  <text x="445" y="350" font-size="12" font-weight="700" fill="#ffffff">backendStore</text>
+  <text x="445" y="370" font-size="10" fill="#a7f3d0">• mode: 'rest' | 'mock' (Dynamic Switch)</text>
+  <text x="445" y="385" font-size="10" fill="#a7f3d0">• serverUrl: '/api/v1'</text>
+  <text x="445" y="400" font-size="10" fill="#a7f3d0">• healthStatus &amp; latency measurements</text>
+
+  <rect x="785" y="325" width="330" height="90" rx="6" fill="#064e3b" stroke="#10b981" />
+  <text x="800" y="350" font-size="12" font-weight="700" fill="#ffffff">i18nStore</text>
+  <text x="800" y="370" font-size="10" fill="#a7f3d0">• currentLocale: en, de, fr, es, ro</text>
+  <text x="800" y="385" font-size="10" fill="#a7f3d0">• Instant reactive UI string updates</text>
+  <text x="800" y="400" font-size="10" fill="#a7f3d0">• Date &amp; currency localization formatters</text>
+
+  <rect x="1140" y="325" width="390" height="90" rx="6" fill="#064e3b" stroke="#10b981" />
+  <text x="1155" y="350" font-size="12" font-weight="700" fill="#ffffff">themeStore</text>
+  <text x="1155" y="370" font-size="10" fill="#a7f3d0">• currentTheme: 'sap_horizon' | 'sap_horizon_dark'</text>
+  <text x="1155" y="385" font-size="10" fill="#a7f3d0">• Sets data-sap-theme on html element</text>
+  <text x="1155" y="400" font-size="10" fill="#a7f3d0">• Injects UI5 shadow DOM stylesheets</text>
+
+  <!-- Bottom Layer: Gateway & Drivers -->
+  <rect x="50" y="465" width="1500" height="200" rx="10" fill="#1e293b" stroke="#a855f7" stroke-width="1.5" />
+  <text x="75" y="490" font-size="13" font-weight="700" fill="#c084fc">COMMUNICATION &amp; BACKEND GATEWAY LAYER (services/backend/)</text>
+
+  <rect x="75" y="505" width="450" height="140" rx="6" fill="#3b0764" stroke="#a855f7" />
+  <text x="90" y="530" font-size="12" font-weight="700" fill="#ffffff">BackendGateway Facade</text>
+  <text x="90" y="550" font-size="10" fill="#e9d5ff">• BackendGateway.dispatchBackend(op, payload)</text>
+  <text x="90" y="565" font-size="10" fill="#e9d5ff">• BackendGateway.requestBackend(op, payload)</text>
+  <text x="90" y="585" font-size="10" fill="#e9d5ff">• Emits lifecycle events: REQUEST, SUCCESS, FAILURE</text>
+  <text x="90" y="605" font-size="10" fill="#e9d5ff">• Routes dynamically to active adapter driver</text>
+
+  <rect x="550" y="505" width="450" height="140" rx="6" fill="#3b0764" stroke="#a855f7" />
+  <text x="565" y="530" font-size="12" font-weight="700" fill="#ffffff">RestBackendAdapter Driver</text>
+  <text x="565" y="550" font-size="10" fill="#e9d5ff">• fetch() HTTP client talking to /api/v1/*</text>
+  <text x="565" y="565" font-size="10" fill="#e9d5ff">• Multipart file upload &amp; FormData encoding</text>
+  <text x="565" y="585" font-size="10" fill="#e9d5ff">• Handles error envelopes &amp; status codes</text>
+  <text x="565" y="605" font-size="10" fill="#e9d5ff">• Keycloak Bearer token attachment</text>
+
+  <rect x="1025" y="505" width="505" height="140" rx="6" fill="#3b0764" stroke="#a855f7" />
+  <text x="1040" y="530" font-size="12" font-weight="700" fill="#ffffff">MockBackendAdapter Driver</text>
+  <text x="1040" y="550" font-size="10" fill="#e9d5ff">• Client-side in-memory mock document collection</text>
+  <text x="1040" y="565" font-size="10" fill="#e9d5ff">• Instant zero-latency responses for offline demos</text>
+  <text x="1040" y="585" font-size="10" fill="#e9d5ff">• Full BibTeX formatting &amp; client-side search simulation</text>
+  <text x="1040" y="605" font-size="10" fill="#e9d5ff">• Used when backend server is disconnected</text>
+
+  <!-- Orthogonal Connectors: Views -> Stores (Perpendicular straight down into top border of stores) -->
+  <path d="M 535 235 L 535 325" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#ui-arrow-green)" />
+  <path d="M 910 235 L 910 325" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#ui-arrow-green)" />
+
+  <!-- Orthogonal Connectors: Stores -> Gateway Facade (Perpendicular straight down into top border of Gateway) -->
+  <path d="M 240 415 L 240 505" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#ui-arrow-purple)" />
+  <path d="M 595 415 L 595 505" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#ui-arrow-purple)" />
+
+  <!-- Intra-Layer Connectors: Gateway Facade -> Driver Adapters (Strict horizontal perpendicular entry into left border) -->
+  <path d="M 525 575 L 550 575" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#ui-arrow)" />
+  <path d="M 1000 575 L 1025 575" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#ui-arrow)" />
+
+</svg>

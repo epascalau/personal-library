@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
- * SAP Fiori Horizon footer view.
+ * SAP Fiori footer view.
  * Provides copyright, open-source AGPL-3.0 licensing notices, architecture metadata,
  * active backend status indicator, and quick-toggle controls for theme switching.
  */
@@ -15,14 +15,14 @@ import { i18nStore } from '../stores/i18nStore';
 import { themeStore } from '../stores/themeStore';
 
 /**
- * SAP Fiori Horizon footer component.
+ * SAP Fiori footer component.
  *
  * Carries the theme-toggle shortcut, the active backend adapter name,
  * the architecture blurb and the legal trademark notice.
  */
 export class FooterView extends Component {
   /**
-   * Constructs the FooterView with semantic `footer` tag and Fiori Horizon responsive styling.
+   * Constructs the FooterView with semantic `footer` tag and Fiori responsive styling.
    *
    * WHAT: Initializes the base Component with a native `<footer>` element, applying border and background styling.
    * WHY: Using the semantic `<footer>` HTML tag ensures landmark navigation compliance for screen readers (WCAG 2.1 AA),
@@ -66,7 +66,7 @@ export class FooterView extends Component {
   /**
    * Generates the semantic HTML markup for the application footer.
    *
-   * WHAT: Produces the layout containing the SAP Horizon theme toggle button, backend adapter indicator,
+   * WHAT: Produces the layout containing the theme toggle button, backend adapter indicator,
    * technology stack highlights (Spring AI, Qdrant), GNU AGPLv3 license link, and SAP trademark disclaimer.
    * WHY: Declaring this as pure `RawHtml` template with localized string interpolation guarantees XSS safety
    * while keeping the rendered DOM fully synchronized with the user's active locale and selected dark/light mode.
@@ -77,8 +77,8 @@ export class FooterView extends Component {
     const t = i18nStore.state.t;
     const isDark = themeStore.state.isDark;
     const themeLabel = isDark
-      ? `🌙 ${t.shellBar.horizonTheme} (${t.shellBar.themeEvening})`
-      : `☀️ ${t.shellBar.horizonTheme} (${t.shellBar.themeMorning})`;
+      ? `🌙 ${t.shellBar.visualTheme} (${t.shellBar.themeEvening})`
+      : `☀️ ${t.shellBar.visualTheme} (${t.shellBar.themeMorning})`;
 
     return html`
       <div
@@ -91,7 +91,7 @@ export class FooterView extends Component {
           type="button"
           data-action="toggle-theme"
           class="text-[#0070f2] dark:text-[#4796ff] hover:underline cursor-pointer flex items-center gap-1 font-medium"
-          title="Click to toggle SAP Horizon light/dark theme"
+          title="Click to toggle light/dark theme"
         >
           <span>${themeLabel}</span>
         </button>

@@ -10,10 +10,12 @@
 import { setTheme as setUi5Theme } from '@ui5/webcomponents-base/dist/config/Theme.js';
 import { Store } from '../core/store';
 
-export type SapHorizonTheme = 'morning-horizon' | 'evening-horizon';
+export type SapTheme = 'light' | 'dark';
+export type AppTheme = SapTheme;
+export type SapHorizonTheme = SapTheme;
 
 export interface ThemeState {
-  theme: SapHorizonTheme;
+  theme: SapTheme;
   isDark: boolean;
   themeName: string;
 }
@@ -23,11 +25,14 @@ const THEME_STORAGE_KEY = 'personal_library_sap_theme';
 const LIGHT_BODY_CLASSES = ['bg-[#f5f6f8]', 'text-[#1d2d3e]'];
 const DARK_BODY_CLASSES = ['bg-[#12171c]', 'text-[#f0f4f8]'];
 
-const readInitialTheme = (): SapHorizonTheme => {
+const readInitialTheme = (): SapTheme => {
   // 1. Check saved localStorage
   const saved = localStorage.getItem(THEME_STORAGE_KEY);
-  if (saved === 'evening-horizon' || saved === 'morning-horizon') {
-    return saved;
+  if (saved === 'dark' || saved === 'evening-horizon') {
+    return 'dark';
+  }
+  if (saved === 'light' || saved === 'morning-horizon') {
+    return 'light';
   }
   // 2. Check system dark mode preference
   if (
@@ -35,16 +40,15 @@ const readInitialTheme = (): SapHorizonTheme => {
     window.matchMedia &&
     window.matchMedia('(prefers-color-scheme: dark)').matches
   ) {
-    return 'evening-horizon';
+    return 'dark';
   }
-  return 'morning-horizon';
+  return 'light';
 };
 
-const describe = (theme: SapHorizonTheme): ThemeState => ({
+const describe = (theme: SapTheme): ThemeState => ({
   theme,
-  isDark: theme === 'evening-horizon',
-  themeName:
-    theme === 'evening-horizon' ? 'SAP Evening Horizon (Dark)' : 'SAP Morning Horizon (Light)'
+  isDark: theme === 'dark',
+  themeName: theme === 'dark' ? 'Dark Theme' : 'Light Theme'
 });
 
 class ThemeStore extends Store<ThemeState> {
@@ -63,25 +67,25 @@ class ThemeStore extends Store<ThemeState> {
   }
 
   /**
-   * Sets the active SAP Horizon theme.
+   * Sets the active UI theme.
    *
    * WHAT: Updates state with the new theme and derived `isDark` boolean.
    * WHY: Triggers subscriber notifications and downstream `applyToDocument()` updates.
    *
-   * @param theme 'morning-horizon' (light) or 'evening-horizon' (dark).
+   * @param theme 'light' or 'dark'.
    */
-  setTheme(theme: SapHorizonTheme): void {
+  setTheme(theme: SapTheme): void {
     this.setState(describe(theme));
   }
 
   /**
-   * Toggles between Morning Horizon (light) and Evening Horizon (dark).
+   * Toggles between Light and Dark theme.
    *
    * WHAT: Flips current theme state to the alternate mode.
    * WHY: Provides a seamless single-click theme switcher in the ShellBar.
    */
   toggleTheme(): void {
-    this.setTheme(this.state.theme === 'morning-horizon' ? 'evening-horizon' : 'morning-horizon');
+    this.setTheme(this.state.theme === 'light' ? 'dark' : 'light');
   }
 
   /**
@@ -106,14 +110,14 @@ class ThemeStore extends Store<ThemeState> {
     if (isDark) {
       root.classList.add('dark');
       root.setAttribute('data-sap-theme', 'sap_horizon_dark');
-      root.setAttribute('data-theme', 'evening-horizon');
+      root.setAttribute('data-theme', 'dark');
       root.style.colorScheme = 'dark';
       document.body.classList.remove(...LIGHT_BODY_CLASSES);
       document.body.classList.add(...DARK_BODY_CLASSES);
     } else {
       root.classList.remove('dark');
       root.setAttribute('data-sap-theme', 'sap_horizon');
-      root.setAttribute('data-theme', 'morning-horizon');
+      root.setAttribute('data-theme', 'light');
       root.style.colorScheme = 'light';
       document.body.classList.remove(...DARK_BODY_CLASSES);
       document.body.classList.add(...LIGHT_BODY_CLASSES);

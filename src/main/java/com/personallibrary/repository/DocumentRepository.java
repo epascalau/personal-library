@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * MongoDB Data Repository for {@link DocumentEntity} persistence and querying.
- * Dynamic multi-field search for the SAP Horizon List Report floorplan is contributed by the
+ * Dynamic multi-field search for the SAP Fiori List Report floorplan is contributed by the
  * {@link DocumentRepositoryCustom} fragment.
  *
  * @author Enterprise Architecture Team

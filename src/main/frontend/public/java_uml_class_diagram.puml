@@ -1,0 +1,225 @@
+@startuml Java_Backend_UML_Class_Diagram
+!theme plain
+skinparam roundCorner 8
+skinparam classFontSize 11
+skinparam defaultFontName Inter
+skinparam packageStyle frame
+skinparam classAttributeIconSize 0
+
+title Personal Library - Java Spring Boot Backend Architecture (UML Class Diagram)
+
+package "com.personallibrary.controller" {
+  class DocumentController <<RestController>> {
+    - documentService: DocumentService
+    - extractionService: BibTeXExtractionService
+    - summarizationService: AiSummarizationService
+    - vectorRagService: VectorRagService
+    - storageService: StorageService
+    - objectMapper: ObjectMapper
+    + queryDocuments(fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder): ResponseEntity<PaginatedResponse<DocumentResponse>>
+    + getDocumentByGuid(guid: String): ResponseEntity<DocumentResponse>
+    + uploadDocument(file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
+    + overwriteDocumentVersion(guid: String, file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
+    + deleteDocument(guid: String): ResponseEntity<Map<String, String>>
+    + summarizeDocument(guid: String, request: SummarizeRequest): ResponseEntity<SummaryRecord>
+    + conversationalChat(request: ChatRequest): ResponseEntity<ChatResponse>
+    + downloadPhysicalAsset(guid: String): ResponseEntity<Resource>
+    + getVersionHistory(guid: String): ResponseEntity<List<DocumentVersionSnapshot>>
+    + downloadHistoricalAsset(guid: String, version: int): ResponseEntity<Resource>
+    + rollbackDocumentVersion(guid: String, version: int): ResponseEntity<DocumentResponse>
+  }
+
+  class AuthController <<RestController>> {
+    + getCurrentUserProfile(principal: Principal): ResponseEntity<UserProfileResponse>
+    + login(): ResponseEntity<Map<String, String>>
+    + logout(): ResponseEntity<Map<String, String>>
+  }
+}
+
+package "com.personallibrary.service" {
+  class DocumentService <<Service>> {
+    - documentRepository: DocumentRepository
+    - storageService: StorageService
+    - extractionService: BibTeXExtractionService
+    - summarizationService: AiSummarizationService
+    - vectorRagService: VectorRagService
+    + uploadDocument(file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse
+    + overwriteVersion(guid: String, file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse
+    + queryDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse<DocumentResponse>
+    + getDocument(guid: String): DocumentResponse
+    + deleteDocument(guid: String): void
+    + getVersionHistory(guid: String): List<DocumentVersionSnapshot>
+    + rollbackVersion(guid: String, targetVersion: int): DocumentResponse
+  }
+
+  class AiSummarizationService <<Service>> {
+    - llamaChatModel: ChatModel
+    - mistralChatModel: ChatModel
+    + generateLlamaSummary(title: String, content: String): SummaryRecord
+    + generateMistralSummary(title: String, content: String): SummaryRecord
+    + generateDualSummaries(title: String, content: String, bibtex: BibTeXMetadata): Map<String, SummaryRecord>
+  }
+
+  class VectorRagService <<Service>> {
+    - qdrantClient: QdrantClient
+    - embeddingModel: EmbeddingModel
+    + indexDocument(docId: String, content: String): List<DocumentChunk>
+    + searchSimilarChunks(query: String, topK: int, docFilter: String): List<DocumentChunk>
+    + deleteDocumentVectors(docId: String): void
+  }
+
+  class BibTeXExtractionService <<Service>> {
+    - chatModel: ChatModel
+    + extractMetadata(fileName: String, content: String): BibTeXMetadata
+    + validateBibTeX(bibtex: BibTeXMetadata): boolean
+    + formatToRawBibTeX(bibtex: BibTeXMetadata): String
+  }
+
+  class StorageService <<Service>> {
+    - storagePath: Path
+    + storeFile(file: MultipartFile, guid: String): Path
+    + loadAsResource(guid: String, fileName: String): Resource
+    + extractTextContent(filePath: Path): String
+    + deleteFile(guid: String): void
+  }
+}
+
+package "com.personallibrary.repository" {
+  interface DocumentRepository <<Repository>> {
+    + findByGuid(guid: String): Optional<DocumentEntity>
+    + deleteByGuid(guid: String): void
+    + findByPreviousVersionGuid(guid: String): List<DocumentEntity>
+  }
+
+  interface DocumentRepositoryCustom {
+    + searchDocuments(criteria: Map<String, Object>, pageable: Pageable): Page<DocumentEntity>
+  }
+
+  class DocumentRepositoryCustomImpl {
+    - mongoTemplate: MongoTemplate
+    + searchDocuments(criteria: Map<String, Object>, pageable: Pageable): Page<DocumentEntity>
+  }
+
+  DocumentRepository --|> DocumentRepositoryCustom
+  DocumentRepositoryCustomImpl ..|> DocumentRepositoryCustom
+}
+
+package "com.personallibrary.model" {
+  class DocumentEntity <<Document>> {
+    - id: String
+    - guid: String
+    - previousVersionGuid: String
+    - versionNumber: int
+    - fileName: String
+    - fileSize: long
+    - fileSizeFormatted: String
+    - format: String
+    - uploadDate: Instant
+    - editDate: Instant
+    - bibtex: BibTeXMetadata
+    - bibtexRaw: String
+    - summaries: Map<String, SummaryRecord>
+    - contentExcerpt: String
+    - fullContent: String
+    - chunks: List<DocumentChunk>
+    - versionHistory: List<DocumentVersionSnapshot>
+  }
+
+  class DocumentVersionSnapshot {
+    - snapshotGuid: String
+    - versionNumber: int
+    - fileName: String
+    - fileSize: long
+    - fileSizeFormatted: String
+    - format: String
+    - savedAt: Instant
+    - bibtex: BibTeXMetadata
+    - bibtexRaw: String
+    - summaries: Map<String, SummaryRecord>
+    - contentExcerpt: String
+    - fullContent: String
+    - chunksCount: int
+    - note: String
+  }
+
+  class BibTeXMetadata {
+    - entryType: BibTeXType
+    - bibKey: String
+    - title: String
+    - author: String
+    - year: String
+    - month: String
+    - journal: String
+    - booktitle: String
+    - volume: String
+    - pages: String
+    - publisher: String
+    - doi: String
+    - url: String
+    - abstractText: String
+    - keywords: String
+    + toRawBibTeX(): String
+  }
+
+  enum BibTeXType {
+    ARTICLE
+    BOOK
+    INPROCEEDINGS
+    TECHREPORT
+    PHDTHESIS
+    MISC
+  }
+
+  class SummaryRecord {
+    - modelName: String
+    - modelKey: String
+    - summaryText: String
+    - createdAt: Instant
+    - durationSeconds: double
+    - durationFormatted: String
+  }
+
+  class DocumentChunk {
+    - id: String
+    - chunkIndex: int
+    - text: String
+  }
+
+  DocumentEntity *-- BibTeXMetadata
+  BibTeXMetadata --> BibTeXType
+  DocumentEntity *-- SummaryRecord
+  DocumentEntity *-- DocumentChunk
+  DocumentEntity *-- DocumentVersionSnapshot
+}
+
+package "com.personallibrary.config" {
+  class SecurityConfig <<Configuration>> {
+    + securityFilterChain(http: HttpSecurity): SecurityFilterChain
+    + jwtAuthenticationConverter(): JwtAuthenticationConverter
+  }
+
+  class OllamaConfig <<Configuration>> {
+    + llamaChatModel(): ChatModel
+    + mistralChatModel(): ChatModel
+    + embeddingModel(): EmbeddingModel
+  }
+
+  class OpenApiConfig <<Configuration>> {
+    + personalLibraryOpenApi(): OpenAPI
+  }
+}
+
+DocumentController --> DocumentService
+DocumentController --> BibTeXExtractionService
+DocumentController --> AiSummarizationService
+DocumentController --> VectorRagService
+DocumentController --> StorageService
+
+DocumentService --> DocumentRepository
+DocumentService --> StorageService
+DocumentService --> BibTeXExtractionService
+DocumentService --> AiSummarizationService
+DocumentService --> VectorRagService
+
+DocumentRepository ..> DocumentEntity
+@enduml

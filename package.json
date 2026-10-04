@@ -17,7 +17,7 @@
     "docs:ts": "typedoc",
     "docs:java": "tsx scripts/generate-javadoc.ts",
     "docs": "typedoc && tsx scripts/generate-javadoc.ts",
-    "diagrams": "tsx scripts/generate-diagrams.ts",
+    "diagrams": "tsx scripts/generate-diagrams.ts && tsx scripts/generate-architecture-diagrams.ts && tsx scripts/generate-uml-diagrams.ts && tsx scripts/generate-architecture-from-mmd.ts && tsx scripts/generate-mindmap.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

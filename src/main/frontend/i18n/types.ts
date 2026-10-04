@@ -71,7 +71,7 @@ export interface TranslationDictionary {
     themeMorning: string;
     themeEvening: string;
     switchTheme: string;
-    horizonTheme: string;
+    visualTheme: string;
     authMethod: string;
     realm: string;
     activeRoles: string;
@@ -218,7 +218,7 @@ export interface TranslationDictionary {
   };
   footer: {
     libraryTitle: string;
-    sapHorizon: string;
+    sapFloorplans: string;
     backendLabel: string;
     architecture: string;
     springAi: string;

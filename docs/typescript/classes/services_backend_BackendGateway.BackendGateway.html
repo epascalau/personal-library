@@ -12,7 +12,7 @@
 <li><a href="" aria-current="page">BackendGateway</a></li></ul>
 <h1>Class BackendGateway</h1></div><aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/BackendGateway.ts:89</li></ul></aside>
+<li>Defined in services/backend/BackendGateway.ts:91</li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -36,16 +36,22 @@
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="constructorbackendgateway"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">BackendGateway</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">resolveAdapter</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">()</span> <span class="tsd-signature-symbol">=&gt;</span> <a href="../interfaces/services_backend_types.BackendAdapter.html" class="tsd-signature-type tsd-kind-interface">BackendAdapter</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">BackendGateway</a><a href="#constructorbackendgateway" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Constructs the backend gateway with a dynamic adapter resolver function.</p>
+<p>WHAT: Accepts a getter function <code>resolveAdapter: () =&gt; BackendAdapter</code>.
+WHY: Resolving the adapter lazily at request execution time ensures that when the user
+switches environment configurations (e.g. from Integrated Mock to Spring Boot :8080),
+the very next dispatched request automatically routes to the new adapter without needing
+to rebuild event bus listeners or restart subscribers.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li><span><span class="tsd-kind-parameter">resolveAdapter</span>: <span class="tsd-signature-symbol">()</span> <span class="tsd-signature-symbol">=&gt;</span> <a href="../interfaces/services_backend_types.BackendAdapter.html" class="tsd-signature-type tsd-kind-interface">BackendAdapter</a></span>
-<div class="tsd-comment tsd-typography"><p>Returns the adapter that is active <em>at the moment a
-request is handled</em>, so a preset switch takes effect immediately.</p>
+<div class="tsd-comment tsd-typography"><p>Callback returning the currently active backend adapter.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">BackendGateway</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/BackendGateway.ts:96</li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in services/backend/BackendGateway.ts:105</li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -55,18 +61,27 @@ request is handled</em>, so a preset switch takes effect immediately.</p>
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="start-1"><span class="tsd-kind-call-signature">start</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#start-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Subscribes the gateway to all backend request topics on the event bus.</p>
+<p>WHAT: Iterates <code>BACKEND_OPERATION_NAMES</code>, registers request event listeners, and stores disposers.
+WHY: Centralizes request consumption so all business operations (documents, uploads, auth, summaries)
+funnel through a uniform pipeline that handles telemetry, error normalization, and timing.</p>
+</div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/BackendGateway.ts:98</li></ul></aside></div></li></ul></section>
+<li>Defined in services/backend/BackendGateway.ts:114</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="stop"><span>stop</span><a href="#stop" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="stop-1"><span class="tsd-kind-call-signature">stop</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#stop-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Unsubscribes all event bus listeners and halts request handling.</p>
+<p>WHAT: Executes and clears all stored disposer callbacks.
+WHY: Prevents dangling event listeners when tearing down environments or in automated tests.</p>
+</div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/BackendGateway.ts:111</li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in services/backend/BackendGateway.ts:133</li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

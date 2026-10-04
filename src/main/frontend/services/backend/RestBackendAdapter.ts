@@ -15,7 +15,7 @@ import {
   DocumentListResult,
   ChatResponseResult
 } from './types';
-import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile } from '../../types';
+import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile, DocumentVersionSnapshot } from '../../types';
 
 export class RestBackendAdapter implements BackendAdapter {
   readonly id: string;
@@ -463,6 +463,37 @@ export class RestBackendAdapter implements BackendAdapter {
    */
   getDownloadUrl(guid: string): string {
     return `${this.config.baseUrl}/documents/${guid}/download`;
+  }
+
+  /**
+   * Retrieves the historical version snapshot list for a document.
+   */
+  async getVersionHistory(guid: string): Promise<DocumentVersionSnapshot[]> {
+    return this.request<DocumentVersionSnapshot[]>(
+      `/documents/${guid}/versions`,
+      { method: 'GET' },
+      10000,
+      1
+    );
+  }
+
+  /**
+   * Rolls back the document to a specific historical version snapshot.
+   */
+  async rollbackVersion(guid: string, targetVersion: number): Promise<DocumentRecord> {
+    return this.request<DocumentRecord>(
+      `/documents/${guid}/rollback/${targetVersion}`,
+      { method: 'POST' },
+      15000,
+      1
+    );
+  }
+
+  /**
+   * Generates a download URL for a specific historical version asset.
+   */
+  getHistoricalDownloadUrl(guid: string, versionNumber: number): string {
+    return `${this.config.baseUrl}/documents/${guid}/versions/${versionNumber}/download`;
   }
 
   /**

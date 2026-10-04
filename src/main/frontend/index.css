@@ -58,7 +58,7 @@
 }
 
 /* ========================================================================= */
-/* SAP Evening Horizon (Dark Theme) Harmonization                             */
+/* Dark Theme Harmonization                                                  */
 /* ========================================================================= */
 
 /* Surface and Container Backgrounds */
@@ -208,7 +208,7 @@
   color: #93c5fd !important;
 }
 
-/* Hover States in Evening Horizon */
+/* Hover States in Dark Mode */
 .dark .hover\:bg-gray-50:hover,
 .dark .hover\:bg-slate-50:hover {
   background-color: #242e39 !important;
@@ -295,7 +295,7 @@ table tbody tr[data-guid] td ui5-button {
   color: #93c5fd;
 }
 
-/* SAP Evening Horizon ShellBar */
+/* Dark Theme ShellBar */
 .dark .sap-shellbar,
 .dark header {
   background-color: #161f28 !important;

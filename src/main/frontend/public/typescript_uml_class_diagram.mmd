@@ -1,0 +1,105 @@
+classDiagram
+    direction TB
+
+    class Component {
+      <<abstract>>
+      #HTMLElement root
+      +mount(container)
+      +unmount()
+      #requestRender()
+      #on(selector, event, handler)
+      #template()
+    }
+
+    class Store {
+      -state T
+      +subscribe(fn)
+      +set(updater)
+    }
+
+    class AppStore {
+      +setDocuments(docs)
+      +setActiveDocument(doc)
+      +setFilters(filters)
+      +setPage(page)
+      +rollbackDocument(guid, version)
+    }
+
+    class ListReportView {
+      -renderFilterBar()
+      -renderTable()
+      -onRowSelect(guid)
+    }
+
+    class ObjectPageView {
+      -renderHeader()
+      -renderSummaryCards()
+      -renderChatDrawer()
+      -renderHistoryTab()
+      -onSendChatMessage(prompt)
+      -onRollbackVersion(version)
+    }
+
+    class DialogView {
+      <<abstract>>
+      #isOpen()
+      #requestClose()
+      #header()
+      #body()
+    }
+
+    class UploadDialogView {
+      -onDropFiles(event)
+      -onStartIngestion()
+    }
+
+    class BackendGateway {
+      -BackendAdapter activeAdapter
+      +dispatchBackend(op, payload)
+      +requestBackend(op, payload)
+    }
+
+    class BackendAdapter {
+      <<interface>>
+      +getDocuments(params)
+      +getDocument(guid)
+      +uploadDocument(payload)
+      +summarizeDocument(guid, model)
+      +chat(payload)
+      +getVersionHistory(guid)
+      +rollbackVersion(guid, version)
+    }
+
+    class RestBackendAdapter {
+      -String baseUrl
+      +getDocuments(params)
+      +uploadDocument(payload)
+      +getVersionHistory(guid)
+      +rollbackVersion(guid, version)
+    }
+
+    class MockBackendAdapter {
+      -DocumentRecord[] localDatabase
+      +getDocuments(params)
+      +uploadDocument(payload)
+      +getVersionHistory(guid)
+      +rollbackVersion(guid, version)
+    }
+
+    class DocumentVersionSnapshot {
+      +String snapshotGuid
+      +number versionNumber
+      +String fileName
+      +String savedAt
+    }
+
+    Component <|-- ListReportView
+    Component <|-- ObjectPageView
+    Component <|-- DialogView
+    DialogView <|-- UploadDialogView
+    Store <|-- AppStore
+    BackendAdapter <|.. RestBackendAdapter
+    BackendAdapter <|.. MockBackendAdapter
+    BackendGateway o-- BackendAdapter
+    ListReportView ..> BackendGateway
+    ObjectPageView ..> BackendGateway

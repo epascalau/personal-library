@@ -22,7 +22,7 @@ import type { ChatMessage, DocumentRecord, SummaryRecord } from '../types';
 import type { SummaryModel } from '../stores/appStore';
 import type Input from '@ui5/webcomponents/dist/Input.js';
 
-type ObjectPageTab = 'info' | 'summaries' | 'chat';
+type ObjectPageTab = 'info' | 'summaries' | 'chat' | 'history';
 
 const COPIED_RESET_MS = 2000;
 
@@ -146,7 +146,7 @@ export class ObjectPageView extends Component {
   private chatDocGuid: string | null = null;
 
   /**
-   * Initializes the Object Page view component with SAP Horizon container classes.
+   * Initializes the Object Page view component with SAP Fiori container classes.
    *
    * WHAT: Sets the host container styling.
    * WHY: Provides responsive margins and layout spacing consistent with SAP Fiori Object Page floorplans.
@@ -244,15 +244,16 @@ export class ObjectPageView extends Component {
       ${this.activeTab === 'info' ? this.infoTab(doc) : ''}
       ${this.activeTab === 'summaries' ? this.summariesTab(doc) : ''}
       ${this.activeTab === 'chat' ? this.chatTab(doc) : ''}
+      ${this.activeTab === 'history' ? this.historyTab(doc) : ''}
     `;
   }
 
   /**
-   * Renders the SAP Horizon Object Page header, navigation bar, actions, and key-value metrics strip.
+   * Renders the SAP Fiori Object Page header, navigation bar, actions, and key-value metrics strip.
    *
    * WHAT: Renders back button, document format badge, title, author subtitle, action buttons (download, BibTeX copy,
    * new version overwrite, delete), and tab bar navigation.
-   * WHY: Adheres to the SAP Fiori Horizon Object Page floorplan standard for enterprise asset inspection.
+   * WHY: Adheres to the SAP Fiori Object Page floorplan standard for enterprise asset inspection.
    *
    * @param doc The active document record.
    * @returns RawHtml header markup.
@@ -359,6 +360,15 @@ export class ObjectPageView extends Component {
                     >
                   </div>`
                 : ''}
+              ${doc.versionHistory && doc.versionHistory.length > 0
+                ? html`<button
+                    type="button"
+                    data-tab="history"
+                    class="mt-1 pt-1 border-t border-gray-200 dark:border-[#2e3b4a] text-[10px] text-[#0070f2] dark:text-[#4796ff] font-semibold hover:underline block text-right w-full cursor-pointer"
+                  >
+                    ${doc.versionHistory.length} historical snapshot${doc.versionHistory.length === 1 ? '' : 's'} available →
+                  </button>`
+                : ''}
             </div>
           </div>
 
@@ -392,7 +402,8 @@ export class ObjectPageView extends Component {
             [
               { id: 'info' as const, label: t.objectPage.tabOverview, iconKey: 'BookOpen' as const, iconClass: 'w-3.5 h-3.5' },
               { id: 'summaries' as const, label: t.objectPage.tabSummaries, iconKey: 'Sparkles' as const, iconClass: 'w-3.5 h-3.5 text-amber-500' },
-              { id: 'chat' as const, label: t.objectPage.tabChat, iconKey: 'Bot' as const, iconClass: 'w-3.5 h-3.5 text-[#0070f2]' }
+              { id: 'chat' as const, label: t.objectPage.tabChat, iconKey: 'Bot' as const, iconClass: 'w-3.5 h-3.5 text-[#0070f2]' },
+              { id: 'history' as const, label: 'Version History & Rollback', iconKey: 'History' as const, iconClass: 'w-3.5 h-3.5 text-rose-500' }
             ]
               .map((tab) =>
                 html`<button
@@ -916,6 +927,214 @@ export class ObjectPageView extends Component {
   }
 
   // ------------------------------------------------------------------
+  // Tab 4 — Version History & Rollback
+  // ------------------------------------------------------------------
+
+  /**
+   * Renders the Version History & Rollback matrix tab.
+   *
+   * WHAT: Displays active revision status, lineage predecessor links, and an interactive
+   * table of archived version snapshots with one-click historical asset download and rollback triggers.
+   * WHY: Empowers researchers to audit revision changes, compare historical metadata/summaries,
+   * download previous file states, and perform non-destructive rollbacks.
+   *
+   * @param doc The active document record being viewed.
+   * @returns RawHtml markup for the version history tab.
+   */
+  private historyTab(doc: DocumentRecord): RawHtml {
+    const snapshots = doc.versionHistory || [];
+
+    return html`
+      <div class="space-y-6">
+        <!-- Active Version & Lineage KPI Bar -->
+        <div class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] p-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 dark:border-[#2e3b4a] pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-[#0070f2] dark:text-[#4796ff]">
+                ${icon('History', { className: 'w-5 h-5' })}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-semibold text-base text-gray-900 dark:text-gray-100">
+                    Active Revision Lineage (v${doc.versionNumber})
+                  </h3>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700">
+                    Active Head
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  All prior revisions are preserved as immutable snapshots with file assets, metadata, and dual-model AI summaries.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <ui5-button
+                class="plib-button"
+                data-action="open-version"
+                icon="upload"
+              >
+                Upload New Revision
+              </ui5-button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-2 text-xs">
+            <div>
+              <span class="text-gray-400 dark:text-gray-400 block font-medium">Current Version</span>
+              <span class="font-bold text-gray-900 dark:text-gray-100 text-sm">v${doc.versionNumber}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 dark:text-gray-400 block font-medium">Predecessor Pointer</span>
+              <span class="font-mono text-gray-700 dark:text-gray-300 truncate block text-[11px]">
+                ${doc.previousVersionGuid ? doc.previousVersionGuid : 'None (Root Ingestion)'}
+              </span>
+            </div>
+            <div>
+              <span class="text-gray-400 dark:text-gray-400 block font-medium">Archived Snapshots</span>
+              <span class="font-semibold text-gray-800 dark:text-gray-200">${snapshots.length} recorded</span>
+            </div>
+            <div>
+              <span class="text-gray-400 dark:text-gray-400 block font-medium">Last Modified</span>
+              <span class="text-gray-800 dark:text-gray-200">${formatDateTime(doc.editDate)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historical Snapshots Table & Rollback Actions -->
+        <div class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-[#2e3b4a] pb-3">
+            <div class="flex items-center gap-2">
+              ${icon('GitBranch', { className: 'w-4 h-4 text-rose-500' })}
+              <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                Historical Snapshot Archive & Rollback Matrix
+              </h3>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+              ${snapshots.length} snapshot${snapshots.length === 1 ? '' : 's'} recorded
+            </span>
+          </div>
+
+          ${snapshots.length === 0
+            ? html`
+                <div class="text-center py-10 px-4 bg-gray-50 dark:bg-[#232c37] rounded-lg border border-dashed border-gray-200 dark:border-[#344458] space-y-3">
+                  <div class="w-12 h-12 mx-auto rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-[#0070f2]">
+                    ${icon('History', { className: 'w-6 h-6' })}
+                  </div>
+                  <h4 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                    Root Version (v1) — No Prior Revisions Yet
+                  </h4>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
+                    This document is currently at its initial ingestion state. When you upload a revision using
+                    <strong>Upload New Revision</strong>, a snapshot of v${doc.versionNumber} will automatically be archived here,
+                    allowing instant historical asset downloading and non-destructive rollbacks.
+                  </p>
+                  <div class="pt-2">
+                    <ui5-button
+                      class="plib-button"
+                      data-action="open-version"
+                      icon="upload"
+                    >
+                      Test Version Overwrite
+                    </ui5-button>
+                  </div>
+                </div>
+              `
+            : html`
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="border-b border-gray-200 dark:border-[#2e3b4a] bg-gray-50 dark:bg-[#232c37] text-gray-600 dark:text-gray-300 font-semibold">
+                        <th class="py-2.5 px-3">Revision</th>
+                        <th class="py-2.5 px-3">Archived Date</th>
+                        <th class="py-2.5 px-3">File Asset</th>
+                        <th class="py-2.5 px-3">Bibliographic Metadata</th>
+                        <th class="py-2.5 px-3">AI Summaries</th>
+                        <th class="py-2.5 px-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-[#2e3b4a]">
+                      ${raw(
+                        snapshots
+                          .map(
+                            (s) => html`
+                              <tr class="hover:bg-gray-50/60 dark:hover:bg-[#232c37]/60 transition-colors">
+                                <td class="py-3 px-3 align-top font-mono">
+                                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-bold text-xs bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                                    v${s.versionNumber}
+                                  </span>
+                                  <div class="text-[10px] text-gray-400 mt-1 truncate max-w-[90px]" title="${s.snapshotGuid}">
+                                    ${s.snapshotGuid.slice(0, 14)}...
+                                  </div>
+                                </td>
+                                <td class="py-3 px-3 align-top text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                  <div>${formatDateTime(s.savedAt)}</div>
+                                  <div class="text-[10px] text-gray-400 mt-0.5 italic max-w-[150px] truncate" title="${s.note || 'Prior revision snapshot'}">
+                                    ${s.note || 'Prior revision snapshot'}
+                                  </div>
+                                </td>
+                                <td class="py-3 px-3 align-top">
+                                  <div class="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[180px]" title="${s.fileName}">
+                                    ${s.fileName}
+                                  </div>
+                                  <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                    ${s.fileSizeFormatted} • <span class="uppercase font-mono">${s.format}</span>
+                                  </div>
+                                </td>
+                                <td class="py-3 px-3 align-top max-w-[220px]">
+                                  <div class="font-medium text-gray-800 dark:text-gray-200 truncate" title="${s.bibtex.title || 'Untitled'}">
+                                    ${s.bibtex.title || 'Untitled'}
+                                  </div>
+                                  <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                    ${s.bibtex.author || '—'} ${s.bibtex.year ? `(${s.bibtex.year})` : ''}
+                                  </div>
+                                </td>
+                                <td class="py-3 px-3 align-top whitespace-nowrap">
+                                  <div class="flex flex-col gap-1 text-[10px]">
+                                    <span class="inline-flex items-center gap-1 ${s.summaries?.llama ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-gray-400'}">
+                                      ${icon('Sparkles', { className: 'w-3 h-3' })} Llama 3.3 ${s.summaries?.llama ? '✓' : '—'}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 ${s.summaries?.mistral ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-gray-400'}">
+                                      ${icon('Sparkles', { className: 'w-3 h-3' })} Mistral Large ${s.summaries?.mistral ? '✓' : '—'}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td class="py-3 px-3 align-top text-right whitespace-nowrap">
+                                  <div class="flex items-center justify-end gap-1.5">
+                                    <a
+                                      href="/api/v1/documents/${doc.guid}/versions/${s.versionNumber}/download"
+                                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-[#2e3b4a] hover:bg-gray-200 dark:hover:bg-[#38495f] text-gray-700 dark:text-gray-200 transition-colors border border-gray-200 dark:border-[#38495f]"
+                                      title="Download historical asset for version ${s.versionNumber}"
+                                    >
+                                      ${icon('Download', { className: 'w-3 h-3' })} Download (v${s.versionNumber})
+                                    </a>
+                                    <ui5-button
+                                      class="plib-button"
+                                      data-action="rollback-version"
+                                      data-guid="${doc.guid}"
+                                      data-version="${s.versionNumber}"
+                                      icon="history"
+                                      design="Emphasized"
+                                    >
+                                      Rollback
+                                    </ui5-button>
+                                  </div>
+                                </td>
+                              </tr>
+                            `.toString()
+                          )
+                          .join('')
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+        </div>
+      </div>
+    `;
+  }
+
+  // ------------------------------------------------------------------
   // Behaviour
   // ------------------------------------------------------------------
 
@@ -938,6 +1157,14 @@ export class ObjectPageView extends Component {
       if (doc) {
         appStore.requestDelete(doc);
       }
+    });
+
+    this.onAll('[data-action="rollback-version"]', 'click', (event) => {
+      const btn = event.currentTarget as HTMLElement;
+      const targetVersion = parseInt(btn.dataset.version || '0', 10);
+      const guid = btn.dataset.guid;
+      if (!guid || !targetVersion) return;
+      void appStore.rollbackDocument(guid, targetVersion);
     });
 
     this.onAll('[data-tab]', 'click', (event) => {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Pierces the UI5 Web Components shadow DOM with a single shared stylesheet so
- * the application's SAP Horizon theming (see public/styles.css) applies to the
+ * the application's enterprise theming (see public/styles.css) applies to the
  * internals of every UI5 element as well as to the light DOM.
  */
 
@@ -72,7 +72,7 @@ let patchApplied = false;
  *
  * WHY:
  * UI5 Web Components encapsulate their styles in Shadow Roots, which ignores document-level Tailwind CSS by default.
- * Monkey-patching the UI5Element base prototype applies enterprise Horizon theming uniformly across all custom element
+ * Monkey-patching the UI5Element base prototype applies enterprise theming uniformly across all custom element
  * shadow roots without modifying third-party vendor bundles, and detaching sheets on `onExitDOM` prevents memory leaks
  * from retaining detached DOM nodes in memory.
  */

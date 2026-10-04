@@ -1,0 +1,72 @@
+@startmindmap
+*[#0284c7] Personal Library & AI Research Engine
+
+**[#059669] 1. Ingestion & Pipeline
+*** Multi-Format Ingestion (PDF, DOCX, Markdown, LaTeX, Plain Text)
+*** Drag-and-Drop Upload Modal with Real-time Progress
+*** Camunda BPMN 2.0 Ingestion Workflow (7 Orchestrated Tasks)
+*** Human Review & Correction Gateway Loop
+*** SHA-256 Content Fingerprinting & De-duplication
+*** Physical Asset Storage with Versioned Archiving
+
+**[#d97706] 2. BibTeX & LaTeX Engine
+*** AST Lexer & Regex Tokenizer for BibTeX Entries
+*** Standard Types (@article, @book, @inproceedings, @techreport, @misc)
+*** 14 Supported Metadata Attributes (DOI, Abstract, Keywords, etc.)
+*** In-Browser Live BibTeX Editor & Validator
+*** LaTeX Special Character & Accent Sanitizer
+*** One-Click Formatted Citation Clipboard & .bib Exporter
+*** Multi-Criteria Faceted Filtering & Fulltext Search
+
+**[#2563eb] 3. Dual AI Models & Benchmarking
+*** Spring AI Multi-Model Orchestration Engine
+*** Llama 3.3 (70B Instruct): Deep Academic & Synthesis Analysis
+*** Mistral Large (2411): Executive Summary & Operational Takeaways
+*** Google Gemini API Cloud Multimodal Integration
+*** Real-time Model Execution Telemetry (Duration, Speed, Tokens)
+*** Side-by-Side Synchronized Benchmark Comparator UI
+*** Cached Immutable Summary History per Document Version
+
+**[#7c3aed] 4. Vector RAG & Conversational Chat
+*** Semantic Text Chunking (500 tokens, 50-token contextual overlap)
+*** Dense Vector Embeddings Generation
+*** Qdrant Vector DB Integration (library_embeddings collection)
+*** Sub-10ms Cosine Distance HNSW Indexing
+*** Natural Language Conversational Q&A Assistant
+*** Interactive Grounded Citation Drawer with Confidence Scores
+*** Strict Source Verification & Anti-Hallucination Controls
+
+left side
+
+**[#e11d48] 5. Version Control & Lineage
+*** Non-Destructive In-Place Version Overwriting
+*** Version Lineage Chain (versionNumber, previousVersionGuid)
+*** Complete Mutation Audit Trail (Timestamp, User, Changes)
+*** Semantic Version Comparison & Diff Viewing
+*** Historical Document Asset Download & Rollback
+
+**[#0d9488] 6. Enterprise UI5 Frontend
+*** SAP Fiori Horizon & Horizon Dark Dual Theming
+*** Standard UI5 Web Components (@ui5/webcomponents v2)
+*** ListReport Floorplan with Multi-Field FilterBar
+*** ObjectPage Floorplan with Sticky Header & KPI Facets
+*** 5 Localized Languages (EN, DE, FR, ES, RO)
+*** Observable Reactive State Stores (core Store<T>)
+*** Resilient Backend Gateway Facade (REST vs. Mock Driver)
+
+**[#dc2626] 7. Security & Governance
+*** Keycloak 24+ OIDC & OAuth2 JWT Bearer Tokens
+*** Role-Based Access Control (LIBRARY_ADMIN, CHIEF_RESEARCHER)
+*** Security Event Audit Logging for Enterprise Compliance
+*** Strict Path Traversal & Sanitization Protections
+*** GNU AGPL-3.0-or-later Strongest Network Copyleft
+
+**[#4f46e5] 8. Architecture & Tooling Ecosystem
+*** Interactive OpenAPI 3.1 Swagger REST Specifications
+*** Complete C4 Architecture & Component Diagrams
+*** Technology-Specific UML Class Diagrams (Java & TypeScript)
+*** Multi-Format Visual Exports (SVG, 4K PNG, Archival PDF, Draw.io)
+*** Complete Self-Contained Project ZIP Repository Export
+*** TypeDoc & Javadoc Interactive Code Documentation
+
+@endmindmap

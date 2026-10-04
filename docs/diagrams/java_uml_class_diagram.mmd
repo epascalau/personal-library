@@ -1,0 +1,119 @@
+classDiagram
+    direction TB
+    
+    class DocumentController {
+      -DocumentService documentService
+      -BibTeXExtractionService extractionService
+      -AiSummarizationService summarizationService
+      -VectorRagService vectorRagService
+      -StorageService storageService
+      +queryDocuments()
+      +getDocumentByGuid(guid)
+      +uploadDocument(file, metadata)
+      +overwriteDocumentVersion(guid, file, metadata)
+      +deleteDocument(guid)
+      +summarizeDocument(guid, request)
+      +conversationalChat(request)
+      +downloadPhysicalAsset(guid)
+      +getVersionHistory(guid)
+      +downloadHistoricalAsset(guid, version)
+      +rollbackDocumentVersion(guid, version)
+    }
+
+    class DocumentService {
+      -DocumentRepository documentRepository
+      -StorageService storageService
+      -BibTeXExtractionService extractionService
+      -AiSummarizationService summarizationService
+      -VectorRagService vectorRagService
+      +uploadDocument(file, bibtex)
+      +overwriteVersion(guid, file, bibtex)
+      +queryDocuments(criteria, pageable)
+      +getDocument(guid)
+      +deleteDocument(guid)
+      +getVersionHistory(guid)
+      +rollbackVersion(guid, targetVersion)
+    }
+
+    class AiSummarizationService {
+      -ChatModel llamaChatModel
+      -ChatModel mistralChatModel
+      +generateLlamaSummary(title, content)
+      +generateMistralSummary(title, content)
+      +generateDualSummaries(title, content, bibtex)
+    }
+
+    class VectorRagService {
+      -QdrantClient qdrantClient
+      -EmbeddingModel embeddingModel
+      +indexDocument(docId, content)
+      +searchSimilarChunks(query, topK, filter)
+      +deleteDocumentVectors(docId)
+    }
+
+    class BibTeXExtractionService {
+      -ChatModel chatModel
+      +extractMetadata(fileName, content)
+      +validateBibTeX(bibtex)
+      +formatToRawBibTeX(bibtex)
+    }
+
+    class StorageService {
+      -Path storagePath
+      +storeFile(file, guid)
+      +loadAsResource(guid, fileName)
+      +extractTextContent(path)
+      +deleteFile(guid)
+    }
+
+    class DocumentRepository {
+      <<interface>>
+      +findByGuid(guid)
+      +deleteByGuid(guid)
+      +findByPreviousVersionGuid(guid)
+    }
+
+    class DocumentEntity {
+      +String guid
+      +String previousVersionGuid
+      +int versionNumber
+      +String fileName
+      +long fileSize
+      +String format
+      +BibTeXMetadata bibtex
+      +Map summaries
+      +List chunks
+      +List versionHistory
+    }
+
+    class DocumentVersionSnapshot {
+      +String snapshotGuid
+      +int versionNumber
+      +String fileName
+      +String savedAt
+      +BibTeXMetadata bibtex
+      +Map summaries
+      +String note
+    }
+
+    class BibTeXMetadata {
+      +BibTeXType entryType
+      +String bibKey
+      +String title
+      +String author
+      +String year
+      +String publisher
+      +toRawBibTeX()
+    }
+
+    DocumentController --> DocumentService
+    DocumentController --> AiSummarizationService
+    DocumentController --> VectorRagService
+    DocumentService --> DocumentRepository
+    DocumentService --> StorageService
+    DocumentService --> BibTeXExtractionService
+    DocumentService --> AiSummarizationService
+    DocumentService --> VectorRagService
+    DocumentRepository ..> DocumentEntity
+    DocumentEntity *-- BibTeXMetadata
+    DocumentEntity *-- DocumentVersionSnapshot

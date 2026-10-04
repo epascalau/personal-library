@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1500" width="2400" height="1500" style="background:#0b1120; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+
+    <!-- Center Hub Gradient -->
+    <linearGradient id="hub-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+
+    <!-- Branch Gradients -->
+    <linearGradient id="g-ingest" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#065f46" /><stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="g-bibtex" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#92400e" /><stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <linearGradient id="g-ai" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e40af" /><stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="g-rag" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6b21a8" /><stop offset="100%" stop-color="#7e22ce" />
+    </linearGradient>
+    <linearGradient id="g-version" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9f1239" /><stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+    <linearGradient id="g-ui" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#115e59" /><stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <linearGradient id="g-sec" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#991b1b" /><stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+    <linearGradient id="g-arch" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3730a3" /><stop offset="100%" stop-color="#4338ca" />
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="hub-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="15" flood-color="#38bdf8" flood-opacity="0.4" />
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+    <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+    <filter id="node-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="2400" height="1500" fill="url(#bg-grad)" />
+
+  <!-- Subtle Blueprint Grid Pattern -->
+  <g opacity="0.04" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="300" x2="2400" y2="300" /><line x1="0" y1="600" x2="2400" y2="600" />
+    <line x1="0" y1="900" x2="2400" y2="900" /><line x1="0" y1="1200" x2="2400" y2="1200" />
+    <line x1="400" y1="0" x2="400" y2="1500" /><line x1="800" y1="0" x2="800" y2="1500" />
+    <line x1="1200" y1="0" x2="1200" y2="1500" /><line x1="1600" y1="0" x2="1600" y2="1500" />
+    <line x1="2000" y1="0" x2="2000" y2="1500" />
+  </g>
+
+  <!-- Header Banner -->
+  <g transform="translate(60, 35)">
+    <rect x="0" y="0" width="2280" height="70" rx="10" fill="#1e293b" fill-opacity="0.7" stroke="#334155" stroke-width="1.5" />
+    <text x="35" y="38" font-size="22" font-weight="900" fill="#ffffff" letter-spacing="0.5">PERSONAL LIBRARY &amp; AI RESEARCH ENGINE — COMPLETE FUNCTIONALITY MINDMAP</text>
+    <text x="35" y="58" font-size="12" font-weight="600" fill="#38bdf8">100% Comprehensive Capability Matrix: Spring Boot 3 • Spring AI • UI5 Web Components • Qdrant Vector RAG • Camunda BPMN • Keycloak OIDC</text>
+    <rect x="2020" y="18" width="220" height="34" rx="6" fill="#0f172a" stroke="#0284c7" stroke-width="1" />
+    <text x="2130" y="39" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">AGPL-3.0-or-later • Enterprise</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- CONNECTING ORTHOGONAL & BEZIER TRUNKS FROM CENTER HUB                     -->
+  <!-- ========================================================================= -->
+  <!-- Center Hub: (1200, 750), width: 360, height: 160 -> Left: 1020, Right: 1380, Top: 670, Bottom: 830 -->
+  <g stroke-linecap="round" fill="none">
+    <!-- RIGHT SIDE BRANCHES -->
+    <!-- Trunk 1: Ingestion & Pipeline (Top-Right: x=1480, y=180) -->
+    <path d="M 1380 710 C 1450 710, 1420 220, 1480 220" stroke="#10b981" stroke-width="3.5" opacity="0.85" />
+    
+    <!-- Trunk 2: BibTeX & LaTeX Engine (Mid-High-Right: x=1480, y=520) -->
+    <path d="M 1380 735 C 1440 735, 1430 540, 1480 540" stroke="#f59e0b" stroke-width="3.5" opacity="0.85" />
+
+    <!-- Trunk 3: Dual AI Models (Mid-Low-Right: x=1480, y=860) -->
+    <path d="M 1380 765 C 1440 765, 1430 880, 1480 880" stroke="#3b82f6" stroke-width="3.5" opacity="0.85" />
+
+    <!-- Trunk 4: Vector RAG & Chat (Bottom-Right: x=1480, y=1200) -->
+    <path d="M 1380 790 C 1450 790, 1420 1220, 1480 1220" stroke="#a855f7" stroke-width="3.5" opacity="0.85" />
+
+    <!-- LEFT SIDE BRANCHES -->
+    <!-- Trunk 5: Version Control & Lineage (Top-Left: x=920, y=180) -->
+    <path d="M 1020 710 C 950 710, 980 220, 920 220" stroke="#f43f5e" stroke-width="3.5" opacity="0.85" />
+
+    <!-- Trunk 6: Enterprise UI5 Frontend (Mid-High-Left: x=920, y=520) -->
+    <path d="M 1020 735 C 960 735, 970 540, 920 540" stroke="#14b8a6" stroke-width="3.5" opacity="0.85" />
+
+    <!-- Trunk 7: Security & Governance (Mid-Low-Left: x=920, y=860) -->
+    <path d="M 1020 765 C 960 765, 970 880, 920 880" stroke="#ef4444" stroke-width="3.5" opacity="0.85" />
+
+    <!-- Trunk 8: Architecture & Tooling (Bottom-Left: x=920, y=1200) -->
+    <path d="M 1020 790 C 950 790, 980 1220, 920 1220" stroke="#6366f1" stroke-width="3.5" opacity="0.85" />
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- CENTRAL ROOT HUB                                                          -->
+  <!-- ========================================================================= -->
+  <g filter="url(#hub-glow)" transform="translate(1020, 670)">
+    <rect width="360" height="160" rx="20" fill="url(#hub-grad)" stroke="#38bdf8" stroke-width="2.5" />
+    <circle cx="180" cy="45" r="22" fill="#0369a1" stroke="#bae6fd" stroke-width="1.5" />
+    <text x="180" y="52" font-size="20" text-anchor="middle" fill="#ffffff">📚</text>
+    
+    <text x="180" y="92" font-size="17" font-weight="900" fill="#ffffff" text-anchor="middle">Personal Library</text>
+    <text x="180" y="112" font-size="13" font-weight="700" fill="#bae6fd" text-anchor="middle">&amp; AI Research Engine</text>
+    
+    <rect x="50" y="125" width="260" height="22" rx="4" fill="#0f172a" fill-opacity="0.6" />
+    <text x="180" y="140" font-size="10.5" font-weight="700" fill="#7dd3fc" text-anchor="middle">8 Strategic Capabilities • Enterprise Grade</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RIGHT SIDE: BRANCH 1 — INGESTION & PIPELINE (x=1480, y=140)              -->
+  <!-- ========================================================================= -->
+  <g transform="translate(1480, 130)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="400" height="52" rx="8" fill="url(#g-ingest)" stroke="#10b981" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">1. INGESTION &amp; PIPELINE</text>
+    <rect x="290" y="14" width="95" height="24" rx="4" fill="#064e3b" stroke="#34d399" />
+    <text x="337" y="30" font-size="10" font-weight="700" fill="#6ee7b7" text-anchor="middle">Camunda BPMN</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 1.1 -->
+    <path d="M 200 52 L 200 70 L 60 70 L 60 85" fill="none" stroke="#10b981" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Multi-Format Document Ingestion</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• PDF, DOCX, Markdown, LaTeX, Plain Text</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• MIME detection &amp; binary streaming</text>
+    </g>
+
+    <!-- Node 1.2 -->
+    <path d="M 200 52 L 200 70 L 330 70 L 330 85" fill="none" stroke="#10b981" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Drag-and-Drop File Upload UI</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Client-side BibTeX extraction preview</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Progress bars, status &amp; error validation</text>
+    </g>
+
+    <!-- Node 1.3 -->
+    <path d="M 200 52 L 200 155 L 60 155 L 60 170" fill="none" stroke="#10b981" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Camunda BPMN 2.0 Ingestion Process</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• 7 Orchestrated tasks with parallel fork</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• User Task review loop on invalid metadata</text>
+    </g>
+
+    <!-- Node 1.4 -->
+    <path d="M 200 52 L 200 155 L 330 155 L 330 170" fill="none" stroke="#10b981" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">SHA-256 Fingerprinting &amp; Storage</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• De-duplication &amp; hash integrity check</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Local/Cloud versioned physical disk archive</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RIGHT SIDE: BRANCH 2 — BIBTEX & LATEX ENGINE (x=1480, y=470)              -->
+  <!-- ========================================================================= -->
+  <g transform="translate(1480, 460)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="400" height="52" rx="8" fill="url(#g-bibtex)" stroke="#f59e0b" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">2. BIBTEX &amp; LATEX ENGINE</text>
+    <rect x="290" y="14" width="95" height="24" rx="4" fill="#78350f" stroke="#fbbf24" />
+    <text x="337" y="30" font-size="10" font-weight="700" fill="#fde68a" text-anchor="middle">AST Parser</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 2.1 -->
+    <path d="M 200 52 L 200 70 L 60 70 L 60 85" fill="none" stroke="#f59e0b" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fde68a">AST Lexer &amp; Regex Tokenizer</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Full parsing of @article, @book, etc.</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• LaTeX accent sanitization ({"a}, '{e}, etc.)</text>
+    </g>
+
+    <!-- Node 2.2 -->
+    <path d="M 200 52 L 200 70 L 330 70 L 330 85" fill="none" stroke="#f59e0b" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fde68a">14 Structured Metadata Fields</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Title, Author, Year, Month, Booktitle, Journal</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• DOI, URL, Volume, Pages, Publisher, Abstract</text>
+    </g>
+
+    <!-- Node 2.3 -->
+    <path d="M 200 52 L 200 155 L 60 155 L 60 170" fill="none" stroke="#f59e0b" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fde68a">Interactive In-Browser BibTeX Editor</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Live syntax highlighting &amp; schema check</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• One-click clipboard citation copy</text>
+    </g>
+
+    <!-- Node 2.4 -->
+    <path d="M 200 52 L 200 155 L 330 155 L 330 170" fill="none" stroke="#f59e0b" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fde68a">Multi-Criteria Faceted Filtering</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Filter by Year, Entry Type, Author</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• MongoDB dynamic criteria execution</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RIGHT SIDE: BRANCH 3 — DUAL AI BENCHMARKING (x=1480, y=810)               -->
+  <!-- ========================================================================= -->
+  <g transform="translate(1480, 800)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="400" height="52" rx="8" fill="url(#g-ai)" stroke="#3b82f6" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">3. DUAL AI BENCHMARKING</text>
+    <rect x="290" y="14" width="95" height="24" rx="4" fill="#1e3a8a" stroke="#60a5fa" />
+    <text x="337" y="30" font-size="10" font-weight="700" fill="#93c5fd" text-anchor="middle">Spring AI</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 3.1 -->
+    <path d="M 200 52 L 200 70 L 60 70 L 60 85" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#93c5fd">Ollama Llama 3.3 (70B Instruct)</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Analytical synthesis &amp; research critique</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Deep methodology decomposition</text>
+    </g>
+
+    <!-- Node 3.2 -->
+    <path d="M 200 52 L 200 70 L 330 70 L 330 85" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#93c5fd">Ollama Mistral Large (2411)</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Executive summary &amp; key bullet takeaways</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Rapid operational digest in sub-3.5 sec</text>
+    </g>
+
+    <!-- Node 3.3 -->
+    <path d="M 200 52 L 200 155 L 60 155 L 60 170" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#93c5fd">Synchronized Comparator UI</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Dual-card side-by-side comparison</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Markdown rendered with math equations</text>
+    </g>
+
+    <!-- Node 3.4 -->
+    <path d="M 200 52 L 200 155 L 330 155 L 330 170" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#93c5fd">Execution Telemetry &amp; Caching</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Latency tracking (seconds/tokens)</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Immutable summary cache per version</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RIGHT SIDE: BRANCH 4 — VECTOR RAG & CHAT (x=1480, y=1140)                -->
+  <!-- ========================================================================= -->
+  <g transform="translate(1480, 1140)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="400" height="52" rx="8" fill="url(#g-rag)" stroke="#a855f7" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">4. VECTOR RAG &amp; CHAT</text>
+    <rect x="290" y="14" width="95" height="24" rx="4" fill="#581c87" stroke="#c084fc" />
+    <text x="337" y="30" font-size="10" font-weight="700" fill="#e9d5ff" text-anchor="middle">Qdrant Vector</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 4.1 -->
+    <path d="M 200 52 L 200 70 L 60 70 L 60 85" fill="none" stroke="#a855f7" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Semantic Text Chunking</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• 500 token chunks with 50-token overlap</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Header preservation &amp; document GUID tag</text>
+    </g>
+
+    <!-- Node 4.2 -->
+    <path d="M 200 52 L 200 70 L 330 70 L 330 85" fill="none" stroke="#a855f7" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Qdrant Vector Database</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• library_embeddings collection</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Dense Cosine metric &amp; HNSW sub-10ms index</text>
+    </g>
+
+    <!-- Node 4.3 -->
+    <path d="M 200 52 L 200 155 L 60 155 L 60 170" fill="none" stroke="#a855f7" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Conversational Document Chat</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Multi-turn conversational memory</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Natural language prompt injection guard</text>
+    </g>
+
+    <!-- Node 4.4 -->
+    <path d="M 200 52 L 200 155 L 330 155 L 330 170" fill="none" stroke="#a855f7" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Grounded Citation Drawer</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Verifiable excerpt text with relevance %</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Page markers &amp; anti-hallucination badges</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- LEFT SIDE: BRANCH 5 — VERSION CONTROL & LINEAGE (x=920, y=140)           -->
+  <!-- ========================================================================= -->
+  <g transform="translate(370, 130)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="550" height="52" rx="8" fill="url(#g-version)" stroke="#f43f5e" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">5. VERSION CONTROL &amp; LINEAGE</text>
+    <rect x="420" y="14" width="115" height="24" rx="4" fill="#881337" stroke="#fb7185" />
+    <text x="477" y="30" font-size="10" font-weight="700" fill="#fecdd3" text-anchor="middle">Audit Immutable</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 5.1 -->
+    <path d="M 275 52 L 275 70 L 135 70 L 135 85" fill="none" stroke="#f43f5e" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fecdd3">In-Place Version Overwriting</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Multipart replacement maintaining root GUID</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Increments versionNumber (V1 -> V2 -> Vn)</text>
+    </g>
+
+    <!-- Node 5.2 -->
+    <path d="M 275 52 L 275 70 L 415 70 L 415 85" fill="none" stroke="#f43f5e" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fecdd3">Version Lineage Chain</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• previousVersionGuid pointer tracking</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Non-destructive historical preservation</text>
+    </g>
+
+    <!-- Node 5.3 -->
+    <path d="M 275 52 L 275 155 L 135 155 L 135 170" fill="none" stroke="#f43f5e" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fecdd3">Comprehensive Mutation Audit Trail</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Timestamps, editing user, changed fields</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Compliance logging in Keycloak/MongoDB</text>
+    </g>
+
+    <!-- Node 5.4 -->
+    <path d="M 275 52 L 275 155 L 415 155 L 415 170" fill="none" stroke="#f43f5e" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fecdd3">Rollback &amp; Historical Asset Access</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Download previous version raw binary file</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Revert or fork version tree anytime</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- LEFT SIDE: BRANCH 6 — ENTERPRISE UI5 FRONTEND (x=920, y=470)              -->
+  <!-- ========================================================================= -->
+  <g transform="translate(370, 460)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="550" height="52" rx="8" fill="url(#g-ui)" stroke="#14b8a6" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">6. ENTERPRISE UI5 FRONTEND</text>
+    <rect x="420" y="14" width="115" height="24" rx="4" fill="#134e4a" stroke="#2dd4bf" />
+    <text x="477" y="30" font-size="10" font-weight="700" fill="#99f6e4" text-anchor="middle">SAP Fiori</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 6.1 -->
+    <path d="M 275 52 L 275 70 L 135 70 L 135 85" fill="none" stroke="#14b8a6" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#14b8a6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#99f6e4">ListReport &amp; ObjectPage Floorplans</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Multi-field FilterBar, sorting, pagination</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Dynamic sticky header &amp; KPI summary cards</text>
+    </g>
+
+    <!-- Node 6.2 -->
+    <path d="M 275 52 L 275 70 L 415 70 L 415 85" fill="none" stroke="#14b8a6" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#14b8a6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#99f6e4">Light &amp; Dark Theming</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Real-time data-sap-theme toggling</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Shadow DOM UI5 component CSS injection</text>
+    </g>
+
+    <!-- Node 6.3 -->
+    <path d="M 275 52 L 275 155 L 135 155 L 135 170" fill="none" stroke="#14b8a6" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#14b8a6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#99f6e4">5 Localized Languages (i18n)</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• English, German, French, Spanish, Romanian</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Instant reactive store translation updates</text>
+    </g>
+
+    <!-- Node 6.4 -->
+    <path d="M 275 52 L 275 155 L 415 155 L 415 170" fill="none" stroke="#14b8a6" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#14b8a6" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#99f6e4">Observable Reactive State &amp; Gateway</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Zero framework overhead (Core Component)</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Instant switch between REST and Mock driver</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- LEFT SIDE: BRANCH 7 — SECURITY & GOVERNANCE (x=920, y=810)                -->
+  <!-- ========================================================================= -->
+  <g transform="translate(370, 800)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="550" height="52" rx="8" fill="url(#g-sec)" stroke="#ef4444" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">7. SECURITY &amp; GOVERNANCE</text>
+    <rect x="420" y="14" width="115" height="24" rx="4" fill="#7f1d1d" stroke="#f87171" />
+    <text x="477" y="30" font-size="10" font-weight="700" fill="#fca5a5" text-anchor="middle">Keycloak OIDC</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 7.1 -->
+    <path d="M 275 52 L 275 70 L 135 70 L 135 85" fill="none" stroke="#ef4444" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fca5a5">Keycloak 24+ OIDC Authentication</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• OAuth2 JWT Bearer token enforcement</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Single Sign-On (SSO) &amp; session lifecycle</text>
+    </g>
+
+    <!-- Node 7.2 -->
+    <path d="M 275 52 L 275 70 L 415 70 L 415 85" fill="none" stroke="#ef4444" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fca5a5">Role-Based Access Control (RBAC)</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• LIBRARY_ADMIN (Full Write, Delete, Overwrite)</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• CHIEF_RESEARCHER (AI benchmark &amp; RAG)</text>
+    </g>
+
+    <!-- Node 7.3 -->
+    <path d="M 275 52 L 275 155 L 135 155 L 135 170" fill="none" stroke="#ef4444" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fca5a5">Audit Event Logging &amp; Defense</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Path traversal blocking &amp; sanitized filenames</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Immutable access logs for audit compliance</text>
+    </g>
+
+    <!-- Node 7.4 -->
+    <path d="M 275 52 L 275 155 L 415 155 L 415 170" fill="none" stroke="#ef4444" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#fca5a5">GNU AGPL-3.0-or-later License</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Strongest network copyleft guarantee</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Transparent open research infrastructure</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- LEFT SIDE: BRANCH 8 — ARCHITECTURE & TOOLING (x=920, y=1140)              -->
+  <!-- ========================================================================= -->
+  <g transform="translate(370, 1140)" filter="url(#card-shadow)">
+    <!-- Branch Header Card -->
+    <rect width="550" height="52" rx="8" fill="url(#g-arch)" stroke="#6366f1" stroke-width="1.5" />
+    <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">8. ARCHITECTURE &amp; TOOLING</text>
+    <rect x="420" y="14" width="115" height="24" rx="4" fill="#312e81" stroke="#818cf8" />
+    <text x="477" y="30" font-size="10" font-weight="700" fill="#c7d2fe" text-anchor="middle">Full Stack</text>
+
+    <!-- Sub-feature Nodes -->
+    <!-- Node 8.1 -->
+    <path d="M 275 52 L 275 70 L 135 70 L 135 85" fill="none" stroke="#6366f1" stroke-width="1.5" />
+    <g transform="translate(10, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#6366f1" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">OpenAPI 3.1 &amp; Swagger Spec</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Interactive REST endpoint documentation</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Downloadable JSON schema &amp; test harness</text>
+    </g>
+
+    <!-- Node 8.2 -->
+    <path d="M 275 52 L 275 70 L 415 70 L 415 85" fill="none" stroke="#6366f1" stroke-width="1.5" />
+    <g transform="translate(280, 85)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#6366f1" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">Complete C4 &amp; UML Diagrams</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• System, Container, Component C4 layers</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Java Spring Boot + TS UI5 UML Class models</text>
+    </g>
+
+    <!-- Node 8.3 -->
+    <path d="M 275 52 L 275 155 L 135 155 L 135 170" fill="none" stroke="#6366f1" stroke-width="1.5" />
+    <g transform="translate(10, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#6366f1" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">Multi-Format Visual Export Suite</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Vector SVG, 4K Ultra-HD PNG, Archival PDF</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• PlantUML (.puml), Mermaid (.mmd), Draw.io</text>
+    </g>
+
+    <!-- Node 8.4 -->
+    <path d="M 275 52 L 275 155 L 415 155 L 415 170" fill="none" stroke="#6366f1" stroke-width="1.5" />
+    <g transform="translate(280, 170)" filter="url(#node-shadow)">
+      <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#6366f1" stroke-width="1" />
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">Self-Contained .ZIP &amp; Docs</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Full repo export with scripts &amp; models</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Javadoc + TypeDoc interactive docs</text>
+    </g>
+  </g>
+
+</svg>

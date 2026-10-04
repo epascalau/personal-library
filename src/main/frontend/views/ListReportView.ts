@@ -110,7 +110,7 @@ export class ListReportView extends Component {
   private pendingFilters: Partial<Record<TextFilterKey, string>> = {};
 
   /**
-   * Initializes the List Report view component with SAP Horizon container classes.
+   * Initializes the List Report view component with SAP Fiori container classes.
    *
    * WHAT: Calls `super(...)` with max-width responsive grid layout classes.
    * WHY: Provides responsive horizontal margins and spacing matching the SAP Fiori design system.
@@ -227,7 +227,7 @@ export class ListReportView extends Component {
   }
 
   /**
-   * Renders the SAP Horizon Filter Bar card with toggle button, input fields, and action buttons.
+   * Renders the SAP Fiori Filter Bar card with toggle button, input fields, and action buttons.
    *
    * WHAT: Generates collapsible card with inputs for file name, title, author, edition, format, and content keywords.
    * WHY: Follows the SAP Fiori List Report pattern: researchers can filter by single or combined fields,
@@ -392,10 +392,10 @@ export class ListReportView extends Component {
   }
 
   /**
-   * Renders the primary SAP Horizon data table container and card shell.
+   * Renders the primary SAP Fiori data table container and card shell.
    *
    * WHAT: Assembles table header bar, responsive table structure, and bottom pagination bar.
-   * WHY: Encapsulates the entire List Report data grid within a unified SAP Horizon card container.
+   * WHY: Encapsulates the entire List Report data grid within a unified SAP Fiori card container.
    *
    * @returns RawHtml markup for the complete table card.
    */
@@ -715,7 +715,7 @@ export class ListReportView extends Component {
   }
 
   /**
-   * Renders the SAP Horizon pagination bar with row count indicators and navigation controls.
+   * Renders the SAP Fiori pagination bar with row count indicators and navigation controls.
    *
    * WHAT: Generates page status labels ("Showing X to Y of Z"), page size selector (`ui5-select`),
    * and directional paging buttons (first, previous, next, last).

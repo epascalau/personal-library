@@ -189,7 +189,7 @@ export interface IconOptions {
  *
  * WHY:
  * 1. Tree-shaking: Importing individual icons rather than `AllIcons.js` saves several hundred kilobytes in bundle size.
- * 2. Visual consistency: Maps familiar Lucide naming onto the enterprise SAP Fiori icon set, matching Horizon aesthetics.
+ * 2. Visual consistency: Maps familiar Lucide naming onto the enterprise SAP Fiori icon set, matching enterprise aesthetics.
  * 3. Accessibility: Automatic `aria-hidden="true"` prevents screen readers from redundantly announcing decorative icons.
  *
  * @param key Semantic icon key defined in `Icons` map.

@@ -217,6 +217,84 @@
 
   <div class="container">
     <div class="grid">
+      <!-- 0. Key Learning Topics & Architecture Concepts -->
+      <div class="card" style="border-color: #3b82f6; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🎓</div>
+          <h2>Key Learning Topics &amp; Architectural Concepts</h2>
+          <p>
+            Comprehensive educational breakdown of 10 core enterprise engineering patterns implemented in this system:
+            SAP Fiori UI5 W3C Web Components, reactive state stores, swappable gateway adapters, dual Large Language Model (LLM) orchestration,
+            Qdrant vector Retrieval-Augmented Generation (RAG), Camunda BPMN 2.0 (Business Process Model and Notation) workflows, BibTeX Abstract Syntax Tree (AST) engineering, immutable version snapshotting, and Architecture-as-Code.
+          </p>
+        </div>
+        <div class="card-meta">
+          10 In-Depth Modules &bull; Formats: Interactive Web &amp; Markdown
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="learning-topics.html" class="btn" style="flex: 1; background: #2563eb;">Explore Learning Guide &rarr;</a>
+          <a href="LEARNING_TOPICS.md" download="LEARNING_TOPICS.md" class="btn btn-secondary" style="flex: 1;">Markdown (.md) &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 0B. Wizard of Oz Illustrated AI Explainer -->
+      <div class="card" style="border-color: #10b981; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🌪️</div>
+          <h2>From Kansas to Vectors: An Illustrated Guide</h2>
+          <p>
+            An accessible and mathematically complete walkthrough explaining subword tokens (Byte-Pair Encoding / BPE), vector embeddings, Qdrant HNSW (Hierarchical Navigable Small World) graphs,
+            and transformer summarization using Chapter 1 of <em>The Wonderful Wizard of Oz</em>. Features four clean vectorial SVG diagrams,
+            dual-tier plain English &amp; linear algebra explanations, and live database payloads.
+          </p>
+        </div>
+        <div class="card-meta">
+          Visual Diagrams &bull; BPE Tokenization &bull; Cosine Metric &bull; HNSW Graphs &bull; Transformer Attention
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="wizard-of-oz-explainer.html" class="btn" style="flex: 1; background: #059669;">Illustrated Guide &rarr;</a>
+          <a href="EXPLAINER_WIZARD_OF_OZ.md" download="EXPLAINER_WIZARD_OF_OZ.md" class="btn btn-secondary" style="flex: 1;">Markdown (.md) &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 0C. RAG Architecture Comparison & Benchmark -->
+      <div class="card" style="border-color: #8b5cf6; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🔬</div>
+          <h2>RAG Architecture Comparison &amp; Benchmark</h2>
+          <p>
+            Rigorous gap analysis evaluating the Personal Library pipeline against canonical modular Reference RAG architectures (Gao et al. 2024, Lewis et al. 2020).
+            Covers hybrid search (Dense + Sparse BM25), Cross-Encoder re-ranking, Parent-Child retrieval, and Ragas Triad evaluation metrics.
+          </p>
+        </div>
+        <div class="card-meta">
+          Stage-by-Stage Matrix &bull; Reciprocal Rank Fusion &bull; Modular Evolution
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="rag-architecture-comparison.html" class="btn" style="flex: 1; background: #7c3aed;">Compare Architecture &rarr;</a>
+          <a href="RAG_ARCHITECTURE_COMPARISON.md" download="RAG_ARCHITECTURE_COMPARISON.md" class="btn btn-secondary" style="flex: 1;">Markdown (.md) &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 0D. Unified Financial Ledger, Commercial Valuation & ROI Analysis -->
+      <div class="card" style="border-color: #10b981; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.04) 100%);">
+        <div>
+          <div class="card-icon">📊</div>
+          <h2>Unified Financial Ledger &amp; Commercial ROI Analysis</h2>
+          <p>
+            Comprehensive financial ledger and commercial market valuation benchmarking the Personal Library project across traditional manual development ($12k–$16.5k),
+            AI copilot workflows ($5.5k–$7k), and the autonomous agent build ($118.31 all-in compute). Features token cost drivers, Cloud Run hosting, and key strategic takeaways.
+          </p>
+        </div>
+        <div class="card-meta">
+          Compute Ledger &bull; Commercial ROI ($118.31 vs $16.5k) &bull; 98% Savings &bull; Context Compounding
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="unified-financial-ledger-roi.html" class="btn" style="flex: 1; background: #059669;">Financial &amp; ROI Ledger &rarr;</a>
+          <a href="unified_financial_ledger_roi_key_takeaways.md" download="unified_financial_ledger_roi_key_takeaways.md" class="btn btn-secondary" style="flex: 1;">Markdown (.md) &rarr;</a>
+        </div>
+      </div>
+
       <!-- 1. TypeScript API Reference -->
       <div class="card">
         <div>
@@ -264,6 +342,107 @@
           Standard: OpenAPI 3.0.3 • Location: /api/v1/openapi.yaml
         </div>
         <a href="/api/v1/openapi.yaml" target="_blank" class="btn btn-secondary">View OpenAPI Spec (YAML) &rarr;</a>
+      </div>
+
+      <!-- 4. System Architecture Diagram -->
+      <div class="card">
+        <div>
+          <div class="card-icon">🏛️</div>
+          <h2>End-to-End System Architecture (C4 &amp; Mermaid)</h2>
+          <p>
+            C4 Container &amp; layered architectural blueprint mapping the SAP UI5 client tier, Express gateway server,
+            Spring AI dual-model inference engines (Llama 3.3 70B &amp; Mistral Large), Qdrant vector database, and MongoDB / Keycloak persistence.
+          </p>
+        </div>
+        <div class="card-meta">
+          Model: architecture_diagrams.mmd &bull; Formats: PDF &bull; SVG &bull; PNG &bull; Draw.io &bull; PlantUML
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/architecture_diagrams.pdf" target="_blank" class="btn" style="flex: 1; background: #9333ea;">Spec PDF &rarr;</a>
+          <a href="diagrams/architecture_diagrams.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/architecture_diagrams.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+          <a href="diagrams/architecture_diagrams.mmd" download="architecture_diagrams.mmd" class="btn btn-secondary" style="flex: 1;">Mermaid &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 5. Vector RAG & Summarization Flow -->
+      <div class="card">
+        <div>
+          <div class="card-icon">🔄</div>
+          <h2>Dual-Model RAG &amp; Summarization Flow</h2>
+          <p>
+            Detailed data flow diagram covering binary PDF ingestion, text extraction, semantic chunking (~350 chars),
+            concurrent Llama/Mistral inference, Qdrant dense vector upsert, and interactive grounding prompt assembly.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; Draw.io (.drawio) &bull; 3200px PNG
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/rag_data_flow.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/rag_data_flow.drawio" download="rag_data_flow.drawio" class="btn" style="flex: 1; background: #059669;">Draw.io XML &rarr;</a>
+          <a href="diagrams/rag_data_flow.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 6. Camunda BPMN 2.0 Ingestion Workflow -->
+      <div class="card">
+        <div>
+          <div class="card-icon">⚙️</div>
+          <h2>Camunda BPMN 2.0 Ingestion Workflow</h2>
+          <p>
+            Full BPMN 2.0 process definition featuring 4 horizontal swimlanes, asynchronous retry boundaries (R3/PT10S),
+            parallel fork/join branches for dual AI, librarian human review gate, and enterprise audit logging.
+          </p>
+        </div>
+        <div class="card-meta">
+          Specification: Camunda 7 &amp; 8 &bull; Formats: Executable BPMN 2.0 XML &bull; SVG &bull; PDF &bull; PNG
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="/api/v1/bpmn/document-ingestion.bpmn?download=true" download="document-ingestion-rag.bpmn" class="btn" style="flex: 1; background: #0d9488;">Camunda BPMN Model &rarr;</a>
+          <a href="diagrams/document_ingestion_rag.pdf" target="_blank" class="btn" style="flex: 1;">Architect PDF &rarr;</a>
+          <a href="diagrams/document_ingestion_rag.svg" target="_blank" class="btn btn-secondary" style="flex: 1;">SVG &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 7. Java Spring Boot UML Class Diagram -->
+      <div class="card">
+        <div>
+          <div class="card-icon">☕</div>
+          <h2>Java Backend UML Class Diagram</h2>
+          <p>
+            Detailed UML class diagram of the Spring Boot 3 backend: REST Controllers, Service layer,
+            MongoDB Data Repositories, Entity models (DocumentEntity, BibTeXMetadata, SummaryRecord), and Spring Security/Ollama configs.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; PlantUML (.puml) &bull; Mermaid (.mmd) &bull; 3200px PNG
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/java_uml_class_diagram.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/java_uml_class_diagram.puml" download="java_uml_class_diagram.puml" class="btn" style="flex: 1; background: #ea580c;">PlantUML &rarr;</a>
+          <a href="diagrams/java_uml_class_diagram.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 8. TypeScript Frontend UML Class Diagram -->
+      <div class="card">
+        <div>
+          <div class="card-icon">⚡</div>
+          <h2>TypeScript Frontend UML Class Diagram</h2>
+          <p>
+            UML class diagram of the frontend micro-framework: Component lifecycle, Store observable state,
+            SAP Fiori views (ListReportView, ObjectPageView, Dialogs), and BackendGateway Adapter driver strategy pattern.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; PlantUML (.puml) &bull; Mermaid (.mmd) &bull; 3200px PNG
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/typescript_uml_class_diagram.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/typescript_uml_class_diagram.puml" download="typescript_uml_class_diagram.puml" class="btn" style="flex: 1; background: #0284c7;">PlantUML &rarr;</a>
+          <a href="diagrams/typescript_uml_class_diagram.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+        </div>
       </div>
     </div>
 

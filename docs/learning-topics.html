@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Learning Topics & Architectural Concepts - Personal Library</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+      --accent: #3b82f6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --code-bg: #0f172a;
+        --accent: #60a5fa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+
+    .hero h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 800px;
+      margin: 0 auto 1rem;
+    }
+
+    .nav-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-bar a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .nav-bar a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .toc {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .toc h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .toc ol {
+      padding-left: 1.25rem;
+    }
+
+    .toc li {
+      margin-bottom: 0.4rem;
+    }
+
+    .toc a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .topic-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    .topic-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .topic-section h3 {
+      font-size: 1.15rem;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--text);
+    }
+
+    .topic-section p {
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .topic-section ul, .topic-section ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .topic-section li {
+      margin-bottom: 0.4rem;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88em;
+    }
+
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    .takeaway-box {
+      background: rgba(59, 130, 246, 0.08);
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin-top: 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    .takeaway-box strong {
+      color: var(--primary);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">&larr; Back to Documentation Hub</a>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">Personal Library Architecture Guide</span>
+    <a href="LEARNING_TOPICS.md" download="LEARNING_TOPICS.md">Download Markdown &darr;</a>
+  </div>
+
+  <div class="hero">
+    <h1>Key Learning Topics &amp; Architectural Concepts</h1>
+    <p>Comprehensive educational breakdown of the 10 core architectural patterns, design decisions, and engineering principles implemented in the Personal Library &amp; AI Research Engine.</p>
+  </div>
+
+  <div class="container">
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#topic-1">1. Enterprise UI (User Interface) Architecture with SAP Fiori &amp; UI5 W3C Web Components</a></li>
+        <li><a href="#topic-2">2. Reactive State Management &amp; Decoupled Frontend Patterns</a></li>
+        <li><a href="#topic-3">3. Pluggable Backend Gateway &amp; Driver Adapter Pattern</a></li>
+        <li><a href="#topic-4">4. Multi-Model Large Language Model (LLM) Orchestration &amp; Comparative Benchmarking</a></li>
+        <li><a href="#topic-5">5. Retrieval-Augmented Generation (RAG) &amp; Vector Database Architecture</a></li>
+        <li><a href="#topic-6">6. Camunda Business Process Model and Notation (BPMN 2.0) Workflow Orchestration</a></li>
+        <li><a href="#topic-7">7. Domain-Specific Parsing &amp; Abstract Syntax Tree (AST) Metadata Engineering (LaTeX / BibTeX)</a></li>
+        <li><a href="#topic-8">8. Document Versioning, Lineage &amp; Immutable Rollback Architecture</a></li>
+        <li><a href="#topic-9">9. Production-Grade Microservices Topology, Keycloak OIDC (OpenID Connect) &amp; Security</a></li>
+        <li><a href="#topic-10">10. Architecture-as-Code &amp; Automated Visual Documentation Tooling</a></li>
+        <li><a href="#topic-11">11. Glossary of Acronyms &amp; Terminology</a></li>
+      </ol>
+    </div>
+
+    <!-- 1 -->
+    <section id="topic-1" class="topic-section">
+      <h2>1. Enterprise UI Architecture with SAP Fiori &amp; UI5 Web Components</h2>
+      <h3>The Concept</h3>
+      <p>Instead of relying on heavy SPA frameworks, this platform is built on standard W3C Web Components via <code>@ui5/webcomponents</code> v2, implementing official SAP Fiori floorplans directly in vanilla TypeScript.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Zero Framework Lock-in:</strong> Runs natively in the browser without virtual DOM diffing overhead or framework upgrade cycles.</li>
+        <li><strong>Proven Enterprise Floorplans:</strong> Employs the <em>List Report</em> (multi-criteria filter bar, high-density table, sorting, pagination) and <em>Object Page</em> (sticky header metrics, KPI blocks, segmented tab containers).</li>
+        <li><strong>Accessibility (WCAG 2.1 AA):</strong> Native screen reader support, keyboard traversal, and standard ARIA roles built into every UI5 component.</li>
+      </ul>
+      <h3>Implementation</h3>
+      <pre><code>// Dynamic Visual Theme Switching
+import { setTheme } from '@ui5/webcomponents-base/dist/config/Theme.js';
+
+export class ThemeStore extends Store&lt;ThemeState&gt; {
+  public toggleTheme(): void {
+    const isDark = !this.state.isDark;
+    setTheme(isDark ? 'sap_horizon_dark' : 'sap_horizon');
+    document.documentElement.classList.toggle('dark', isDark);
+    this.setState({ isDark, themeName: isDark ? 'Dark Theme' : 'Light Theme' });
+  }
+}</code></pre>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Web Components provide an enterprise-grade design system with native performance, built-in accessibility, and zero framework churn.
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="topic-2" class="topic-section">
+      <h2>2. Reactive State Management &amp; Decoupled Frontend Patterns</h2>
+      <h3>The Concept</h3>
+      <p>A reactive, lightweight state management layer built with the Observer and Pub/Sub patterns in under 150 lines of TypeScript, replacing heavyweight external libraries.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Discrete Domain Stores:</strong> State is modularized into <code>appStore</code> (documents, filters, upload queue), <code>backendStore</code> (active mode, latency), <code>themeStore</code> (visual theme), and <code>i18nStore</code> (localization dictionaries).</li>
+        <li><strong>Fine-Grained Subscriptions:</strong> Views subscribe only to the state slices they consume, eliminating full-page DOM thrashing.</li>
+        <li><strong>Automatic Lifecycle Management:</strong> The base <code>Component</code> class tracks subscriptions with <code>track(unsub)</code> and cleans up during <code>unmount()</code> to prevent memory leaks.</li>
+      </ul>
+      <pre><code>// src/main/frontend/core/store.ts
+export class Store&lt;T&gt; {
+  private _state: T;
+  private _listeners = new Set&lt;(state: T) =&gt; void&gt;();
+
+  constructor(initialState: T) { this._state = Object.freeze({ ...initialState }); }
+  public getState(): T { return this._state; }
+  public setState(partial: Partial&lt;T&gt;): void {
+    this._state = Object.freeze({ ...this._state, ...partial });
+    for (const listener of this._listeners) { listener(this._state); }
+  }
+  public subscribe(listener: (state: T) =&gt; void): () =&gt; void {
+    this._listeners.add(listener);
+    return () =&gt; this._listeners.delete(listener);
+  }
+}</code></pre>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Minimalist observable state stores combined with structured component lifecycles yield predictable, leak-free reactivity without framework bloat.
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section id="topic-3" class="topic-section">
+      <h2>3. Pluggable Backend Gateway &amp; Driver Adapter Pattern</h2>
+      <h3>The Concept</h3>
+      <p>A unified Gateway Facade (<code>BackendGateway</code>) mediates all data and AI requests, dispatching to swappable adapter drivers adhering to the <code>BackendAdapter</code> interface.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Standalone Execution:</strong> The <code>MockBackendAdapter</code> enables full-fidelity frontend execution (offline demo sandboxes, CI test suites) with local storage persistence and simulated AI latency.</li>
+        <li><strong>Hot-Swapping at Runtime:</strong> Users can toggle between Mock and Live Spring Boot REST modes in real time without refreshing or losing state.</li>
+        <li><strong>Protocol Isolation:</strong> UI views never execute HTTP calls directly, ensuring that changes to network protocols do not ripple through presentation code.</li>
+      </ul>
+      <pre><code>// src/main/frontend/services/backend/adapter.ts
+export interface BackendAdapter {
+  readonly mode: BackendMode;
+  listDocuments(query?: DocumentListQuery): Promise&lt;DocumentListResult&gt;;
+  getDocument(guid: string): Promise&lt;DocumentRecord&gt;;
+  uploadDocument(payload: DocumentUploadPayload): Promise&lt;DocumentRecord&gt;;
+  overwriteDocument(guid: string, payload: DocumentUploadPayload): Promise&lt;DocumentRecord&gt;;
+  deleteDocument(guid: string): Promise&lt;boolean&gt;;
+  getVersionHistory(guid: string): Promise&lt;DocumentVersionSnapshot[]&gt;;
+  rollbackVersion(guid: string, targetVersion: number): Promise&lt;DocumentRecord&gt;;
+  summarizeDocument(guid: string, model: 'llama' | 'mistral'): Promise&lt;SummaryRecord&gt;;
+  chat(payload: ChatRequestPayload): Promise&lt;ChatResponseResult&gt;;
+  getHealth(): Promise&lt;HealthStatusResult&gt;;
+}</code></pre>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Abstracting backend access behind a typed adapter contract makes applications testable, resilient to network outages, and easy to run in standalone environments.
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section id="topic-4" class="topic-section">
+      <h2>4. Multi-Model Large Language Model (LLM) Orchestration &amp; Comparative Benchmarking</h2>
+      <h3>The Concept</h3>
+      <p>Pairing two specialized local Large Language Models (LLMs: Ollama Llama 3.3 70B and Mistral Large 2411) with distinctive analytical personas, reinforced with Google Gemini cloud fallback via <code>@google/genai</code> Software Development Kit (SDK).</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Persona Specialization:</strong> Llama acts as an academic researcher performing deep structural and methodological critiques; Mistral acts as an executive technology director highlighting actionable takeaways.</li>
+        <li><strong>Cloud Fallback Resilience:</strong> When local Ollama hardware is unavailable or overloaded, requests cascade automatically to server-side Google Gemini Flash via <code>@google/genai</code>.</li>
+        <li><strong>Thread-Safe Concurrency:</strong> Both models can be triggered simultaneously without race conditions, tracking execution duration and generation telemetry independently.</li>
+      </ul>
+      <pre><code>// Parallel Regeneration in appStore.ts
+public async regenerateSummary(guid: string, model: 'llama' | 'mistral'): Promise&lt;void&gt; {
+  this.setSummaryLoading(guid, model, true);
+  try {
+    const record = await backendGateway.summarizeDocument(guid, model);
+    this.updateDocumentSummary(guid, model, record);
+  } finally {
+    this.setSummaryLoading(guid, model, false);
+  }
+}</code></pre>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Dual-persona model orchestration provides multifaceted insights, while parallel execution and cloud fallback guarantee both performance and reliability.
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section id="topic-5" class="topic-section">
+      <h2>5. Retrieval-Augmented Generation (RAG) &amp; Vector Database Architecture</h2>
+      <h3>The Concept</h3>
+      <p>Grounded conversational document Q&amp;A built on Qdrant vector database similarity indexing, semantic chunking, Hierarchical Navigable Small World (HNSW) graphs, and verifiable source attribution.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Sliding-Window Chunking:</strong> Partitions document text into 500-token chunks with 50-token contextual overlaps to preserve sentence boundaries.</li>
+        <li><strong>Dense Cosine Similarity:</strong> Uses Qdrant HNSW indexing in the <code>library_embeddings</code> collection for sub-10ms top-$k$ nearest neighbor retrieval.</li>
+        <li><strong>Anti-Hallucination Controls:</strong> Prompts restrict models to retrieved excerpts only, requiring direct citation anchors.</li>
+        <li><strong>Interactive Citation Drawer:</strong> Clicking citation markers in responses highlights the exact verbatim excerpt in the source document alongside relevance confidence scores.</li>
+      </ul>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Vector Retrieval-Augmented Generation (RAG) with interactive source attribution transforms speculative LLM text into an auditable research instrument.
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section id="topic-6" class="topic-section">
+      <h2>6. Camunda Business Process Model and Notation (BPMN 2.0) Workflow Orchestration</h2>
+      <h3>The Concept</h3>
+      <p>Modeling and executing document ingestion, Optical Character Recognition (OCR) extraction, vectorization, and dual AI summarization as an auditable enterprise Business Process Model and Notation (BPMN 2.0) process.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Long-Running Reliability:</strong> Handles asynchronous multi-step extraction with built-in retry policies (<code>R3/PT10S</code>) for network resilience.</li>
+        <li><strong>Human-in-the-Loop Gateway:</strong> Routes low-confidence metadata extractions to a manual review task before vector indexing.</li>
+        <li><strong>Full Auditability:</strong> Visualized in-app with an interactive BPMN viewer dialog and executable BPMN 2.0 XML inspector.</li>
+      </ul>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Formal BPMN workflow modeling bridges business process governance with technical microservice task execution.
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section id="topic-7" class="topic-section">
+      <h2>7. Domain-Specific Parsing &amp; Abstract Syntax Tree (AST) Metadata Engineering (LaTeX / BibTeX)</h2>
+      <h3>The Concept</h3>
+      <p>A specialized lexer and Abstract Syntax Tree (AST) tokenizer that parses, validates, and generates standardized LaTeX BibTeX entries across 14 metadata fields.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Schema-Driven Dynamic Forms:</strong> Adapts form layouts dynamically depending on publication type (<code>@article</code>, <code>@book</code>, <code>@inproceedings</code>, etc.).</li>
+        <li><strong>Bidirectional Conversion:</strong> Translates structured form state into sanitized LaTeX Backus–Naur Form (BNF) notation, handling nested braces and LaTeX accents (e.g. <code>\"{a}</code> &rarr; <code>ä</code>).</li>
+        <li><strong>Citation Exports:</strong> Provides one-click clipboard copying, <code>.bib</code> file downloads, and formatted academic citations (APA, IEEE, Chicago).</li>
+      </ul>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Domain-specific format engineering ensures seamless interoperability with academic publishing workflows.
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section id="topic-8" class="topic-section">
+      <h2>8. Document Versioning, Lineage &amp; Immutable Rollback Architecture</h2>
+      <h3>The Concept</h3>
+      <p>An append-only version control architecture combining in-place Globally Unique Identifier (GUID) continuity with immutable historical snapshot archiving and instant rollback.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Stable Primary Key Continuity:</strong> The document GUID remains constant across revisions, preserving external bookmarks and citation links.</li>
+        <li><strong>Immutable Snapshot Archiving:</strong> Captures complete document state, raw BibTeX, text chunks, dual summaries, and physical binary files before any mutation.</li>
+        <li><strong>Non-Destructive Rollback:</strong> Reverting to an earlier version restores its contents while incrementing the version counter (e.g. rolling back from <code>v3</code> to <code>v1</code> yields <code>v4</code>), maintaining a complete audit trail without data loss.</li>
+        <li><strong>Historical Asset Retrieval:</strong> Preserved files can be downloaded directly for any historical version revision.</li>
+      </ul>
+      <pre><code>// Snapshot Interface
+export interface DocumentVersionSnapshot {
+  version: number;
+  timestamp: string;
+  action: 'UPLOAD' | 'OVERWRITE' | 'ROLLBACK';
+  note: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  bibtex: BibTeXMetadata;
+  summaries: Record&lt;string, SummaryRecord&gt;;
+  downloadUrl: string;
+}</code></pre>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Combining stable GUIDs with immutable snapshot archiving provides complete disaster recovery and auditability across document lifecycles.
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section id="topic-9" class="topic-section">
+      <h2>9. Production-Grade Microservices Topology, Keycloak OIDC (OpenID Connect) &amp; Security</h2>
+      <h3>The Concept</h3>
+      <p>A multi-tier containerized architecture orchestrated via Docker Compose, secured with Keycloak OpenID Connect (OIDC) / OAuth 2.0 and Role-Based Access Control (RBAC) under GNU AGPLv3.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Tiered Microservices:</strong> Spring Boot API Gateway, MongoDB Document Store, Qdrant Vector DB, Ollama LLM server, and Keycloak Identity and Access Management (IAM).</li>
+        <li><strong>Stateless JWT Security:</strong> Validates JSON Web Token (JWT Bearer) claims against the <code>personal-library-realm</code> with Spring Security resource server filters.</li>
+        <li><strong>Granular RBAC:</strong> Enforces distinct capabilities for <code>LIBRARY_ADMIN</code>, <code>CHIEF_RESEARCHER</code>, and <code>VIEWER</code> roles.</li>
+        <li><strong>Strong Copyleft Compliance:</strong> Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later) to protect network user freedom and ensure open-source reciprocity.</li>
+      </ul>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Decoupled container orchestration combined with standards-based OIDC and RBAC delivers enterprise-grade security and operational maturity.
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="topic-10" class="topic-section">
+      <h2>10. Architecture-as-Code &amp; Automated Visual Documentation Tooling</h2>
+      <h3>The Concept</h3>
+      <p>Treating documentation and diagrams as executable code, automatically compiling synchronized visual artifacts across multiple industry formats from single sources of truth.</p>
+      <h3>Architectural Rationale</h3>
+      <ul>
+        <li><strong>Prevention of Documentation Drift:</strong> Running <code>npm run diagrams</code> re-renders all diagrams whenever data models or endpoints change.</li>
+        <li><strong>Multi-Format Outputs:</strong>
+          <ul>
+            <li><strong>Developers:</strong> Mermaid (<code>.mmd</code>) and PlantUML (<code>.puml</code>) for version control and git diffing.</li>
+            <li><strong>Architects:</strong> Vector SVG and Draw.io (<code>.drawio</code>) XML for infinite zoom and collaborative editing.</li>
+            <li><strong>Executives &amp; Compliance:</strong> Ultra-HD 4K PNGs (via Resvg) and archival multi-page landscape PDFs (via PDFKit).</li>
+          </ul>
+        </li>
+        <li><strong>Contract-First OpenAPI:</strong> Complete REST API documentation maintained in <code>openapi.yaml</code> with interactive Swagger UI support.</li>
+      </ul>
+      <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Programmatic visual diagram generation keeps documentation evergreen and synchronized with production code.
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section id="topic-11" class="topic-section">
+      <h2>11. Glossary of Acronyms &amp; Terminology</h2>
+      <p>A reference table defining key enterprise, AI, and web technology acronyms used throughout this documentation:</p>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.92rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border); color: var(--accent);">
+              <th style="padding: 0.6rem 0.8rem;">Acronym</th>
+              <th style="padding: 0.6rem 0.8rem;">Full Expansion</th>
+              <th style="padding: 0.6rem 0.8rem;">Definition in Project Context</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>RAG</strong></td><td style="padding: 0.5rem 0.8rem;">Retrieval-Augmented Generation</td><td style="padding: 0.5rem 0.8rem;">Combines vector database search with LLM prompting to eliminate hallucinations and cite source excerpts.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>LLM</strong></td><td style="padding: 0.5rem 0.8rem;">Large Language Model</td><td style="padding: 0.5rem 0.8rem;">Deep neural models (Llama 3.3 70B, Mistral Large 2411, Gemini Flash) for text analysis and summarization.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>BPMN</strong></td><td style="padding: 0.5rem 0.8rem;">Business Process Model and Notation (2.0)</td><td style="padding: 0.5rem 0.8rem;">Standardized workflow diagram notation and executable XML schema executed by Camunda Zeebe.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>HNSW</strong></td><td style="padding: 0.5rem 0.8rem;">Hierarchical Navigable Small World</td><td style="padding: 0.5rem 0.8rem;">Multi-layer graph metric space providing O(log N) nearest-neighbor vector search in Qdrant.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>AST</strong></td><td style="padding: 0.5rem 0.8rem;">Abstract Syntax Tree</td><td style="padding: 0.5rem 0.8rem;">Hierarchical node tree representing parsed BibTeX entries and LaTeX citation syntax.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>BPE</strong></td><td style="padding: 0.5rem 0.8rem;">Byte-Pair Encoding</td><td style="padding: 0.5rem 0.8rem;">Subword tokenization algorithm that creates vocabulary tokens by iteratively merging byte pairs.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>OIDC</strong></td><td style="padding: 0.5rem 0.8rem;">OpenID Connect</td><td style="padding: 0.5rem 0.8rem;">Identity protocol layered over OAuth 2.0 enabling Single Sign-On and user verification via Keycloak.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>JWT</strong></td><td style="padding: 0.5rem 0.8rem;">JSON Web Token</td><td style="padding: 0.5rem 0.8rem;">Digitally signed token standard (RFC 7519) carrying authenticated user roles and identity claims.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>RBAC</strong></td><td style="padding: 0.5rem 0.8rem;">Role-Based Access Control</td><td style="padding: 0.5rem 0.8rem;">Security policy enforcing access boundaries for LIBRARY_ADMIN, CHIEF_RESEARCHER, and VIEWER.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>REST</strong></td><td style="padding: 0.5rem 0.8rem;">Representational State Transfer</td><td style="padding: 0.5rem 0.8rem;">Stateless architectural pattern communicating over standard HTTP verbs (GET, POST, PUT, DELETE).</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>W3C</strong></td><td style="padding: 0.5rem 0.8rem;">World Wide Web Consortium</td><td style="padding: 0.5rem 0.8rem;">International web standards organization behind the W3C Web Components specification.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>WCAG</strong></td><td style="padding: 0.5rem 0.8rem;">Web Content Accessibility Guidelines</td><td style="padding: 0.5rem 0.8rem;">Accessibility guidelines (WCAG 2.1 Level AA) ensuring usability for assistive technologies.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>ARIA</strong></td><td style="padding: 0.5rem 0.8rem;">Accessible Rich Internet Applications</td><td style="padding: 0.5rem 0.8rem;">Semantic HTML attributes providing screen reader support across custom web components.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>BNF</strong></td><td style="padding: 0.5rem 0.8rem;">Backus–Naur Form</td><td style="padding: 0.5rem 0.8rem;">Formal context-free grammar metasyntax used for LaTeX/BibTeX formatting and sanitization.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>GUID</strong></td><td style="padding: 0.5rem 0.8rem;">Globally Unique Identifier</td><td style="padding: 0.5rem 0.8rem;">128-bit unique primary key guaranteeing identity across distributed nodes and version lifecycles.</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.8rem;"><strong>AGPL</strong></td><td style="padding: 0.5rem 0.8rem;">Affero General Public License (v3.0)</td><td style="padding: 0.5rem 0.8rem;">Strong copyleft open-source license protecting network user freedoms for SaaS deployments.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

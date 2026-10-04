@@ -42,6 +42,8 @@ const invokers: { [K in BackendOperationName]: Invoker<K> } = {
   uploadDocument: (adapter, request) => adapter.uploadDocument(request),
   overwriteVersion: (adapter, { guid, ...payload }) => adapter.overwriteVersion(guid, payload),
   deleteDocument: (adapter, request) => adapter.deleteDocument(request.guid),
+  getVersionHistory: (adapter, request) => adapter.getVersionHistory(request.guid),
+  rollbackVersion: (adapter, request) => adapter.rollbackVersion(request.guid, request.targetVersion),
   regenerateSummary: (adapter, request) => adapter.regenerateSummary(request.guid, request.modelKey),
   chatWithDocument: (adapter, request) =>
     adapter.chatWithDocument(request.guid, request.question, request.chatHistory),

@@ -1,0 +1,73 @@
+<mxfile host="app.diagrams.net" modified="2026-10-04T12:00:00.000Z" agent="PersonalLibrary" version="24.0.0" type="device">
+  <diagram id="rag-flow" name="Dual-Model RAG &amp; Pipeline Data Flow">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1050" background="#0B1120" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="rag_title" value="Personal Library — Dual-Model Summarization &amp;amp; Conversational RAG Data Flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1F2937;strokeColor=#374151;fontColor=#F9FAFB;fontSize=18;fontStyle=1;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="1560" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 1: Ingestion -->
+        <mxCell id="box_upload" value="&lt;b&gt;1. UPLOAD &amp;amp; EXTRACT&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#94a3b8&quot;&gt;• Multi-format: PDF, DOCX, MD, TXT&lt;br&gt;• Binary PDF stream via pdf-parse&lt;br&gt;• Magic byte &amp;amp; MIME verification&lt;br&gt;• Clean plain text extracted&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#3B82F6;fontColor=#FFFFFF;fontSize=12;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="50" y="120" width="280" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 2: BibTeX & Chunking -->
+        <mxCell id="box_chunk" value="&lt;b&gt;2. BIBTEX &amp;amp; CHUNKING&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#94a3b8&quot;&gt;• BibTeX Heuristic &amp;amp; LLM Inference&lt;br&gt;• Title, Authors, Year, DOI, Keywords&lt;br&gt;• Formatted LaTeX @entry string&lt;br&gt;• Paragraph Chunking (~350 chars)&lt;br&gt;• DocumentChunk[] collection&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#6366F1;fontColor=#FFFFFF;fontSize=12;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="380" y="120" width="300" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 3: Parallel AI & Indexing -->
+        <mxCell id="box_ai" value="&lt;b&gt;3. CONCURRENT INFERENCE &amp;amp; VECTORIZATION&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#A7F3D0&quot;&gt;&lt;b&gt;Branch A: Llama 3.3 (70B Instruct)&lt;/b&gt;&lt;br&gt;Analytical breakdown, methodology, benchmarks&lt;br&gt;&lt;br&gt;&lt;b&gt;Branch B: Mistral Large (2411)&lt;/b&gt;&lt;br&gt;Executive synthesis, key takeaways, audience&lt;br&gt;&lt;br&gt;&lt;b&gt;Branch C: Qdrant Vector Upsert&lt;/b&gt;&lt;br&gt;Dense embeddings indexed to library_embeddings&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064E3B;strokeColor=#10B981;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="730" y="110" width="460" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 4: MongoDB Persistence -->
+        <mxCell id="box_mongo" value="&lt;b&gt;4. ATOMIC PERSISTENCE &amp;amp; NOTIFY&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#94a3b8&quot;&gt;• MongoDB DocumentEntity write&lt;br&gt;• Both SummaryRecord items stored&lt;br&gt;• In-place GUID version history linked&lt;br&gt;• SAP UI5 EventBus notification sent&lt;br&gt;• Status: DOCUMENT_INDEXED&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FFFFFF;fontSize=12;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="120" width="360" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Connectors Top -->
+        <mxCell id="arrow_1_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38BDF8;strokeWidth=2;" edge="1" parent="1" source="box_upload" target="box_chunk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_2_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38BDF8;strokeWidth=2;" edge="1" parent="1" source="box_chunk" target="box_ai">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_3_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38BDF8;strokeWidth=2;" edge="1" parent="1" source="box_ai" target="box_mongo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Interactive RAG Query Section -->
+        <mxCell id="box_query_container" value="INTERACTIVE CONVERSATIONAL RAG QUERY LIFECYCLE (Object Page Chat)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#111827;strokeColor=#374151;fontColor=#38BDF8;fontSize=12;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="50" y="400" width="1550" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="q_step1" value="&lt;b&gt;A. User Question&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#94a3b8&quot;&gt;Patron types query into Object Page chat:&lt;br&gt;&lt;i&gt;&quot;Who are the characters and what is the Scarecrow seeking?&quot;&lt;/i&gt;&lt;br&gt;&lt;br&gt;POST /api/v1/chat&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="box_query_container">
+          <mxGeometry x="20" y="50" width="320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="q_step2" value="&lt;b&gt;B. Qdrant Similarity Search&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#D8B4FE&quot;&gt;• Scoped to active doc.guid&lt;br&gt;• Dense cosine similarity search&lt;br&gt;• Top-3 ranked excerpts retrieved&lt;br&gt;&lt;br&gt;Ranked chunks with metadata&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#A855F7;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="box_query_container">
+          <mxGeometry x="390" y="50" width="340" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="q_step3" value="&lt;b&gt;C. Grounded Context Prompt&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#6EE7B7&quot;&gt;Prompt assembly with source excerpts:&lt;br&gt;System: You are an expert RAG analyst.&lt;br&gt;Context: [Excerpt 1], [Excerpt 2]&lt;br&gt;Question: User inquiry&lt;br&gt;&lt;br&gt;Prevents hallucinations&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#10B981;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="box_query_container">
+          <mxGeometry x="780" y="50" width="340" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="q_step4" value="&lt;b&gt;D. Synthesized Response&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#FDE68A&quot;&gt;Markdown answer rendered in chat:&lt;br&gt;• Structured character lists&lt;br&gt;• Verifiable source quotations&lt;br&gt;• Clickable [Excerpt 1] citation chips&lt;br&gt;&lt;br&gt;Model: Llama 3.3 (70B) / Gemini Fallback&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="box_query_container">
+          <mxGeometry x="1170" y="50" width="350" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- Query Arrows -->
+        <mxCell id="q_arrow_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38BDF8;strokeWidth=2;" edge="1" parent="box_query_container" source="q_step1" target="q_step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="q_arrow_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38BDF8;strokeWidth=2;" edge="1" parent="box_query_container" source="q_step2" target="q_step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="q_arrow_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38BDF8;strokeWidth=2;" edge="1" parent="box_query_container" source="q_step3" target="q_step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

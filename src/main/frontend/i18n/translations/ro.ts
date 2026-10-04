@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
- * Romanian (Română) dictionary for Personal Library SAP Fiori Horizon UI.
+ * Romanian (Română) dictionary for Personal Library SAP Fiori UI.
  */
 
 import { TranslationDictionary } from '../types';
@@ -51,10 +51,10 @@ export const ro: TranslationDictionary = {
     docs: 'Doc',
     backend: 'Backend',
     openapi: 'OpenAPI',
-    themeMorning: 'Morning',
-    themeEvening: 'Evening',
+    themeMorning: 'Luminos',
+    themeEvening: 'Întunecat',
     switchTheme: 'Schimbă tema',
-    horizonTheme: 'Temă SAP Horizon',
+    visualTheme: 'Temă vizuală',
     authMethod: 'Metodă Autentificare',
     realm: 'Realm',
     activeRoles: 'Roluri Active',
@@ -201,7 +201,7 @@ export const ro: TranslationDictionary = {
   },
   footer: {
     libraryTitle: 'Biblioteca Personală',
-    sapHorizon: 'Planuri de etaj SAP Fiori (Temă Horizon)',
+    sapFloorplans: 'Planuri de etaj SAP Fiori',
     backendLabel: 'Backend',
     architecture: 'Arhitectură Backend Decuplată',
     springAi: 'Spring AI + Ollama (Llama & Mistral)',
@@ -209,6 +209,6 @@ export const ro: TranslationDictionary = {
     license: 'Licență',
     licenseInfo: 'Distribuit sub Licența Publică Generală GNU Affero v3.0 (AGPL-3.0-or-later)',
     viewLicense: 'Vezi Licența (GNU AGPLv3)',
-    trademarkDisclaimer: 'SAP, SAP Fiori, SAP Horizon și celelalte produse și servicii SAP menționate aici, precum și logo-urile respective, sunt mărci comerciale sau înregistrate ale SAP SE în Germania și alte țări. Această aplicație independentă nu este afiliată, aprobată sau sponsorizată de SAP SE.'
+    trademarkDisclaimer: 'SAP, SAP Fiori și celelalte produse și servicii SAP menționate aici, precum și logo-urile respective, sunt mărci comerciale sau înregistrate ale SAP SE în Germania și alte țări. Această aplicație independentă nu este afiliată, aprobată sau sponsorizată de SAP SE.'
   }
 };

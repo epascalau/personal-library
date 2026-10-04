@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Data Transfer Object representing an enterprise document response for API clients,
- * the SAP Horizon List Report table, and the Object Page details view.
+ * the SAP Fiori List Report table, and the Object Page details view.
  *
  * @author Enterprise Architecture Team
  * @version 1.0.0
@@ -58,6 +58,8 @@ public class DocumentResponse {
     private String contentExcerpt;
     /** Indexed text chunks. */
     private List<DocumentChunk> chunks;
+    /** Historical version snapshots preserved prior to in-place overwrites or rollbacks. */
+    private List<DocumentVersionSnapshot> versionHistory;
 
     /**
      * Converts a database {@link DocumentEntity} domain model to this external API response DTO.
@@ -86,6 +88,7 @@ public class DocumentResponse {
                 .summaries(entity.getSummaries())
                 .contentExcerpt(entity.getContentExcerpt())
                 .chunks(entity.getChunks())
+                .versionHistory(entity.getVersionHistory())
                 .build();
     }
 }

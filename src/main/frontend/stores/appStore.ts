@@ -349,7 +349,7 @@ class AppStore extends Store<AppState> {
    * Clears all filter criteria to empty defaults and schedules a query.
    *
    * WHAT: Replaces `filters` with `EMPTY_FILTERS`, sets `page: 1`, and schedules a fetch.
-   * WHY: Provides a one-click reset matching SAP Horizon Filter Bar UX guidelines.
+   * WHY: Provides a one-click reset matching SAP Fiori Filter Bar UX guidelines.
    */
   resetFilters(): void {
     this.setState({ filters: { ...EMPTY_FILTERS }, page: 1 });
@@ -411,7 +411,7 @@ class AppStore extends Store<AppState> {
    * Opens the document upload dialog.
    *
    * WHAT: Sets `uploadModalOpen: true` in application state.
-   * WHY: Triggers reactive visibility of the SAP Horizon document upload floorplan modal.
+   * WHY: Triggers reactive visibility of the SAP Fiori document upload floorplan modal.
    */
   openUpload(): void {
     this.setState({ uploadModalOpen: true });
@@ -650,6 +650,35 @@ class AppStore extends Store<AppState> {
         summarizingModels: updatedSummarizing,
         summarizingModel: activeRunningModel
       });
+    }
+  }
+
+  /**
+   * Rolls back the specified document to a designated historical version snapshot.
+   *
+   * WHAT: Dispatches `rollbackVersion` to backend, updates `activeDocument`,
+   * refreshes the document catalog, and provides user feedback toast.
+   * WHY: Enables researchers to revert accidental changes or retrieve prior revision states seamlessly.
+   *
+   * @param guid Unique document identifier.
+   * @param targetVersion Historical version sequence number to restore.
+   */
+  async rollbackDocument(guid: string, targetVersion: number): Promise<void> {
+    try {
+      this.showToast(`Initiating rollback to Version ${targetVersion}...`);
+      const updatedDoc = await requestBackend('rollbackVersion', {
+        guid,
+        targetVersion
+      });
+
+      if (this.state.activeDocument && this.state.activeDocument.guid === guid) {
+        this.setState({ activeDocument: updatedDoc });
+      }
+
+      this.showToast(`Document successfully rolled back to Version ${targetVersion} (now active as v${updatedDoc.versionNumber})`, 'success');
+      void this.fetchDocuments();
+    } catch (err: any) {
+      this.showToast(err?.message || 'Failed to rollback document version', 'error');
     }
   }
 

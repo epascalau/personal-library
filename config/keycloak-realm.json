@@ -1,0 +1,110 @@
+{
+  "id": "personal-library-realm",
+  "realm": "personal-library-realm",
+  "displayName": "Personal Library & AI Research Engine",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "LIBRARY_ADMIN",
+        "description": "Full administrator privileges (CRUD, versions, rollback, system administration)"
+      },
+      {
+        "name": "CHIEF_RESEARCHER",
+        "description": "Researcher privileges (upload, summarize, vector search, RAG chat)"
+      },
+      {
+        "name": "VIEWER",
+        "description": "Read-only access (search, read documents, download assets)"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "personal-library-client",
+      "name": "Personal Library Web Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "enterprise-library-secret",
+      "bearerOnly": false,
+      "publicClient": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-keycloak-101",
+      "username": "admin",
+      "email": "admin@personallibrary.local",
+      "firstName": "Library",
+      "lastName": "Administrator",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "LIBRARY_ADMIN",
+        "CHIEF_RESEARCHER"
+      ]
+    },
+    {
+      "id": "usr-keycloak-102",
+      "username": "researcher",
+      "email": "researcher@personallibrary.local",
+      "firstName": "Chief",
+      "lastName": "Researcher",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "researcher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "CHIEF_RESEARCHER"
+      ]
+    },
+    {
+      "id": "usr-keycloak-103",
+      "username": "viewer",
+      "email": "viewer@personallibrary.local",
+      "firstName": "Academic",
+      "lastName": "Viewer",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "viewer123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "VIEWER"
+      ]
+    }
+  ]
+}

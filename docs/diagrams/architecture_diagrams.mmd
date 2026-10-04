@@ -1,0 +1,50 @@
+%% Mermaid C4 Container Diagram for Personal Library
+graph TD
+    subgraph ClientTier["1. SAP Fiori Horizon Client Tier (UI5 Web Components + TypeScript)"]
+        Shell["ShellBarView<br/>(i18n, Theme, Keycloak Session)"]
+        ListReport["ListReportView<br/>(Multi-field FilterBar, Paginated Table)"]
+        ObjectPage["ObjectPageView<br/>(BibTeX, Dual AI Cards, RAG Chat, Version History & Rollback)"]
+        Dialogs["Modal Dialogs<br/>(Upload Pipeline, Version Overwrite, Rollback Confirm, BPMN View)"]
+        Stores["Reactive Stores<br/>(appStore, backendStore, themeStore, i18nStore)"]
+        Gateway["BackendGateway Facade<br/>(RestBackendAdapter & MockBackendAdapter)"]
+        
+        Shell --> Stores
+        ListReport --> Stores
+        ObjectPage --> Stores
+        Dialogs --> Stores
+        Stores --> Gateway
+    end
+
+    subgraph GatewayTier["2. Express / Spring Boot API Gateway (Port 3000)"]
+        Express["Express Server<br/>(Vite Dev Middleware / Static SPA Host)"]
+        Controllers["REST API Controllers<br/>(/api/v1/documents, /versions, /rollback, /chat, /auth)"]
+        Extraction["Extraction & BibTeX Engine<br/>(pdf-parse, LaTeX BNF Formatter, GUID Snapshot Archiving & Rollbacks)"]
+        Camunda["Camunda BPMN 2.0 Engine<br/>(Process_DocumentIngestionRAG)"]
+        
+        Express --> Controllers
+        Controllers --> Extraction
+        Controllers --> Camunda
+    end
+
+    subgraph AITier["3. Generative AI & Vector Retrieval Tier"]
+        Llama["Ollama Llama 3.3 (70B Instruct)<br/>(Analytical Decomposition & Methodology)"]
+        Mistral["Ollama Mistral Large (2411)<br/>(Executive Summary & Key Takeaways)"]
+        Gemini["Server-Side Gemini Fallback (@google/genai)<br/>(gemini-3.1-flash-lite & 3.8-flash)"]
+        Qdrant["Qdrant Vector Database<br/>(Dense Cosine Similarity, Collection: library_embeddings)"]
+    end
+
+    subgraph DataTier["4. Persistence & Security Tier"]
+        MongoDB[("MongoDB Document Store<br/>(Collection: documents, GUID Primary Key)")]
+        Keycloak["Keycloak OIDC Server<br/>(Realm: personal-library-realm, JWT Bearer)"]
+        FileStore["Raw File Asset Store<br/>(PDF, DOCX, Markdown Files)"]
+    end
+
+    Gateway -->|HTTP REST / JSON / Multipart| Controllers
+    Controllers -->|Async Service Task| Llama
+    Controllers -->|Async Service Task| Mistral
+    Controllers -->|Fallback Cascade| Gemini
+    Extraction -->|Upsert Chunks & Embeddings| Qdrant
+    Controllers -->|Search Top-K Excerpts| Qdrant
+    Controllers -->|DocumentEntity CRUD| MongoDB
+    Controllers -->|OAuth2 Bearer Token Validation| Keycloak
+    Controllers -->|Download / Stream| FileStore

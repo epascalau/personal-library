@@ -16,13 +16,21 @@
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="createrequestid"><span class="tsd-kind-call-signature">createRequestId</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">operation</span><span class="tsd-signature-symbol">:</span> <a href="../types/services_backend_events.BackendOperationName.html" class="tsd-signature-type tsd-kind-type-alias">BackendOperationName</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><a href="#createrequestid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Generates an idempotent, chronologically unique correlation identifier for a backend request.</p>
+<p>WHAT: Combines the operation name, monotonic sequence counter, and UUID (or crypto/timestamp fallback).
+WHY: Unique request IDs allow asynchronous responses to be matched unambiguously to their triggering call
+across multiplexed event-bus listeners, preventing race conditions when requests overlap.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
-<li><span><span class="tsd-kind-parameter">operation</span>: <a href="../types/services_backend_events.BackendOperationName.html" class="tsd-signature-type tsd-kind-type-alias">BackendOperationName</a></span></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<li><span><span class="tsd-kind-parameter">operation</span>: <a href="../types/services_backend_events.BackendOperationName.html" class="tsd-signature-type tsd-kind-type-alias">BackendOperationName</a></span>
+<div class="tsd-comment tsd-typography"><p>Name of the backend operation.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><p>Unique correlation ID string.</p>
+<aside class="tsd-sources">
 <ul>
-<li>Defined in services/backend/events.ts:210</li></ul></aside></div></li></ul></section></div>
+<li>Defined in services/backend/events.ts:256</li></ul></aside></div></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

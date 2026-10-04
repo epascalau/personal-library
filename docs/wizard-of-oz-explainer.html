@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>From Kansas to Vectors: An Illustrated Guide to AI Summarization, Tokens & Qdrant</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+      --math-bg: #f1f5f9;
+      --accent-blue: #3b82f6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --code-bg: #030712;
+        --code-text: #f3f4f6;
+        --math-bg: #0f172a;
+        --accent-blue: #60a5fa;
+        --accent-emerald: #34d399;
+        --accent-amber: #fbbf24;
+        --accent-purple: #a78bfa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+      color: #ffffff;
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #bfdbfe;
+      max-width: 820px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .nav-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-bar a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .nav-bar a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .passage-card {
+      background: linear-gradient(180deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 2px solid var(--accent-blue);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+    }
+
+    .passage-card h3 {
+      font-size: 1.1rem;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .passage-card blockquote {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.8;
+      border-left: 4px solid var(--accent-blue);
+      padding-left: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .passage-card cite {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: normal;
+      text-align: right;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.25rem;
+      margin-bottom: 2.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--accent-blue);
+    }
+
+    .tier-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    .tier-plain {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid var(--accent-emerald);
+    }
+
+    .tier-math {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid var(--accent-purple);
+    }
+
+    .tier-code {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid var(--accent-amber);
+    }
+
+    .svg-container {
+      margin: 1.75rem 0;
+      text-align: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
+
+    .svg-container svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .math-block {
+      background: var(--math-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent-purple);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      font-family: 'Cambria Math', 'Latin Modern Math', 'Times New Roman', serif;
+      font-size: 1.05rem;
+      overflow-x: auto;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.9em;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.25rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mini-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .mini-card h4 {
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .takeaway {
+      background: rgba(59, 130, 246, 0.08);
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">&larr; Back to Documentation Hub</a>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">Personal Library Educational Guide</span>
+    <a href="EXPLAINER_WIZARD_OF_OZ.md" download="EXPLAINER_WIZARD_OF_OZ.md">Download Markdown &darr;</a>
+  </div>
+
+  <div class="hero">
+    <h1>From Kansas to Vectors: An Illustrated Guide</h1>
+    <p>Understanding AI (Artificial Intelligence) Summarization, Subword Tokens (Byte-Pair Encoding / BPE), Vector Databases (Qdrant HNSW Graphs), and Retrieval-Augmented Generation (RAG) through a single passage from <em>The Wonderful Wizard of Oz</em>.</p>
+  </div>
+
+  <div class="container">
+    <!-- Kansas Passage Card -->
+    <div class="passage-card">
+      <h3>The Source Text &bull; Chapter 1: The Cyclone</h3>
+      <blockquote>
+        "Dorothy lived in the midst of the great Kansas prairies, with Uncle Henry, who was a farmer, and Aunt Em, who was the farmer's wife. Their house was small, for the lumber to build it had to be carried by wagon many miles. There were four walls, a floor and a roof, which made one room; and this room contained a rusty looking cookstove, a cupboard for the dishes, a table, three or four chairs, and the beds. Uncle Henry and Aunt Em had a big bed in one corner, and Dorothy a little bed in another corner. There was no garret at all, and no cellar—except a small hole dug in the ground, called a cyclone cellar, where the family could go in case one of those great whirlwinds arose, mighty enough to crush any building in its path."
+      </blockquote>
+      <cite>&mdash; L. Frank Baum, <em>The Wonderful Wizard of Oz</em> (1900)</cite>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- PHASE 1: TOKENS -->
+    <!-- ===================================================================== -->
+    <section class="section-card">
+      <h2>1. What Are Tokens? (Text into Lego Bricks &amp; Numbers)</h2>
+      
+      <span class="tier-label tier-plain">Plain English (For Everyone)</span>
+      <p>
+        A computer processor is an electronic calculator. It has no eyes to see letters and no brain to comprehend words. 
+        Before an AI can read about Dorothy and her cyclone cellar, it must snap the sentence apart into standardized chunks called <strong>tokens</strong>.
+      </p>
+      <p>
+        Think of tokens like <strong>LEGO bricks</strong>:
+        Common words like <code>"the"</code> or <code>"house"</code> get their own single brick. Rare words or proper names like <code>"Dorothy"</code> get split into two smaller bricks: <code>["Dor", "othy"]</code>.
+        Every single unique brick in the computer's dictionary has an assigned serial number (Token ID). The computer turns Baum's storytelling into a sequence of numbers.
+      </p>
+
+      <!-- Minimalist Vectorial SVG 1: Tokenization -->
+      <div class="svg-container">
+        <svg viewBox="0 0 880 200" width="880" height="200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Title -->
+          <text x="440" y="24" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#64748b" text-anchor="middle" letter-spacing="1">SUBWORD TOKENIZATION BREAKDOWN &amp; INTEGER VOCABULARY MAPPING</text>
+
+          <!-- Input Sentence Banner -->
+          <rect x="30" y="40" width="820" height="34" rx="6" fill="#1e293b" />
+          <text x="50" y="62" font-family="Georgia, serif" font-size="14" fill="#f8fafc" font-style="italic">"Dorothy lived in the midst of the great Kansas prairies..."</text>
+
+          <!-- Arrows -->
+          <path d="M 90 74 L 90 95 M 170 74 L 170 95 M 245 74 L 245 95 M 310 74 L 310 95 M 380 74 L 380 95 M 460 74 L 460 95 M 540 74 L 540 95 M 630 74 L 630 95 M 720 74 L 720 95 M 800 74 L 800 95" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
+
+          <!-- Token Chips -->
+          <!-- 1: Dor -->
+          <g transform="translate(45, 100)">
+            <rect width="65" height="52" rx="6" fill="#3b82f6" />
+            <text x="32" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">"Dor"</text>
+            <rect y="32" width="65" height="20" rx="0 0 6 6" fill="#1d4ed8" />
+            <text x="32" y="46" font-family="monospace" font-size="10.5" fill="#bfdbfe" text-anchor="middle">#18421</text>
+          </g>
+          <!-- 2: othy -->
+          <g transform="translate(120, 100)">
+            <rect width="65" height="52" rx="6" fill="#3b82f6" />
+            <text x="32" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">"othy"</text>
+            <rect y="32" width="65" height="20" rx="0 0 6 6" fill="#1d4ed8" />
+            <text x="32" y="46" font-family="monospace" font-size="10.5" fill="#bfdbfe" text-anchor="middle">#1422</text>
+          </g>
+          <!-- 3: lived -->
+          <g transform="translate(195, 100)">
+            <rect width="75" height="52" rx="6" fill="#0d9488" />
+            <text x="37" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" lived"</text>
+            <rect y="32" width="75" height="20" rx="0 0 6 6" fill="#115e59" />
+            <text x="37" y="46" font-family="monospace" font-size="10.5" fill="#99f6e4" text-anchor="middle">#6452</text>
+          </g>
+          <!-- 4: in -->
+          <g transform="translate(280, 100)">
+            <rect width="55" height="52" rx="6" fill="#64748b" />
+            <text x="27" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" in"</text>
+            <rect y="32" width="55" height="20" rx="0 0 6 6" fill="#475569" />
+            <text x="27" y="46" font-family="monospace" font-size="10.5" fill="#cbd5e1" text-anchor="middle">#297</text>
+          </g>
+          <!-- 5: the -->
+          <g transform="translate(345, 100)">
+            <rect width="55" height="52" rx="6" fill="#64748b" />
+            <text x="27" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" the"</text>
+            <rect y="32" width="55" height="20" rx="0 0 6 6" fill="#475569" />
+            <text x="27" y="46" font-family="monospace" font-size="10.5" fill="#cbd5e1" text-anchor="middle">#262</text>
+          </g>
+          <!-- 6: midst -->
+          <g transform="translate(410, 100)">
+            <rect width="75" height="52" rx="6" fill="#0d9488" />
+            <text x="37" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" midst"</text>
+            <rect y="32" width="75" height="20" rx="0 0 6 6" fill="#115e59" />
+            <text x="37" y="46" font-family="monospace" font-size="10.5" fill="#99f6e4" text-anchor="middle">#19424</text>
+          </g>
+          <!-- 7: of the -->
+          <g transform="translate(495, 100)">
+            <rect width="80" height="52" rx="6" fill="#64748b" />
+            <text x="40" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" of the"</text>
+            <rect y="32" width="80" height="20" rx="0 0 6 6" fill="#475569" />
+            <text x="40" y="46" font-family="monospace" font-size="10.5" fill="#cbd5e1" text-anchor="middle">#304, 262</text>
+          </g>
+          <!-- 8: Kansas -->
+          <g transform="translate(585, 100)">
+            <rect width="85" height="52" rx="6" fill="#8b5cf6" />
+            <text x="42" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" Kansas"</text>
+            <rect y="32" width="85" height="20" rx="0 0 6 6" fill="#6d28d9" />
+            <text x="42" y="46" font-family="monospace" font-size="10.5" fill="#ddd6fe" text-anchor="middle">#15431</text>
+          </g>
+          <!-- 9: prair -->
+          <g transform="translate(680, 100)">
+            <rect width="70" height="52" rx="6" fill="#f59e0b" />
+            <text x="35" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">" prair"</text>
+            <rect y="32" width="70" height="20" rx="0 0 6 6" fill="#b45309" />
+            <text x="35" y="46" font-family="monospace" font-size="10.5" fill="#fde68a" text-anchor="middle">#32114</text>
+          </g>
+          <!-- 10: ies -->
+          <g transform="translate(760, 100)">
+            <rect width="60" height="52" rx="6" fill="#f59e0b" />
+            <text x="30" y="22" font-family="monospace" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">"ies"</text>
+            <rect y="32" width="60" height="20" rx="0 0 6 6" fill="#b45309" />
+            <text x="30" y="46" font-family="monospace" font-size="10.5" fill="#fde68a" text-anchor="middle">#892</text>
+          </g>
+
+          <!-- Output Vector Array preview -->
+          <text x="440" y="180" font-family="monospace" font-size="11.5" fill="#64748b" text-anchor="middle">Integer Array: [ 18421, 1422, 6452, 297, 262, 19424, 304, 262, 15431, 32114, 892, ... ]</text>
+        </svg>
+      </div>
+
+      <span class="tier-label tier-math">The Mathematics &bull; Byte-Pair Encoding (Sennrich et al., 2016)</span>
+      <p>
+        The vocabulary $V$ is built iteratively. Starting from the alphabet base $\Sigma$, the most frequent pair of adjacent tokens is merged:
+      </p>
+      <div class="math-block">
+        $$\text{freq}(c_i, c_j) = \max_{(a, b) \in V_k \times V_k} \sum_{w \in C} \text{count}(a \circ b \in w), \quad V_{k+1} = V_k \cup \{ c_i \circ c_j \}$$
+      </div>
+      <p>
+        To retain the order of words in Kansas, sinusoidal positional encodings $PE$ (Vaswani et al., 2017) are added to the token vectors:
+      </p>
+      <div class="math-block">
+        $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right)$$
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PHASE 2: EMBEDDINGS & VECTOR SPACE -->
+    <!-- ===================================================================== -->
+    <section class="section-card">
+      <h2>2. Embeddings &amp; Vector Space (Words as Coordinates in Thought-Space)</h2>
+      
+      <span class="tier-label tier-plain">Plain English (For Everyone)</span>
+      <p>
+        How does the AI know that a <em>cyclone</em> and a <em>whirlwind</em> are almost the same thing, even though they share no common letters?
+      </p>
+      <p>
+        Imagine a giant map of human knowledge. On this map, words that mean similar things live next door to each other, while unrelated things are continents apart.
+        Unlike a paper map with only 2 directions (North/South, East/West), an AI thought-map has <strong>384 to 1536 dimensions</strong>.
+        When Dorothy's paragraph is sent through an embedding model, it is turned into a single point: an address of 384 numbers.
+      </p>
+
+      <!-- Minimalist Vectorial SVG 2: Vector Space & Angle -->
+      <div class="svg-container">
+        <svg viewBox="0 0 880 280" width="880" height="280" xmlns="http://www.w3.org/2000/svg">
+          <!-- Coordinate Axes -->
+          <line x1="100" y1="230" x2="800" y2="230" stroke="#64748b" stroke-width="1.5" />
+          <line x1="100" y1="230" x2="100" y2="30" stroke="#64748b" stroke-width="1.5" />
+          <polygon points="800,230 790,225 790,235" fill="#64748b" />
+          <polygon points="100,30 95,40 105,40" fill="#64748b" />
+          <text x="800" y="250" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b" text-anchor="end">Axis 1: Agricultural &amp; Rural Concepts &rarr;</text>
+          <text x="115" y="45" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&uarr; Axis 2: Meteorological Hazards</text>
+
+          <!-- Vector A: Document Chunk (Cyclone Cellar) -->
+          <line x1="100" y1="230" x2="620" y2="70" stroke="#2563eb" stroke-width="3" />
+          <circle cx="620" cy="70" r="6" fill="#2563eb" />
+          <rect x="635" y="55" width="220" height="34" rx="4" fill="#dbeafe" stroke="#3b82f6" />
+          <text x="645" y="70" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#1e3a8a">Vector u: Dorothy's Cellar Chunk</text>
+          <text x="645" y="83" font-family="monospace" font-size="9.5" fill="#1d4ed8">[ 0.72, 0.68, ..., -0.15 ]</text>
+
+          <!-- Vector B: Query (Tornado Shelter in Kansas) -->
+          <line x1="100" y1="230" x2="660" y2="105" stroke="#10b981" stroke-width="3" />
+          <circle cx="660" cy="105" r="6" fill="#10b981" />
+          <rect x="675" y="100" width="185" height="34" rx="4" fill="#d1fae5" stroke="#10b981" />
+          <text x="685" y="115" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#065f46">Vector v: "Kansas storm shelter"</text>
+          <text x="685" y="128" font-family="monospace" font-size="9.5" fill="#047857">[ 0.76, 0.63, ..., -0.11 ]</text>
+
+          <!-- Cosine Angle Theta Arc -->
+          <path d="M 230 195 A 140 140 0 0 0 240 183" fill="none" stroke="#f59e0b" stroke-width="3" />
+          <text x="255" y="185" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#d97706">&theta; = 18.2&deg;</text>
+          <text x="255" y="200" font-family="monospace" font-size="11" fill="#b45309">cos(&theta;) = 0.950 (95% Match!)</text>
+
+          <!-- Semantic Clusters -->
+          <!-- Prairie Cluster -->
+          <circle cx="520" cy="200" r="28" fill="rgba(245, 158, 11, 0.15)" stroke="#f59e0b" stroke-dasharray="2 2" />
+          <text x="520" y="198" font-family="-apple-system, sans-serif" font-size="9.5" fill="#b45309" text-anchor="middle">"prairie"</text>
+          <text x="520" y="210" font-family="-apple-system, sans-serif" font-size="9.5" fill="#b45309" text-anchor="middle">"farmer"</text>
+
+          <!-- Storm Cluster -->
+          <circle cx="220" cy="80" r="26" fill="rgba(139, 92, 246, 0.15)" stroke="#8b5cf6" stroke-dasharray="2 2" />
+          <text x="220" y="78" font-family="-apple-system, sans-serif" font-size="9.5" fill="#6d28d9" text-anchor="middle">"cyclone"</text>
+          <text x="220" y="90" font-family="-apple-system, sans-serif" font-size="9.5" fill="#6d28d9" text-anchor="middle">"whirlwind"</text>
+
+          <!-- Furniture Cluster (Orthogonal / Unrelated) -->
+          <circle cx="280" cy="180" r="24" fill="rgba(100, 116, 139, 0.15)" stroke="#64748b" stroke-dasharray="2 2" />
+          <text x="280" y="183" font-family="-apple-system, sans-serif" font-size="9" fill="#475569" text-anchor="middle">"cookstove"</text>
+        </svg>
+      </div>
+
+      <span class="tier-label tier-math">The Mathematics &bull; Cosine Similarity &amp; Angular Distance</span>
+      <p>
+        The semantic relevance between chunk $\mathbf{u}$ and query $\mathbf{v}$ is the cosine of the angle between them (Reimers &amp; Gurevych, 2019):
+      </p>
+      <div class="math-block">
+        $$\text{CosineSimilarity}(\mathbf{u}, \mathbf{v}) = \cos(\theta) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2} = \frac{\sum_{i=1}^d u_i v_i}{\sqrt{\sum_{i=1}^d u_i^2} \sqrt{\sum_{i=1}^d v_i^2}}$$
+      </div>
+      <p>When vectors are pre-normalized during ingestion ($\|\mathbf{u}\| = \|\mathbf{v}\| = 1$), this reduces to a blazing-fast dot product: $\sum_{i=1}^d u_i v_i$.</p>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PHASE 3: QDRANT & HNSW -->
+    <!-- ===================================================================== -->
+    <section class="section-card">
+      <h2>3. How Qdrant Works (Finding Needles with Hierarchical Navigable Small World / HNSW Graphs)</h2>
+
+      <span class="tier-label tier-plain">Plain English (For Everyone)</span>
+      <p>
+        Imagine a library containing <strong>10 million books</strong>. If someone asks for a book about <em>underground storm shelters in Kansas</em>, checking every book one by one would take weeks.
+      </p>
+      <p>
+        Instead, <strong>Qdrant</strong> builds an <strong>Express Highway Network</strong> (technically called an <em>HNSW Graph</em>):
+      </p>
+      <ul>
+        <li><strong>Top Layer (The Interstate Highway):</strong> Connects a few major concept cities ("Science", "History", "Farming &amp; Agriculture"). The search zooms straight to "Farming &amp; Agriculture".</li>
+        <li><strong>Middle Layer (The State Highway):</strong> Branches out to "Livestock", "Farm Machinery", and "Prairie Weather Hazards". The search hops to "Prairie Weather Hazards".</li>
+        <li><strong>Bottom Layer (The Local Driveway):</strong> Houses all individual paragraphs. The search lands on Dorothy's cyclone cellar chunk in <strong>under 3 milliseconds</strong>.</li>
+      </ul>
+
+      <!-- Minimalist Vectorial SVG 3: HNSW Multi-Layer Highway Graph -->
+      <div class="svg-container">
+        <svg viewBox="0 0 880 260" width="880" height="260" xmlns="http://www.w3.org/2000/svg">
+          <!-- Layer 2 (Express) -->
+          <rect x="50" y="20" width="780" height="50" rx="8" fill="rgba(37, 99, 235, 0.08)" stroke="#3b82f6" stroke-width="1.2" />
+          <text x="65" y="42" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#2563eb">LAYER 2 &bull; Express Highway (Few Landmarks)</text>
+          <circle cx="200" cy="45" r="7" fill="#64748b" />
+          <text x="200" y="60" font-family="-apple-system, sans-serif" font-size="8.5" fill="#64748b" text-anchor="middle">Space</text>
+          <circle cx="500" cy="45" r="9" fill="#2563eb" stroke="#ffffff" stroke-width="2" />
+          <text x="500" y="60" font-family="-apple-system, sans-serif" font-size="8.5" font-weight="700" fill="#1e3a8a" text-anchor="middle">Agriculture Entry</text>
+          <line x1="207" y1="45" x2="491" y2="45" stroke="#94a3b8" stroke-width="2" />
+
+          <!-- Downward Hop 1 -->
+          <path d="M 500 54 L 500 105" stroke="#2563eb" stroke-width="2" stroke-dasharray="3 3" />
+          <polygon points="500,105 496,97 504,97" fill="#2563eb" />
+
+          <!-- Layer 1 (Regional) -->
+          <rect x="50" y="95" width="780" height="60" rx="8" fill="rgba(16, 185, 129, 0.08)" stroke="#10b981" stroke-width="1.2" />
+          <text x="65" y="117" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#059669">LAYER 1 &bull; Regional Network (Themes &amp; Sub-topics)</text>
+          <circle cx="340" cy="125" r="6" fill="#64748b" />
+          <text x="340" y="140" font-family="-apple-system, sans-serif" font-size="8.5" fill="#64748b" text-anchor="middle">Crops</text>
+          <circle cx="500" cy="125" r="6" fill="#10b981" />
+          <circle cx="660" cy="125" r="9" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+          <text x="660" y="140" font-family="-apple-system, sans-serif" font-size="8.5" font-weight="700" fill="#065f46" text-anchor="middle">Prairie Storms</text>
+          <line x1="346" y1="125" x2="494" y2="125" stroke="#94a3b8" stroke-width="1.5" />
+          <line x1="506" y1="125" x2="651" y2="125" stroke="#10b981" stroke-width="2.5" />
+
+          <!-- Downward Hop 2 -->
+          <path d="M 660 134 L 660 185" stroke="#10b981" stroke-width="2" stroke-dasharray="3 3" />
+          <polygon points="660,185 656,177 664,177" fill="#10b981" />
+
+          <!-- Layer 0 (Local Chunks) -->
+          <rect x="50" y="175" width="780" height="70" rx="8" fill="rgba(245, 158, 11, 0.08)" stroke="#f59e0b" stroke-width="1.2" />
+          <text x="65" y="195" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#d97706">LAYER 0 &bull; Local Chunks (All 10,000,000 Documents)</text>
+          <circle cx="560" cy="210" r="5" fill="#64748b" />
+          <circle cx="610" cy="210" r="5" fill="#64748b" />
+          <circle cx="660" cy="210" r="10" fill="#f59e0b" stroke="#b45309" stroke-width="2.5" />
+          <text x="660" y="235" font-family="-apple-system, sans-serif" font-size="9" font-weight="700" fill="#b45309" text-anchor="middle">TARGET: Cyclone Cellar Chunk</text>
+          <circle cx="720" cy="210" r="5" fill="#64748b" />
+          <circle cx="770" cy="210" r="5" fill="#64748b" />
+          <line x1="565" y1="210" x2="605" y2="210" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="615" y1="210" x2="650" y2="210" stroke="#f59e0b" stroke-width="2" />
+          <line x1="670" y1="210" x2="715" y2="210" stroke="#cbd5e1" stroke-width="1" />
+        </svg>
+      </div>
+
+      <span class="tier-label tier-math">The Mathematics &bull; HNSW Skip-List Probability (Malkov &amp; Yashunin, 2018)</span>
+      <p>
+        The layer $l$ of an inserted vector is assigned using an exponential decay distribution parameterized by $m_L = 1 / \ln(M)$:
+      </p>
+      <div class="math-block">
+        $$l = \left\lfloor -\ln(\text{uniform}(0, 1)) \cdot m_L \right\rfloor, \quad \text{guaranteeing } |V_l| \approx \frac{|V_{l-1}|}{M}$$
+      </div>
+      <p>
+        <strong>Time Complexity:</strong> Drops from linear brute-force $\mathcal{O}(N \cdot d)$ down to logarithmic $\mathcal{O}(\log(N) \cdot d)$. Searching 10 million passages takes ~24 graph hops instead of 10,000,000 checks.
+      </p>
+
+      <span class="tier-label tier-code">Live Qdrant Payload</span>
+      <pre><code>// Actual Point Stored in Qdrant Vector Collection: library_embeddings
+{
+  "id": "e6a1f810-72c3-4d89-9a24-118f69b104ad",
+  "vector": [ 0.04128, -0.07891, 0.23154, /* ... 381 more floats ... */ ],
+  "payload": {
+    "documentGuid": "doc-oz-ch01-cyclone",
+    "citeKey": "baum1900wizard",
+    "chunkIndex": 0,
+    "text": "Dorothy lived in the midst of the great Kansas prairies... called a cyclone cellar..."
+  }
+}</code></pre>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PHASE 4: SUMMARIZATION & ATTENTION -->
+    <!-- ===================================================================== -->
+    <section class="section-card">
+      <h2>4. How Summarization Works (Attention, Distillation &amp; Synthesis via Large Language Models / LLMs)</h2>
+
+      <span class="tier-label tier-plain">Plain English (For Everyone)</span>
+      <p>
+        When you summarize Dorothy's paragraph, you naturally ignore the rusty cookstove and the chairs, because your brain focuses on the <strong>vital plot facts</strong>:
+        <em>Dorothy lives with her aunt and uncle in a tiny one-room Kansas house, equipped with a storm cellar to protect against crushing cyclones.</em>
+      </p>
+      <p>
+        An AI model does this with a mathematical highlighter called <strong>Self-Attention</strong>: every word casts an attention spotlight onto other words in the sentence. The word <code>"cyclone"</code> casts intense spotlights onto <code>"cellar"</code>, <code>"Kansas"</code>, and <code>"crush"</code>.
+      </p>
+
+      <!-- Minimalist Vectorial SVG 4: End-to-End Pipeline -->
+      <div class="svg-container">
+        <svg viewBox="0 0 880 200" width="880" height="200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Step 1: Input Text -->
+          <g transform="translate(30, 40)">
+            <rect width="160" height="120" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="80" y="30" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1. Baum's Text</text>
+            <text x="80" y="55" font-family="Georgia, serif" font-size="10.5" fill="#94a3b8" text-anchor="middle">"Dorothy lived in</text>
+            <text x="80" y="72" font-family="Georgia, serif" font-size="10.5" fill="#94a3b8" text-anchor="middle">Kansas... cyclone</text>
+            <text x="80" y="89" font-family="Georgia, serif" font-size="10.5" fill="#94a3b8" text-anchor="middle">cellar..." (794 chars)</text>
+          </g>
+
+          <!-- Arrow 1 -->
+          <line x1="200" y1="100" x2="235" y2="100" stroke="#94a3b8" stroke-width="2" />
+          <polygon points="235,100 227,95 227,105" fill="#94a3b8" />
+
+          <!-- Step 2: Attention -->
+          <g transform="translate(245, 40)">
+            <rect width="180" height="120" rx="8" fill="#581c87" stroke="#7e22ce" />
+            <text x="90" y="30" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">2. Self-Attention</text>
+            <text x="90" y="55" font-family="monospace" font-size="10" fill="#e9d5ff" text-anchor="middle">Softmax(QK^T / &radic;d)V</text>
+            <text x="90" y="78" font-family="-apple-system, sans-serif" font-size="10" fill="#d8b4fe" text-anchor="middle">cyclone &harr; cellar (0.89)</text>
+            <text x="90" y="94" font-family="-apple-system, sans-serif" font-size="10" fill="#d8b4fe" text-anchor="middle">house &harr; one room (0.84)</text>
+          </g>
+
+          <!-- Arrow 2 (Fork to Dual Models) -->
+          <path d="M 435 100 L 460 70 M 435 100 L 460 130" stroke="#94a3b8" stroke-width="2" />
+          <polygon points="460,70 452,67 455,75" fill="#94a3b8" />
+          <polygon points="460,130 455,125 452,133" fill="#94a3b8" />
+
+          <!-- Step 3A: Llama 3.3 -->
+          <g transform="translate(470, 20)">
+            <rect width="380" height="70" rx="6" fill="#1e3a8a" stroke="#3b82f6" />
+            <text x="15" y="24" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff">3A. Llama 3.3 (Academic / Structural Critique)</text>
+            <text x="15" y="44" font-family="-apple-system, sans-serif" font-size="10" fill="#bfdbfe">"Baum establishes an environment of extreme socioeconomic frugality</text>
+            <text x="15" y="58" font-family="-apple-system, sans-serif" font-size="10" fill="#bfdbfe">and physical vulnerability; the cyclone cellar is an indispensable survival tool."</text>
+          </g>
+
+          <!-- Step 3B: Mistral Large -->
+          <g transform="translate(470, 105)">
+            <rect width="380" height="70" rx="6" fill="#134e4a" stroke="#14b8a6" />
+            <text x="15" y="24" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff">3B. Mistral Large (Executive Operational Summary)</text>
+            <text x="15" y="44" font-family="-apple-system, sans-serif" font-size="10" fill="#99f6e4">&bull; Setting: Rural Kansas prairie homestead (Dorothy, Uncle Henry, Aunt Em).</text>
+            <text x="15" y="58" font-family="-apple-system, sans-serif" font-size="10" fill="#99f6e4">&bull; Constraints: One-room home; underground cellar for cyclone survival.</text>
+          </g>
+        </svg>
+      </div>
+
+      <span class="tier-label tier-math">The Mathematics &bull; Scaled Dot-Product Attention (Vaswani et al., 2017)</span>
+      <p>
+        The attention calculation queries $Q$ against keys $K$ to weight values $V$:
+      </p>
+      <div class="math-block">
+        $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+      </div>
+      <p>
+        During generation, tokens are emitted autoregressively according to a probability distribution scaled by temperature $T$:
+      </p>
+      <div class="math-block">
+        $$P(y_t = w \mid y_{<t}, X) = \text{softmax}\left(\frac{\mathbf{h}_t W_{\text{vocab}}}{T}\right)$$
+      </div>
+
+      <span class="tier-label tier-code">MongoDB Database Entity</span>
+      <pre><code>// DocumentEntity.java serialized into MongoDB collection: documents
+{
+  "_id": "67004f128bc9a21d5500e19a",
+  "guid": "doc-oz-ch01-cyclone",
+  "versionNumber": 1,
+  "title": "The Wonderful Wizard of Oz - Chapter 1",
+  "summaries": {
+    "llama": {
+      "model": "llama-3.3-70b",
+      "summary": "Baum establishes an environment of extreme socioeconomic frugality...",
+      "duration": "1m 12s",
+      "tokensUsed": 248
+    },
+    "mistral": {
+      "model": "mistral-large-2411",
+      "summary": "• Setting: Rural Kansas prairie homestead (Dorothy, Uncle Henry, Aunt Em)...",
+      "duration": "0m 44s",
+      "tokensUsed": 162
+    }
+  }
+}</code></pre>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PHASE 5: COMPLETE RAG RETRIEVAL -->
+    <!-- ===================================================================== -->
+    <section class="section-card">
+      <h2>5. The Full Lifecycle in Action: Grounded Retrieval-Augmented Generation (RAG)</h2>
+      
+      <p>When a researcher types into the chat drawer: <em>"Where does Dorothy's family hide during a violent tornado?"</em>, here is what happens:</p>
+
+      <div class="mini-card" style="border-left: 4px solid var(--accent-blue); margin-bottom: 1rem;">
+        <h4>Step 1: Embedding &amp; Qdrant Fast Retrieval</h4>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0;">
+          The question is vectorized and hops through Qdrant's HNSW graph in <strong>2.8 ms</strong>, returning Dorothy's Chapter 1 chunk with a <strong>91.8% semantic match</strong>.
+        </p>
+      </div>
+
+      <div class="mini-card" style="border-left: 4px solid var(--accent-purple); margin-bottom: 1rem;">
+        <h4>Step 2: Grounded Prompt Injection</h4>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0;">
+          The retrieved chunk is injected into the prompt context: <em>"Answer strictly using the citation context below..."</em>
+        </p>
+      </div>
+
+      <div class="mini-card" style="border-left: 4px solid var(--accent-emerald);">
+        <h4>Step 3: Verified Answer with Interactive Citation</h4>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0;">
+          The AI responds: <em>"Dorothy's family hides in a small hole dug in the ground called a 'cyclone cellar' <span style="background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-weight: bold;">[Citation 1]</span>, designed to protect them from whirlwinds mighty enough to crush any building."</em>
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <strong>The Big Picture:</strong> Tokens turn words into numbers &bull; Vectors turn numbers into meanings &bull; Qdrant organizes meanings into express highways &bull; Attention distills meanings into summaries and answers.
+      </div>
+    </section>
+
+    <!-- References -->
+    <section class="section-card">
+      <h2>📚 Bibliographic References</h2>
+      <ol style="margin-left: 1.5rem; font-size: 0.95rem; color: var(--text-muted);">
+        <li style="margin-bottom: 0.5rem;"><strong>Baum, L. F.</strong> (1900). <em>The Wonderful Wizard of Oz</em>. Chicago: George M. Hill Company.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Vaswani, A. et al.</strong> (2017). Attention Is All You Need. <em>NeurIPS 2017</em>, 30, 5998–6008.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Malkov, Y. A., &amp; Yashunin, D. A.</strong> (2018). Efficient and Robust Approximate Nearest Neighbor Search Using HNSW Graphs. <em>IEEE TPAMI</em>, 42(4), 824–836.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Sennrich, R., Haddow, B., &amp; Birch, A.</strong> (2016). Neural Machine Translation of Rare Words with Subword Units. <em>ACL 2016</em>, 1715–1725.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Reimers, N., &amp; Gurevych, I.</strong> (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. <em>EMNLP 2019</em>, 3982–3992.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Lewis, P. et al.</strong> (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. <em>NeurIPS 2020</em>, 33, 9459–9474.</li>
+      </ol>
+    </section>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

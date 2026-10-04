@@ -43,9 +43,9 @@ export class ShellBarView extends Component<void> {
   private readonly languageSelector = this.own(new LanguageSelectorView({ variant: 'shellbar' }));
 
   /**
-   * Constructs the SAP Horizon ShellBar header component.
+   * Constructs the SAP Fiori ShellBar header component.
    *
-   * WHAT: Initializes the Component base with a `<header>` element and sticky SAP Horizon brand styling.
+   * WHAT: Initializes the Component base with a `<header>` element and sticky SAP Fiori brand styling.
    * WHY: Pins the top navigation shell across all floorplans while keeping elevation and theme transitions consistent.
    */
   constructor() {
@@ -109,6 +109,14 @@ export class ShellBarView extends Component<void> {
         action: () => appStore.openOpenApi()
       },
       {
+        id: 'mindmap',
+        iconKey: 'Layers',
+        tile: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 border-blue-100 dark:border-blue-900/50',
+        title: 'Full Capability Mindmap',
+        subtitle: '8 Pillars: Ingestion, BibTeX, Dual AI, Qdrant RAG, UI5, Security',
+        action: () => appStore.openBpmnModal()
+      },
+      {
         id: 'camunda-bpmn',
         iconKey: 'GitBranch',
         tile: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 border-teal-100 dark:border-teal-900/50',
@@ -150,7 +158,7 @@ export class ShellBarView extends Component<void> {
    * Renders an individual tool item row inside the profile popover.
    *
    * WHAT: Generates an anchor tag (for external links/downloads) or a clickable button (for in-app modals).
-   * WHY: Differentiates navigation targets while maintaining consistent SAP Horizon hover styles.
+   * WHY: Differentiates navigation targets while maintaining consistent SAP Fiori hover styles.
    *
    * @param entry Tool definition item.
    * @returns RawHtml markup for the row.
@@ -206,7 +214,7 @@ export class ShellBarView extends Component<void> {
   }
 
   /**
-   * Renders the SAP Fiori Horizon ShellBar template markup.
+   * Renders the SAP Fiori ShellBar template markup.
    *
    * WHAT: Generates brand logo, application title, language selector slot, profile popover trigger,
    * and popover body containing active user details, dual AI model telemetry, and enterprise developer tools.
@@ -339,7 +347,7 @@ export class ShellBarView extends Component<void> {
                 <span
                   class="px-1.5 py-0.5 text-[9px] font-medium bg-slate-100 dark:bg-[#253240] text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-[#354556]"
                 >
-                  SAP Horizon
+                  SAP Fiori
                 </span>
               </div>
             </div>
@@ -452,12 +460,12 @@ export class ShellBarView extends Component<void> {
             ${this.tools.map((entry) => this.renderTool(entry))}
           </div>
 
-          <!-- 4. SAP Horizon Theme Switcher -->
+          <!-- 4. Visual Theme Switcher -->
           <div class="p-3 space-y-1.5">
             <div
               class="flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
             >
-              <span>SAP Horizon Theme</span>
+              <span>${t.shellBar.visualTheme}</span>
               <span class="text-[10px] font-normal text-gray-400 capitalize">
                 ${isDark ? t.shellBar.themeEvening : t.shellBar.themeMorning}
               </span>
@@ -465,10 +473,10 @@ export class ShellBarView extends Component<void> {
             <div class="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                data-theme-option="morning-horizon"
+                data-theme-option="light"
                 class="${cx(
                   'flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer',
-                  theme === 'morning-horizon'
+                  theme === 'light'
                     ? 'bg-[#ebf8ff] dark:bg-[#1a365d] text-[#0070f2] dark:text-[#38bdf8] border-[#0070f2] shadow-xs'
                     : 'bg-gray-50 dark:bg-[#253240] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-[#354556] hover:bg-gray-100 dark:hover:bg-[#2c3b4b]'
                 )}"
@@ -478,10 +486,10 @@ export class ShellBarView extends Component<void> {
               </button>
               <button
                 type="button"
-                data-theme-option="evening-horizon"
+                data-theme-option="dark"
                 class="${cx(
                   'flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer',
-                  theme === 'evening-horizon'
+                  theme === 'dark'
                     ? 'bg-[#1e293b] text-[#38bdf8] border-[#38bdf8] shadow-xs'
                     : 'bg-gray-50 dark:bg-[#253240] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-[#354556] hover:bg-gray-100 dark:hover:bg-[#2c3b4b]'
                 )}"
@@ -566,7 +574,7 @@ export class ShellBarView extends Component<void> {
     });
 
     this.onAll('[data-theme-option]', 'click', (_event, element) => {
-      themeStore.setTheme(element.dataset.themeOption as 'morning-horizon' | 'evening-horizon');
+      themeStore.setTheme(element.dataset.themeOption as 'light' | 'dark');
     });
 
     this.on('[data-action="logout"]', 'click', () => {

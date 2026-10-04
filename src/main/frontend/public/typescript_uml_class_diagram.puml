@@ -1,0 +1,192 @@
+@startuml TypeScript_Frontend_UML_Class_Diagram
+!theme plain
+skinparam roundCorner 8
+skinparam classFontSize 11
+skinparam defaultFontName Inter
+skinparam packageStyle frame
+skinparam classAttributeIconSize 0
+
+title Personal Library - TypeScript Frontend & Gateway Architecture (UML Class Diagram)
+
+package "core (Reactive Micro-Framework)" {
+  abstract class Component {
+    # root: HTMLElement
+    - cleanupFns: Array<() => void>
+    + mount(container: HTMLElement): void
+    + unmount(): void
+    # onMount(): void
+    # onUnmount(): void
+    # requestRender(): void
+    # on(selector: String, event: String, handler: EventListener): void
+    # track(cleanup: () => void): void
+    # template(): RawHtml
+  }
+
+  class "Store<T>" as Store {
+    - _state: T
+    - listeners: Set<(state: T) => void>
+    + state: T
+    + set(updater: (state: T) => void): void
+    + subscribe(listener: (state: T) => void): () => void
+  }
+
+  class "EventBus<T>" as EventBus {
+    - handlers: Map<String, Set<Function>>
+    + subscribe(event: String, fn: Function): () => void
+    + publish(event: String, payload: T): void
+    + clear(): void
+  }
+}
+
+package "stores" {
+  class AppStore extends Store {
+    + setDocuments(docs: DocumentRecord[]): void
+    + setActiveDocument(doc: DocumentRecord): void
+    + setFilters(filters: Partial<FilterState>): void
+    + setPage(page: number): void
+    + openUploadDialog(): void
+    + openBpmnModal(): void
+    + rollbackDocument(guid: String, targetVersion: number): Promise<void>
+  }
+
+  class BackendStore extends Store {
+    + setMode(mode: 'rest' | 'mock'): void
+    + setHealth(status: 'online' | 'offline'): void
+  }
+
+  class ThemeStore extends Store {
+    + setTheme(theme: 'sap_horizon' | 'sap_horizon_dark'): void
+    + toggleTheme(): void
+  }
+
+  class I18nStore extends Store {
+    + setLocale(locale: 'en' | 'de' | 'fr' | 'es' | 'ro'): void
+    + t(key: String, params?: Object): String
+  }
+}
+
+package "views (SAP Fiori)" {
+  class AppView extends Component {
+    - shellBarView: ShellBarView
+    - listReportView: ListReportView
+    - objectPageView: ObjectPageView
+    - footerView: FooterView
+  }
+
+  class ShellBarView extends Component {
+    - onSearchInput(query: String): void
+    - onThemeToggle(): void
+    - onModeSwitch(mode: String): void
+  }
+
+  class ListReportView extends Component {
+    - renderFilterBar(): RawHtml
+    - renderTable(): RawHtml
+    - onRowSelect(guid: String): void
+    - onSort(column: String): void
+  }
+
+  class ObjectPageView extends Component {
+    - activeTab: 'info' | 'summaries' | 'chat' | 'history'
+    - renderHeader(): RawHtml
+    - renderSummaryCards(): RawHtml
+    - renderChatDrawer(): RawHtml
+    - renderHistoryTab(): RawHtml
+    - onSendChatMessage(prompt: String): Promise<void>
+    - onRollbackVersion(targetVersion: number): Promise<void>
+  }
+
+  abstract class DialogView extends Component {
+    # isOpen(): boolean
+    # requestClose(): void
+    # header(): RawHtml
+    # body(): RawHtml
+    # footer(): RawHtml
+  }
+
+  class UploadDialogView extends DialogView {
+    - selectedFiles: File[]
+    - uploadProgress: number
+    - onDropFiles(e: DragEvent): void
+    - onStartIngestion(): Promise<void>
+  }
+
+  class BpmnModalView extends DialogView {
+    - activeTab: 'diagram' | 'pipeline' | 'xml' | 'deployment'
+    - xmlContent: String
+    - loadBpmnXml(): Promise<void>
+  }
+
+  class BackendSettingsModalView extends DialogView {}
+  class AuthModalView extends DialogView {}
+  class VersionOverwriteDialogView extends DialogView {}
+  class DeleteConfirmDialogView extends DialogView {}
+
+  DialogView --|> Component
+  UploadDialogView --|> DialogView
+  BpmnModalView --|> DialogView
+  BackendSettingsModalView --|> DialogView
+  AuthModalView --|> DialogView
+  VersionOverwriteDialogView --|> DialogView
+  DeleteConfirmDialogView --|> DialogView
+}
+
+package "services/backend" {
+  class BackendGateway {
+    - activeAdapter: BackendAdapter
+    + dispatchBackend<T>(op: BackendOperations, payload: any): Promise<T>
+    + requestBackend<T>(op: BackendOperations, payload: any): Promise<T>
+  }
+
+  interface BackendAdapter {
+    + getHealth(): Promise<BackendHealthResult>
+    + getDocuments(params: DocumentQueryParams): Promise<DocumentListResult>
+    + getDocument(guid: String): Promise<DocumentRecord>
+    + uploadDocument(req: DocumentUploadPayload): Promise<DocumentRecord>
+    + overwriteDocument(guid: String, req: DocumentUploadPayload): Promise<DocumentRecord>
+    + deleteDocument(guid: String): Promise<boolean>
+    + summarizeDocument(guid: String, model: String): Promise<SummaryRecord>
+    + chat(req: ChatRequestPayload): Promise<ChatResponseResult>
+    + getVersionHistory(guid: String): Promise<DocumentVersionSnapshot[]>
+    + rollbackVersion(guid: String, targetVersion: number): Promise<DocumentRecord>
+    + getHistoricalDownloadUrl(guid: String, versionNumber: number): String
+  }
+
+  interface DocumentVersionSnapshot {
+    snapshotGuid: String
+    versionNumber: number
+    fileName: String
+    fileSize: number
+    fileSizeFormatted: String
+    format: String
+    savedAt: String
+    bibtex: BibTeXMetadata
+    summaries: Object
+    note?: String
+  }
+
+  class RestBackendAdapter implements BackendAdapter {
+    - baseUrl: String
+    - buildHeaders(): Headers
+    - request<T>(path: String, init: RequestInit): Promise<T>
+  }
+
+  class MockBackendAdapter implements BackendAdapter {
+    - localDatabase: DocumentRecord[]
+    - simulateDelay(): Promise<void>
+  }
+
+  BackendGateway o-- BackendAdapter
+}
+
+AppView *-- ShellBarView
+AppView *-- ListReportView
+AppView *-- ObjectPageView
+ListReportView ..> BackendGateway
+ObjectPageView ..> BackendGateway
+UploadDialogView ..> BackendGateway
+
+AppView ..> AppStore
+ListReportView ..> AppStore
+ObjectPageView ..> AppStore
+@enduml

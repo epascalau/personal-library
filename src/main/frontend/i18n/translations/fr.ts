@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
- * French (Français) dictionary for Personal Library SAP Fiori Horizon UI.
+ * French (Français) dictionary for Personal Library SAP Fiori UI.
  */
 
 import { TranslationDictionary } from '../types';
@@ -51,10 +51,10 @@ export const fr: TranslationDictionary = {
     docs: 'Docs',
     backend: 'Backend',
     openapi: 'OpenAPI',
-    themeMorning: 'Morning',
-    themeEvening: 'Evening',
+    themeMorning: 'Clair',
+    themeEvening: 'Sombre',
     switchTheme: 'Changer de thème',
-    horizonTheme: 'Thème SAP Horizon',
+    visualTheme: 'Thème visuel',
     authMethod: 'Authentification',
     realm: 'Royaume',
     activeRoles: 'Rôles actifs',
@@ -201,7 +201,7 @@ export const fr: TranslationDictionary = {
   },
   footer: {
     libraryTitle: 'Bibliothèque Personnelle',
-    sapHorizon: 'Plans d’étage SAP Fiori (Thème Horizon)',
+    sapFloorplans: 'Plans d’étage SAP Fiori',
     backendLabel: 'Backend',
     architecture: 'Architecture backend découplée',
     springAi: 'Spring AI + Ollama (Llama & Mistral)',
@@ -209,6 +209,6 @@ export const fr: TranslationDictionary = {
     license: 'Licence',
     licenseInfo: 'Distribué sous licence GNU Affero General Public License v3.0 (AGPL-3.0-or-later)',
     viewLicense: 'Voir la licence (GNU AGPLv3)',
-    trademarkDisclaimer: 'SAP, SAP Fiori, SAP Horizon ainsi que les autres produits et services SAP mentionnés ici, et leurs logos respectifs, sont des marques commerciales ou déposées de SAP SE en Allemagne et dans d’autres pays. Cette application indépendante n’est en aucun cas affiliée, sponsorisée ou approuvée par SAP SE.'
+    trademarkDisclaimer: 'SAP, SAP Fiori ainsi que les autres produits et services SAP mentionnés ici, et leurs logos respectifs, sont des marques commerciales ou déposées de SAP SE en Allemagne et dans d’autres pays. Cette application indépendante n’est en aucun cas affiliée, sponsorisée ou approuvée par SAP SE.'
   }
 };

@@ -212,7 +212,7 @@ public class DocumentService {
      * WHAT: Maps client sort keys to MongoDB field paths, assembles Pageable requests, calls dynamic query fragment,
      * and maps entities to PaginatedResponse of DocumentResponse DTOs.
      * WHY: Delivers high-performance server-side filtering, sorting, and pagination tailored specifically to
-     * the SAP Fiori Horizon List Report grid specifications.
+     * the SAP Fiori List Report grid specifications.
      *
      * @param fileName  Filter substring for file name.
      * @param title     Filter substring for bibliographic title.

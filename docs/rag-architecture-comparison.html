@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG Architecture Evaluation: Personal Library vs. Reference Baseline</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+      --math-bg: #f1f5f9;
+      --accent-blue: #3b82f6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --code-bg: #030712;
+        --code-text: #f3f4f6;
+        --math-bg: #0f172a;
+        --accent-blue: #60a5fa;
+        --accent-emerald: #34d399;
+        --accent-amber: #fbbf24;
+        --accent-purple: #a78bfa;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      color: #ffffff;
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 3px solid #8b5cf6;
+    }
+
+    .hero h1 {
+      font-size: 2.3rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #ddd6fe;
+      max-width: 820px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .nav-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-bar a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .nav-bar a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.25rem;
+      margin-bottom: 2.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-card h2 {
+      font-size: 1.55rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--accent-purple);
+    }
+
+    .section-card h3 {
+      font-size: 1.2rem;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: rgba(139, 92, 246, 0.08);
+      color: var(--accent-purple);
+      font-weight: 700;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .status-match {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid var(--accent-emerald);
+    }
+
+    .status-exceeds {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+    }
+
+    .status-gap {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid var(--accent-amber);
+    }
+
+    .math-block {
+      background: var(--math-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent-purple);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 1.05rem;
+      overflow-x: auto;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.9em;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    .callout {
+      background: rgba(59, 130, 246, 0.08);
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.25rem 0;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">&larr; Back to Documentation Hub</a>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">Architecture Evaluation &amp; Benchmark</span>
+    <a href="RAG_ARCHITECTURE_COMPARISON.md" download="RAG_ARCHITECTURE_COMPARISON.md">Download Markdown &darr;</a>
+  </div>
+
+  <div class="hero">
+    <h1>Retrieval-Augmented Generation (RAG) Architecture</h1>
+    <p>Comparative Evaluation: Personal Library &amp; AI Research Engine vs. Canonical Enterprise Reference Architecture</p>
+  </div>
+
+  <div class="container">
+    <!-- Executive Summary -->
+    <section class="section-card">
+      <h2>1. Executive Summary: Evolutionary Classification</h2>
+      <p>
+        In modern Artificial Intelligence (AI) systems literature (<em>Gao et al., 2024: "Retrieval-Augmented Generation for Large Language Models: A Survey"</em>), RAG systems evolve across three progressive paradigms:
+      </p>
+      <ul>
+        <li><strong>Naive RAG:</strong> Standard linear pipeline of text splitting, single-modality dense vector embedding, cosine similarity search, and prompt augmentation.</li>
+        <li><strong>Advanced RAG:</strong> Introduces boundary-aware chunking, pre-retrieval query routing, and post-retrieval verification.</li>
+        <li><strong>Modular RAG:</strong> An enterprise-grade, multi-stage architecture featuring <strong>Hybrid Search</strong> (Dense Vector + Sparse Lexical BM25), <strong>Cross-Encoder Re-Ranking</strong>, <strong>Parent-Child Context Expansion</strong>, and automated <strong>RAG Triad (Ragas) Quality Reflection</strong>.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Where Personal Library Sits:</strong> Our current implementation operates as a highly mature <strong>Advanced-Lean RAG Architecture</strong> with native Qdrant vector database integration, dual-model LLM benchmarking (Llama 3.3 70B &amp; Mistral Large 2411), strict document GUID isolation, and an interactive UI citation drawer that exceeds standard reference implementations.
+      </div>
+    </section>
+
+    <!-- Detailed Comparison Table -->
+    <section class="section-card">
+      <h2>2. Side-by-Side Architectural Matrix</h2>
+      <p>Comparing our current codebase against the industry reference architecture across each pipeline stage:</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Pipeline Stage</th>
+              <th>Canonical Modular Reference RAG</th>
+              <th>Personal Library Implementation</th>
+              <th>Assessment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Document Ingestion</strong></td>
+              <td>Asynchronous queues with multi-column layout analysis and OCR extraction.</td>
+              <td>Camunda BPMN 2.0 workflow with <code>pdf-parse</code> stream extraction and retry policies.</td>
+              <td><span class="status-badge status-match">Production Grade</span></td>
+            </tr>
+            <tr>
+              <td><strong>Metadata Extraction</strong></td>
+              <td>Generic title and date regex inference.</td>
+              <td>AST lexer/tokenizer extracting 14 standard LaTeX BibTeX publication fields with schema generation.</td>
+              <td><span class="status-badge status-exceeds">Exceeds Reference</span></td>
+            </tr>
+            <tr>
+              <td><strong>Chunking Granularity</strong></td>
+              <td>Hierarchical "Small-to-Big" (sentence vectors linked to parent paragraphs).</td>
+              <td>Paragraph-boundary sliding window (~400 characters in Spring Boot, 500 tokens in mock).</td>
+              <td><span class="status-badge status-match">Standard Advanced</span></td>
+            </tr>
+            <tr>
+              <td><strong>Vector Database</strong></td>
+              <td>Specialized vector database with HNSW graph indexing.</td>
+              <td>Qdrant v1.11.0 with Cosine distance and HNSW multi-layer graphs in Docker.</td>
+              <td><span class="status-badge status-match">Full Match</span></td>
+            </tr>
+            <tr>
+              <td><strong>Retrieval Modality</strong></td>
+              <td><strong>Hybrid Search</strong>: Dense Vector (Cosine) + Sparse Lexical (BM25) via Reciprocal Rank Fusion (RRF).</td>
+              <td><strong>Dense Vector Search</strong>: Qdrant cosine similarity search scoped by <code>documentGuid</code>.</td>
+              <td><span class="status-badge status-gap">Opportunity: Hybrid</span></td>
+            </tr>
+            <tr>
+              <td><strong>Query Processing</strong></td>
+              <td>Conversational query reformulation, multi-query expansion, and HyDE.</td>
+              <td>Direct user question embedding into Qdrant search.</td>
+              <td><span class="status-badge status-gap">Opportunity: Rewriting</span></td>
+            </tr>
+            <tr>
+              <td><strong>Post-Retrieval Re-Ranking</strong></td>
+              <td>Two-stage retrieval with Cross-Encoder (e.g. <code>bge-reranker-large</code>, Cohere).</td>
+              <td>Direct Top-4 selection sorted by bi-encoder vector similarity.</td>
+              <td><span class="status-badge status-gap">Opportunity: Re-rank</span></td>
+            </tr>
+            <tr>
+              <td><strong>LLM Synthesis</strong></td>
+              <td>Single generalist model via API.</td>
+              <td><strong>Dual-Model Local Orchestration</strong>: Llama 3.3 (70B) + Mistral Large (2411) with Gemini Flash fallback.</td>
+              <td><span class="status-badge status-exceeds">Exceeds Reference</span></td>
+            </tr>
+            <tr>
+              <td><strong>Attribution &amp; Citations</strong></td>
+              <td>Static footnotes or numbered references.</td>
+              <td><strong>Interactive Citation Drawer</strong>: Clicking citation chips highlights verbatim text with similarity confidence.</td>
+              <td><span class="status-badge status-exceeds">Exceeds Reference</span></td>
+            </tr>
+            <tr>
+              <td><strong>Quality Evaluation</strong></td>
+              <td>Automated Ragas Triad metrics (Faithfulness, Context Relevance, Answer Relevance).</td>
+              <td>Prompt-enforced anti-hallucination guardrails + heuristic confidence match scores.</td>
+              <td><span class="status-badge status-gap">Opportunity: Ragas</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Mathematical Formulations -->
+    <section class="section-card">
+      <h2>3. Mathematical Formulations of Reference RAG Enhancements</h2>
+
+      <h3>1. Reciprocal Rank Fusion (RRF) for Hybrid Dense + Sparse Search</h3>
+      <p>
+        Combining dense semantic vector rankings with sparse keyword rankings (<em>Cormack et al., 2009</em>):
+      </p>
+      <div class="math-block">
+        $$\text{RRF}(d) = \frac{1}{k + R_{\text{dense}}(d)} + \frac{1}{k + R_{\text{sparse}}(d)}, \quad \text{where } k = 60$$
+      </div>
+
+      <h3>2. Cross-Encoder Re-Ranking Score</h3>
+      <p>
+        Full token-to-token cross-attention between query $q$ and candidate chunk $c$:
+      </p>
+      <div class="math-block">
+        $$s_{\text{cross}}(q, c) = \sigma\left( W \cdot \text{Transformer}([q \;\|\; \text{[SEP]} \;\|\; c]) \right)$$
+      </div>
+
+      <h3>3. Ragas Faithfulness Metric</h3>
+      <p>
+        Measuring whether generated statements $S(A)$ are strictly entailed by retrieved context $C$ (<em>Es et al., 2023</em>):
+      </p>
+      <div class="math-block">
+        $$\text{Faithfulness}(A, C) = \frac{| \{ s \in S(A) \mid C \vdash s \} |}{|S(A)|}$$
+      </div>
+    </section>
+
+    <!-- Evolution Roadmap -->
+    <section class="section-card">
+      <h2>4. Recommended Modular RAG Evolution Roadmap</h2>
+      <p>To upgrade Personal Library from its current Advanced-Lean baseline to a Full Modular Reference Architecture:</p>
+
+      <ol style="margin-left: 1.5rem;">
+        <li style="margin-bottom: 0.75rem;">
+          <strong>Conversational Query Reformulation:</strong> In multi-turn chat sessions, use a lightweight prompt to rewrite pronouns and follow-up queries into self-contained search statements before hitting Qdrant.
+        </li>
+        <li style="margin-bottom: 0.75rem;">
+          <strong>Small-to-Big (Parent-Child) Indexing:</strong> Store small 150-token child vectors in Qdrant with a pointer to their 800-token parent paragraph, returning the parent text to the LLM context.
+        </li>
+        <li style="margin-bottom: 0.75rem;">
+          <strong>Qdrant Hybrid Search:</strong> Leverage Qdrant's native sparse vector payload support to execute BM25 alongside dense cosine embeddings in a single fused call.
+        </li>
+      </ol>
+    </section>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

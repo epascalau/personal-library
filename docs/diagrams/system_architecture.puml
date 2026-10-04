@@ -1,0 +1,56 @@
+@startuml System_Architecture_Personal_Library
+!theme plain
+skinparam roundCorner 10
+skinparam defaultFontName Inter
+skinparam packageStyle rectangle
+
+title Personal Library - Enterprise System Architecture (C4 Container Map)
+
+package "1. Client Tier: SAP Fiori Horizon (UI5 Web Components + TypeScript)" as ClientTier #EBF8FF {
+  [ShellBar & Router] as ShellBar
+  [ListReportView (Table & FilterBar)] as ListReport
+  [ObjectPageView (BibTeX & RAG Chat)] as ObjectPage
+  [Observable Stores (appStore, themeStore, i18nStore)] as Stores
+  [BackendGateway (REST & Mock Adapters)] as Gateway
+  
+  ShellBar --> Stores
+  ListReport --> Stores
+  ObjectPage --> Stores
+  Stores --> Gateway
+}
+
+package "2. API Gateway Tier (Express Node.js on Port 3000 / Spring Boot)" as GatewayTier #F0FDFA {
+  [Express Server / Vite Middleware] as ExpressServer
+  [REST API Controllers (/api/v1/*)] as RestControllers
+  [Document & BibTeX Extraction Service] as ExtractionEngine
+  [Camunda BPMN 2.0 Engine] as CamundaEngine
+  
+  ExpressServer --> RestControllers
+  RestControllers --> ExtractionEngine
+  RestControllers --> CamundaEngine
+}
+
+package "3. Generative AI & Vector Retrieval Tier" as AITier #FAF5FF {
+  [Ollama Llama 3.3 (70B Instruct)] as LlamaModel
+  [Ollama Mistral Large (2411)] as MistralModel
+  [Gemini Cloud Fallback (@google/genai)] as GeminiFallback
+  database "Qdrant Vector DB (Port 6333)" as QdrantDB
+}
+
+package "4. Persistence & Security Tier" as DataTier #FEF3C7 {
+  database "MongoDB (DocumentEntity Collection)" as MongoDB
+  [Keycloak OIDC (OAuth2 Resource Server)] as Keycloak
+  storage "Raw File Store" as FileStorage
+}
+
+Gateway -down-> RestControllers : "HTTP REST (JSON/Multipart)"
+RestControllers -down-> LlamaModel : "Analytical Prompt"
+RestControllers -down-> MistralModel : "Executive Synthesis"
+RestControllers -down-> GeminiFallback : "Resilience Fallback"
+ExtractionEngine -down-> QdrantDB : "Upsert Chunks & Embeddings"
+RestControllers -down-> QdrantDB : "Cosine Similarity Top-K"
+RestControllers -down-> MongoDB : "Persist DocumentEntity"
+RestControllers -down-> Keycloak : "Validate Bearer JWT"
+RestControllers -down-> FileStorage : "Stream Asset"
+
+@enduml

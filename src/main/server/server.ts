@@ -82,6 +82,26 @@ export interface DocumentChunk {
   text: string;
 }
 
+export interface DocumentVersionSnapshot {
+  snapshotGuid: string;
+  versionNumber: number;
+  fileName: string;
+  fileSize: number;
+  fileSizeFormatted: string;
+  format: string;
+  savedAt: string;
+  bibtex: BibTeXMetadata;
+  bibtexRaw: string;
+  summaries: {
+    llama?: SummaryRecord;
+    mistral?: SummaryRecord;
+  };
+  contentExcerpt: string;
+  fullContent?: string;
+  chunksCount?: number;
+  note?: string;
+}
+
 export interface DocumentRecord {
   guid: string;
   previousVersionGuid: string | null;
@@ -101,6 +121,7 @@ export interface DocumentRecord {
   contentExcerpt: string;
   fullContent: string;
   chunks: DocumentChunk[];
+  versionHistory?: DocumentVersionSnapshot[];
 }
 
 export interface UserProfile {
@@ -266,29 +287,29 @@ Abstract: The dominant sequence transduction models are based on complex recurre
   },
   {
     guid: 'b2c3d4e5-f6a1-4b2c-9d3e-4f5a6b7c8d9e',
-    previousVersionGuid: null,
-    versionNumber: 1,
-    fileName: 'sap_fiori_horizon_design_system.md',
+    previousVersionGuid: 'snapshot-b2c3d4e5-v1-archive',
+    versionNumber: 2,
+    fileName: 'sap_fiori_design_system.md',
     fileSize: 842100,
     fileSizeFormatted: '822.4 KB',
     format: 'md',
-    uploadDate: new Date(Date.now() - 3600000 * 24).toISOString(),
+    uploadDate: new Date(Date.now() - 3600000 * 48).toISOString(),
     editDate: new Date(Date.now() - 3600000 * 24).toISOString(),
     bibtex: {
       entryType: 'techreport',
-      bibKey: 'sap2023horizon',
-      title: 'SAP Fiori Horizon Design System: Enterprise Floorplans and Visual Principles',
+      bibKey: 'sap2023fiori',
+      title: 'SAP Fiori Design System: Enterprise Floorplans and Visual Principles',
       author: 'SAP Design & UX Architecture Group',
       year: '2023',
       month: 'October',
       institution: 'SAP SE',
-      edition: 'Horizon v1.84',
-      doi: '10.1007/sap-fiori-horizon-2023',
+      edition: 'Release v1.84',
+      doi: '10.1007/sap-fiori-design-2023',
       url: 'https://www.sap.com/design-system/fiori-design-web/',
-      abstract: 'An enterprise specification outlining the visual language, floorplans (List Report, Object Page, Analytical Dashboard), and accessibility requirements for next-generation enterprise applications under the Horizon theme family.',
-      keywords: 'SAP Fiori, Horizon Theme, List Report, Object Page, Enterprise UX'
+      abstract: 'An enterprise specification outlining the visual language, floorplans (List Report, Object Page, Analytical Dashboard), and accessibility requirements for next-generation enterprise applications under the SAP Fiori family.',
+      keywords: 'SAP Fiori, Design System, List Report, Object Page, Enterprise UX'
     },
-    bibtexRaw: `@techreport{sap2023horizon,\n  title     = {SAP Fiori Horizon Design System: Enterprise Floorplans and Visual Principles},\n  author    = {SAP Design & UX Architecture Group},\n  year      = {2023},\n  month     = {October},\n  institution = {SAP SE},\n  edition   = {Horizon v1.84},\n  doi       = {10.1007/sap-fiori-horizon-2023},\n  url       = {https://www.sap.com/design-system/fiori-design-web/},\n  keywords  = {SAP Fiori, Horizon Theme, List Report, Object Page, Enterprise UX}\n}`,
+    bibtexRaw: `@techreport{sap2023fiori,\n  title     = {SAP Fiori Design System: Enterprise Floorplans and Visual Principles},\n  author    = {SAP Design & UX Architecture Group},\n  year      = {2023},\n  month     = {October},\n  institution = {SAP SE},\n  edition   = {Release v1.84},\n  doi       = {10.1007/sap-fiori-design-2023},\n  url       = {https://www.sap.com/design-system/fiori-design-web/},\n  keywords  = {SAP Fiori, Design System, List Report, Object Page, Enterprise UX}\n}`,
     summaries: {
       llama: {
         modelName: 'Ollama Llama 3.3 (70B Instruct)',
@@ -300,7 +321,7 @@ Abstract: The dominant sequence transduction models are based on complex recurre
 **Key Findings:**
 1. **Floorplan Architecture:** Outlines standard enterprise layouts—specifically the List Report for high-density filtering and sorting, and the Object Page for comprehensive deep-dives.
 2. **Visual Hierarchy:** Employs vibrant primary accents (#0070F2), elevated card containers, and rounded geometry for increased readability and touch/mouse ergonomics.
-3. **Accessibility:** Strictly conforms to WCAG 2.1 AA standards with high-contrast variants (Morning Horizon and Evening Horizon).`
+3. **Accessibility:** Strictly conforms to WCAG 2.1 AA standards with high-contrast variants (Light and Dark theme).`
       },
       mistral: {
         modelName: 'Ollama Mistral Large (2411)',
@@ -312,13 +333,13 @@ Abstract: The dominant sequence transduction models are based on complex recurre
 Comprehensive design guide for enterprise modernization. Enforces consistent ShellBars, unified filter bars, and seamless navigation between overview collections and detailed entity views.`
       }
     },
-    contentExcerpt: 'The SAP Fiori Horizon design system provides an elevated, human-centric design language for intelligent enterprise applications. It emphasizes clarity, purpose, and responsive adaptability across devices...',
-    fullContent: `SAP Fiori Horizon Design System Whitepaper
+    contentExcerpt: 'The SAP Fiori design system provides an elevated, human-centric design language for intelligent enterprise applications. It emphasizes clarity, purpose, and responsive adaptability across devices...',
+    fullContent: `SAP Fiori Design System Whitepaper
 Author: SAP Design & UX Architecture Group
 Year: 2023
 
 1. Executive Overview:
-The Horizon visual theme brings modern aesthetics, calm palettes, and clear information hierarchy to enterprise software. Key themes include Morning Horizon (light) and Evening Horizon (dark).
+The SAP Fiori visual language brings modern aesthetics, calm palettes, and clear information hierarchy to enterprise software. Key themes include Light and Dark themes.
 
 2. List Report Floorplan:
 The List Report floorplan enables users to view, filter, and work with large lists of items. The floorplan consists of:
@@ -334,7 +355,7 @@ The Object Page represents individual items in depth:
       {
         id: 'chunk-h1',
         chunkIndex: 0,
-        text: 'The Horizon visual theme brings modern aesthetics, calm palettes, and clear information hierarchy to enterprise software. Key themes include Morning Horizon (light) and Evening Horizon (dark).'
+        text: 'The SAP Fiori visual language brings modern aesthetics, calm palettes, and clear information hierarchy to enterprise software. Key themes include Light and Dark themes.'
       },
       {
         id: 'chunk-h2',
@@ -345,6 +366,56 @@ The Object Page represents individual items in depth:
         id: 'chunk-h3',
         chunkIndex: 2,
         text: 'The Object Page represents individual items in depth with a sticky header and modular sections for general information, metadata, AI summaries, and interactive context chat.'
+      }
+    ],
+    versionHistory: [
+      {
+        snapshotGuid: 'snapshot-b2c3d4e5-v1-archive',
+        versionNumber: 1,
+        fileName: 'sap_fiori_design_draft_v1.md',
+        fileSize: 524288,
+        fileSizeFormatted: '512.0 KB',
+        format: 'md',
+        savedAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+        bibtex: {
+          entryType: 'techreport',
+          bibKey: 'sap2023fioridraft',
+          title: 'SAP Fiori Design System: Early Draft & Core Themes',
+          author: 'SAP Design & UX Architecture Group',
+          year: '2023',
+          month: 'January',
+          institution: 'SAP SE',
+          edition: 'Initial Draft v1.0',
+          doi: '10.1007/sap-fiori-design-2023-draft',
+          url: 'https://www.sap.com/design-system/fiori-design-web/',
+          abstract: 'Initial draft specification for the SAP Fiori design system introducing modern enterprise design concepts.',
+          keywords: 'SAP Fiori, Draft, UX Principles'
+        },
+        bibtexRaw: `@techreport{sap2023fioridraft,\n  title     = {SAP Fiori Design System: Early Draft & Core Themes},\n  author    = {SAP Design & UX Architecture Group},\n  year      = {2023},\n  month     = {January},\n  institution = {SAP SE},\n  edition   = {Initial Draft v1.0},\n  doi       = {10.1007/sap-fiori-design-2023-draft},\n  url       = {https://www.sap.com/design-system/fiori-design-web/},\n  keywords  = {SAP Fiori, Draft, UX Principles}\n}`,
+        summaries: {
+          llama: {
+            modelName: 'Ollama Llama 3.3 (70B Instruct)',
+            modelKey: 'llama',
+            createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+            durationSeconds: 4.1,
+            durationFormatted: '0 min 4.1 sec',
+            summaryText: `### Analytical Synthesis (Draft v1)
+Initial analysis of early Fiori foundations emphasizing contrast and baseline component themes.`
+          },
+          mistral: {
+            modelName: 'Ollama Mistral Large (2411)',
+            modelKey: 'mistral',
+            createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+            durationSeconds: 2.8,
+            durationFormatted: '0 min 2.8 sec',
+            summaryText: `### Executive Summary (Draft v1)
+Early architectural preview of the Fiori aesthetic prior to formal enterprise floorplan standardization.`
+          }
+        },
+        contentExcerpt: 'Initial draft specification for the SAP Fiori visual language...',
+        fullContent: `# SAP Fiori Design System (Early Draft v1.0)\n\nPreliminary draft outlining initial visual themes for enterprise applications...`,
+        chunksCount: 2,
+        note: 'Archived prior to upgrade to version 2 (Fiori v1.84 Enterprise Release)'
       }
     ]
   },
@@ -1397,9 +1468,33 @@ app.put('/api/v1/documents/:guid', async (req: Request, res: Response) => {
     const bibtexRaw = formatBibTeXRaw(mergedBibtex);
     const summaries = await runDualModelSummarization(mergedBibtex.title || existing.fileName, newContent, mergedBibtex);
 
+    // 1. Automatically archive existing version snapshot before overwriting
+    const snapshotGuid = `snapshot-${existing.guid}-v${existing.versionNumber || 1}-${Date.now()}`;
+    const previousSnapshot: DocumentVersionSnapshot = {
+      snapshotGuid,
+      versionNumber: existing.versionNumber || 1,
+      fileName: existing.fileName,
+      fileSize: existing.fileSize,
+      fileSizeFormatted: existing.fileSizeFormatted,
+      format: existing.format,
+      savedAt: existing.editDate || existing.uploadDate || new Date().toISOString(),
+      bibtex: JSON.parse(JSON.stringify(existing.bibtex)),
+      bibtexRaw: existing.bibtexRaw,
+      summaries: JSON.parse(JSON.stringify(existing.summaries)),
+      contentExcerpt: existing.contentExcerpt,
+      fullContent: existing.fullContent,
+      chunksCount: existing.chunks ? existing.chunks.length : 0,
+      note: `Archived automatically prior to version ${(existing.versionNumber || 1) + 1} overwrite`
+    };
+
+    const updatedHistory: DocumentVersionSnapshot[] = [
+      previousSnapshot,
+      ...(existing.versionHistory || [])
+    ];
+
     const updatedDocRecord: DocumentRecord = {
       guid: existing.guid, // Retain the existing GUID
-      previousVersionGuid: existing.previousVersionGuid || null,
+      previousVersionGuid: snapshotGuid,
       versionNumber: (existing.versionNumber || 1) + 1,
       fileName: fileName || existing.fileName,
       fileSize: newSize,
@@ -1412,7 +1507,8 @@ app.put('/api/v1/documents/:guid', async (req: Request, res: Response) => {
       summaries,
       contentExcerpt: newContent.slice(0, 300),
       fullContent: newContent,
-      chunks: newChunks
+      chunks: newChunks,
+      versionHistory: updatedHistory
     };
 
     // Overwrite the record in database in-place
@@ -1427,6 +1523,125 @@ app.put('/api/v1/documents/:guid', async (req: Request, res: Response) => {
     existing.editDate = new Date().toISOString();
     return res.json(existing);
   }
+});
+
+/**
+ * Retrieves the historical version snapshot list for a document.
+ */
+app.get('/api/v1/documents/:guid/versions', (req: Request, res: Response) => {
+  const { guid } = req.params;
+  const doc = documentsDatabase.find(d => d.guid === guid);
+  if (!doc) {
+    return res.status(404).json({ error: `Document with GUID ${guid} not found` });
+  }
+  return res.json(doc.versionHistory || []);
+});
+
+/**
+ * Streams the physical asset for a specific historical version snapshot.
+ */
+app.get('/api/v1/documents/:guid/versions/:version/download', (req: Request, res: Response) => {
+  const { guid, version } = req.params;
+  const targetVer = parseInt(version, 10);
+  const doc = documentsDatabase.find(d => d.guid === guid);
+  if (!doc) {
+    return res.status(404).send('Document not found');
+  }
+
+  // If current active version requested
+  if (doc.versionNumber === targetVer) {
+    res.setHeader('Content-Disposition', `attachment; filename="${doc.fileName}"`);
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    return res.send(doc.fullContent || `Physical Asset: ${doc.fileName}`);
+  }
+
+  const snapshot = (doc.versionHistory || []).find(v => v.versionNumber === targetVer);
+  if (!snapshot) {
+    return res.status(404).send(`Historical version ${version} not found for document ${guid}`);
+  }
+
+  res.setHeader('Content-Disposition', `attachment; filename="${snapshot.fileName}"`);
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  return res.send(snapshot.fullContent || snapshot.contentExcerpt || `Historical Asset: ${snapshot.fileName} (v${snapshot.versionNumber})`);
+});
+
+/**
+ * Rolls back the document state to a designated historical version snapshot.
+ *
+ * WHAT: Restores metadata, text content, summaries, and file format from the specified snapshot,
+ * archiving the current state as a new snapshot and advancing the version sequence counter.
+ * WHY: Provides guaranteed non-destructive rollbacks while maintaining full audit integrity.
+ */
+app.post('/api/v1/documents/:guid/rollback/:version', (req: Request, res: Response) => {
+  const { guid, version } = req.params;
+  const targetVer = parseInt(version, 10);
+  const existingIndex = documentsDatabase.findIndex(d => d.guid === guid);
+  if (existingIndex === -1) {
+    return res.status(404).json({ error: `Document with GUID ${guid} not found` });
+  }
+
+  const existing = documentsDatabase[existingIndex];
+  if (existing.versionNumber === targetVer) {
+    return res.status(400).json({ error: `Document is already at version ${targetVer}` });
+  }
+
+  const snapshotIndex = (existing.versionHistory || []).findIndex(v => v.versionNumber === targetVer);
+  if (snapshotIndex === -1) {
+    return res.status(404).json({ error: `Historical version snapshot ${targetVer} not found` });
+  }
+
+  const targetSnapshot = existing.versionHistory![snapshotIndex];
+
+  // 1. Archive current active state into a snapshot before restoring
+  const currentSnapshotGuid = `snapshot-${existing.guid}-v${existing.versionNumber}-${Date.now()}`;
+  const currentSnapshot: DocumentVersionSnapshot = {
+    snapshotGuid: currentSnapshotGuid,
+    versionNumber: existing.versionNumber,
+    fileName: existing.fileName,
+    fileSize: existing.fileSize,
+    fileSizeFormatted: existing.fileSizeFormatted,
+    format: existing.format,
+    savedAt: existing.editDate || new Date().toISOString(),
+    bibtex: JSON.parse(JSON.stringify(existing.bibtex)),
+    bibtexRaw: existing.bibtexRaw,
+    summaries: JSON.parse(JSON.stringify(existing.summaries)),
+    contentExcerpt: existing.contentExcerpt,
+    fullContent: existing.fullContent,
+    chunksCount: existing.chunks ? existing.chunks.length : 0,
+    note: `Archived prior to rollback to version ${targetVer}`
+  };
+
+  // 2. Prepare restored state
+  const restoredContent = targetSnapshot.fullContent || targetSnapshot.contentExcerpt;
+  const restoredChunks = chunkText(restoredContent);
+
+  const newVersionNumber = (existing.versionNumber || 1) + 1;
+  const updatedHistory: DocumentVersionSnapshot[] = [
+    currentSnapshot,
+    ...(existing.versionHistory || [])
+  ];
+
+  const restoredRecord: DocumentRecord = {
+    guid: existing.guid,
+    previousVersionGuid: targetSnapshot.snapshotGuid,
+    versionNumber: newVersionNumber,
+    fileName: targetSnapshot.fileName,
+    fileSize: targetSnapshot.fileSize,
+    fileSizeFormatted: targetSnapshot.fileSizeFormatted,
+    format: targetSnapshot.format,
+    uploadDate: existing.uploadDate,
+    editDate: new Date().toISOString(),
+    bibtex: JSON.parse(JSON.stringify(targetSnapshot.bibtex)),
+    bibtexRaw: targetSnapshot.bibtexRaw,
+    summaries: JSON.parse(JSON.stringify(targetSnapshot.summaries)),
+    contentExcerpt: targetSnapshot.contentExcerpt,
+    fullContent: restoredContent,
+    chunks: restoredChunks,
+    versionHistory: updatedHistory
+  };
+
+  documentsDatabase[existingIndex] = restoredRecord;
+  return res.json(restoredRecord);
 });
 
 /**
@@ -1763,6 +1978,249 @@ app.get(['/api/v1/diagrams/bpmn.svg', '/document_ingestion_rag.svg'], (_req: Req
 });
 
 /**
+ * Serves End-to-End System Architecture diagrams (SVG & PNG).
+ */
+app.get(['/api/v1/diagrams/system.svg', '/system_architecture.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/system_architecture.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="system_architecture.svg"');
+    }
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('System architecture SVG not found');
+});
+
+app.get(['/api/v1/diagrams/system.png', '/system_architecture.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/system_architecture.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="system_architecture.png"');
+    }
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('System architecture PNG not found');
+});
+
+/**
+ * Serves Vector RAG & Summarization Pipeline Data Flow diagrams.
+ */
+app.get(['/api/v1/diagrams/rag.svg', '/rag_data_flow.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/rag_data_flow.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="rag_data_flow.svg"');
+    }
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('RAG data flow SVG not found');
+});
+
+app.get(['/api/v1/diagrams/rag.png', '/rag_data_flow.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/rag_data_flow.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="rag_data_flow.png"');
+    }
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('RAG data flow PNG not found');
+});
+
+/**
+ * Serves SAP Fiori UI5 Frontend Architecture diagrams.
+ */
+app.get(['/api/v1/diagrams/frontend.svg', '/frontend_architecture.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/frontend_architecture.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="frontend_architecture.svg"');
+    }
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('Frontend architecture SVG not found');
+});
+
+app.get(['/api/v1/diagrams/frontend.png', '/frontend_architecture.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/frontend_architecture.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="frontend_architecture.png"');
+    }
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('Frontend architecture PNG not found');
+});
+
+/**
+ * Serves Java Backend UML Class Diagram (SVG, PNG, PUML).
+ */
+app.get(['/api/v1/diagrams/java-uml.svg', '/java_uml_class_diagram.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/java_uml_class_diagram.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="java_uml_class_diagram.svg"');
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('Java UML SVG not found');
+});
+
+app.get(['/api/v1/diagrams/java-uml.png', '/java_uml_class_diagram.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/java_uml_class_diagram.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="java_uml_class_diagram.png"');
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('Java UML PNG not found');
+});
+
+app.get(['/api/v1/diagrams/java-uml.puml', '/java_uml_class_diagram.puml'], (_req: Request, res: Response) => {
+  const pumlPath = path.resolve(projectRoot, 'docs/diagrams/java_uml_class_diagram.puml');
+  if (fs.existsSync(pumlPath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="java_uml_class_diagram.puml"');
+    return res.sendFile(pumlPath);
+  }
+  return res.status(404).send('Java UML PUML not found');
+});
+
+/**
+ * Serves TypeScript Frontend UML Class Diagram (SVG, PNG, PUML).
+ */
+app.get(['/api/v1/diagrams/typescript-uml.svg', '/typescript_uml_class_diagram.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/typescript_uml_class_diagram.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="typescript_uml_class_diagram.svg"');
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('TypeScript UML SVG not found');
+});
+
+app.get(['/api/v1/diagrams/typescript-uml.png', '/typescript_uml_class_diagram.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/typescript_uml_class_diagram.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="typescript_uml_class_diagram.png"');
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('TypeScript UML PNG not found');
+});
+
+app.get(['/api/v1/diagrams/typescript-uml.puml', '/typescript_uml_class_diagram.puml'], (_req: Request, res: Response) => {
+  const pumlPath = path.resolve(projectRoot, 'docs/diagrams/typescript_uml_class_diagram.puml');
+  if (fs.existsSync(pumlPath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="typescript_uml_class_diagram.puml"');
+    return res.sendFile(pumlPath);
+  }
+  return res.status(404).send('TypeScript UML PUML not found');
+});
+
+/**
+ * Serves Mermaid-Derived Architecture Diagrams (SVG, PNG, PDF, MMD).
+ */
+app.get(['/api/v1/diagrams/architecture.svg', '/architecture_diagrams.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/architecture_diagrams.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="architecture_diagrams.svg"');
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('Architecture SVG not found');
+});
+
+app.get(['/api/v1/diagrams/architecture.png', '/architecture_diagrams.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/architecture_diagrams.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="architecture_diagrams.png"');
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('Architecture PNG not found');
+});
+
+app.get(['/api/v1/diagrams/architecture.pdf', '/architecture_diagrams.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/architecture_diagrams.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="architecture_diagrams.pdf"');
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('Architecture PDF not found');
+});
+
+app.get(['/api/v1/diagrams/architecture.mmd', '/architecture_diagrams.mmd'], (_req: Request, res: Response) => {
+  const mmdPath = path.resolve(projectRoot, 'docs/diagrams/architecture_diagrams.mmd');
+  if (fs.existsSync(mmdPath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="architecture_diagrams.mmd"');
+    return res.sendFile(mmdPath);
+  }
+  return res.status(404).send('Architecture MMD not found');
+});
+
+/**
+ * Serves Full Capability Mindmap assets (SVG, PNG, PDF, Mermaid, PlantUML).
+ */
+app.get(['/api/v1/diagrams/mindmap.svg', '/mindmap.svg'], (_req: Request, res: Response) => {
+  const svgPath = path.resolve(projectRoot, 'docs/diagrams/mindmap.svg');
+  if (fs.existsSync(svgPath)) {
+    res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="mindmap.svg"');
+    return res.sendFile(svgPath);
+  }
+  return res.status(404).send('Mindmap SVG not found');
+});
+
+app.get(['/api/v1/diagrams/mindmap.png', '/mindmap.png'], (_req: Request, res: Response) => {
+  const pngPath = path.resolve(projectRoot, 'docs/diagrams/mindmap.png');
+  if (fs.existsSync(pngPath)) {
+    res.setHeader('Content-Type', 'image/png');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="mindmap.png"');
+    return res.sendFile(pngPath);
+  }
+  return res.status(404).send('Mindmap PNG not found');
+});
+
+app.get(['/api/v1/diagrams/mindmap.pdf', '/mindmap.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/mindmap.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="mindmap.pdf"');
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('Mindmap PDF not found');
+});
+
+app.get(['/api/v1/diagrams/mindmap.mmd', '/mindmap.mmd'], (_req: Request, res: Response) => {
+  const mmdPath = path.resolve(projectRoot, 'docs/diagrams/mindmap.mmd');
+  if (fs.existsSync(mmdPath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="mindmap.mmd"');
+    return res.sendFile(mmdPath);
+  }
+  return res.status(404).send('Mindmap MMD not found');
+});
+
+app.get(['/api/v1/diagrams/mindmap.puml', '/mindmap.puml'], (_req: Request, res: Response) => {
+  const pumlPath = path.resolve(projectRoot, 'docs/diagrams/mindmap.puml');
+  if (fs.existsSync(pumlPath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="mindmap.puml"');
+    return res.sendFile(pumlPath);
+  }
+  return res.status(404).send('Mindmap PUML not found');
+});
+
+/**
  * Serves GNU AGPLv3 license terms text.
  *
  * WHAT: Streams `LICENSE` file as utf-8 plain text.
@@ -1784,17 +2242,17 @@ app.get('/LICENSE', (_req: Request, res: Response) => {
  * WHY: Enables one-click full codebase export for local Docker/Spring Boot development.
  */
 const handleZipExport = async (_req: Request, res: Response) => {
-  const zipPath = path.resolve(projectRoot, 'personal-library-project.zip');
-  if (!fs.existsSync(zipPath)) {
-    const { generateProjectZip } = await import('../../../scripts/export-zip.ts');
-    generateProjectZip();
-  }
-  if (fs.existsSync(zipPath)) {
+  try {
+    const { generateProjectZipBuffer } = await import('../../../scripts/export-zip.ts');
+    const buffer = generateProjectZipBuffer();
     res.setHeader('Content-Disposition', 'attachment; filename="personal-library-enterprise.zip"');
     res.setHeader('Content-Type', 'application/zip');
-    return res.sendFile(zipPath);
+    res.setHeader('Content-Length', buffer.length.toString());
+    return res.send(buffer);
+  } catch (err) {
+    console.error('Failed to generate project ZIP archive:', err);
+    return res.status(500).send('Failed to generate project ZIP archive');
   }
-  return res.status(500).send('Failed to generate project ZIP archive');
 };
 
 app.get('/export.zip', handleZipExport);

@@ -292,6 +292,101 @@ paths:
                     type: string
                     example: Document and vector embeddings removed
 
+  /documents/{guid}/versions:
+    get:
+      tags:
+        - Versioning
+        - Documents
+      summary: Retrieve historical version snapshots for a document
+      description: Returns list of immutable past version snapshots archived prior to overwrites and rollbacks.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          description: Unique GUID of the document
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of historical version snapshots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentVersionSnapshot'
+        '404':
+          description: Document not found
+
+  /documents/{guid}/versions/{version}/download:
+    get:
+      tags:
+        - Versioning
+        - Documents
+      summary: Download historical asset file for a specific version
+      description: Streams the original physical file asset preserved at the requested version.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          description: Target version sequence number
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Historical document binary attachment
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename="document_v1.pdf"
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Historical version or document not found
+
+  /documents/{guid}/rollback/{version}:
+    post:
+      tags:
+        - Versioning
+        - Documents
+      summary: Roll back document state to a designated historical version
+      description: >
+        Restores file asset, metadata, and dual-model AI summaries from the designated version snapshot,
+        archives the active state into the version history, and advances the version sequence counter.
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          description: Version sequence number to restore
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document successfully rolled back and updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDetail'
+        '404':
+          description: Document or target version snapshot not found
+
   /documents/{guid}/summarize:
     post:
       tags:
@@ -549,6 +644,58 @@ components:
           type: string
         downloadUrl:
           type: string
+        versionHistory:
+          type: array
+          description: Historical immutable revision snapshots archived prior to overwrites or rollbacks
+          items:
+            $ref: '#/components/schemas/DocumentVersionSnapshot'
+
+    DocumentVersionSnapshot:
+      type: object
+      properties:
+        snapshotGuid:
+          type: string
+          example: snapshot-b2c3d4e5-v1-archive
+        versionNumber:
+          type: integer
+          example: 1
+        fileName:
+          type: string
+          example: document_v1.pdf
+        fileSize:
+          type: integer
+          example: 524288
+        fileSizeFormatted:
+          type: string
+          example: 512.0 KB
+        format:
+          type: string
+          enum: [md, docx, pdf, txt, doc, xls, xlsx, ppt, pptx]
+          example: pdf
+        savedAt:
+          type: string
+          format: date-time
+        bibtex:
+          $ref: '#/components/schemas/BibTeXMetadata'
+        bibtexRaw:
+          type: string
+        summaries:
+          type: object
+          properties:
+            llama:
+              $ref: '#/components/schemas/SummaryRecord'
+            mistral:
+              $ref: '#/components/schemas/SummaryRecord'
+        contentExcerpt:
+          type: string
+        fullContent:
+          type: string
+        chunksCount:
+          type: integer
+          example: 2
+        note:
+          type: string
+          example: Archived prior to upgrade to version 2
 
     DocumentListResponse:
       type: object

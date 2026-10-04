@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 /**
  * Custom repository fragment providing the dynamic multi-predicate document search
- * backing the SAP Horizon List Report floorplan.
+ * backing the SAP Fiori List Report floorplan.
  *
  * <p>The filter combination is genuinely dynamic: every criterion is optional and any
  * subset may be supplied. Such a query cannot be expressed as a static
@@ -29,7 +29,7 @@ public interface DocumentRepositoryCustom {
      * Omitted ({@code null} or blank) criteria are not applied.
      *
      * WHAT: Compiles an dynamic MongoDB Criteria query combining text predicates with pagination and sort options.
-     * WHY: Users in the SAP Horizon List Report floorplan may filter by one, some, or all available metadata fields
+     * WHY: Users in the SAP Fiori List Report floorplan may filter by one, some, or all available metadata fields
      * in arbitrary combinations; static Spring Data repository methods cannot support variable combinations of nullable parameters.
      *
      * @param fileName Optional file name substring (case-insensitive).

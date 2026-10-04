@@ -89,7 +89,7 @@ export const bootstrapUi5 = (): Promise<void> => {
     applyGlobalStylesheetPatch();
     bootstrapped = loadGlobalStylesheet().catch((err) => {
       // A missing global stylesheet must not take the whole application down;
-      // UI5 falls back to its stock Horizon styling.
+      // UI5 falls back to its default styling.
       console.error('[personal-library] Failed to load the global stylesheet', err);
     });
   }

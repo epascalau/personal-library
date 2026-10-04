@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile } from '../../types';
+import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile, DocumentVersionSnapshot } from '../../types';
 
 /**
  * Supported backend architecture driver classifications.
@@ -258,6 +258,32 @@ export interface BackendAdapter {
    * @returns Download link URL.
    */
   getDownloadUrl(guid: string): string;
+
+  /**
+   * Retrieves the version history and snapshots for a document.
+   *
+   * @param guid Unique document identifier.
+   * @returns Promise resolving to list of historical version snapshots.
+   */
+  getVersionHistory(guid: string): Promise<DocumentVersionSnapshot[]>;
+
+  /**
+   * Rolls back the document to a specific historical version snapshot.
+   *
+   * @param guid Unique document identifier.
+   * @param targetVersion Version sequence number to restore.
+   * @returns Promise resolving to the updated document record.
+   */
+  rollbackVersion(guid: string, targetVersion: number): Promise<DocumentRecord>;
+
+  /**
+   * Generates a download URL for a specific historical version asset.
+   *
+   * @param guid Unique document identifier.
+   * @param versionNumber Target historical version number.
+   * @returns Download link URL.
+   */
+  getHistoricalDownloadUrl(guid: string, versionNumber: number): string;
 
   /**
    * Retrieves raw OpenAPI 3.0.3 specification YAML document.

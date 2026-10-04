@@ -4,7 +4,7 @@
  *
  * CSS custom properties defined on :root already inherit across the shadow
  * boundary, so this file focuses on things that cannot cross it: styling the
- * internal parts of UI5 elements, and mapping the app's SAP Horizon palette
+ * internal parts of UI5 elements, and mapping the app's palette
  * (defined in src/index.css) onto UI5's own theming parameters.
  */
 
@@ -400,7 +400,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* SAP Evening Horizon (dark) harmonisation                            */
+/* Dark theme harmonisation                                           */
 /* ------------------------------------------------------------------ */
 
 [data-sap-theme='sap_horizon_dark'] {
