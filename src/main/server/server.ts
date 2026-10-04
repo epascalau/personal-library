@@ -2035,6 +2035,68 @@ app.get(['/api/v1/diagrams/rag.png', '/rag_data_flow.png'], (_req: Request, res:
   return res.status(404).send('RAG data flow PNG not found');
 });
 
+// -----------------------------------------------------------------------------
+// RAG Tokens & Embeddings Deep Dive Diagrams
+// -----------------------------------------------------------------------------
+app.get(['/api/v1/diagrams/rag-tokens-embeddings.svg', '/rag-tokens-embeddings-explained.svg'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/rag-tokens-embeddings-explained.svg');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('RAG tokens & embeddings SVG not found');
+});
+
+app.get(['/api/v1/diagrams/rag-tokens-embeddings.png', '/rag-tokens-embeddings-explained.png'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/rag-tokens-embeddings-explained.png');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/png');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('RAG tokens & embeddings PNG not found');
+});
+
+app.get(['/api/v1/diagrams/rag-tokens-embeddings.pdf', '/rag-tokens-embeddings-explained.pdf'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/rag-tokens-embeddings-explained.pdf');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="rag-tokens-embeddings-explained.pdf"');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('RAG tokens & embeddings PDF not found');
+});
+
+// -----------------------------------------------------------------------------
+// RAG Dual-Store End-to-End Workflow Diagrams
+// -----------------------------------------------------------------------------
+app.get(['/api/v1/diagrams/rag-workflow.svg', '/rag-workflow.svg'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/rag-workflow.svg');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('RAG workflow SVG not found');
+});
+
+app.get(['/api/v1/diagrams/rag-workflow.png', '/rag-workflow.png'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/rag-workflow.png');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/png');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('RAG workflow PNG not found');
+});
+
+app.get(['/api/v1/diagrams/rag-workflow.pdf', '/rag-workflow.pdf'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/rag-workflow.pdf');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="rag-workflow.pdf"');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('RAG workflow PDF not found');
+});
+
 /**
  * Serves SAP Fiori UI5 Frontend Architecture diagrams.
  */

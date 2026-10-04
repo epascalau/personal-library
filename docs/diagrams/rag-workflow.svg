@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" style="background:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <linearGradient id="headerGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+
+    <filter id="shadowBox" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+
+    <marker id="flowArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0070f2" />
+    </marker>
+    <marker id="flowArrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669" />
+    </marker>
+    <marker id="flowArrowPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed" />
+    </marker>
+  </defs>
+
+  <!-- Title Banner -->
+  <rect x="0" y="0" width="1600" height="80" fill="url(#headerGrad2)" />
+  <text x="40" y="44" font-size="24" font-weight="800" fill="#ffffff" letter-spacing="-0.02em">Dual-Database Retrieval-Augmented Generation (RAG) Architecture &amp; Workflow</text>
+  <text x="40" y="66" font-size="13" font-weight="500" fill="#94a3b8">Spring Boot 3.3.4 • MongoDB 7.0 • Qdrant HNSW • Ollama Llama 3.3 (70B) &amp; Mistral Large • SAP Fiori Horizon UI</text>
+
+  <!-- Lane 1: Ingestion & Vectorization Flow (Top Lane) -->
+  <g transform="translate(40, 110)">
+    <rect width="1520" height="290" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 12 Q 0 0 12 0 L 1508 0 Q 1520 0 1520 12 L 1520 36 L 0 36 Z" fill="#0284c7" />
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#ffffff">&#128392; INGESTION PHASE: Binary Parsing, Semantic Chunking, Dense Embedding &amp; Dual-Storage</text>
+
+    <!-- Step 1.1: Upload -->
+    <g transform="translate(24, 60)" filter="url(#shadowBox)">
+      <rect width="190" height="190" rx="8" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" />
+      <rect x="0" y="0" width="190" height="32" rx="8" fill="#eff6ff" />
+      <text x="14" y="21" font-size="12" font-weight="700" fill="#0369a1">1. PDF / Doc Upload</text>
+      <text x="14" y="56" font-size="11" fill="#334155">• Drag &amp; drop file</text>
+      <text x="14" y="76" font-size="11" fill="#334155">• Auto-extract BibTeX</text>
+      <text x="14" y="96" font-size="11" fill="#334155">• Extract full text</text>
+      <text x="14" y="116" font-size="11" fill="#334155">• SHA-256 Checksum</text>
+      <rect x="12" y="140" width="166" height="32" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1" />
+      <text x="95" y="160" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0284c7">DocumentRecord</text>
+    </g>
+
+    <line x1="220" y1="155" x2="256" y2="155" stroke="#0070f2" stroke-width="2.5" marker-end="url(#flowArrow)" />
+
+    <!-- Step 1.2: Text Extraction & Chunking -->
+    <g transform="translate(264, 60)" filter="url(#shadowBox)">
+      <rect width="210" height="190" rx="8" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" />
+      <rect x="0" y="0" width="210" height="32" rx="8" fill="#eff6ff" />
+      <text x="14" y="21" font-size="12" font-weight="700" fill="#0369a1">2. Semantic Chunking</text>
+      <text x="14" y="56" font-size="11" fill="#334155">• Chunk size: ~500 chars</text>
+      <text x="14" y="76" font-size="11" fill="#334155">• 100 char sliding overlap</text>
+      <text x="14" y="96" font-size="11" fill="#334155">• Sentence boundary split</text>
+      <text x="14" y="116" font-size="11" fill="#334155">• Preserves context flows</text>
+      <rect x="12" y="140" width="186" height="32" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1" />
+      <text x="105" y="160" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0284c7">Chunks: [C0, C1, ... Cn]</text>
+    </g>
+
+    <line x1="480" y1="155" x2="516" y2="155" stroke="#0070f2" stroke-width="2.5" marker-end="url(#flowArrow)" />
+
+    <!-- Step 1.3: Vector Embedding -->
+    <g transform="translate(524, 60)" filter="url(#shadowBox)">
+      <rect width="220" height="190" rx="8" fill="#ffffff" stroke="#d8b4fe" stroke-width="1.5" />
+      <rect x="0" y="0" width="220" height="32" rx="8" fill="#faf5ff" />
+      <text x="14" y="21" font-size="12" font-weight="700" fill="#7c3aed">3. nomic-embed-text</text>
+      <text x="14" y="56" font-size="11" fill="#334155">• Local Ollama or Gemini</text>
+      <text x="14" y="76" font-size="11" fill="#334155">• 768-dimensional float32</text>
+      <text x="14" y="96" font-size="11" fill="#334155">• Unit L2 normalized</text>
+      <text x="14" y="116" font-size="11" fill="#334155">• High-throughput batching</text>
+      <rect x="12" y="140" width="196" height="32" rx="6" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1" />
+      <text x="110" y="160" text-anchor="middle" font-size="10" font-family="monospace" font-weight="700" fill="#6b21a8">v ∈ ℝ⁷⁶⁸ (||v|| = 1.0)</text>
+    </g>
+
+    <!-- Branch Fork Lines -->
+    <path d="M 750 155 L 790 155 L 790 110 L 830 110" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#flowArrowGreen)" />
+    <path d="M 750 155 L 790 155 L 790 200 L 830 200" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#flowArrow)" />
+
+    <!-- Step 1.4: MongoDB -->
+    <g transform="translate(840, 50)" filter="url(#shadowBox)">
+      <rect width="320" height="100" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="1.5" />
+      <rect x="0" y="0" width="320" height="28" rx="8" fill="#f0fdf4" />
+      <text x="14" y="19" font-size="11.5" font-weight="700" fill="#166534">&#128194; MongoDB 7.0 (System of Record)</text>
+      <text x="14" y="46" font-size="10.5" fill="#334155">• Stores full BSON, BibTeX, versions, PDF asset</text>
+      <text x="14" y="64" font-size="10.5" fill="#334155">• Caches dual Llama &amp; Mistral summaries</text>
+      <text x="14" y="82" font-size="10.5" font-weight="700" fill="#047857">ACID Guarantees • B-Tree Index • Port 27017</text>
+    </g>
+
+    <!-- Step 1.5: Qdrant DB -->
+    <g transform="translate(840, 160)" filter="url(#shadowBox)">
+      <rect width="320" height="100" rx="8" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" />
+      <rect x="0" y="0" width="320" height="28" rx="8" fill="#eff6ff" />
+      <text x="14" y="19" font-size="11.5" font-weight="700" fill="#1e40af">&#9889; Qdrant Vector DB (Vector Index)</text>
+      <text x="14" y="46" font-size="10.5" fill="#334155">• Stores 768-D dense vectors + chunk payload</text>
+      <text x="14" y="64" font-size="10.5" fill="#334155">• Hierarchical Navigable Small World (HNSW)</text>
+      <text x="14" y="82" font-size="10.5" font-weight="700" fill="#1d4ed8">&lt; 3ms Cosine Distance ANN • Port 6333/6334</text>
+    </g>
+
+    <!-- Step 1.6: Background Dual-Model Summarization -->
+    <g transform="translate(1200, 50)" filter="url(#shadowBox)">
+      <rect width="290" height="210" rx="8" fill="#ffffff" stroke="#f0abfc" stroke-width="1.5" />
+      <rect x="0" y="0" width="290" height="32" rx="8" fill="#fdf4ff" />
+      <text x="14" y="21" font-size="12" font-weight="700" fill="#a21caf">&#9881; Concurrent Summarization</text>
+      <text x="14" y="56" font-size="11" font-weight="700" fill="#7c3aed">1. Llama 3.3 (70B Instruct):</text>
+      <text x="20" y="74" font-size="10.5" fill="#475569">Analytical synthesis • Methodologies</text>
+      <text x="14" y="104" font-size="11" font-weight="700" fill="#b91c1c">2. Mistral Large (2411):</text>
+      <text x="20" y="122" font-size="10.5" fill="#475569">Executive brief • Key findings</text>
+      <rect x="12" y="150" width="266" height="46" rx="6" fill="#fdf4ff" stroke="#e879f9" stroke-width="1" />
+      <text x="145" y="168" text-anchor="middle" font-size="10" font-weight="700" fill="#86198f">Concurrent Async Threads</text>
+      <text x="145" y="184" text-anchor="middle" font-size="9" fill="#a21caf">Duration tracked &amp; rendered in Object Page</text>
+    </g>
+    <path d="M 1166 100 L 1192 100" stroke="#a21caf" stroke-width="2.5" marker-end="url(#flowArrowPurple)" />
+  </g>
+
+  <!-- Lane 2: Retrieval-Augmented Generation (RAG) Interactive Loop (Bottom Lane) -->
+  <g transform="translate(40, 440)">
+    <rect width="1520" height="420" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 12 Q 0 0 12 0 L 1508 0 Q 1520 0 1520 12 L 1520 36 L 0 36 Z" fill="url(#headerGrad2)" />
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#ffffff">&#128172; QUERY &amp; GENERATION PHASE: Interactive Conversational RAG with Multi-Head Attention</text>
+
+    <!-- User Query -->
+    <g transform="translate(30, 60)" filter="url(#shadowBox)">
+      <rect width="250" height="320" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+      <rect x="0" y="0" width="250" height="36" rx="8" fill="#0070f2" />
+      <text x="14" y="23" font-size="12" font-weight="700" fill="#ffffff">&#128100; SAP Fiori User / Client</text>
+      <text x="14" y="60" font-size="11" font-weight="700" fill="#334155">Natural Language Question:</text>
+      <rect x="12" y="70" width="226" height="60" rx="6" fill="#ffffff" stroke="#0070f2" stroke-width="1.5" />
+      <text x="20" y="94" font-size="11" font-weight="600" fill="#0854a0">"What are the primary</text>
+      <text x="20" y="112" font-size="11" font-weight="600" fill="#0854a0">findings of this paper?"</text>
+      <text x="14" y="156" font-size="10.5" fill="#475569">• Emitted from Object Page</text>
+      <text x="14" y="174" font-size="10.5" fill="#475569">• POST /api/v1/documents/:id/chat</text>
+      <text x="14" y="192" font-size="10.5" fill="#475569">• Passes prior chat history</text>
+      <rect x="12" y="230" width="226" height="70" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1" />
+      <text x="125" y="254" text-anchor="middle" font-size="10" font-weight="700" fill="#0284c7">RestBackendAdapter</text>
+      <text x="125" y="272" text-anchor="middle" font-size="9" fill="#64748b">Keycloak Bearer JWT Header</text>
+      <text x="125" y="286" text-anchor="middle" font-size="9" fill="#64748b">Gateway Proxy / Express</text>
+    </g>
+
+    <line x1="286" y1="210" x2="330" y2="210" stroke="#0070f2" stroke-width="3" marker-end="url(#flowArrow)" />
+
+    <!-- Query Vectorization & Qdrant Search -->
+    <g transform="translate(340, 60)" filter="url(#shadowBox)">
+      <rect width="280" height="320" rx="8" fill="#f0f9ff" stroke="#93c5fd" stroke-width="1.5" />
+      <rect x="0" y="0" width="280" height="36" rx="8" fill="#0284c7" />
+      <text x="14" y="23" font-size="12" font-weight="700" fill="#ffffff">&#128065; Qdrant HNSW Similarity</text>
+      <text x="14" y="60" font-size="11" font-weight="700" fill="#0369a1">1. Query Vectorization:</text>
+      <text x="20" y="78" font-size="10.5" fill="#475569">v_query = Embed(question)</text>
+      <text x="14" y="106" font-size="11" font-weight="700" fill="#0369a1">2. Filtered Cosine Distance:</text>
+      <text x="20" y="124" font-size="10.5" fill="#475569">doc_id == currentDocument</text>
+      <text x="20" y="142" font-size="10.5" fill="#475569">Threshold: cos(θ) &gt; 0.65</text>
+      <text x="14" y="170" font-size="11" font-weight="700" fill="#0369a1">3. Top-K Extraction (K=3):</text>
+      <rect x="12" y="184" width="256" height="116" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1" />
+      <text x="20" y="206" font-size="10" font-weight="700" fill="#16a34a">• Chunk #2 (Score: 0.94) • Page 4</text>
+      <text x="20" y="222" font-size="9" fill="#64748b">"Multi-head attention allows..."</text>
+      <text x="20" y="244" font-size="10" font-weight="700" fill="#16a34a">• Chunk #0 (Score: 0.88) • Page 1</text>
+      <text x="20" y="260" font-size="9" fill="#64748b">"We propose the Transformer..."</text>
+      <text x="20" y="282" font-size="10" font-weight="700" fill="#ca8a04">• Chunk #7 (Score: 0.73) • Page 9</text>
+    </g>
+
+    <line x1="626" y1="210" x2="670" y2="210" stroke="#0070f2" stroke-width="3" marker-end="url(#flowArrow)" />
+
+    <!-- Prompt Assembly -->
+    <g transform="translate(680, 60)" filter="url(#shadowBox)">
+      <rect width="320" height="320" rx="8" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5" />
+      <rect x="0" y="0" width="320" height="36" rx="8" fill="#7c3aed" />
+      <text x="14" y="23" font-size="12" font-weight="700" fill="#ffffff">&#128221; Grounding Prompt Assembly</text>
+      <rect x="12" y="48" width="296" height="254" rx="6" fill="#ffffff" stroke="#e9d5ff" stroke-width="1" />
+      <text x="20" y="70" font-size="10" font-family="monospace" font-weight="700" fill="#6b21a8">[SYSTEM PROMPT]</text>
+      <text x="20" y="86" font-size="9" font-family="monospace" fill="#475569">You are Spring AI Assistant powered by</text>
+      <text x="20" y="100" font-size="9" font-family="monospace" fill="#475569">Llama 3.3. Ground responses strictly in</text>
+      <text x="20" y="114" font-size="9" font-family="monospace" fill="#475569">the retrieved passages with citations.</text>
+      <text x="20" y="138" font-size="10" font-family="monospace" font-weight="700" fill="#15803d">[RETRIEVED PASSAGES]</text>
+      <text x="20" y="154" font-size="8.5" font-family="monospace" fill="#334155">[Excerpt 1] Multi-Head Attention...</text>
+      <text x="20" y="168" font-size="8.5" font-family="monospace" fill="#334155">[Excerpt 2] We propose the Transformer...</text>
+      <text x="20" y="192" font-size="10" font-family="monospace" font-weight="700" fill="#0369a1">[RECENT CHAT TURNS]</text>
+      <text x="20" y="208" font-size="8.5" font-family="monospace" fill="#475569">User: Tell me about parallelization.</text>
+      <text x="20" y="222" font-size="8.5" font-family="monospace" fill="#475569">Assistant: Unlike RNNs, Transformer...</text>
+      <text x="20" y="246" font-size="10" font-family="monospace" font-weight="700" fill="#b91c1c">[USER QUESTION]</text>
+      <text x="20" y="262" font-size="8.5" font-family="monospace" fill="#b91c1c">"What are the primary findings?"</text>
+      <rect x="20" y="274" width="280" height="20" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+      <text x="160" y="288" text-anchor="middle" font-size="8.5" font-weight="700" fill="#166534">Zero-Hallucination Guardrail Active</text>
+    </g>
+
+    <line x1="1006" y1="210" x2="1050" y2="210" stroke="#7c3aed" stroke-width="3" marker-end="url(#flowArrowPurple)" />
+
+    <!-- LLM Generation -->
+    <g transform="translate(1060, 60)" filter="url(#shadowBox)">
+      <rect width="430" height="320" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+      <rect x="0" y="0" width="430" height="36" rx="8" fill="#1e293b" />
+      <text x="14" y="23" font-size="12" font-weight="700" fill="#ffffff">&#129302; Grounded Synthesis &amp; UI Citation Card</text>
+
+      <rect x="14" y="48" width="402" height="150" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+      <text x="24" y="68" font-size="10.5" font-weight="700" fill="#0f172a">Streaming Synthesized Response (Markdown):</text>
+      <text x="24" y="88" font-size="10" fill="#334155">"The primary findings demonstrate that the **Transformer**</text>
+      <text x="24" y="104" font-size="10" fill="#334155">replaces recurrent layers with **Multi-Head Attention** [Excerpt 1].</text>
+      <text x="24" y="120" font-size="10" fill="#334155">On WMT 2014 translation benchmarks, the big model achieves</text>
+      <text x="24" y="136" font-size="10" font-weight="700" fill="#0284c7">28.4 BLEU, training in 3.5 days on 8 GPUs [Excerpt 2]."</text>
+      <line x1="24" y1="150" x2="400" y2="150" stroke="#e2e8f0" stroke-width="1" />
+      <text x="24" y="172" font-size="10" font-weight="700" fill="#059669">✓ Model: Llama 3.3 (70B Instruct) via Spring AI • Latency: 1.8s</text>
+      <text x="24" y="188" font-size="9" fill="#64748b">Directly verifiable in SAP UI5 Object Page with interactive excerpt cards</text>
+
+      <!-- Citation Footnotes Box -->
+      <rect x="14" y="210" width="402" height="92" rx="6" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1" />
+      <text x="24" y="230" font-size="10.5" font-weight="700" fill="#065f46">&#128279; Interactive Citation Sources (Click to Jump):</text>
+      <text x="24" y="250" font-size="9.5" fill="#047857">• <strong>[Excerpt 1]</strong> Chunk 2 (Relevance: 94.2%) — "Multi-Head Attention..."</text>
+      <text x="24" y="268" font-size="9.5" fill="#047857">• <strong>[Excerpt 2]</strong> Chunk 0 (Relevance: 88.0%) — "Attention Is All You Need..."</text>
+      <text x="24" y="286" font-size="9" font-style="italic" fill="#059669">Full audit trail preserved in MongoDB document version logs</text>
+    </g>
+  </g>
+</svg>

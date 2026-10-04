@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG Explained from Scratch &bull; Intuitive First-Principles Guide (Zero-Knowledge Edition)</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
+  <style>
+    :root {
+      --sap-brand: #0070f2;
+      --sap-brand-dark: #0854a0;
+      --sap-bg: #f8fafc;
+      --sap-shell: #0f172a;
+      --sap-card: #ffffff;
+      --sap-text: #0f172a;
+      --sap-subtext: #475569;
+      --sap-border: #e2e8f0;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-purple: #7c3aed;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background: var(--sap-bg);
+      color: var(--sap-text);
+      line-height: 1.7;
+    }
+
+    header {
+      background: var(--sap-shell);
+      color: #fff;
+      padding: 24px 32px;
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .breadcrumb {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .breadcrumb a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .btn-primary {
+      background: var(--sap-brand);
+      border-color: #0369a1;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--sap-brand-dark);
+    }
+    .btn-accent {
+      background: #047857;
+      border-color: #065f46;
+      color: #fff;
+    }
+    .btn-accent:hover {
+      background: #065f46;
+    }
+
+    .main-wrap {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    /* Hero Banner */
+    .hero-box {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #0f172a 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 36px;
+      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.2);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .hero-box h2 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+    .hero-box p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #e0f2fe;
+      max-width: 800px;
+    }
+
+    /* Switcher Banner */
+    .edition-switch {
+      background: #fff;
+      border: 1px solid var(--sap-border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .edition-info h4 {
+      font-size: 15px;
+      color: var(--sap-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .edition-info p {
+      font-size: 13px;
+      color: var(--sap-subtext);
+      margin-top: 2px;
+    }
+
+    /* Chapter Card */
+    .chapter {
+      background: var(--sap-card);
+      border: 1px solid var(--sap-border);
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .chapter-tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--sap-brand);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chapter h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--sap-text);
+      margin-bottom: 16px;
+    }
+    .chapter p {
+      font-size: 15px;
+      color: #334155;
+      margin-bottom: 16px;
+    }
+
+    /* Analogy Box */
+    .analogy-box {
+      background: #f0fdf4;
+      border-left: 5px solid #10b981;
+      padding: 20px 24px;
+      border-radius: 0 10px 10px 0;
+      margin: 20px 0;
+    }
+    .analogy-box h4 {
+      color: #065f46;
+      font-size: 15px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .analogy-box p {
+      color: #166534;
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    .warning-box {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      padding: 20px 24px;
+      border-radius: 0 10px 10px 0;
+      margin: 20px 0;
+    }
+    .warning-box h4 {
+      color: #92400e;
+      font-size: 15px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .warning-box p {
+      color: #78350f;
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    /* Comparison Grid */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 24px 0;
+    }
+    @media (max-width: 768px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+    .compare-card {
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--sap-border);
+    }
+    .compare-closed {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+    .compare-closed h4 {
+      color: #b91c1c;
+      font-size: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .compare-open {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+    .compare-open h4 {
+      color: #047857;
+      font-size: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .compare-card ul {
+      padding-left: 20px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .compare-card li {
+      margin-bottom: 8px;
+    }
+
+    /* Interactive Toy 1: Token Slicer */
+    .toy-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .toy-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--sap-shell);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lego-blocks {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+    .lego {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 14px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .lego-1 { background: #38bdf8; color: #082f49; }
+    .lego-2 { background: #4ade80; color: #052e16; }
+    .lego-3 { background: #fbbf24; color: #451a03; }
+    .lego-4 { background: #c084fc; color: #3b0764; }
+    .lego-5 { background: #f87171; color: #450a0a; }
+
+    /* Interactive Toy 2: Map of Meaning */
+    .map-box {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background: #0f172a;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 24px 0;
+      border: 1px solid #334155;
+    }
+    .map-grid-line {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .pin:hover {
+      transform: translate(-50%, -50%) scale(1.15);
+      z-index: 10;
+    }
+    .pin-pet { background: #0284c7; }
+    .pin-royal { background: #9333ea; }
+    .pin-fruit { background: #16a34a; }
+    .pin-ocean { background: #ea580c; }
+
+    /* Step Journey */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 24px 0;
+    }
+    .step-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--sap-brand);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 112, 242, 0.3);
+    }
+    .step-content {
+      background: #f8fafc;
+      border: 1px solid var(--sap-border);
+      border-radius: 12px;
+      padding: 20px;
+      flex: 1;
+    }
+    .step-content h4 {
+      font-size: 16px;
+      color: var(--sap-text);
+      margin-bottom: 6px;
+    }
+    .step-content p {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 0;
+    }
+
+    /* Diagram Card */
+    .diagram-wrap {
+      border: 1px solid var(--sap-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 24px 0;
+      background: #fff;
+    }
+    .diagram-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #f8fafc;
+    }
+    .diagram-footer {
+      padding: 14px 20px;
+      background: #f1f5f9;
+      border-top: 1px solid var(--sap-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Story Card */
+    .story-card {
+      background: #fafaf9;
+      border: 1px solid #e7e5e4;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+      font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+    }
+    .story-card p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #292524;
+      font-style: italic;
+    }
+    .story-author {
+      font-family: var(--font-family);
+      font-size: 13px;
+      color: #78716c;
+      font-style: normal;
+      margin-top: 12px;
+      text-align: right;
+    }
+
+    footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 40px 24px;
+      border-top: 1px solid #1e293b;
+      text-align: center;
+      font-size: 13px;
+    }
+    footer a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-content">
+      <div>
+        <div class="breadcrumb">
+          <a href="index.html">&larr; Documentation Portal</a> / Architecture &amp; Theory
+        </div>
+        <h1>RAG Explained from Scratch</h1>
+        <p class="subtitle">Intuitive First-Principles Guide &bull; Zero-Knowledge Edition</p>
+      </div>
+      <div class="header-actions">
+        <a href="cs-phd-perspective.html" class="btn" style="background: #4f46e5; border-color: #4338ca;">&#127891; CS PhD Perspective</a>
+        <a href="rag-guide.html" class="btn" title="View technical edition with math and code">&#9874; Deep-Dive Tech Edition</a>
+        <a href="diagrams/rag-tokens-embeddings-explained.svg" target="_blank" class="btn">&#128202; Tokens &amp; Embeddings</a>
+        <a href="diagrams/rag-workflow.pdf" target="_blank" class="btn btn-primary">&#128196; Download PDF</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-wrap">
+
+    <!-- Hero Banner -->
+    <div class="hero-box">
+      <div class="hero-badge">&#128161; Zero Machine Learning Prerequisites</div>
+      <h2>Imagine an AI that Never Guesses and Always Cites Its Sources</h2>
+      <p>
+        You have probably heard words like <em>Tokens</em>, <em>Embeddings</em>, <em>Vector Databases</em>, and <em>RAG</em>. 
+        Engineers often make them sound like wizardry. But at their heart, they are simple, brilliant ideas based on common sense.
+        Here is how it all works—explained with everyday analogies and <em>The Wonderful Wizard of Oz</em>.
+      </p>
+    </div>
+
+    <!-- Edition Switcher -->
+    <div class="edition-switch">
+      <div class="edition-info">
+        <h4><span>&#128035;</span> You are reading: The Zero-Knowledge Edition</h4>
+        <p>Written for executives, curious researchers, and developers who want crystal-clear intuition without math formulas.</p>
+      </div>
+      <div>
+        <a href="rag-guide.html" class="btn btn-accent">&#129302; Switch to Deep-Dive Tech Edition (Formulas, MongoDB &amp; Qdrant Code) &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Chapter 1: The Goldfish Problem -->
+    <section class="chapter" id="goldfish">
+      <div class="chapter-tag">&#127979; Chapter 1</div>
+      <h2>The Problem: The "Goldfish Memory" of Smart Computers</h2>
+      <p>
+        Imagine you hire the smartest research assistant in the world. They have read billions of websites and encyclopedia articles.
+        They write poetry, translate five languages, and summarize complex memos in seconds.
+      </p>
+      <p>
+        There is only one problem: <strong>their desk is very small</strong>.
+      </p>
+
+      <div class="analogy-box">
+        <h4><span>&#129504;</span> The Tiny Desk Analogy</h4>
+        <p>
+          Your assistant can only hold about <strong>3 to 5 pages of text</strong> on their desk at any given moment.
+          If you hand them an entire 800-page company manual or the complete text of a book, the pages fall off the desk.
+          The assistant gets overwhelmed and forgets what they were reading.
+        </p>
+      </div>
+
+      <p>
+        When you ask them a question about page 420 of a book they cannot see, they hate saying <em>"I don't know"</em>.
+        So they do what any anxious student does: <strong>they make up a plausible-sounding answer</strong>.
+        In AI, this embarrassing habit is called a <strong>Hallucination</strong>.
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card compare-closed">
+          <h4><span>&#10060;</span> The Closed-Book Exam (Traditional AI)</h4>
+          <ul>
+            <li>The AI relies purely on what it memorized months ago during training.</li>
+            <li>Cannot read your company's private documents uploaded today.</li>
+            <li>Guesses when it forgets details, giving confident but fake answers.</li>
+            <li>Zero proof, zero page citations, zero accountability.</li>
+          </ul>
+        </div>
+        <div class="compare-card compare-open">
+          <h4><span>&#9989;</span> The Open-Book Exam (RAG)</h4>
+          <ul>
+            <li>Before answering, a super-librarian fetches the exact 2 pages needed.</li>
+            <li>The pages are laid right on the assistant's desk with a sticky note.</li>
+            <li>The assistant writes an answer based strictly on those 2 pages.</li>
+            <li>Includes verifiable footnotes: <em>"According to Page 14, Paragraph 3"</em>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>
+        This open-book superpower is what engineers call <strong>RAG</strong>: <strong>Retrieval-Augmented Generation</strong>.
+      </p>
+    </section>
+
+    <!-- Chapter 2: What are Tokens? -->
+    <section class="chapter" id="tokens">
+      <div class="chapter-tag">&#129521; Chapter 2</div>
+      <h2>What is a "Token"? (The Lego Bricks of Language)</h2>
+      <p>
+        Computers do not have eyeballs. They do not read words like human beings do.
+        When you give a sentence to an AI, the first thing it does is take a pair of scissors and cut the words into small syllable-sized pieces.
+      </p>
+      <p>
+        These pieces are called <strong>Tokens</strong>. You can think of them as <strong>Lego bricks</strong>.
+      </p>
+
+      <div class="toy-box">
+        <div class="toy-title">&#129521; How the AI Cuts Sentences into Lego Bricks (Tokens)</div>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 12px;">
+          Common short words get their own brick. Longer words are snapped into 2 or 3 smaller bricks:
+        </p>
+        
+        <div class="lego-blocks">
+          <div class="lego lego-1">Dorothy</div>
+          <div class="lego lego-2">walk</div>
+          <div class="lego lego-3">ed</div>
+          <div class="lego lego-4">down</div>
+          <div class="lego lego-5">the</div>
+          <div class="lego lego-1">yellow</div>
+          <div class="lego lego-2">brick</div>
+          <div class="lego lego-3">road</div>
+        </div>
+
+        <p style="font-size: 13px; color: #475569; margin-top: 10px;">
+          Notice how <em>"walked"</em> became two bricks: <code>walk</code> + <code>ed</code>!
+          On average, <strong>1,000 words</strong> of English equals about <strong>1,330 Lego bricks (tokens)</strong>.
+        </p>
+      </div>
+
+      <div class="warning-box">
+        <h4><span>&#9888;&#65039;</span> Why Tokens Matter for Your Library</h4>
+        <p>
+          Every AI model has a <strong>"Token Budget"</strong> (called its context window).
+          If your book has 200,000 tokens, you cannot stuff it all into the AI at once.
+          That is why we must break documents into small, bite-sized <strong>Chunks</strong> (e.g., 500 characters each).
+        </p>
+      </div>
+    </section>
+
+    <!-- Chapter 3: What are Embeddings? -->
+    <section class="chapter" id="embeddings">
+      <div class="chapter-tag">&#127757; Chapter 3</div>
+      <h2>What is an "Embedding"? (Coordinates on the Map of Meaning)</h2>
+      <p>
+        Here is a fascinating puzzle:
+        If you search for the word <strong>"puppy"</strong>, but the document only contains the word <strong>"dog"</strong>, 
+        a traditional search engine fails! Why? Because <code>p-u-p-p-y</code> and <code>d-o-g</code> share zero letters.
+      </p>
+      <p>
+        How does an AI know that <em>puppy</em> and <em>dog</em> are practically twins?
+      </p>
+      <p>
+        It uses a magical invention called an <strong>Embedding</strong>.
+      </p>
+
+      <div class="analogy-box">
+        <h4><span>&#127963;</span> The GPS Coordinate Analogy</h4>
+        <p>
+          Think of a world map. Paris and the Eiffel Tower have different spellings, but their GPS coordinates are right next to each other on the globe.
+          <br><br>
+          An AI has an internal <strong>"Map of Meaning"</strong> with hundreds of dimensions.
+          Instead of storing words as letters, it gives every idea a <strong>GPS coordinate</strong>!
+          Ideas that mean similar things are placed in the same neighborhood.
+        </p>
+      </div>
+
+      <div class="map-box" id="map-simulation">
+        <!-- Visual Grid -->
+        <div class="map-grid-line" style="top: 50%; left: 0; right: 0; height: 1px;"></div>
+        <div class="map-grid-line" style="left: 50%; top: 0; bottom: 0; width: 1px;"></div>
+
+        <!-- Neighborhood 1: Pets -->
+        <div class="pin pin-pet" style="top: 28%; left: 24%;">
+          <span>&#128054;</span> puppy [X: 2.1, Y: 4.8]
+        </div>
+        <div class="pin pin-pet" style="top: 32%; left: 29%;">
+          <span>&#128021;</span> dog [X: 2.3, Y: 4.6]
+        </div>
+        <div class="pin pin-pet" style="top: 22%; left: 34%;">
+          <span>&#128049;</span> kitten [X: 2.5, Y: 5.1]
+        </div>
+
+        <!-- Neighborhood 2: Royalty -->
+        <div class="pin pin-royal" style="top: 25%; left: 75%;">
+          <span>&#128081;</span> king [X: 8.2, Y: 5.0]
+        </div>
+        <div class="pin pin-royal" style="top: 30%; left: 82%;">
+          <span>&#128120;</span> queen [X: 8.4, Y: 4.7]
+        </div>
+
+        <!-- Neighborhood 3: Ocean -->
+        <div class="pin pin-ocean" style="top: 75%; left: 22%;">
+          <span>&#128674;</span> submarine [X: 1.8, Y: -4.2]
+        </div>
+        <div class="pin pin-ocean" style="top: 80%; left: 30%;">
+          <span>&#128011;</span> whale [X: 2.2, Y: -4.6]
+        </div>
+
+        <!-- Neighborhood 4: Fruit -->
+        <div class="pin pin-fruit" style="top: 72%; left: 76%;">
+          <span>&#127822;</span> apple [X: 7.9, Y: -3.8]
+        </div>
+        <div class="pin pin-fruit" style="top: 78%; left: 83%;">
+          <span>&#127820;</span> banana [X: 8.3, Y: -4.1]
+        </div>
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; text-align: center;">
+        Interactive Conceptual Map: <em>"puppy"</em> and <em>"dog"</em> are neighbors. <em>"submarine"</em> and <em>"whale"</em> live across town in the deep water zone.
+      </p>
+
+      <p style="margin-top: 16px;">
+        When our system runs, a specialized embedding model (<code>nomic-embed-text</code>) converts every paragraph of text into a list of <strong>768 numbers</strong>.
+        Those numbers are simply coordinates pinpointing the exact meaning of that paragraph on the giant map!
+      </p>
+    </section>
+
+    <!-- Visual Infographic 1: Tokens, Embeddings & MongoDB/Qdrant -->
+    <section class="chapter" id="tokens-infographic">
+      <div class="chapter-tag">&#128200; Visual Infographic</div>
+      <h2>Tokens, Embeddings, MongoDB &amp; Qdrant at a Glance</h2>
+      <p>
+        The architectural diagram below summarizes how text breaks down into tokens, transforms into 768-D coordinates, and routes into MongoDB and Qdrant:
+      </p>
+      <div class="diagram-wrap">
+        <a href="diagrams/rag-tokens-embeddings-explained.png" target="_blank" title="Click to view full-resolution image">
+          <img src="diagrams/rag-tokens-embeddings-explained.svg" alt="Tokens, Embeddings, MongoDB and Qdrant Architecture Diagram" class="diagram-img" />
+        </a>
+        <div class="diagram-footer">
+          <div style="font-size: 13px; color: #475569;">
+            <strong>Step-by-Step Architecture:</strong> Tokenization &bull; Dense Coordinates &bull; Dual-DB &bull; 4-Stage Pipeline
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a href="diagrams/rag-tokens-embeddings-explained.svg" download class="btn" style="border-color: #0284c7; color: #38bdf8;">&#11015; SVG</a>
+            <a href="diagrams/rag-tokens-embeddings-explained.png" download class="btn" style="border-color: #10b981; color: #4ade80;">&#11015; PNG</a>
+            <a href="diagrams/rag-tokens-embeddings-explained.pdf" download class="btn" style="border-color: #ef4444; color: #f87171;">&#11015; PDF</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 4: What is a Vector Database? -->
+    <section class="chapter" id="vectordb">
+      <div class="chapter-tag">&#128452; Chapter 4</div>
+      <h2>What is a "Vector Database"? (The Super-Librarian)</h2>
+      <p>
+        In an old-fashioned library, books are arranged alphabetically by author's last name.
+        If you want to find <em>"stories about people who travel through magical tornadoes"</em>, you have to walk down every single aisle reading book summaries one by one.
+      </p>
+      <p>
+        A <strong>Vector Database</strong> (in our app, <strong>Qdrant</strong>) is like a super-librarian with superhuman speed:
+      </p>
+
+      <div class="analogy-box">
+        <h4><span>&#128218;</span> The Meaning-Radar Analogy</h4>
+        <p>
+          When you ask a question:
+          <br>
+          1. The librarian converts your question into a GPS coordinate on the Map of Meaning.
+          <br>
+          2. The librarian fires a radar beam into the warehouse.
+          <br>
+          3. Out of 100,000 paragraphs, it instantly grabs the <strong>top 3 paragraphs that are closest in distance</strong> to your question!
+          <br>
+          It doesn't care if the words match exactly; it finds the paragraphs that <strong>mean the same thing</strong>!
+        </p>
+      </div>
+    </section>
+
+    <!-- Chapter 5: The Wizard of Oz Walkthrough -->
+    <section class="chapter" id="walkthrough">
+      <div class="chapter-tag">&#127914; Chapter 5</div>
+      <h2>Step-by-Step Storybook Walkthrough: <em>The Wizard of Oz</em></h2>
+      <p>
+        Let's watch what actually happens when you use our Personal Library app to ask a question about <em>The Wonderful Wizard of Oz</em>.
+      </p>
+
+      <div class="story-card">
+        <p>
+          "The Guardian of the Gates led them into a large room with a great green spectacles case. 
+          'You must wear green spectacles,' said the Guardian, 'for if you did not, the brightness and glory of the Emerald City would blind you. 
+          Even those who live in the City must wear spectacles night and day. They are locked on with a key, for so the Great Oz has ordered.'"
+        </p>
+        <div class="story-author">&mdash; L. Frank Baum, <em>The Wonderful Wizard of Oz</em> (Chapter 11)</div>
+      </div>
+
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>You Ask a Question in Plain English</h4>
+            <p>You type: <em>"Why do visitors have to wear green glasses in the Emerald City?"</em></p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>The Question Gets Its GPS Coordinate</h4>
+            <p>
+              The embedding model scans your question and computes its location on the Map of Meaning:
+              <code>[0.082, -0.419, 0.722, ... 768 coordinate numbers]</code>.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Qdrant Finds the Closest Paragraphs</h4>
+            <p>
+              Qdrant searches through all chapters of the book and pulls out Chapter 11, Chunk #4:
+              <em>"The brightness and glory of the Emerald City would blind you... locked on with a key."</em>
+              <strong>Match Confidence: 94.2%</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>The AI Receives the Open-Book Exam</h4>
+            <p>
+              Our Spring Boot backend assembles a prompt for the local Llama 3.3 model:
+              <br>
+              <em>"You are a factual research assistant. Use ONLY this paragraph from Chapter 11 to answer: Why do visitors have to wear green glasses?"</em>
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h4>The AI Answers with Proof (Citations)</h4>
+            <p>
+              The AI streams back the verified answer in real-time:
+              <br>
+              <strong>"Visitors must wear green spectacles because the intense brightness of the Emerald City would permanently blind anyone who viewed it unprotected. The spectacles are locked with a golden key by the Guardian of the Gates [Chapter 11, Page 82]."</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 6: Visual Vector Architecture -->
+    <section class="chapter" id="architecture-diagram">
+      <div class="chapter-tag">&#128202; Chapter 6</div>
+      <h2>Visual Architecture of the Entire System</h2>
+      <p>
+        Here is the complete picture of how the pieces connect together in our application:
+      </p>
+
+      <div class="diagram-wrap">
+        <a href="diagrams/rag-workflow.png" target="_blank" title="Click to view full-resolution image">
+          <img src="diagrams/rag-workflow.svg" alt="RAG Pipeline Flowchart" class="diagram-img" />
+        </a>
+        <div class="diagram-footer">
+          <div style="font-size: 13px; color: #475569;">
+            <strong>Pipeline Model:</strong> Ingestion &bull; Chunking &bull; 768-D Embeddings &bull; Qdrant HNSW &bull; Grounded Prompt &bull; Llama 3.3
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a href="diagrams/rag-workflow.svg" download class="btn" style="border-color: #0284c7; color: #38bdf8;">&#11015; SVG</a>
+            <a href="diagrams/rag-workflow.png" download class="btn" style="border-color: #10b981; color: #4ade80;">&#11015; PNG</a>
+            <a href="diagrams/rag-workflow.pdf" download class="btn" style="border-color: #ef4444; color: #f87171;">&#11015; PDF</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary Checklist -->
+    <section class="chapter" style="background: #f0fdfa; border-color: #99f6e4;">
+      <div class="chapter-tag" style="color: #0f766e;">&#10004;&#65039; Summary in 4 Sentences</div>
+      <h2 style="color: #134e4a;">What You Now Understand</h2>
+      <ol style="padding-left: 20px; font-size: 15px; color: #115e59; line-height: 1.8;">
+        <li><strong>Tokens</strong> are the Lego-brick syllables that computers use to count and budget words.</li>
+        <li><strong>Embeddings</strong> are GPS coordinates that place ideas on a giant map of meaning.</li>
+        <li><strong>Vector Databases</strong> are super-librarians that find paragraphs by concept instead of exact spelling.</li>
+        <li><strong>RAG</strong> turns an AI from a student guessing on a closed-book test into a scholar taking an open-book exam with footnotes.</li>
+      </ol>
+      <div style="margin-top: 24px;">
+        <a href="rag-guide.html" class="btn btn-accent">&#128214; Ready for the Math &amp; Code? Read the Technical Edition &rarr;</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <strong>Personal Library Documentation Suite</strong> &bull; Zero-Knowledge RAG Guide
+      </div>
+      <div>
+        <a href="index.html">Documentation Portal</a> &bull;
+        <a href="cs-phd-perspective.html">CS PhD Perspective</a> &bull;
+        <a href="rag-guide.html">Technical Deep-Dive Edition</a> &bull;
+        <a href="rag-architecture-comparison.html">Architecture Models</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

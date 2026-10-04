@@ -123,13 +123,14 @@ if (fs.existsSync(docsDir)) {
 
     while ((hrefMatch = hrefRegex.exec(content)) !== null) {
       const href = hrefMatch[1];
-      // Skip external links, fragments, mailto, javascript
+      // Skip external links, fragments, mailto, javascript, data URIs
       if (
         href.startsWith('http://') ||
         href.startsWith('https://') ||
         href.startsWith('#') ||
         href.startsWith('mailto:') ||
-        href.startsWith('javascript:')
+        href.startsWith('javascript:') ||
+        href.startsWith('data:')
       ) {
         continue;
       }
