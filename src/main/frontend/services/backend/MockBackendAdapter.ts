@@ -1,3 +1,12 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Mock in-memory backend adapter.
+ * Provides client-side document persistence, multi-attribute filtering, sorting,
+ * simulated network latencies, and local RAG search for zero-dependency standalone operation.
+ */
+
 import {
   BackendAdapter,
   BackendConfig,
@@ -134,6 +143,16 @@ export class MockBackendAdapter implements BackendAdapter {
   readonly config: BackendConfig;
   private documents: DocumentRecord[] = [];
 
+  /**
+   * Initializes the standalone mock adapter and restores persisted local documents.
+   *
+   * WHAT: Attempts to load document records from `localStorage` under `personal_library_mock_docs`;
+   * falls back to `INITIAL_MOCK_DOCUMENTS` if empty or corrupted.
+   * WHY: Enables zero-dependency standalone demonstrations and offline development
+   * without requiring Docker, MongoDB, Ollama, or Spring Boot running locally.
+   *
+   * @param config Backend configuration options.
+   */
   constructor(config: BackendConfig) {
     this.config = config;
     const stored = localStorage.getItem('personal_library_mock_docs');
@@ -148,10 +167,33 @@ export class MockBackendAdapter implements BackendAdapter {
     }
   }
 
+  /**
+   * Persists the in-memory documents collection to browser localStorage.
+   *
+   * WHAT: Serializes `this.documents` as JSON.
+   * WHY: Preserves user uploads, version updates, and deletions across page reloads in offline mode.
+   */
   private save() {
     localStorage.setItem('personal_library_mock_docs', JSON.stringify(this.documents));
   }
 
+  /**
+   * Queries documents with multi-attribute filtering, sorting, and pagination in memory.
+   *
+   * WHAT:
+   * 1. Introduces an intentional 120ms delay to simulate realistic asynchronous network latency.
+   * 2. Filters documents by fileName, title, author, edition/year, format, and content excerpt.
+   * 3. Sorts records in-place by the requested attribute and sort order.
+   * 4. Slices the paginated page window and returns total matching count.
+   *
+   * WHY:
+   * 1. Simulated latency ensures that loading skeletons, spinners, and async race condition guards
+   *    in UI components behave identically in mock mode as they do with real network servers.
+   * 2. Comprehensive multi-field filtering mirrors the Spring Data MongoDB `MongoTemplate` query behavior.
+   *
+   * @param params Filter criteria, sorting, and pagination.
+   * @returns Paginated DocumentListResult.
+   */
   async getDocuments(params: {
     page: number;
     pageSize: number;
@@ -166,7 +208,13 @@ export class MockBackendAdapter implements BackendAdapter {
     if (f.fileName) filtered = filtered.filter(d => d.fileName.toLowerCase().includes(f.fileName.toLowerCase()));
     if (f.title) filtered = filtered.filter(d => (d.bibtex.title || '').toLowerCase().includes(f.title.toLowerCase()));
     if (f.author) filtered = filtered.filter(d => (d.bibtex.author || '').toLowerCase().includes(f.author.toLowerCase()));
-    if (f.edition) filtered = filtered.filter(d => (d.bibtex.edition || '').toLowerCase().includes(f.edition.toLowerCase()));
+    if (f.edition) {
+      const term = f.edition.toLowerCase();
+      filtered = filtered.filter(d =>
+        (d.bibtex.edition || '').toLowerCase().includes(term) ||
+        (d.bibtex.year || '').toLowerCase().includes(term)
+      );
+    }
     if (f.format && f.format !== 'all') filtered = filtered.filter(d => d.format.toLowerCase() === f.format.toLowerCase());
     if (f.content) {
       filtered = filtered.filter(d =>
@@ -177,8 +225,12 @@ export class MockBackendAdapter implements BackendAdapter {
 
     // Sort
     filtered.sort((a, b) => {
-      let valA: any = (a as any)[params.sortBy] ?? (a.bibtex as any)[params.sortBy] ?? '';
-      let valB: any = (b as any)[params.sortBy] ?? (b.bibtex as any)[params.sortBy] ?? '';
+      let valA: any = params.sortBy === 'edition'
+        ? (a.bibtex.edition || a.bibtex.year || '')
+        : ((a as any)[params.sortBy] ?? (a.bibtex as any)[params.sortBy] ?? '');
+      let valB: any = params.sortBy === 'edition'
+        ? (b.bibtex.edition || b.bibtex.year || '')
+        : ((b as any)[params.sortBy] ?? (b.bibtex as any)[params.sortBy] ?? '');
       if (typeof valA === 'string') valA = valA.toLowerCase();
       if (typeof valB === 'string') valB = valB.toLowerCase();
       if (valA < valB) return params.sortOrder === 'asc' ? -1 : 1;
@@ -195,6 +247,15 @@ export class MockBackendAdapter implements BackendAdapter {
     };
   }
 
+  /**
+   * Retrieves a document record by its unique GUID from the local in-memory store.
+   *
+   * WHAT: Searches `this.documents` for a record matching `guid`.
+   * WHY: Simulates local document retrieval with an 80ms delay to replicate fast database lookups.
+   *
+   * @param guid Target document GUID.
+   * @returns Matching DocumentRecord or throws if not found.
+   */
   async getDocument(guid: string): Promise<DocumentRecord> {
     await new Promise(r => setTimeout(r, 80));
     const doc = this.documents.find(d => d.guid === guid);
@@ -202,6 +263,17 @@ export class MockBackendAdapter implements BackendAdapter {
     return doc;
   }
 
+  /**
+   * Ingests a new document record into local storage with simulated dual-model summaries.
+   *
+   * WHAT: Generates a mock GUID, builds a full `DocumentRecord`, prepends it to `this.documents`,
+   * and saves to `localStorage`.
+   * WHY: Allows researchers to test upload dialogs and immediately inspect generated records
+   * even when disconnected from live Ollama or MongoDB backends.
+   *
+   * @param payload Upload payload with file metadata.
+   * @returns Newly created DocumentRecord.
+   */
   async uploadDocument(payload: {
     file: File;
     fileName: string;
@@ -257,6 +329,17 @@ export class MockBackendAdapter implements BackendAdapter {
     return newDoc;
   }
 
+  /**
+   * Overwrites an existing document record while retaining its persistent GUID.
+   *
+   * WHAT: Increments `versionNumber`, updates edit timestamp and file properties, and saves to storage.
+   * WHY: Enforces the architectural invariant that in-place version updates must retain the exact
+   * same persistent GUID, preserving citation links.
+   *
+   * @param guid Existing document GUID.
+   * @param payload Updated version data.
+   * @returns Updated DocumentRecord.
+   */
   async overwriteVersion(
     guid: string,
     payload: {
@@ -296,6 +379,15 @@ export class MockBackendAdapter implements BackendAdapter {
     return updatedDoc;
   }
 
+  /**
+   * Deletes a document from the local offline collection.
+   *
+   * WHAT: Filters out the document with matching GUID and writes updated list to localStorage.
+   * WHY: Provides realistic deletion semantics for offline mode testing.
+   *
+   * @param guid Document GUID.
+   * @returns Success response.
+   */
   async deleteDocument(guid: string): Promise<{ success: boolean; message: string }> {
     await new Promise(r => setTimeout(r, 200));
     this.documents = this.documents.filter(d => d.guid !== guid);
@@ -303,6 +395,16 @@ export class MockBackendAdapter implements BackendAdapter {
     return { success: true, message: `Document ${guid} deleted from offline engine.` };
   }
 
+  /**
+   * Simulates an on-demand summary request in offline mode.
+   *
+   * WHAT: Rejects with a clear instruction message explaining that live Ollama is required.
+   * WHY: Transparently informs researchers that live LLM synthesis requires switching to
+   * the live Integrated Gateway or Spring Boot backend in settings.
+   *
+   * @param guid Document GUID.
+   * @param model 'llama' or 'mistral'.
+   */
   async regenerateSummary(guid: string, model: 'llama' | 'mistral'): Promise<SummaryRecord> {
     await new Promise(r => setTimeout(r, 400));
     throw new Error(
@@ -310,6 +412,17 @@ export class MockBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Answers questions regarding a document using offline heuristics and excerpt citations.
+   *
+   * WHAT: Evaluates question keywords and returns domain-specific answers with mock citation chunks.
+   * WHY: Provides an interactive demonstration of RAG conversational UI flows without requiring
+   * local vector database instances or live GPU execution.
+   *
+   * @param guid Document GUID.
+   * @param question User question.
+   * @returns ChatResponseResult with answer text and citations.
+   */
   async chatWithDocument(
     guid: string,
     question: string
@@ -330,7 +443,7 @@ export class MockBackendAdapter implements BackendAdapter {
 
     return {
       answer,
-      modelUsed: 'Llama 3.3 (Offline Simulator)',
+      modelUsed: 'Llama 3.3 (70B Instruct) (Offline Engine)',
       citations: doc.chunks.map((c, i) => ({
         chunkIndex: c.chunkIndex ?? i,
         score: 0.95,
@@ -339,6 +452,16 @@ export class MockBackendAdapter implements BackendAdapter {
     };
   }
 
+  /**
+   * Generates mock BibTeX bibliographic metadata from a file name.
+   *
+   * WHAT: Derives clean titles, citation keys, and dummy fields from file naming conventions.
+   * WHY: Enables testing the upload dialog's automated form population offline.
+   *
+   * @param fileName File name to parse.
+   * @param sampleContent Optional text snippet.
+   * @returns Mock BibTeXMetadata record.
+   */
   async extractMetadata(
     fileName: string,
     sampleContent?: string,
@@ -360,6 +483,15 @@ export class MockBackendAdapter implements BackendAdapter {
     };
   }
 
+  /**
+   * Simulates successful local authentication without Keycloak.
+   *
+   * WHAT: Returns a mock JWT token and admin user profile derived from the provided username.
+   * WHY: Enables testing role-gated UI actions (e.g. document deletion, version overwriting) offline.
+   *
+   * @param username Login identifier.
+   * @returns Mock auth token and profile.
+   */
   async login(username: string): Promise<{ accessToken: string; user: UserProfile }> {
     return {
       accessToken: 'mock_jwt_token',
@@ -375,16 +507,45 @@ export class MockBackendAdapter implements BackendAdapter {
     };
   }
 
+  /**
+   * Simulates user session termination in offline standalone mode.
+   *
+   * WHAT: No-op asynchronous completion simulating Keycloak realm logout.
+   * WHY: Satisfies the BackendAdapter contract without needing remote HTTP requests in offline mock mode.
+   */
   async logout(): Promise<void> {}
 
+  /**
+   * Returns a local data URI download link for offline documents.
+   *
+   * WHAT: Returns `data:text/plain;...`.
+   * WHY: Allows document downloads to function locally without a web server.
+   *
+   * @param guid Document GUID.
+   * @returns Data URI download link.
+   */
   getDownloadUrl(guid: string): string {
     return `data:text/plain;charset=utf-8,Document%20Asset%20${guid}`;
   }
 
+  /**
+   * Returns a mock OpenAPI 3.0 YAML document.
+   *
+   * WHAT: Returns inline OpenAPI YAML.
+   * WHY: Prevents network 404s when viewing OpenAPI documentation offline.
+   */
   async getOpenApiSpec(): Promise<string> {
     return `# Offline Engine OpenAPI Spec\nopenapi: 3.0.3\ninfo:\n  title: Mock Engine\n  version: 1.0.0`;
   }
 
+  /**
+   * Reports health and status for the standalone offline adapter.
+   *
+   * WHAT: Returns instant 1ms latency and document count.
+   * WHY: Signals to the UI status pill that the client is functioning normally in offline mode.
+   *
+   * @returns BackendHealthResult.
+   */
   async testHealth(): Promise<BackendHealthResult> {
     return {
       ok: true,

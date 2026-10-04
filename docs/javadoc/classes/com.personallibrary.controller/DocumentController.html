@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentController (com.personallibrary.controller) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.controller.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.controller.html">com.personallibrary.controller</a> &gt;
+      <strong>DocumentController</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.controller</div>
+        <h2>class DocumentController</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Slf4j</span>  <span class="annotation">@RestController</span>  <span class="annotation">@RequestMapping(&quot;/api/v1/documents&quot;)</span>  <span class="annotation">@RequiredArgsConstructor</span>  <span class="annotation">@Tag(name = &quot;Documents&quot;, description = &quot;Document management, BibTeX extraction, dual summaries, and RAG chat&quot;)</span> </div>
+        <div class="signature">
+          public class <strong>DocumentController</strong>
+          
+          
+        </div>
+        <p>REST Controller exposing document management endpoints for the SAP Horizon floorplans: List Report querying with multi-attribute filtering, Object Page details, file uploads with automated BibTeX extraction and dual summarization, in-place version overwriting, and RAG conversational search.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private DocumentService</td>
+                <td class="name-col"><code>documentService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXExtractionService</td>
+                <td class="name-col"><code>extractionService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private AiSummarizationService</td>
+                <td class="name-col"><code>summarizationService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private VectorRagService</td>
+                <td class="name-col"><code>vectorRagService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private StorageService</td>
+                <td class="name-col"><code>storageService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private ObjectMapper</td>
+                <td class="name-col"><code>objectMapper</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="name-col"><code>bibtex</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="name-col"><code>bibtex</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;PaginatedResponse&lt;DocumentResponse&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">getDocuments</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">List Report Floorplan query: Supports single or combined filters: file name, document name, author, edition, format, content.  WHAT: Executes a dynamic multi-attribute search across both relational metadata and document full-text, applying pagination and custom sorting.  WHY: Paginating and filtering on the database level prevents high-memory overhead on the client, while supporting fuzzy case-insensitive substring queries aligns with the SAP Fiori List Report standard.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public equalsIgnoreCas</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">e</a></strong>(Object format)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public searchDocument</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">s</a></strong>(Object fileName, Object title, Object author, Object edition, Object cleanFormat, Object content, Object page, Object pageSize, Object sortBy, Object sortOrder)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">k</a></strong>(Object response)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;DocumentResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">uploadDocument</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Uploads a single file and triggers automated pipeline: file persistence, BibTeX extraction, Qdrant vector indexing, and dual model summaries.  WHAT: Ingests a multipart physical file, generates text chunks, writes dense embeddings into Qdrant, computes dual Llama 3.3 and Mistral summaries, and creates a persistent document record with a unique GUID.  WHY: Performing full ingestion atomically within the backend upload pipeline guarantees that as soon as the client receives HTTP 201 Created, the document is immediately queryable via semantic vector RAG search and has complete bibliographic citations.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">f</a></strong>(bibtexJson != null &amp;&amp; !bibtexJson.isBlank()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public readValu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">e</a></strong>(Object bibtexJson, Object BibTeXMetadata.class)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public uploadDocumen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">t</a></strong>(Object file, Object bibtex)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public statu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">s</a></strong>(Object 201)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;BibTeXMetadata&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">extractMetadata</a></strong>(Object &lt;String, String&gt; payload)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">AI extraction preview helper endpoint.  WHAT: Accepts a file name and content sample and infers structured BibTeX metadata fields.  WHY: Running extraction on a lightweight preview endpoint allows the frontend upload modal to pre-populate form fields for user review before committing physical file storage or Qdrant embeddings.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getOrDefaul</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">t</a></strong>(Object &quot;fileName&quot;, Object &quot;document.txt&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getOrDefaul</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">t</a></strong>(Object &quot;contentSample&quot;, Object &quot;&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public extractMetadat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">a</a></strong>(Object fileName, Object sampleContent)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">k</a></strong>(Object extracted)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;DocumentResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">getDocument</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Object Page Floorplan: Retrieve document details.  WHAT: Fetches complete document entity by GUID, including physical metadata, BibTeX fields, and dual model summaries.  WHY: Provides a single REST lookup for the detailed SAP Fiori Object Page, returning fully denormalized metadata in a single network round-trip.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">k</a></strong>(Object documentService.getDocumentByGuid(guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;DocumentResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">overwriteVersion</a></strong>(Object param, Object param, required = false)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Overwrites active document content and metadata in-place while keeping its existing GUID.  WHAT: Replaces the stored file asset and/or metadata, increments `versionNumber`, re-chunks text, re-embeds vectors into Qdrant, and updates the existing document entity.  WHY: Stable GUID preservation ensures existing citation links and external URLs remain valid across document revisions, reflecting academic library versioning standards.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">f</a></strong>(bibtexJson != null &amp;&amp; !bibtexJson.isBlank()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public readValu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">e</a></strong>(Object bibtexJson, Object BibTeXMetadata.class)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public overwriteDocumen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">t</a></strong>(Object guid, Object file, Object bibtex)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">k</a></strong>(Object response)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Object&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">deleteDocument</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Permanently purges a document, its physical asset, and vector embeddings.  WHAT: Cascades deletion across database storage, file system repositories, and Qdrant vector collections.  WHY: Complete multi-store cascading purge prevents orphaned vector embeddings from polluting future semantic RAG searches or consuming disk space.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public deleteDocumen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">t</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">k</a></strong>(Map.of( &quot;success&quot;, Object true, Object &quot;message&quot;, &quot;Document &quot; + guid + &quot; purged from MongoDB, local drive, and Qdrant.&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;SummaryRecord&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">regenerateSummary</a></strong>(Object param, Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Triggers summary regeneration for a specific model (Llama 3.3 or Mistral Large).  WHAT: Sends document content to the requested Ollama model engine and updates the document&#39;s summary map.  WHY: Allows researchers to benchmark individual models independently or recompute summaries if model parameters, system prompts, or upstream context changes.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getEntityByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public generateSummaryForMode</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">l</a></strong>(Object request.getModel()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getBibte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">x</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getFullConten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getBibte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">x</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getSummarie</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">s</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setEditDat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-31">e</a></strong>(Object java.time.Instant.now()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getDocumentByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-32">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-33">k</a></strong>(Object newSummary)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;ChatResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">chatWithDocument</a></strong>(Object param, Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Interactive RAG conversational chat scoped to the active document.  WHAT: Queries Qdrant vector store for semantic citations matching the user&#39;s question, constructs a grounded contextual prompt, and generates an answer via Llama 3.3.  WHY: RAG grounding constrains the model&#39;s responses to verified excerpts from the active document, returning exact citation snippets and similarity scores to eliminate factual hallucination.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getEntityByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chatWithDocumen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-36">t</a></strong>(Object doc, Object request)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">k</a></strong>(Object response)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">getDocuments</div>
+            <div><span class="annotation">@GetMapping</span>  <span class="annotation">@Operation(summary = &quot;Retrieve and filter paginated document list (List Report Floorplan)&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;PaginatedResponse&lt;DocumentResponse&gt;&gt; <strong>getDocuments</strong>(Object param)
+            </div>
+            <p>List Report Floorplan query: Supports single or combined filters: file name, document name, author, edition, format, content.  WHAT: Executes a dynamic multi-attribute search across both relational metadata and document full-text, applying pagination and custom sorting.  WHY: Paginating and filtering on the database level prevents high-memory overhead on the client, while supporting fuzzy case-insensitive substring queries aligns with the SAP Fiori List Report standard.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>fileName</code> - Filter for physical file name.</dd><dd><code>title</code> - Filter for bibliographic title.</dd><dd><code>author</code> - Filter for author name.</dd><dd><code>edition</code> - Filter for edition.</dd><dd><code>format</code> - Filter for file format.</dd><dd><code>content</code> - Full-text search query.</dd><dd><code>page</code> - Page number (1-based).</dd><dd><code>pageSize</code> - Page size.</dd><dd><code>sortBy</code> - Sort field.</dd><dd><code>sortOrder</code> - Sort direction (&quot;asc&quot; or &quot;desc&quot;).</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Paginated list of document responses.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">e</div>
+            <div><span class="annotation">@RequestParam(required = false) String title,</span>  <span class="annotation">@RequestParam(required = false) String author,</span>  <span class="annotation">@RequestParam(required = false) String edition,</span>  <span class="annotation">@RequestParam(required = false, defaultValue = &quot;all&quot;) String format,</span>  <span class="annotation">@RequestParam(required = false) String content,</span>  <span class="annotation">@RequestParam(defaultValue = &quot;1&quot;) int page,</span>  <span class="annotation">@RequestParam(defaultValue = &quot;10&quot;) int pageSize,</span>  <span class="annotation">@RequestParam(defaultValue = &quot;uploadDate&quot;) String sortBy,</span>  <span class="annotation">@RequestParam(defaultValue = &quot;desc&quot;) String sortOrder</span> </div>
+            <div class="signature">
+              public equalsIgnoreCas <strong>e</strong>(Object format)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public searchDocument <strong>s</strong>(Object fileName, Object title, Object author, Object edition, Object cleanFormat, Object content, Object page, Object pageSize, Object sortBy, Object sortOrder)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object response)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">uploadDocument</div>
+            <div><span class="annotation">@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)</span>  <span class="annotation">@Operation(summary = &quot;Upload document (single file only) and trigger automated pipeline&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;DocumentResponse&gt; <strong>uploadDocument</strong>(Object param)
+            </div>
+            <p>Uploads a single file and triggers automated pipeline: file persistence, BibTeX extraction, Qdrant vector indexing, and dual model summaries.  WHAT: Ingests a multipart physical file, generates text chunks, writes dense embeddings into Qdrant, computes dual Llama 3.3 and Mistral summaries, and creates a persistent document record with a unique GUID.  WHY: Performing full ingestion atomically within the backend upload pipeline guarantees that as soon as the client receives HTTP 201 Created, the document is immediately queryable via semantic vector RAG search and has complete bibliographic citations.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>file</code> - Uploaded multipart file.</dd><dd><code>bibtexJson</code> - Optional JSON-encoded BibTeX metadata.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link DocumentResponse} representing the new document.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Throws:</dt>
+                <dd><code>IOException</code> - If file parsing fails.</dd>
+              </dl>
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(bibtexJson != null &amp;&amp; !bibtexJson.isBlank()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public readValu <strong>e</strong>(Object bibtexJson, Object BibTeXMetadata.class)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public uploadDocumen <strong>t</strong>(Object file, Object bibtex)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public statu <strong>s</strong>(Object 201)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">extractMetadata</div>
+            <div><span class="annotation">@PostMapping(&quot;/extract-metadata&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Auto-extract BibTeX metadata suggestions using Spring AI&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;BibTeXMetadata&gt; <strong>extractMetadata</strong>(Object &lt;String, String&gt; payload)
+            </div>
+            <p>AI extraction preview helper endpoint.  WHAT: Accepts a file name and content sample and infers structured BibTeX metadata fields.  WHY: Running extraction on a lightweight preview endpoint allows the frontend upload modal to pre-populate form fields for user review before committing physical file storage or Qdrant embeddings.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>payload</code> - Map containing fileName and contentSample.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Extracted {@link BibTeXMetadata}.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getOrDefaul <strong>t</strong>(Object &quot;fileName&quot;, Object &quot;document.txt&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getOrDefaul <strong>t</strong>(Object &quot;contentSample&quot;, Object &quot;&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">a</div>
+            
+            <div class="signature">
+              public extractMetadat <strong>a</strong>(Object fileName, Object sampleContent)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object extracted)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">getDocument</div>
+            <div><span class="annotation">@GetMapping(&quot;/{guid}&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Retrieve document details for Object Page Floorplan&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;DocumentResponse&gt; <strong>getDocument</strong>(Object param)
+            </div>
+            <p>Object Page Floorplan: Retrieve document details.  WHAT: Fetches complete document entity by GUID, including physical metadata, BibTeX fields, and dual model summaries.  WHY: Provides a single REST lookup for the detailed SAP Fiori Object Page, returning fully denormalized metadata in a single network round-trip.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link DocumentResponse} DTO.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object documentService.getDocumentByGuid(guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">overwriteVersion</div>
+            <div><span class="annotation">@PutMapping(value = &quot;/{guid}&quot;, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)</span>  <span class="annotation">@Operation(summary = &quot;Upload replacement version (overwrites active document in-place, preserves GUID)&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;DocumentResponse&gt; <strong>overwriteVersion</strong>(Object param, Object param, required = false)
+            </div>
+            <p>Overwrites active document content and metadata in-place while keeping its existing GUID.  WHAT: Replaces the stored file asset and/or metadata, increments `versionNumber`, re-chunks text, re-embeds vectors into Qdrant, and updates the existing document entity.  WHY: Stable GUID preservation ensures existing citation links and external URLs remain valid across document revisions, reflecting academic library versioning standards.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Document GUID to overwrite.</dd><dd><code>file</code> - Optional replacement file asset.</dd><dd><code>bibtexJson</code> - Optional replacement BibTeX metadata JSON string.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Updated {@link DocumentResponse}.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Throws:</dt>
+                <dd><code>IOException</code> - If file reading or parsing fails.</dd>
+              </dl>
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(bibtexJson != null &amp;&amp; !bibtexJson.isBlank()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public readValu <strong>e</strong>(Object bibtexJson, Object BibTeXMetadata.class)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public overwriteDocumen <strong>t</strong>(Object guid, Object file, Object bibtex)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object response)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">deleteDocument</div>
+            <div><span class="annotation">@DeleteMapping(&quot;/{guid}&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Delete document record, file asset, and Qdrant vector embeddings&quot;)</span> </div>
+            <div class="signature">
+              public Object&gt;&gt; <strong>deleteDocument</strong>(Object param)
+            </div>
+            <p>Permanently purges a document, its physical asset, and vector embeddings.  WHAT: Cascades deletion across database storage, file system repositories, and Qdrant vector collections.  WHY: Complete multi-store cascading purge prevents orphaned vector embeddings from polluting future semantic RAG searches or consuming disk space.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Status map confirming purge.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public deleteDocumen <strong>t</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Map.of( &quot;success&quot;, Object true, Object &quot;message&quot;, &quot;Document &quot; + guid + &quot; purged from MongoDB, local drive, and Qdrant.&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">regenerateSummary</div>
+            <div><span class="annotation">@PostMapping(&quot;/{guid}/summarize&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Trigger summary regeneration for a specific model (llama or mistral)&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;SummaryRecord&gt; <strong>regenerateSummary</strong>(Object param, Object param)
+            </div>
+            <p>Triggers summary regeneration for a specific model (Llama 3.3 or Mistral Large).  WHAT: Sends document content to the requested Ollama model engine and updates the document&#39;s summary map.  WHY: Allows researchers to benchmark individual models independently or recompute summaries if model parameters, system prompts, or upstream context changes.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Document GUID.</dd><dd><code>request</code> - {@link SummarizeRequest} indicating target model engine.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Newly computed {@link SummaryRecord}.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getEntityByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public generateSummaryForMode <strong>l</strong>(Object request.getModel()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public getBibte <strong>x</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getFullConten <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public getBibte <strong>x</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public getSummarie <strong>s</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-31">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public setEditDat <strong>e</strong>(Object java.time.Instant.now()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-32">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getDocumentByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-33">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object newSummary)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-34">
+            <div class="detail-title">chatWithDocument</div>
+            <div><span class="annotation">@PostMapping(&quot;/{guid}/chat&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Conversational chat with document assistant via Qdrant RAG and Llama 3.3&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;ChatResponse&gt; <strong>chatWithDocument</strong>(Object param, Object param)
+            </div>
+            <p>Interactive RAG conversational chat scoped to the active document.  WHAT: Queries Qdrant vector store for semantic citations matching the user&#39;s question, constructs a grounded contextual prompt, and generates an answer via Llama 3.3.  WHY: RAG grounding constrains the model&#39;s responses to verified excerpts from the active document, returning exact citation snippets and similarity scores to eliminate factual hallucination.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Document GUID.</dd><dd><code>request</code> - {@link ChatRequest} with question and conversation history.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link ChatResponse} with answer and grounded citations.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-35">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getEntityByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-36">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public chatWithDocumen <strong>t</strong>(Object doc, Object request)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-37">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object response)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

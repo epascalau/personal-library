@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenApiConfig (com.personallibrary.config) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.config.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.config.html">com.personallibrary.config</a> &gt;
+      <strong>OpenApiConfig</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.config</div>
+        <h2>class OpenApiConfig</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Configuration</span> </div>
+        <div class="signature">
+          public class <strong>OpenApiConfig</strong>
+          
+          
+        </div>
+        <p>OpenAPI 3.0.3 and Swagger UI configuration. Generates API documentation contracts and defines Keycloak Bearer JWT security schemes.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>securitySchemeName</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public OpenAPI</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">customOpenAPI</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Constructs the root OpenAPI specification document with metadata, endpoints, and security schemes.  WHAT: Assembles the OpenAPI 3.0 descriptor with title, version, contact details, global security requirements, and a Bearer HTTP JWT security scheme named `KeycloakBearerAuth`. WHY: Standardizes machine-readable REST API contracts, enabling automated client generation, Swagger UI testing, and in-app OpenAPI YAML viewer inspection while explicitly documenting Keycloak token expectations.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">OpenAPI</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public inf</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">o</a></strong>(new Info()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public titl</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">e</a></strong>(&quot;Personal Library API&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public versio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">n</a></strong>(Object &quot;1.0.0&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public descriptio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">n</a></strong>(&quot;Enterprise-grade AI document management system API. Supports document uploads, BibTeX metadata auto-extraction, vector-powered semantic search, dual-model AI summarization (Llama and Mistral)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public contac</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">t</a></strong>(new Contact()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public nam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">e</a></strong>(&quot;Personal Library Architecture Team&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public emai</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">l</a></strong>(Object &quot;support)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addSecurityIte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">m</a></strong>(new SecurityRequirement()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public component</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">s</a></strong>(new Components()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addSecurityScheme</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">s</a></strong>(Object securitySchemeName, new SecurityScheme()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public nam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">e</a></strong>(Object securitySchemeName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public typ</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">e</a></strong>(Object SecurityScheme.Type.HTTP)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public schem</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">e</a></strong>(Object &quot;bearer&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public bearerForma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">t</a></strong>(Object &quot;JWT&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public descriptio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">n</a></strong>(&quot;Keycloak OIDC Bearer Token&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">customOpenAPI</div>
+            <div><span class="annotation">@Bean</span> </div>
+            <div class="signature">
+              public OpenAPI <strong>customOpenAPI</strong>()
+            </div>
+            <p>Constructs the root OpenAPI specification document with metadata, endpoints, and security schemes.  WHAT: Assembles the OpenAPI 3.0 descriptor with title, version, contact details, global security requirements, and a Bearer HTTP JWT security scheme named `KeycloakBearerAuth`. WHY: Standardizes machine-readable REST API contracts, enabling automated client generation, Swagger UI testing, and in-app OpenAPI YAML viewer inspection while explicitly documenting Keycloak token expectations.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Fully configured {@link OpenAPI} object.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">OpenAPI</div>
+            
+            <div class="signature">
+              public new <strong>OpenAPI</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">o</div>
+            
+            <div class="signature">
+              public inf <strong>o</strong>(new Info()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public titl <strong>e</strong>(&quot;Personal Library API&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public versio <strong>n</strong>(Object &quot;1.0.0&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public descriptio <strong>n</strong>(&quot;Enterprise-grade AI document management system API. Supports document uploads, BibTeX metadata auto-extraction, vector-powered semantic search, dual-model AI summarization (Llama and Mistral)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public contac <strong>t</strong>(new Contact()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public nam <strong>e</strong>(&quot;Personal Library Architecture Team&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public emai <strong>l</strong>(Object &quot;support)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">m</div>
+            
+            <div class="signature">
+              public addSecurityIte <strong>m</strong>(new SecurityRequirement()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public component <strong>s</strong>(new Components()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public addSecurityScheme <strong>s</strong>(Object securitySchemeName, new SecurityScheme()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public nam <strong>e</strong>(Object securitySchemeName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public typ <strong>e</strong>(Object SecurityScheme.Type.HTTP)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public schem <strong>e</strong>(Object &quot;bearer&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public bearerForma <strong>t</strong>(Object &quot;JWT&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public descriptio <strong>n</strong>(&quot;Keycloak OIDC Bearer Token&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

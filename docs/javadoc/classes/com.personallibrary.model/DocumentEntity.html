@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentEntity (com.personallibrary.model) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.model.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.model.html">com.personallibrary.model</a> &gt;
+      <strong>DocumentEntity</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.model</div>
+        <h2>class DocumentEntity</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span>  <span class="annotation">@Document(collection = &quot;documents&quot;)</span> </div>
+        <div class="signature">
+          public class <strong>DocumentEntity</strong>
+          
+          
+        </div>
+        <p>MongoDB document entity representing an ingested document in the enterprise library. Persists bibliographic attributes, physical file location, AI-generated dual-model summaries, and associated vector index chunks.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>guid</code></td>
+                <td class="desc-col">Unique identifier (GUID / UUID) for this document. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>previousVersionGuid</code></td>
+                <td class="desc-col">Lineage tracking for versioning: links to the previous document GUID if overwritten. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Integer</td>
+                <td class="name-col"><code>versionNumber</code></td>
+                <td class="desc-col">Incremental version number (1, 2, 3...). /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileName</code></td>
+                <td class="desc-col">Original file name with extension. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Long</td>
+                <td class="name-col"><code>fileSize</code></td>
+                <td class="desc-col">File size in bytes. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileSizeFormatted</code></td>
+                <td class="desc-col">Human-readable formatted file size (e.g. &quot;1.4 MB&quot;). /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>format</code></td>
+                <td class="desc-col">File format extension (e.g. &quot;pdf&quot;, &quot;docx&quot;, &quot;txt&quot;). /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>physicalFilePath</code></td>
+                <td class="desc-col">Physical file storage path on server disk or volume. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Instant</td>
+                <td class="name-col"><code>uploadDate</code></td>
+                <td class="desc-col">Document initial creation/upload timestamp. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Instant</td>
+                <td class="name-col"><code>editDate</code></td>
+                <td class="desc-col">Latest modification or version overwrite timestamp. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="name-col"><code>bibtex</code></td>
+                <td class="desc-col">Structured BibTeX bibliographic metadata object. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>bibtexRaw</code></td>
+                <td class="desc-col">Raw formatted RFC BibTeX citation string. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>contentExcerpt</code></td>
+                <td class="desc-col">Brief excerpt of document content for list displays. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fullContent</code></td>
+                <td class="desc-col">Full extracted text content of the document. /</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public String</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">formatBytes</a></strong>(long bytes)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Converts a raw byte count into a readable binary string (B, KB, MB).  WHAT: Formats raw byte count into human-readable B, KB, or MB units formatted to one decimal place. WHY: Standardizes byte formatting for consistent display in both the SAP Horizon List Report and Object Page without duplicating conversion algorithms across client and server layers.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">f</a></strong>(bytes &lt; 1024)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">f</a></strong>(bytes &lt; 1024 * 1024)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public forma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">t</a></strong>(&quot;%.1f MB&quot;, bytes / (1024.0 * 1024.0)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">formatBytes</div>
+            
+            <div class="signature">
+              public String <strong>formatBytes</strong>(long bytes)
+            </div>
+            <p>Converts a raw byte count into a readable binary string (B, KB, MB).  WHAT: Formats raw byte count into human-readable B, KB, or MB units formatted to one decimal place. WHY: Standardizes byte formatting for consistent display in both the SAP Horizon List Report and Object Page without duplicating conversion algorithms across client and server layers.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>bytes</code> - Number of bytes.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Formatted size string.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(bytes &lt; 1024)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(bytes &lt; 1024 * 1024)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(&quot;%.1f MB&quot;, bytes / (1024.0 * 1024.0)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,10 @@ public class StorageService {
     /**
      * Initializes storage root directory and Apache Tika parser engine.
      *
+     * WHAT: Resolves storage root path, instantiates Apache Tika parser, and ensures root directories exist.
+     * WHY: Initializing filesystem directories eagerly during service construction prevents file creation race conditions
+     * during subsequent high-concurrency document uploads.
+     *
      * @param uploadDir Storage root directory path configured in properties.
      */
     public StorageService(@Value("${app.storage.upload-dir:./storage/documents}") String uploadDir) {
@@ -45,6 +53,10 @@ public class StorageService {
 
     /**
      * Stores a physical uploaded file to the local disk under a unique GUID directory.
+     *
+     * WHAT: Cleans original filename, creates subdirectory named by document GUID, and writes stream with REPLACE_EXISTING.
+     * WHY: Subdividing files into GUID-isolated folders prevents filename collision and preserves version isolation
+     * across documents sharing identical original filenames.
      *
      * @param file Uploaded multipart file.
      * @param guid Unique document identifier.
@@ -65,6 +77,10 @@ public class StorageService {
     /**
      * Extracts full plain text content from a file using Apache Tika.
      *
+     * WHAT: Invokes Apache Tika parser to extract text across PDF, DOCX, TXT, and office documents with fallback string on failure.
+     * WHY: Apache Tika provides content-detection and metadata extraction across hundreds of file types,
+     * delivering uniform plain text to downstream vector embedding and summarization pipelines.
+     *
      * @param filePath Path to the physical file on disk.
      * @return Extracted plain text string content.
      */
@@ -80,6 +96,10 @@ public class StorageService {
 
     /**
      * Purges physical files and directory for a specified document GUID.
+     *
+     * WHAT: Recursively walks the GUID directory in bottom-up reverse order and deletes each file and subfolder.
+     * WHY: Bottom-up deletion ensures child files are deleted before parent directories, guaranteeing clean removal
+     * without left-over orphaned disk assets.
      *
      * @param guid Unique document identifier.
      */
@@ -103,3 +123,4 @@ public class StorageService {
         }
     }
 }
+

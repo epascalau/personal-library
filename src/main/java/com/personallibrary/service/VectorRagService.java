@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.service;
 
 import com.personallibrary.dto.ChatRequest;
@@ -33,6 +37,9 @@ public class VectorRagService {
     /**
      * Constructs the Vector RAG service with the Qdrant vector store and Llama chat client.
      *
+     * WHAT: Injects Spring AI VectorStore and qualified LlamaChatClient.
+     * WHY: Pairs high-dimensional vector search with Llama 3.3 instruction-following model for conversational QA.
+     *
      * @param vectorStore     Spring AI Qdrant VectorStore implementation.
      * @param llamaChatClient Llama 3.3 chat model client.
      */
@@ -45,6 +52,11 @@ public class VectorRagService {
 
     /**
      * Splits full text into semantic chunks and ingests embeddings into Qdrant Vector Store.
+     *
+     * WHAT: Partitions text into paragraph-aligned chunks (~400 chars), assigns unique chunk IDs,
+     * attaches document GUID metadata, and ingests into Qdrant VectorStore.
+     * WHY: Paragraph-boundary chunking preserves natural sentence semantics, avoiding truncated ideas
+     * while producing fine-grained vectors for accurate cosine similarity retrieval.
      *
      * @param docGuid Unique document identifier.
      * @param text    Full text body of the document.
@@ -114,6 +126,12 @@ public class VectorRagService {
 
     /**
      * Executes RAG conversational inference over the specific document context.
+     *
+     * WHAT: Performs cosine similarity search in Qdrant for top-4 passages matching the user question,
+     * scopes matches to the target document GUID, constructs a grounded system prompt, invokes Llama 3.3,
+     * and packages the answer with verifiable citations and excerpts.
+     * WHY: Enforces strict retrieval grounding to eliminate hallucinations, providing academic researchers
+     * with verifiable snippet citations referencing the exact source paragraphs.
      *
      * @param docEntity Target document entity providing document metadata and content fallback.
      * @param request   User question and dialogue history.
@@ -204,3 +222,4 @@ public class VectorRagService {
                 .build();
     }
 }
+

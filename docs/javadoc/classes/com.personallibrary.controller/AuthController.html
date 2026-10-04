@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AuthController (com.personallibrary.controller) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.controller.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.controller.html">com.personallibrary.controller</a> &gt;
+      <strong>AuthController</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.controller</div>
+        <h2>class AuthController</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@RestController</span>  <span class="annotation">@RequestMapping(&quot;/api/v1/auth&quot;)</span>  <span class="annotation">@Tag(name = &quot;Authentication&quot;, description = &quot;Keycloak / OIDC client session and profile endpoints&quot;)</span> </div>
+        <div class="signature">
+          public class <strong>AuthController</strong>
+          
+          
+        </div>
+        <p>Controller handling Keycloak OpenID Connect authentication session probing, userinfo resolution, and token exchange.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public Object&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">getUserInfo</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves the profile and roles of the currently authenticated Keycloak user.  WHAT: Resolves claims (subject ID, username, email, full name, realm roles) from the active Spring Security JWT principal. If running in local mock development without an active OAuth2 authorization server, provides a default administrative persona.  WHY: Inspecting claims via `@AuthenticationPrincipal Jwt` leverages Spring Security&#39;s native reactive context instead of manual bearer header parsing, while the mock fallback ensures uninterrupted offline development and automated testing without requiring a live Keycloak Docker container.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">f</a></strong>(jwt == null)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">k</a></strong>(Map.of( &quot;id&quot;, Object &quot;usr-keycloak-101&quot;, Object &quot;username&quot;, Object &quot;emilian.pascalau&quot;, Object &quot;email&quot;, Object &quot;emilian.pascalau, Object &quot;name&quot;, &quot;Emilian Pascalau&quot;, Object &quot;roles&quot;, Object List.of(&quot;LIBRARY_ADMIN&quot;, Object &quot;RESEARCHER&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public no</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">w</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">k</a></strong>(Map.of( &quot;id&quot;, Object jwt.getSubject()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getClaimAsStrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">g</a></strong>(Object &quot;preferred_username&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getClaimAsStrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">g</a></strong>(Object &quot;email&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getClaimAsStrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">g</a></strong>(Object &quot;name&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getClaimAsStringLis</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">t</a></strong>(Object &quot;roles&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Object&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">login</a></strong>(Object &lt;String, String&gt; credentials)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Direct authentication or mock token exchange for development workflows.  WHAT: Accepts username/password credentials and issues a signed or development bearer JWT with associated user identity and role scopes.  WHY: Provides a seamless authentication endpoint for single-page applications and CLI scripts that prefer direct token issuance over browser redirect-based authorization code flows during local sandbox evaluation.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getOrDefaul</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">t</a></strong>(Object &quot;username&quot;, Object &quot;emilian.pascalau)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">k</a></strong>(Map.of( &quot;accessToken&quot;, &quot;kc_jwt_&quot; + System.currentTimeMillis()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">f</a></strong>(Object &quot;id&quot;, &quot;usr-kc-&quot; + username.hashCode()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public spli</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">t</a></strong>(Object &quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public spli</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">t</a></strong>(Object &quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">f</a></strong>(Object &quot;LIBRARY_ADMIN&quot;, Object &quot;RESEARCHER&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getOrDefaul</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">t</a></strong>(Object &quot;realm&quot;, Object &quot;personal-library-realm&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Object&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">logout</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Invalidates active Keycloak authentication session.  WHAT: Signals the client that the authentication session is terminated and returns success confirmation.  WHY: Explicit logout endpoints ensure client applications can cleanly purge stored JWTs, clear session caches, and prevent unauthorized reuse of lingering tokens on shared multi-user workstations.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">k</a></strong>(Map.of( &quot;success&quot;, Object true, Object &quot;message&quot;, &quot;Keycloak OIDC session terminated successfully.&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">getUserInfo</div>
+            <div><span class="annotation">@GetMapping(&quot;/userinfo&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Get current authenticated Keycloak user profile&quot;)</span> </div>
+            <div class="signature">
+              public Object&gt;&gt; <strong>getUserInfo</strong>(Object param)
+            </div>
+            <p>Retrieves the profile and roles of the currently authenticated Keycloak user.  WHAT: Resolves claims (subject ID, username, email, full name, realm roles) from the active Spring Security JWT principal. If running in local mock development without an active OAuth2 authorization server, provides a default administrative persona.  WHY: Inspecting claims via `@AuthenticationPrincipal Jwt` leverages Spring Security&#39;s native reactive context instead of manual bearer header parsing, while the mock fallback ensures uninterrupted offline development and automated testing without requiring a live Keycloak Docker container.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>jwt</code> - Decoded bearer JWT injected by Spring Security.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>User profile details including user ID, name, email, roles, and active realm.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(jwt == null)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Map.of( &quot;id&quot;, Object &quot;usr-keycloak-101&quot;, Object &quot;username&quot;, Object &quot;emilian.pascalau&quot;, Object &quot;email&quot;, Object &quot;emilian.pascalau, Object &quot;name&quot;, &quot;Emilian Pascalau&quot;, Object &quot;roles&quot;, Object List.of(&quot;LIBRARY_ADMIN&quot;, Object &quot;RESEARCHER&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">w</div>
+            
+            <div class="signature">
+              public no <strong>w</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Map.of( &quot;id&quot;, Object jwt.getSubject()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public getClaimAsStrin <strong>g</strong>(Object &quot;preferred_username&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public getClaimAsStrin <strong>g</strong>(Object &quot;email&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public getClaimAsStrin <strong>g</strong>(Object &quot;name&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getClaimAsStringLis <strong>t</strong>(Object &quot;roles&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">login</div>
+            <div><span class="annotation">@PostMapping(&quot;/login&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Direct authentication or OIDC token exchange&quot;)</span> </div>
+            <div class="signature">
+              public Object&gt;&gt; <strong>login</strong>(Object &lt;String, String&gt; credentials)
+            </div>
+            <p>Direct authentication or mock token exchange for development workflows.  WHAT: Accepts username/password credentials and issues a signed or development bearer JWT with associated user identity and role scopes.  WHY: Provides a seamless authentication endpoint for single-page applications and CLI scripts that prefer direct token issuance over browser redirect-based authorization code flows during local sandbox evaluation.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>credentials</code> - Map containing username, password, and realm.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Bearer token response bundle.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getOrDefaul <strong>t</strong>(Object &quot;username&quot;, Object &quot;emilian.pascalau)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Map.of( &quot;accessToken&quot;, &quot;kc_jwt_&quot; + System.currentTimeMillis()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public o <strong>f</strong>(Object &quot;id&quot;, &quot;usr-kc-&quot; + username.hashCode()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public spli <strong>t</strong>(Object &quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public spli <strong>t</strong>(Object &quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public o <strong>f</strong>(Object &quot;LIBRARY_ADMIN&quot;, Object &quot;RESEARCHER&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getOrDefaul <strong>t</strong>(Object &quot;realm&quot;, Object &quot;personal-library-realm&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">logout</div>
+            <div><span class="annotation">@PostMapping(&quot;/logout&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Terminate Keycloak session&quot;)</span> </div>
+            <div class="signature">
+              public Object&gt;&gt; <strong>logout</strong>()
+            </div>
+            <p>Invalidates active Keycloak authentication session.  WHAT: Signals the client that the authentication session is terminated and returns success confirmation.  WHY: Explicit logout endpoints ensure client applications can cleanly purge stored JWTs, clear session caches, and prevent unauthorized reuse of lingering tokens on shared multi-user workstations.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Confirmation response.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Map.of( &quot;success&quot;, Object true, Object &quot;message&quot;, &quot;Keycloak OIDC session terminated successfully.&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

@@ -1,3 +1,14 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Vite build and development configuration for Personal Library frontend.
+ *
+ * WHAT: Configures frontend root (`src/main/frontend`), public assets, Tailwind CSS plugin, and `./dist` build destination.
+ * WHY: Placing frontend source under `src/main/frontend` mirrors standard Maven/Gradle Spring Boot directory layouts
+ * while emitting the compiled bundle directly to `./dist` for Express static serving.
+ */
+
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 import {defineConfig} from 'vite';

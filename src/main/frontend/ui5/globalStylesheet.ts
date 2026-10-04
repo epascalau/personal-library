@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Pierces the UI5 Web Components shadow DOM with a single shared stylesheet so
  * the application's SAP Horizon theming (see public/styles.css) applies to the
@@ -27,6 +27,13 @@ const importText = `@import url('${GLOBAL_STYLESHEET_URL}');`;
 const STYLE_TAG_KEY = '__plibStyleTag';
 const CALLBACK_KEY = '__plibAttachStyleCallback';
 
+/**
+ * Injects a fallback `<style>` tag into elements that bypass `adoptedStyleSheets`.
+ *
+ * WHAT: Creates a `<style>` element containing an `@import` rule and appends it to the component's shadow root.
+ * WHY: Certain complex custom elements (like `ui5-busy-indicator` or `ui5-slider`) reset or isolate their inner shadow DOM
+ * dynamically, requiring an inline style tag rather than purely relying on `adoptedStyleSheets`.
+ */
 const attachStylesTag = function (this: UI5Element) {
   const state = this._state as unknown as MutableState;
   if (this.shadowRoot && !state[STYLE_TAG_KEY]) {
@@ -37,6 +44,13 @@ const attachStylesTag = function (this: UI5Element) {
   }
 };
 
+/**
+ * Ensures the style tag injection callback is registered for elements in `tagsRequiringStyleTagSet`.
+ *
+ * WHAT: Attaches `attachStylesTag` to the component's state-finalized lifecycle hook if not already registered.
+ * WHY: Registering in the finalized lifecycle stage guarantees that the shadow root DOM has been generated
+ * before the `<style>` tag is inserted.
+ */
 const ensureStyleTagCallback = function (this: UI5Element) {
   const state = this._state as unknown as MutableState;
   if (tagsRequiringStyleTagSet.has(this.tagName) && !state[CALLBACK_KEY]) {
@@ -48,6 +62,20 @@ const ensureStyleTagCallback = function (this: UI5Element) {
 
 let patchApplied = false;
 
+/**
+ * Monkey-patches UI5Element prototype lifecycle hooks to pierce Web Component shadow DOM trees.
+ *
+ * WHAT:
+ * 1. Adopts `globalStylesheet` into `document.adoptedStyleSheets`.
+ * 2. Intercepts `onAfterRendering` to adopt `globalStylesheet` into each component's `shadowRoot.adoptedStyleSheets`.
+ * 3. Patches `_initShadowRoot`, `onEnterDOM`, and `onExitDOM` to safely inject and clean up style tags for edge-case elements.
+ *
+ * WHY:
+ * UI5 Web Components encapsulate their styles in Shadow Roots, which ignores document-level Tailwind CSS by default.
+ * Monkey-patching the UI5Element base prototype applies enterprise Horizon theming uniformly across all custom element
+ * shadow roots without modifying third-party vendor bundles, and detaching sheets on `onExitDOM` prevents memory leaks
+ * from retaining detached DOM nodes in memory.
+ */
 export const applyGlobalStylesheetPatch = (): void => {
   if (patchApplied) {
     return;
@@ -119,7 +147,14 @@ export const applyGlobalStylesheetPatch = (): void => {
 };
 
 /**
- * async retrieval of styles and update of the global stylesheet instance
+ * Asynchronously downloads the enterprise CSS stylesheet and populates `globalStylesheet`.
+ *
+ * WHAT: Fetches CSS text from `url` (defaults to `/styles.css`) and calls `globalStylesheet.replaceSync(css)`.
+ * WHY: Using `replaceSync` on a constructed `CSSStyleSheet` instantly updates styles across the document
+ * and all participating shadow roots simultaneously in a single atomic browser paint.
+ *
+ * @param url URL to fetch CSS rules from.
+ * @returns Promise that resolves when the stylesheet has been updated.
  */
 export const loadGlobalStylesheet = async (url = GLOBAL_STYLESHEET_URL): Promise<void> => {
   const css = await (await fetch(url)).text();

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentRepositoryCustomImpl (com.personallibrary.repository) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.repository.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.repository.html">com.personallibrary.repository</a> &gt;
+      <strong>DocumentRepositoryCustomImpl</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.repository</div>
+        <h2>class DocumentRepositoryCustomImpl</h2>
+        
+        <div class="signature">
+          public class <strong>DocumentRepositoryCustomImpl</strong>
+          
+          implements DocumentRepositoryCustom
+        </div>
+        <p>{@link MongoTemplate} backed implementation of the dynamic document search.  &lt;p&gt;Criteria are appended only for the filters the caller actually supplied, which keeps the emitted MongoDB query minimal and index friendly. All user supplied terms are quoted via {@link Pattern#quote(String)} so that regular expression metacharacters in search input are treated as literals rather than altering the query semantics.&lt;/p&gt;  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-10-02</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private MongoTemplate</td>
+                <td class="name-col"><code>mongoTemplate</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public DocumentRepositoryCustomImp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">l</a></strong>(MongoTemplate mongoTemplate)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Creates the fragment implementation.  WHAT: Initializes custom repository fragment with Spring Data MongoTemplate. WHY: Injects MongoTemplate dependency for programmatic MongoDB query compilation and execution.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Page&lt;DocumentEntity&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">searchDocuments</a></strong>(String fileName, String title, String author, String edition, String format, String content, Pageable pageable)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">{@inheritDoc}  WHAT: Builds Criteria conjunction from non-blank filters, counts matching documents, and executes paginated find. WHY: Running the count against the unpaged query guarantees accurate totalCount calculation for the List Report pager, while safe regex quoting prevents regex injection attacks. /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addContain</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">s</a></strong>(Object filters, Object &quot;fileName&quot;, Object fileName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addContain</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">s</a></strong>(Object filters, Object &quot;bibtex.title&quot;, Object title)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addContain</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">s</a></strong>(Object filters, Object &quot;bibtex.author&quot;, Object author)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addContain</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">s</a></strong>(Object filters, Object &quot;bibtex.edition&quot;, Object edition)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">f</a></strong>(Object hasText(format)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">d</a></strong>(Object Criteria.where(&quot;format&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">f</a></strong>(Object hasText(content)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public containsIgnoreCas</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">e</a></strong>(Object content)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">d</a></strong>(new Criteria()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public wher</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">e</a></strong>(Object &quot;fullContent&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public wher</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">e</a></strong>(Object &quot;chunks.text&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public wher</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">e</a></strong>(Object &quot;bibtex.abstractText&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public wher</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">e</a></strong>(Object &quot;bibtex.keywords&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">Query</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">f</a></strong>(Object !filters.isEmpty()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public addCriteri</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">a</a></strong>(new Criteria()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public coun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">t</a></strong>(Object Query.of(query)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">d</a></strong>(Object query.with(pageable)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getPag</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">e</a></strong>(Object documents, Object pageable, Object ()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private void</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">addContains</a></strong>(List&lt;Criteria&gt; filters, String field, String value)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Appends a case-insensitive &quot;contains&quot; criterion when the supplied value carries text.  WHAT: Compiles regex pattern and adds Criteria.where(field).regex(term) if value has text. WHY: Avoids polluting MongoDB query trees with null criteria branches for empty search inputs.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">f</a></strong>(Object hasText(value)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">d</a></strong>(Object Criteria.where(field)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Pattern</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">containsIgnoreCase</a></strong>(String value)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Builds a case-insensitive substring pattern from a literal search term.  WHAT: Trims input, applies Pattern.quote(), and compiles with CASE_INSENSITIVE flag. WHY: Ensures special characters like parentheses, brackets, or dots in user search queries are treated as exact literal text rather than regex tokens.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public compil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">e</a></strong>(Object Pattern.quote(value.trim()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Pattern</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">exactIgnoreCase</a></strong>(String value)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Builds a case-insensitive whole-value pattern from a literal term.  WHAT: Trims input, quotes with Pattern.quote(), anchors with ^ and $, and compiles with CASE_INSENSITIVE. WHY: Enforces strict equality for categorical fields such as file format (&quot;pdf&quot;, &quot;docx&quot;) while ignoring case.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public compil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">e</a></strong>(&quot;^&quot; + Pattern.quote(value.trim()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private boolean</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">hasText</a></strong>(String value)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Determines whether an optional filter value should be applied.  WHAT: Checks if value is non-null and not blank. WHY: Safely eliminates empty string queries from generating redundant database predicates.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public isBlan</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">k</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public DocumentRepositoryCustomImp <strong>l</strong>(MongoTemplate mongoTemplate)
+            </div>
+            <p>Creates the fragment implementation.  WHAT: Initializes custom repository fragment with Spring Data MongoTemplate. WHY: Injects MongoTemplate dependency for programmatic MongoDB query compilation and execution.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>mongoTemplate</code> - Template used to execute the dynamically assembled query.</dd>
+              </dl>
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">searchDocuments</div>
+            <div><span class="annotation">@Override</span> </div>
+            <div class="signature">
+              public Page&lt;DocumentEntity&gt; <strong>searchDocuments</strong>(String fileName, String title, String author, String edition, String format, String content, Pageable pageable)
+            </div>
+            <p>{@inheritDoc}  WHAT: Builds Criteria conjunction from non-blank filters, counts matching documents, and executes paginated find. WHY: Running the count against the unpaged query guarantees accurate totalCount calculation for the List Report pager, while safe regex quoting prevents regex injection attacks. /</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public addContain <strong>s</strong>(Object filters, Object &quot;fileName&quot;, Object fileName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public addContain <strong>s</strong>(Object filters, Object &quot;bibtex.title&quot;, Object title)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public addContain <strong>s</strong>(Object filters, Object &quot;bibtex.author&quot;, Object author)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public addContain <strong>s</strong>(Object filters, Object &quot;bibtex.edition&quot;, Object edition)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object hasText(format)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object Criteria.where(&quot;format&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object hasText(content)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public containsIgnoreCas <strong>e</strong>(Object content)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(new Criteria()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public wher <strong>e</strong>(Object &quot;fullContent&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public wher <strong>e</strong>(Object &quot;chunks.text&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public wher <strong>e</strong>(Object &quot;bibtex.abstractText&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public wher <strong>e</strong>(Object &quot;bibtex.keywords&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">Query</div>
+            
+            <div class="signature">
+              public new <strong>Query</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object !filters.isEmpty()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">a</div>
+            
+            <div class="signature">
+              public addCriteri <strong>a</strong>(new Criteria()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public coun <strong>t</strong>(Object Query.of(query)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public fin <strong>d</strong>(Object query.with(pageable)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public getPag <strong>e</strong>(Object documents, Object pageable, Object ()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">addContains</div>
+            
+            <div class="signature">
+              private void <strong>addContains</strong>(List&lt;Criteria&gt; filters, String field, String value)
+            </div>
+            <p>Appends a case-insensitive &quot;contains&quot; criterion when the supplied value carries text.  WHAT: Compiles regex pattern and adds Criteria.where(field).regex(term) if value has text. WHY: Avoids polluting MongoDB query trees with null criteria branches for empty search inputs.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>filters</code> - Mutable criteria accumulator.</dd><dd><code>field</code> - Target MongoDB document field path.</dd><dd><code>value</code> - Optional user supplied search term.</dd>
+              </dl>
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object hasText(value)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object Criteria.where(field)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">containsIgnoreCase</div>
+            
+            <div class="signature">
+              private Pattern <strong>containsIgnoreCase</strong>(String value)
+            </div>
+            <p>Builds a case-insensitive substring pattern from a literal search term.  WHAT: Trims input, applies Pattern.quote(), and compiles with CASE_INSENSITIVE flag. WHY: Ensures special characters like parentheses, brackets, or dots in user search queries are treated as exact literal text rather than regex tokens.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>value</code> - Raw user input.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Compiled pattern matching any occurrence of the literal term.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public compil <strong>e</strong>(Object Pattern.quote(value.trim()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">exactIgnoreCase</div>
+            
+            <div class="signature">
+              private Pattern <strong>exactIgnoreCase</strong>(String value)
+            </div>
+            <p>Builds a case-insensitive whole-value pattern from a literal term.  WHAT: Trims input, quotes with Pattern.quote(), anchors with ^ and $, and compiles with CASE_INSENSITIVE. WHY: Enforces strict equality for categorical fields such as file format (&quot;pdf&quot;, &quot;docx&quot;) while ignoring case.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>value</code> - Raw user input.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Compiled anchored pattern matching the complete field value.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public compil <strong>e</strong>(&quot;^&quot; + Pattern.quote(value.trim()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">hasText</div>
+            
+            <div class="signature">
+              private boolean <strong>hasText</strong>(String value)
+            </div>
+            <p>Determines whether an optional filter value should be applied.  WHAT: Checks if value is non-null and not blank. WHY: Safely eliminates empty string queries from generating redundant database predicates.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>value</code> - Candidate filter value.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@code true} if the value is non-null and not blank.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public isBlan <strong>k</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

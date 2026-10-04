@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla + UI5 replacement for `components/ShellBar.tsx`.
  *
@@ -42,11 +42,26 @@ const PROFILE_TRIGGER_ID = 'plib-profile-trigger';
 export class ShellBarView extends Component<void> {
   private readonly languageSelector = this.own(new LanguageSelectorView({ variant: 'shellbar' }));
 
+  /**
+   * Constructs the SAP Horizon ShellBar header component.
+   *
+   * WHAT: Initializes the Component base with a `<header>` element and sticky SAP Horizon brand styling.
+   * WHY: Pins the top navigation shell across all floorplans while keeping elevation and theme transitions consistent.
+   */
   constructor() {
     super(undefined as void, 'header',
       'sticky top-0 z-40 bg-[#354a5f] dark:bg-[#161f28] text-white shadow-sm border-b border-[#283848] dark:border-[#24303f] transition-colors duration-200');
   }
 
+  /**
+   * Subscribes the ShellBar to user profile, catalog totals, backend configuration, and theme updates.
+   *
+   * WHAT: Watches `user`, `totalCount`, `config`, `theme`, and `i18nStore`.
+   * WHY:
+   * Crucial UX consideration: Notice that the 30-second background health poll (`backendStore.healthStatus`)
+   * is deliberately omitted from the watched slices here. If the ShellBar re-rendered on every 30s health poll,
+   * any open profile menu or popover would be abruptly closed while the user was interacting with it.
+   */
   protected onMount(): void {
     // Only re-render for the slices actually shown, so the 30s health poll
     // never tears down an open profile popover.
@@ -63,6 +78,14 @@ export class ShellBarView extends Component<void> {
     this.track(i18nStore.subscribe(() => this.requestRender()));
   }
 
+  /**
+   * Generates the developer and enterprise tools menu specification.
+   *
+   * WHAT: Assembles tool definitions for Backend Settings, OpenAPI 3.0, Code Docs (Javadoc/TypeDoc),
+   * AGPLv3 License, and full repository ZIP export.
+   * WHY: Provides researchers and engineers with direct, single-click access to system internals,
+   * specifications, and documentation directly from the user profile popover.
+   */
   private get tools(): ToolEntry[] {
     const t = i18nStore.state.t;
     const config = backendStore.state.config;
@@ -86,6 +109,23 @@ export class ShellBarView extends Component<void> {
         action: () => appStore.openOpenApi()
       },
       {
+        id: 'camunda-bpmn',
+        iconKey: 'GitBranch',
+        tile: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 border-teal-100 dark:border-teal-900/50',
+        title: 'Camunda BPMN 2.0 Workflow',
+        subtitle: 'Document Ingestion, Dual AI & Qdrant RAG Process',
+        action: () => appStore.openBpmnModal()
+      },
+      {
+        id: 'code-docs',
+        iconKey: 'BookOpen',
+        tile: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 border-indigo-100 dark:border-indigo-900/50',
+        title: 'API & Code Docs (Javadoc & TypeDoc)',
+        subtitle: 'Interactive TypeScript & Java Spring Boot documentation',
+        external: true,
+        href: '/docs/'
+      },
+      {
         id: 'license',
         iconKey: 'Scale',
         tile: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 border-emerald-100 dark:border-emerald-900/50',
@@ -106,6 +146,15 @@ export class ShellBarView extends Component<void> {
     ];
   }
 
+  /**
+   * Renders an individual tool item row inside the profile popover.
+   *
+   * WHAT: Generates an anchor tag (for external links/downloads) or a clickable button (for in-app modals).
+   * WHY: Differentiates navigation targets while maintaining consistent SAP Horizon hover styles.
+   *
+   * @param entry Tool definition item.
+   * @returns RawHtml markup for the row.
+   */
   private renderTool(entry: ToolEntry): RawHtml {
     const rowClasses =
       'w-full flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-[#253240] transition-colors border border-transparent hover:border-gray-200 dark:hover:border-[#2e3b4a] text-left cursor-pointer group';
@@ -156,6 +205,16 @@ export class ShellBarView extends Component<void> {
     return html`<button type="button" data-tool="${entry.id}" class="${rowClasses}">${body}</button>`;
   }
 
+  /**
+   * Renders the SAP Fiori Horizon ShellBar template markup.
+   *
+   * WHAT: Generates brand logo, application title, language selector slot, profile popover trigger,
+   * and popover body containing active user details, dual AI model telemetry, and enterprise developer tools.
+   * WHY: Centralizes top-level navigation, system health telemetry, and profile utilities into a cohesive,
+   * accessible header following SAP Fiori design guidelines.
+   *
+   * @returns RawHtml markup representing the complete ShellBar.
+   */
   protected template(): RawHtml {
     const { user, totalCount } = appStore.state;
     const { config } = backendStore.state;
@@ -193,11 +252,16 @@ export class ShellBarView extends Component<void> {
             </svg>
           </div>
 
-          <div class="flex items-baseline gap-2">
+          <div class="flex items-center gap-2.5">
             <span
               class="font-semibold text-lg tracking-tight text-white flex items-center gap-1.5"
             >
               Personal Library
+            </span>
+            <span
+              class="hidden lg:inline-flex items-center text-[11px] text-[#b0c4de] dark:text-[#8ba2be] font-normal border-l border-white/20 pl-2.5 leading-tight tracking-normal"
+            >
+              Educational Sandbox for Enterprise Document Management & RAG
             </span>
           </div>
         </div>
@@ -319,7 +383,7 @@ export class ShellBarView extends Component<void> {
                 <div class="flex items-center justify-between mb-0.5">
                   <span
                     class="font-semibold text-gray-800 dark:text-gray-200 text-[11px] truncate"
-                    >Llama 3.3 (70B)</span
+                    >Llama 3.3 (70B Instruct)</span
                   >
                   <span class="relative flex h-2 w-2 shrink-0 ml-1">
                     <span
@@ -449,6 +513,15 @@ export class ShellBarView extends Component<void> {
     `;
   }
 
+  /**
+   * Binds UI5 popover events, language selector child adoption, navigation handlers, and theme switches.
+   *
+   * WHAT: Adopts LanguageSelectorView into designated slot, links the profile avatar trigger to `ui5-popover`,
+   * syncs ARIA expanded states and chevron rotation, and binds click handlers for home navigation, tool modals,
+   * theme toggles, and logout actions.
+   * WHY: Encapsulates interactive DOM behavior and event delegations safely after the shadow root and DOM tree
+   * are rendered, avoiding premature element access errors while managing UI state transitions.
+   */
   protected afterRender(): void {
     this.adopt('[data-slot="language-selector"]', this.languageSelector);
 

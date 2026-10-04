@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.model;
 
 import lombok.AllArgsConstructor;
@@ -120,6 +124,10 @@ public class DocumentEntity {
     /**
      * Converts a raw byte count into a readable binary string (B, KB, MB).
      *
+     * WHAT: Formats raw byte count into human-readable B, KB, or MB units formatted to one decimal place.
+     * WHY: Standardizes byte formatting for consistent display in both the SAP Horizon List Report and Object Page
+     * without duplicating conversion algorithms across client and server layers.
+     *
      * @param bytes Number of bytes.
      * @return Formatted size string.
      */
@@ -129,3 +137,4 @@ public class DocumentEntity {
         return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
     }
 }
+

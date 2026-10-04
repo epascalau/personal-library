@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla + UI5 replacement for `components/LanguageSelector.tsx`.
  *
@@ -28,14 +28,41 @@ let instanceSeq = 0;
 export class LanguageSelectorView extends Component<LanguageSelectorProps> {
   private readonly uid = `plib-lang-${(instanceSeq += 1)}`;
 
+  /**
+   * Constructs the LanguageSelectorView with a unique element identifier and relative positioning.
+   *
+   * WHAT: Initializes the Component host container with a monotonically incremented UID.
+   * WHY: Generating unique UIDs for each instance prevents DOM ID collisions between the ShellBar
+   * and any secondary footer/settings instances, which is critical because `ui5-popover` requires
+   * an explicit, unambiguous DOM opener reference.
+   *
+   * @param props Visual variant configuration ('shellbar' | 'compact' | 'footer').
+   */
   constructor(props: LanguageSelectorProps = {}) {
     super(props, 'div', 'relative inline-block');
   }
 
+  /**
+   * Establishes reactive subscriptions to the internationalization store.
+   *
+   * WHAT: Subscribes to `i18nStore` updates to request re-render upon locale changes.
+   * WHY: When any component updates the active language, this selector must immediately update
+   * its displayed flag, code badge, and selection checkmark to maintain UI consistency.
+   */
   protected onMount(): void {
     this.track(i18nStore.subscribe(() => this.requestRender()));
   }
 
+  /**
+   * Renders the trigger button and the popup language selection list.
+   *
+   * WHAT: Renders a trigger button containing the globe icon, active national flag, language code,
+   * and a `ui5-popover` element housing the supported language choices (English, German, French, Spanish, Romanian).
+   * WHY: Using SAP UI5's Web Component popover (`ui5-popover`) provides accessibility compliance (ARIA roles,
+   * focus trapping, Escape key handling, and outside-click dismissal) out of the box without manual document listeners.
+   *
+   * @returns RawHtml markup representing the language selector and popover.
+   */
   protected template(): RawHtml {
     const { variant = 'shellbar' } = this.props;
     const { language, currentLanguage, languages } = i18nStore.state;
@@ -111,6 +138,13 @@ export class LanguageSelectorView extends Component<LanguageSelectorProps> {
     `;
   }
 
+  /**
+   * Binds the UI5 Popover instance to its trigger and attaches locale selection click handlers.
+   *
+   * WHAT: Sets the popover `opener` property, toggles `open` on trigger click, and updates `i18nStore` on language selection.
+   * WHY: UI5 Popovers require an explicit DOM element reference via `.opener` rather than a CSS selector string.
+   * Closing the popover immediately upon selection gives instant, responsive feedback to the user.
+   */
   protected afterRender(): void {
     const popover = this.$<Popover>(`#${this.uid}-popover`);
     const trigger = this.$(`#${this.uid}-trigger`);

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentUploadRequest (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>DocumentUploadRequest</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class DocumentUploadRequest</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>DocumentUploadRequest</strong>
+          
+          
+        </div>
+        <p>Data Transfer Object containing document upload metadata and optional content payload when submitting documents via JSON endpoints or API clients.  WHAT: Encapsulates incoming document attributes (file name, format, byte size, raw text, and optional BibTeX metadata). WHY: Decouples multipart form parameters and JSON body payloads from persistence entities, allowing validation and pre-processing before allocating file storage or executing entity persistence.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileName</code></td>
+                <td class="desc-col">Target file name. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileFormat</code></td>
+                <td class="desc-col">File format classification. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Long</td>
+                <td class="name-col"><code>fileSize</code></td>
+                <td class="desc-col">File size in bytes. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileContent</code></td>
+                <td class="desc-col">Raw text content of the document. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="name-col"><code>bibtex</code></td>
+                <td class="desc-col">Optional pre-filled BibTeX metadata. */</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

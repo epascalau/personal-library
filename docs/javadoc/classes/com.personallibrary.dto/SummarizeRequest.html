@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SummarizeRequest (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>SummarizeRequest</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class SummarizeRequest</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>SummarizeRequest</strong>
+          
+          
+        </div>
+        <p>Request payload for re-computing an AI executive or analytical summary for an existing document using a designated Spring AI Ollama model.  WHAT: Validates and transmits the target LLM identifier (&quot;llama&quot; for analytical synthesis or &quot;mistral&quot; for executive summary). WHY: Validating the requested model parameter via regular expression prevents invalid inference model names from triggering unexpected exceptions in the summarization service orchestrator.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>model</code></td>
+                <td class="desc-col">Target AI model identifier (&quot;llama&quot; for analytical synthesis or &quot;mistral&quot; for executive summary). /</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

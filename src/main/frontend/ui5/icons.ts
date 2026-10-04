@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Icon registry. The React implementation used `lucide-react`; each icon it
  * referenced is mapped here onto the closest SAP icon so the visual language
@@ -181,9 +181,20 @@ export interface IconOptions {
 }
 
 /**
- * Renders a decorative or labelled SAP icon.
- * `<ui5-icon>` is `display: inline-block`, so Tailwind sizing utilities such as
- * `w-4 h-4` work exactly as they did on the lucide SVG components.
+ * Renders an accessible SAP UI5 icon mapped from familiar Lucide icon aliases.
+ *
+ * WHAT:
+ * Emits a `<ui5-icon>` custom element referencing the mapped SAP icon name, applying specified CSS classes
+ * and assigning either `accessible-name` for screen-reader announced icons or `aria-hidden="true"` for decorative icons.
+ *
+ * WHY:
+ * 1. Tree-shaking: Importing individual icons rather than `AllIcons.js` saves several hundred kilobytes in bundle size.
+ * 2. Visual consistency: Maps familiar Lucide naming onto the enterprise SAP Fiori icon set, matching Horizon aesthetics.
+ * 3. Accessibility: Automatic `aria-hidden="true"` prevents screen readers from redundantly announcing decorative icons.
+ *
+ * @param key Semantic icon key defined in `Icons` map.
+ * @param options Styling and accessibility parameters.
+ * @returns RawHtml markup representing the UI5 icon.
  */
 export const icon = (key: IconKey, options: IconOptions = {}): RawHtml => {
   const { className = 'w-4 h-4', label } = options;

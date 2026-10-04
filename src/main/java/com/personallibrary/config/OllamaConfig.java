@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.config;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -35,6 +39,10 @@ public class OllamaConfig {
     /**
      * Initializes the low-level Ollama API client.
      *
+     * WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL.
+     * WHY: Centralizes HTTP communication and REST connectivity to the local or remote Ollama daemon,
+     * ensuring connection pooling and uniform base URL resolution across all downstream chat models.
+     *
      * @return Configured {@link OllamaApi} pointing to the host server.
      */
     @Bean
@@ -46,6 +54,10 @@ public class OllamaConfig {
 
     /**
      * Primary ChatModel configured with Llama 3.3 model specifications.
+     *
+     * WHAT: Instantiates an OllamaChatModel backed by Llama 3.3 with temperature set to 0.2.
+     * WHY: Lower temperature (0.2) promotes rigorous factual precision, strict citation grounding,
+     * and minimal hallucination when analyzing complex academic literature, codebases, and RAG contexts.
      *
      * @param ollamaApi Low-level Ollama API client.
      * @return {@link OllamaChatModel} configured for Llama inference.
@@ -65,6 +77,10 @@ public class OllamaConfig {
     /**
      * Secondary ChatModel configured with Mistral Large model specifications.
      *
+     * WHAT: Instantiates an OllamaChatModel backed by Mistral Large with temperature set to 0.3.
+     * WHY: A slightly higher temperature (0.3) enables fluent, expressive natural language synthesis
+     * optimal for high-level executive summaries, architectural takeaways, and concise abstractive overviews.
+     *
      * @param ollamaApi Low-level Ollama API client.
      * @return {@link OllamaChatModel} configured for Mistral inference.
      */
@@ -82,6 +98,10 @@ public class OllamaConfig {
     /**
      * Fluent ChatClient wrapper for the primary Llama chat model.
      *
+     * WHAT: Constructs a high-level Spring AI ChatClient wrapping the primary LlamaChatModel.
+     * WHY: Provides a fluent, builder-based prompt composition API with prompt templates and system prompt
+     * injection capabilities for analytical processing and RAG answering.
+     *
      * @param llamaChatModel Llama Chat Model.
      * @return Configured {@link ChatClient}.
      */
@@ -93,6 +113,10 @@ public class OllamaConfig {
     /**
      * Fluent ChatClient wrapper for the secondary Mistral chat model.
      *
+     * WHAT: Constructs a high-level Spring AI ChatClient wrapping the secondary MistralChatModel.
+     * WHY: Simplifies prompt assembly and response extraction for executive summarization pipelines
+     * using Spring AI's modern ChatClient abstractions.
+     *
      * @param mistralChatModel Mistral Chat Model.
      * @return Configured {@link ChatClient}.
      */
@@ -101,3 +125,4 @@ public class OllamaConfig {
         return ChatClient.builder(mistralChatModel).build();
     }
 }
+

@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VectorRagService (com.personallibrary.service) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.service.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.service.html">com.personallibrary.service</a> &gt;
+      <strong>VectorRagService</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.service</div>
+        <h2>class VectorRagService</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Slf4j</span>  <span class="annotation">@Service</span> </div>
+        <div class="signature">
+          public class <strong>VectorRagService</strong>
+          
+          
+        </div>
+        <p>Service managing semantic document chunking, vector embedding indexing via Qdrant, cosine similarity search, and ground-truth Retrieval-Augmented Generation (RAG) conversational chat.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private VectorStore</td>
+                <td class="name-col"><code>vectorStore</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private ChatClient</td>
+                <td class="name-col"><code>llamaChatClient</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>index</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>chunkId</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>chunkId</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>chunks</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>answer</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public VectorRagServic</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">e</a></strong>(VectorStore vectorStore, Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Constructs the Vector RAG service with the Qdrant vector store and Llama chat client.  WHAT: Injects Spring AI VectorStore and qualified LlamaChatClient. WHY: Pairs high-dimensional vector search with Llama 3.3 instruction-following model for conversational QA.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public List&lt;DocumentChunk&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">indexDocumentChunks</a></strong>(String docGuid, String text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Splits full text into semantic chunks and ingests embeddings into Qdrant Vector Store.  WHAT: Partitions text into paragraph-aligned chunks (~400 chars), assigns unique chunk IDs, attaches document GUID metadata, and ingests into Qdrant VectorStore. WHY: Paragraph-boundary chunking preserves natural sentence semantics, avoiding truncated ideas while producing fine-grained vectors for accurate cosine similarity retrieval.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public spli</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">t</a></strong>(Object &quot;\\n\\s*\\n&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">StringBuilder</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fo</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">r</a></strong>(String para : paragraphs)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">f</a></strong>(Object (current.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public toStrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">g</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">d</a></strong>(Object chunkId)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chunkInde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">x</a></strong>(Object index)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public tex</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">t</a></strong>(Object chunkText)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">d</a></strong>(Object chunk)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">t</a></strong>(Object &quot;documentGuid&quot;, Object docGuid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">t</a></strong>(Object &quot;chunkIndex&quot;, Object index)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">d</a></strong>(new Document(chunkId, Object chunkText, Object metadata)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">StringBuilder</a></strong>(Object para)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">f</a></strong>(Object current.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public appen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">d</a></strong>(Object para)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">f</a></strong>(Object current.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public toStrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">g</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">d</a></strong>(Object DocumentChunk.builder()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">d</a></strong>(Object chunkId)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chunkInde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">x</a></strong>(Object index)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public tex</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">t</a></strong>(Object chunkText)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">t</a></strong>(Object &quot;documentGuid&quot;, Object docGuid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">t</a></strong>(Object &quot;chunkIndex&quot;, Object index)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">d</a></strong>(new Document(chunkId, Object chunkText, Object metadata)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">f</a></strong>(Object !springAiDocs.isEmpty()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">d</a></strong>(Object springAiDocs)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public inf</td>
+                <td class="desc-col">
+                  <strong><a href="#method-31">o</a></strong>(&quot;Indexed {} semantic chunks into Qdrant Vector DB for document: {}&quot;, Object springAiDocs.size()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-32">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public war</td>
+                <td class="desc-col">
+                  <strong><a href="#method-33">n</a></strong>(&quot;Vector store indexing skipped or failed (fallback to in-memory)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ChatResponse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">chatWithDocument</a></strong>(DocumentEntity docEntity, ChatRequest request)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Executes RAG conversational inference over the specific document context.  WHAT: Performs cosine similarity search in Qdrant for top-4 passages matching the user question, scopes matches to the target document GUID, constructs a grounded system prompt, invokes Llama 3.3, and packages the answer with verifiable citations and excerpts. WHY: Enforces strict retrieval grounding to eliminate hallucinations, providing academic researchers with verifiable snippet citations referencing the exact source paragraphs.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getQuestio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">n</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public similaritySearc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-36">h</a></strong>(Object SearchRequest.builder()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public quer</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">y</a></strong>(Object query)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public top</td>
+                <td class="desc-col">
+                  <strong><a href="#method-38">K</a></strong>(Object 4)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public similarityThreshol</td>
+                <td class="desc-col">
+                  <strong><a href="#method-39">d</a></strong>(Object 0.5)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-40">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fo</td>
+                <td class="desc-col">
+                  <strong><a href="#method-41">r</a></strong>(Document doc : similarDocs)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getMetadat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-42">a</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-43">f</a></strong>(docGuid == null || docGuid.equals(docEntity.getGuid()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getMetadat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-44">a</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-45">d</a></strong>(Object ChatResponse.CitationDto.builder()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chunkInde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-46">x</a></strong>(chunkIndex != null ? chunkIndex : 0)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public scor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-47">e</a></strong>(Object 0.88)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public snippe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-48">t</a></strong>(Object doc.getText()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-49">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-50">d</a></strong>(Object doc.getText()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-51">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public war</td>
+                <td class="desc-col">
+                  <strong><a href="#method-52">n</a></strong>(&quot;Qdrant similarity search encountered issue, falling back to document excerpt: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-53">f</a></strong>(Object contextPassages.isEmpty()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getContentExcerp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-54">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-55">f</a></strong>(excerpt != null)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-56">d</a></strong>(Object excerpt)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ad</td>
+                <td class="desc-col">
+                  <strong><a href="#method-57">d</a></strong>(Object ChatResponse.CitationDto.builder()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chunkInde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-58">x</a></strong>(Object 0)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public scor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-59">e</a></strong>(Object 1.0)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public snippe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-60">t</a></strong>(Object excerpt.substring(0, Object Math.min(excerpt.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-61">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public joi</td>
+                <td class="desc-col">
+                  <strong><a href="#method-62">n</a></strong>(Object &quot;\n\n---\n\n&quot;, Object contextPassages)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public forma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-63">t</a></strong>(&quot;&quot;&quot; You are an expert academic research assistant embedded in the Personal Library enterprise system. Answer the user&#39;s question accurately using ONLY the context retrieved below from the document: Title: &quot;%s&quot; Author: %s Retrieved Context: %s Instructions: - Ground your answer strictly on the provided context passages. - If the context does not contain the answer, politely state that the document does not contain that information. - Provide clear, Object direct, and structured explanations. &quot;&quot;&quot;, Object docEntity.getBibtex()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getBibte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-64">x</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public promp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-65">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public syste</td>
+                <td class="desc-col">
+                  <strong><a href="#method-66">m</a></strong>(Object systemPrompt)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public use</td>
+                <td class="desc-col">
+                  <strong><a href="#method-67">r</a></strong>(Object query)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cal</td>
+                <td class="desc-col">
+                  <strong><a href="#method-68">l</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public conten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-69">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-70">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public erro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-71">r</a></strong>(&quot;Error generating RAG answer: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-72">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public answe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-73">r</a></strong>(Object answer)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public modelUse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-74">d</a></strong>(&quot;Ollama Llama 3.3 (70B Instruct)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public citation</td>
+                <td class="desc-col">
+                  <strong><a href="#method-75">s</a></strong>(Object citations)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-76">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public VectorRagServic <strong>e</strong>(VectorStore vectorStore, Object param)
+            </div>
+            <p>Constructs the Vector RAG service with the Qdrant vector store and Llama chat client.  WHAT: Injects Spring AI VectorStore and qualified LlamaChatClient. WHY: Pairs high-dimensional vector search with Llama 3.3 instruction-following model for conversational QA.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>vectorStore</code> - Spring AI Qdrant VectorStore implementation.</dd><dd><code>llamaChatClient</code> - Llama 3.3 chat model client.</dd>
+              </dl>
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">indexDocumentChunks</div>
+            
+            <div class="signature">
+              public List&lt;DocumentChunk&gt; <strong>indexDocumentChunks</strong>(String docGuid, String text)
+            </div>
+            <p>Splits full text into semantic chunks and ingests embeddings into Qdrant Vector Store.  WHAT: Partitions text into paragraph-aligned chunks (~400 chars), assigns unique chunk IDs, attaches document GUID metadata, and ingests into Qdrant VectorStore. WHY: Paragraph-boundary chunking preserves natural sentence semantics, avoiding truncated ideas while producing fine-grained vectors for accurate cosine similarity retrieval.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>docGuid</code> - Unique document identifier.</dd><dd><code>text</code> - Full text body of the document.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>List of persisted {@link DocumentChunk} items.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public spli <strong>t</strong>(Object &quot;\\n\\s*\\n&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">StringBuilder</div>
+            
+            <div class="signature">
+              public new <strong>StringBuilder</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public fo <strong>r</strong>(String para : paragraphs)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object (current.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public toStrin <strong>g</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public i <strong>d</strong>(Object chunkId)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public chunkInde <strong>x</strong>(Object index)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public tex <strong>t</strong>(Object chunkText)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object chunk)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;documentGuid&quot;, Object docGuid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;chunkIndex&quot;, Object index)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(new Document(chunkId, Object chunkText, Object metadata)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">StringBuilder</div>
+            
+            <div class="signature">
+              public new <strong>StringBuilder</strong>(Object para)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object current.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public appen <strong>d</strong>(Object para)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object current.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public toStrin <strong>g</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object DocumentChunk.builder()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public i <strong>d</strong>(Object chunkId)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public chunkInde <strong>x</strong>(Object index)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public tex <strong>t</strong>(Object chunkText)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;documentGuid&quot;, Object docGuid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;chunkIndex&quot;, Object index)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(new Document(chunkId, Object chunkText, Object metadata)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object !springAiDocs.isEmpty()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object springAiDocs)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-31">
+            <div class="detail-title">o</div>
+            
+            <div class="signature">
+              public inf <strong>o</strong>(&quot;Indexed {} semantic chunks into Qdrant Vector DB for document: {}&quot;, Object springAiDocs.size()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-32">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-33">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public war <strong>n</strong>(&quot;Vector store indexing skipped or failed (fallback to in-memory)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-34">
+            <div class="detail-title">chatWithDocument</div>
+            
+            <div class="signature">
+              public ChatResponse <strong>chatWithDocument</strong>(DocumentEntity docEntity, ChatRequest request)
+            </div>
+            <p>Executes RAG conversational inference over the specific document context.  WHAT: Performs cosine similarity search in Qdrant for top-4 passages matching the user question, scopes matches to the target document GUID, constructs a grounded system prompt, invokes Llama 3.3, and packages the answer with verifiable citations and excerpts. WHY: Enforces strict retrieval grounding to eliminate hallucinations, providing academic researchers with verifiable snippet citations referencing the exact source paragraphs.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>docEntity</code> - Target document entity providing document metadata and content fallback.</dd><dd><code>request</code> - User question and dialogue history.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link ChatResponse} containing synthesized answer and supporting citations.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-35">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public getQuestio <strong>n</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-36">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public similaritySearc <strong>h</strong>(Object SearchRequest.builder()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-37">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public quer <strong>y</strong>(Object query)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-38">
+            <div class="detail-title">K</div>
+            
+            <div class="signature">
+              public top <strong>K</strong>(Object 4)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-39">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public similarityThreshol <strong>d</strong>(Object 0.5)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-40">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-41">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public fo <strong>r</strong>(Document doc : similarDocs)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-42">
+            <div class="detail-title">a</div>
+            
+            <div class="signature">
+              public getMetadat <strong>a</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-43">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(docGuid == null || docGuid.equals(docEntity.getGuid()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-44">
+            <div class="detail-title">a</div>
+            
+            <div class="signature">
+              public getMetadat <strong>a</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-45">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object ChatResponse.CitationDto.builder()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-46">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public chunkInde <strong>x</strong>(chunkIndex != null ? chunkIndex : 0)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-47">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public scor <strong>e</strong>(Object 0.88)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-48">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public snippe <strong>t</strong>(Object doc.getText()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-49">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-50">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object doc.getText()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-51">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-52">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public war <strong>n</strong>(&quot;Qdrant similarity search encountered issue, falling back to document excerpt: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-53">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object contextPassages.isEmpty()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-54">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public getContentExcerp <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-55">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(excerpt != null)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-56">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object excerpt)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-57">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public ad <strong>d</strong>(Object ChatResponse.CitationDto.builder()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-58">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public chunkInde <strong>x</strong>(Object 0)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-59">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public scor <strong>e</strong>(Object 1.0)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-60">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public snippe <strong>t</strong>(Object excerpt.substring(0, Object Math.min(excerpt.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-61">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-62">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public joi <strong>n</strong>(Object &quot;\n\n---\n\n&quot;, Object contextPassages)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-63">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(&quot;&quot;&quot; You are an expert academic research assistant embedded in the Personal Library enterprise system. Answer the user&#39;s question accurately using ONLY the context retrieved below from the document: Title: &quot;%s&quot; Author: %s Retrieved Context: %s Instructions: - Ground your answer strictly on the provided context passages. - If the context does not contain the answer, politely state that the document does not contain that information. - Provide clear, Object direct, and structured explanations. &quot;&quot;&quot;, Object docEntity.getBibtex()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-64">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public getBibte <strong>x</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-65">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public promp <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-66">
+            <div class="detail-title">m</div>
+            
+            <div class="signature">
+              public syste <strong>m</strong>(Object systemPrompt)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-67">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public use <strong>r</strong>(Object query)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-68">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public cal <strong>l</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-69">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public conten <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-70">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-71">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public erro <strong>r</strong>(&quot;Error generating RAG answer: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-72">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-73">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public answe <strong>r</strong>(Object answer)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-74">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public modelUse <strong>d</strong>(&quot;Ollama Llama 3.3 (70B Instruct)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-75">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public citation <strong>s</strong>(Object citations)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-76">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

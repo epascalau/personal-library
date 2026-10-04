@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Minimal, dependency-free HTML templating with automatic escaping.
  *
@@ -27,20 +27,64 @@ const ESCAPE_MAP: Record<string, string> = {
   "'": '&#39;'
 };
 
-/** Escapes a value for safe interpolation into HTML text or an attribute. */
+/**
+ * Escapes special HTML characters in a string or primitive value.
+ *
+ * WHAT: Replaces `&`, `<`, `>`, `"`, and `'` with their corresponding HTML entity equivalents.
+ * WHY: Protects against cross-site scripting (XSS) when untrusted or backend-provided data
+ * (such as document titles, user prompts, and summaries) is interpolated into HTML strings or attributes.
+ *
+ * @param value Raw value to sanitize.
+ * @returns Sanitized string safe for HTML interpolation.
+ */
 export const esc = (value: unknown): string =>
   String(value ?? '').replace(/[&<>"']/g, (char) => ESCAPE_MAP[char]);
 
-/** Marks a string as already-safe HTML so `html` will not escape it. */
+/**
+ * Marks a string as trusted HTML that must bypass automatic escaping.
+ *
+ * WHAT: Wraps the string in an object marked with the unforgeable `RAW` Symbol.
+ * WHY:
+ * 1. Safe composition: Allows trusted template fragments (like SVG icons or nested `html` templates)
+ *    to be composed together without double-escaping entity characters.
+ * 2. Unforgeable branding: Using a private `Symbol('plib.raw')` ensures that malicious external JSON
+ *    or input payloads cannot forge the brand.
+ *
+ * @param value Trusted HTML markup.
+ * @returns RawHtml wrapper object.
+ */
 export const raw = (value: string): RawHtml => ({
   [RAW]: true,
   value,
   toString: () => value
 });
 
+/**
+ * Type guard verifying whether an unknown value is a trusted `RawHtml` instance.
+ *
+ * WHAT: Checks that the input is a non-null object bearing the internal `RAW` Symbol brand.
+ * WHY: Used by template compilers to differentiate between safe markup and unescaped user strings.
+ *
+ * @param value Value to check.
+ * @returns True if value is an authentic RawHtml instance.
+ */
 export const isRawHtml = (value: unknown): value is RawHtml =>
   typeof value === 'object' && value !== null && (value as RawHtml)[RAW] === true;
 
+/**
+ * Normalizes and converts an interpolated template value to safe HTML markup.
+ *
+ * WHAT:
+ * - Drops null, undefined, and booleans.
+ * - Leaves `RawHtml` unescaped.
+ * - Recursively flattens arrays (e.g. lists of rendered rows or badges).
+ * - Automatically escapes everything else via `esc()`.
+ * WHY: Mirrors React JSX interpolation semantics, allowing arrays and conditional expressions
+ * (`condition && html\`...\``) to behave identically to declarative UI paradigms.
+ *
+ * @param value Value to stringify and sanitize.
+ * @returns Sanitized HTML string.
+ */
 const stringify = (value: unknown): string => {
   if (value === null || value === undefined || value === false || value === true) {
     return '';
@@ -54,6 +98,18 @@ const stringify = (value: unknown): string => {
   return esc(value);
 };
 
+/**
+ * Tagged template literal for generating sanitized HTML markup.
+ *
+ * WHAT: Assembles template strings and interpolated values into a trusted `RawHtml` token,
+ * automatically sanitizing all interpolated values unless explicitly marked with `raw()`.
+ * WHY: Eliminates virtual-DOM overhead and external framework dependencies while providing
+ * first-class compile-time XSS protection and concise JSX-like templating syntax.
+ *
+ * @param strings Static template string chunks.
+ * @param values Interpolated expressions.
+ * @returns RawHtml token containing the assembled safe markup.
+ */
 export const html = (strings: TemplateStringsArray, ...values: unknown[]): RawHtml => {
   let out = strings[0];
   for (let i = 0; i < values.length; i += 1) {
@@ -62,17 +118,44 @@ export const html = (strings: TemplateStringsArray, ...values: unknown[]): RawHt
   return raw(out);
 };
 
-/** Resolves a `RawHtml` or plain string into a markup string. */
+/**
+ * Unwraps a `RawHtml` object or plain string into a final HTML string ready for `innerHTML`.
+ *
+ * WHAT: Extracts `.value` if input is `RawHtml`, otherwise returns the string directly.
+ * WHY: Standardizes the boundary between template evaluation and DOM property assignment.
+ *
+ * @param value RawHtml token or plain string.
+ * @returns Plain string suitable for innerHTML assignment.
+ */
 export const toMarkup = (value: RawHtml | string): string =>
   isRawHtml(value) ? value.value : value;
 
-/** Joins conditional class names, mirroring the previous `clsx`-style usage. */
+/**
+ * Combines conditional CSS class names into a single normalized class string.
+ *
+ * WHAT: Accepts a list of class strings or falsy values, filters out falsy entries, and joins with spaces.
+ * WHY: Simplifies dynamic Tailwind CSS styling by allowing concise conditional expressions
+ * (e.g. `cx('btn', isActive && 'btn-active')`) without manual string concatenation.
+ *
+ * @param parts List of candidate class names or falsy conditional guards.
+ * @returns Normalized space-delimited class string.
+ */
 export const cx = (...parts: Array<string | false | null | undefined>): string =>
   parts.filter(Boolean).join(' ');
 
 /**
- * Emits an attribute only when the value is present, e.g.
- * `<ui5-input ${attr('value', doc.title)}>`.
+ * Conditionally generates a sanitized HTML attribute.
+ *
+ * WHAT:
+ * - If value is null, undefined, false, or empty string: emits nothing.
+ * - If value is true: emits the bare attribute name (e.g. `disabled`).
+ * - Otherwise: emits `name="escapedValue"`.
+ * WHY: Adheres strictly to the HTML5 boolean attribute specification (where presence implies true)
+ * while ensuring dynamic attribute values are escaped to prevent attribute breakout vulnerabilities.
+ *
+ * @param name HTML attribute name.
+ * @param value Attribute value or boolean flag.
+ * @returns RawHtml attribute string or empty raw HTML.
  */
 export const attr = (name: string, value: unknown): RawHtml => {
   if (value === null || value === undefined || value === false || value === '') {

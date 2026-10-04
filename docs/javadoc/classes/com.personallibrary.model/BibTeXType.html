@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BibTeXType (com.personallibrary.model) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.model.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.model.html">com.personallibrary.model</a> &gt;
+      <strong>BibTeXType</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.model</div>
+        <h2>enum BibTeXType</h2>
+        
+        <div class="signature">
+          public enum <strong>BibTeXType</strong>
+          
+          
+        </div>
+        <p>Standard classification types for bibliographic entries according to the BibTeX specification.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>value</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>value</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>b</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>MISC</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public ARTICL</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">E</a></strong>(Object &quot;article&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">An article from a journal or magazine. */</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public BOO</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">K</a></strong>(Object &quot;book&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">A book with an explicit publisher. */</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public INPROCEEDING</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">S</a></strong>(Object &quot;inproceedings&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">An article in a conference proceedings. */</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public TECHREPOR</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">T</a></strong>(Object &quot;techreport&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">A report published by an institution or university. */</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public PHDTHESI</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">S</a></strong>(Object &quot;phdthesis&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">A doctoral thesis or dissertation. */</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public MIS</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">C</a></strong>(Object &quot;misc&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Fallback type when a document does not neatly fit any other classification. */</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public BibTeXTyp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">e</a></strong>(String value)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Initializes the enum constant with its standard lowercase BibTeX token.  WHAT: Binds the serialized canonical string identifier to the enum constant. WHY: Maintains direct compatibility with standard BibTeX `.bib` files and REST JSON serialization.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public String</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">getValue</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Returns the serialized string representation of the BibTeX type.  WHAT: Returns the lowercase BibTeX entry type name (e.g. &quot;article&quot;, &quot;inproceedings&quot;). WHY: Annotated with Jackson&#39;s `@JsonValue` to ensure clean lowercase string serialization across JSON REST contracts and client stores.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public BibTeXType</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">fromString</a></strong>(String text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Resolves a string value to its corresponding enum constant with fallback to MISC.  WHAT: Case-insensitively compares the input string against known BibTeX constants, returning MISC if null or unrecognized. WHY: Gracefully handles messy or non-standard BibTeX tokens encountered during PDF/DOCX heuristic metadata extraction without throwing runtime exceptions.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">f</a></strong>(text == null)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fo</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">r</a></strong>(BibTeXType b : BibTeXType.values()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">f</a></strong>(Object b.value.equalsIgnoreCase(text.trim()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">E</div>
+            
+            <div class="signature">
+              public ARTICL <strong>E</strong>(Object &quot;article&quot;)
+            </div>
+            <p>An article from a journal or magazine. */</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">K</div>
+            
+            <div class="signature">
+              public BOO <strong>K</strong>(Object &quot;book&quot;)
+            </div>
+            <p>A book with an explicit publisher. */</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">S</div>
+            
+            <div class="signature">
+              public INPROCEEDING <strong>S</strong>(Object &quot;inproceedings&quot;)
+            </div>
+            <p>An article in a conference proceedings. */</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">T</div>
+            
+            <div class="signature">
+              public TECHREPOR <strong>T</strong>(Object &quot;techreport&quot;)
+            </div>
+            <p>A report published by an institution or university. */</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">S</div>
+            
+            <div class="signature">
+              public PHDTHESI <strong>S</strong>(Object &quot;phdthesis&quot;)
+            </div>
+            <p>A doctoral thesis or dissertation. */</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">C</div>
+            
+            <div class="signature">
+              public MIS <strong>C</strong>(Object &quot;misc&quot;)
+            </div>
+            <p>Fallback type when a document does not neatly fit any other classification. */</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public BibTeXTyp <strong>e</strong>(String value)
+            </div>
+            <p>Initializes the enum constant with its standard lowercase BibTeX token.  WHAT: Binds the serialized canonical string identifier to the enum constant. WHY: Maintains direct compatibility with standard BibTeX `.bib` files and REST JSON serialization.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>value</code> - Canonical lowercase BibTeX type token.</dd>
+              </dl>
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">getValue</div>
+            <div><span class="annotation">@JsonValue</span> </div>
+            <div class="signature">
+              public String <strong>getValue</strong>()
+            </div>
+            <p>Returns the serialized string representation of the BibTeX type.  WHAT: Returns the lowercase BibTeX entry type name (e.g. &quot;article&quot;, &quot;inproceedings&quot;). WHY: Annotated with Jackson&#39;s `@JsonValue` to ensure clean lowercase string serialization across JSON REST contracts and client stores.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>lowercase BibTeX type name.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">fromString</div>
+            
+            <div class="signature">
+              public BibTeXType <strong>fromString</strong>(String text)
+            </div>
+            <p>Resolves a string value to its corresponding enum constant with fallback to MISC.  WHAT: Case-insensitively compares the input string against known BibTeX constants, returning MISC if null or unrecognized. WHY: Gracefully handles messy or non-standard BibTeX tokens encountered during PDF/DOCX heuristic metadata extraction without throwing runtime exceptions.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>text</code> - input string value.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>matching {@link BibTeXType} or {@link #MISC} if unmatched.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(text == null)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public fo <strong>r</strong>(BibTeXType b : BibTeXType.values()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object b.value.equalsIgnoreCase(text.trim()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

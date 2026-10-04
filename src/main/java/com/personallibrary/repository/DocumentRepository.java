@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.repository;
 
 import com.personallibrary.model.DocumentEntity;
@@ -22,6 +26,10 @@ public interface DocumentRepository extends MongoRepository<DocumentEntity, Stri
     /**
      * Finds a document entity by its unique persistent GUID.
      *
+     * WHAT: Queries MongoDB `documents` collection for a record where `guid` equals the provided argument.
+     * WHY: Primary lookup mechanism for document detail retrieval, version overwriting, and deletion
+     * using immutable UUIDs rather than internal MongoDB BSON ObjectIds.
+     *
      * @param guid Unique document identifier.
      * @return Optional containing the document if found.
      */
@@ -30,16 +38,12 @@ public interface DocumentRepository extends MongoRepository<DocumentEntity, Stri
     /**
      * Finds all predecessor versions linked to a specified ancestor document GUID.
      *
+     * WHAT: Queries MongoDB `documents` collection matching `previousVersionGuid`.
+     * WHY: Traverses document version lineage chains, allowing the UI and services to trace document revision history.
+     *
      * @param previousVersionGuid Predecessor document GUID.
      * @return List of matching historical version records.
      */
     List<DocumentEntity> findByPreviousVersionGuid(String previousVersionGuid);
-
-    /**
-     * Executes a dynamic multi-predicate MongoDB query supporting individual or combined filters
-     * across fileName, title, author, edition, file format, and document content.
-     *
-     * <p>Implemented by {@link DocumentRepositoryCustomImpl}: the predicate set varies per request,
-     * which a static query string cannot express.</p>
-     */
 }
+

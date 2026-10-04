@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -25,12 +29,24 @@ public enum BibTeXType {
 
     private final String value;
 
+    /**
+     * Initializes the enum constant with its standard lowercase BibTeX token.
+     *
+     * WHAT: Binds the serialized canonical string identifier to the enum constant.
+     * WHY: Maintains direct compatibility with standard BibTeX `.bib` files and REST JSON serialization.
+     *
+     * @param value Canonical lowercase BibTeX type token.
+     */
     BibTeXType(String value) {
         this.value = value;
     }
 
     /**
      * Returns the serialized string representation of the BibTeX type.
+     *
+     * WHAT: Returns the lowercase BibTeX entry type name (e.g. "article", "inproceedings").
+     * WHY: Annotated with Jackson's `@JsonValue` to ensure clean lowercase string serialization
+     * across JSON REST contracts and client stores.
      *
      * @return lowercase BibTeX type name.
      */
@@ -41,6 +57,10 @@ public enum BibTeXType {
 
     /**
      * Resolves a string value to its corresponding enum constant with fallback to MISC.
+     *
+     * WHAT: Case-insensitively compares the input string against known BibTeX constants, returning MISC if null or unrecognized.
+     * WHY: Gracefully handles messy or non-standard BibTeX tokens encountered during PDF/DOCX heuristic metadata extraction
+     * without throwing runtime exceptions.
      *
      * @param text input string value.
      * @return matching {@link BibTeXType} or {@link #MISC} if unmatched.
@@ -55,3 +75,4 @@ public enum BibTeXType {
         return MISC;
     }
 }
+

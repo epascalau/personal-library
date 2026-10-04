@@ -1,6 +1,10 @@
 /**
- * @fileoverview Internationalization (i18n) types and schemas for Personal Library.
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Internationalization (i18n) types and schemas for Personal Library.
  * Supports SAP multilingual standard locales: English, Deutsch, Français, Español, Română.
+ * @packageDocumentation
  */
 
 export type SupportedLanguage = 'en' | 'de' | 'fr' | 'es' | 'ro';
@@ -219,6 +223,9 @@ export interface TranslationDictionary {
     architecture: string;
     springAi: string;
     qdrant: string;
+    license: string;
+    licenseInfo: string;
+    viewLicense: string;
     trademarkDisclaimer: string;
   };
 }

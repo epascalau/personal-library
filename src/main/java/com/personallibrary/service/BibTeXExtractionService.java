@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +33,9 @@ public class BibTeXExtractionService {
     /**
      * Constructs the extraction service with the primary AI chat client.
      *
+     * WHAT: Injects the Llama ChatClient and Jackson ObjectMapper for parsing LLM JSON responses.
+     * WHY: Employs Llama 3.3's analytical comprehension to extract bibliographic fields from messy document text.
+     *
      * @param chatClient   Llama AI chat client.
      * @param objectMapper Jackson JSON object mapper.
      */
@@ -39,6 +46,11 @@ public class BibTeXExtractionService {
 
     /**
      * Analyzes document text and filename to infer bibliographic attributes and assemble a {@link BibTeXMetadata} record.
+     *
+     * WHAT: Sends a structured JSON extraction prompt containing filename and a 4,000-character text sample to Llama,
+     * parses the returned JSON, and builds a populated BibTeXMetadata instance; falls back to heuristic metadata on failure.
+     * WHY: Eliminates manual data entry by extracting title, authors, year, publication venue, DOI, and keywords directly
+     * from document front matter, with graceful fallback ensuring upload operations never fail even if the LLM is offline.
      *
      * @param fileName      Physical filename of the document.
      * @param sampleContent Extracted plain text content excerpt.
@@ -123,6 +135,18 @@ public class BibTeXExtractionService {
         return fallbackMetadata(cleanTitle, currentYear, defaultKey);
     }
 
+    /**
+     * Synthesizes sensible fallback bibliographic metadata from filename and system defaults.
+     *
+     * WHAT: Constructs a BibTeXMetadata record populated with cleaned file title, current year, and default citation key.
+     * WHY: Guarantees that documents uploaded without internet access or with unsupported layouts still receive valid,
+     * queryable metadata records in the library catalogue.
+     *
+     * @param title Sanitized document title.
+     * @param year  Default publication year.
+     * @param key   Generated fallback BibTeX key.
+     * @return Minimal valid BibTeXMetadata instance.
+     */
     private BibTeXMetadata fallbackMetadata(String title, String year, String key) {
         return BibTeXMetadata.builder()
                 .entryType(BibTeXType.MISC)
@@ -137,6 +161,16 @@ public class BibTeXExtractionService {
                 .build();
     }
 
+    /**
+     * Strips Markdown code fence formatting (` ```json ... ``` `) from model responses.
+     *
+     * WHAT: Removes leading and trailing Markdown code fences and whitespace from raw LLM outputs.
+     * WHY: LLM chat models frequently wrap JSON outputs in Markdown code blocks; stripping fences ensures
+     * reliable Jackson deserialization without formatting syntax errors.
+     *
+     * @param raw Raw response text from the LLM.
+     * @return Clean JSON string suitable for ObjectMapper parsing.
+     */
     private String cleanJsonResponse(String raw) {
         String clean = raw.trim();
         if (clean.startsWith("```json")) {
@@ -150,3 +184,4 @@ public class BibTeXExtractionService {
         return clean.trim();
     }
 }
+

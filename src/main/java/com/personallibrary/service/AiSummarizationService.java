@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.service;
 
 import com.personallibrary.model.BibTeXMetadata;
@@ -33,6 +37,9 @@ public class AiSummarizationService {
     /**
      * Constructs the summarization service with qualified model chat clients.
      *
+     * WHAT: Injects Spring AI ChatClients specifically bound to Llama and Mistral chat models.
+     * WHY: Separates model client references by qualifier name to ensure distinct temperature and model parameters.
+     *
      * @param llamaChatClient   Chat client configured for Llama 3.3 inference.
      * @param mistralChatClient Chat client configured for Mistral Large inference.
      */
@@ -47,6 +54,10 @@ public class AiSummarizationService {
      * Computes dual-model summaries automatically upon document ingestion:
      * 1. Llama model: in-depth technical & analytical synthesis
      * 2. Mistral model: high-impact executive operational synthesis
+     *
+     * WHAT: Consecutively calls `generateSummaryForModel` for both "llama" and "mistral" and returns a composite map.
+     * WHY: Produces both analytical and executive viewpoints in a single pipeline run during document upload,
+     * ensuring immediate availability of dual summaries when opening the SAP Horizon Object Page.
      *
      * @param title   Document title.
      * @param content Raw extracted text content.
@@ -69,6 +80,11 @@ public class AiSummarizationService {
 
     /**
      * Generates or regenerates a summary for a specific target model with precise duration telemetry.
+     *
+     * WHAT: Truncates content to a 6,000 character prompt window, selects model-specific system prompts,
+     * executes inference via Spring AI ChatClient, measures execution duration, and constructs a SummaryRecord.
+     * WHY: Truncating to 6,000 characters balances representative context coverage with rapid response times;
+     * timing telemetry provides users with concrete insight into model inference performance.
      *
      * @param modelKey Target model engine ("llama" or "mistral").
      * @param title    Document title.
@@ -167,3 +183,4 @@ public class AiSummarizationService {
                 .build();
     }
 }
+

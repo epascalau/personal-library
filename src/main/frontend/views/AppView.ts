@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla replacement for `App.tsx`. All orchestration state now lives in
  * `appStore`; this view only owns the shell layout and decides which floorplan
@@ -22,6 +22,7 @@ import { ShellBarView } from './ShellBarView';
 import { ToastView } from './ToastView';
 import { AuthModalView } from './dialogs/AuthModalView';
 import { BackendSettingsModalView } from './dialogs/BackendSettingsModalView';
+import { BpmnModalView } from './dialogs/BpmnModalView';
 import { DeleteConfirmDialogView } from './dialogs/DeleteConfirmDialogView';
 import { OpenApiModalView } from './dialogs/OpenApiModalView';
 import { UploadDialogView } from './dialogs/UploadDialogView';
@@ -40,6 +41,7 @@ export class AppView extends Component {
     this.own(new DeleteConfirmDialogView()),
     this.own(new AuthModalView()),
     this.own(new OpenApiModalView()),
+    this.own(new BpmnModalView()),
     this.own(new BackendSettingsModalView())
   ];
 
@@ -51,6 +53,12 @@ export class AppView extends Component {
 
   private floorplanKind: AppViewName | null = null;
 
+  /**
+   * Initializes the root application view with full-height flex column layout.
+   *
+   * WHAT: Sets up host element styling with min-height and theme transitions.
+   * WHY: Provides the full-viewport scaffold for SAP Horizon applications.
+   */
   constructor() {
     super(
       undefined,
@@ -59,6 +67,13 @@ export class AppView extends Component {
     );
   }
 
+  /**
+   * Subscribes the root view to navigation transitions.
+   *
+   * WHAT: Watches `appStore.currentView` and triggers `syncFloorplan()`.
+   * WHY: Enables immediate switching between the List Report and Object Page floorplans
+   * when users click a document row or click "Back to Library".
+   */
   protected onMount(): void {
     this.track(
       watch(
@@ -69,6 +84,13 @@ export class AppView extends Component {
     );
   }
 
+  /**
+   * Produces the structural shell template with placeholders for persistent and dynamic regions.
+   *
+   * WHAT: Emits slots for ShellBar, main floorplan, dialogs, toast notifications, and footer.
+   * WHY: The root layout shell is static; child components are adopted into these slots so they
+   * never lose their event listeners or state during view transitions.
+   */
   protected template(): RawHtml | string {
     return html`
       <div data-slot="shellbar"></div>
@@ -79,6 +101,13 @@ export class AppView extends Component {
     `;
   }
 
+  /**
+   * Post-render lifecycle callback that adopts persistent views and synchronizes the active floorplan.
+   *
+   * WHAT: Moves shellBar, dialogs, toast, and footer into their respective slots, and calls `syncFloorplan()`.
+   * WHY: Using `adopt()` preserves all long-lived DOM nodes and internal component state
+   * (e.g. active inputs inside dialogs, ongoing toast timers, and shell bar profile open states).
+   */
   protected afterRender(): void {
     this.adopt('[data-slot="shellbar"]', this.shellBar);
     this.dialogs.forEach((dialog) => this.adopt('[data-slot="dialogs"]', dialog));
@@ -87,7 +116,20 @@ export class AppView extends Component {
     this.syncFloorplan();
   }
 
-  /** Mounts (or swaps in) the floorplan matching the current navigation state. */
+  /**
+   * Mounts or swaps the active SAP floorplan inside the `<main>` container.
+   *
+   * WHAT:
+   * 1. If the current floorplan matches `kind`, ensures it is attached to `main`.
+   * 2. If transitioning (e.g. from List to Object Page or vice versa), destroys the old floorplan,
+   *    instantiates the new floorplan (`ListReportView` or `ObjectPageView`), and mounts it.
+   *
+   * WHY:
+   * 1. Memory hygiene: Unlike the persistent shell bar or dialogs, floorplans hold large collections
+   *    of table rows, chat transcripts, or citation chunks. Destroying the inactive floorplan
+   *    ensures full garbage collection of unused DOM nodes.
+   * 2. Clean view lifecycle: Mounting a fresh instance guarantees clean initial focus and predictable state.
+   */
   private syncFloorplan(): void {
     const kind = appStore.state.currentView;
     const main = this.$('[data-slot="main"]');
@@ -108,6 +150,12 @@ export class AppView extends Component {
     this.floorplan.mount(main);
   }
 
+  /**
+   * Teardown callback for the root application view.
+   *
+   * WHAT: Destroys the active floorplan.
+   * WHY: Ensures complete cleanup when unmounting the root application.
+   */
   protected onDestroy(): void {
     this.floorplan?.destroy();
     this.floorplan = null;

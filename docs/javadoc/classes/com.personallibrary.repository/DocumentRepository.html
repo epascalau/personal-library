@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentRepository (com.personallibrary.repository) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.repository.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.repository.html">com.personallibrary.repository</a> &gt;
+      <strong>DocumentRepository</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.repository</div>
+        <h2>interface DocumentRepository</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Repository</span> </div>
+        <div class="signature">
+          public interface <strong>DocumentRepository</strong>
+          extends MongoRepository
+          
+        </div>
+        <p>MongoDB Data Repository for {@link DocumentEntity} persistence and querying. Dynamic multi-field search for the SAP Horizon List Report floorplan is contributed by the {@link DocumentRepositoryCustom} fragment.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public Optional&lt;DocumentEntity&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">findByGuid</a></strong>(String guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Finds a document entity by its unique persistent GUID.  WHAT: Queries MongoDB `documents` collection for a record where `guid` equals the provided argument. WHY: Primary lookup mechanism for document detail retrieval, version overwriting, and deletion using immutable UUIDs rather than internal MongoDB BSON ObjectIds.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public List&lt;DocumentEntity&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">findByPreviousVersionGuid</a></strong>(String previousVersionGuid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Finds all predecessor versions linked to a specified ancestor document GUID.  WHAT: Queries MongoDB `documents` collection matching `previousVersionGuid`. WHY: Traverses document version lineage chains, allowing the UI and services to trace document revision history.  /</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">findByGuid</div>
+            
+            <div class="signature">
+              public Optional&lt;DocumentEntity&gt; <strong>findByGuid</strong>(String guid)
+            </div>
+            <p>Finds a document entity by its unique persistent GUID.  WHAT: Queries MongoDB `documents` collection for a record where `guid` equals the provided argument. WHY: Primary lookup mechanism for document detail retrieval, version overwriting, and deletion using immutable UUIDs rather than internal MongoDB BSON ObjectIds.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Optional containing the document if found.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">findByPreviousVersionGuid</div>
+            
+            <div class="signature">
+              public List&lt;DocumentEntity&gt; <strong>findByPreviousVersionGuid</strong>(String previousVersionGuid)
+            </div>
+            <p>Finds all predecessor versions linked to a specified ancestor document GUID.  WHAT: Queries MongoDB `documents` collection matching `previousVersionGuid`. WHY: Traverses document version lineage chains, allowing the UI and services to trace document revision history.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>previousVersionGuid</code> - Predecessor document GUID.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>List of matching historical version records.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

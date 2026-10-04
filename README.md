@@ -79,12 +79,12 @@ still emitted to `dist/` at the repository root:
 
 ### Decoupled UI & Pluggable Backend Adapter Architecture
 The UI is decoupled from the backend implementation via the **Backend Adapter Pattern** (`src/main/frontend/services/backend/` and the event-driven `BackendGateway`):
-* **No hardcoded endpoints in UI components:** `ListReportView`, `ObjectPageView`, `UploadDialogView`, and `AuthModalView` dispatch typed events on the gateway.
-* **Instant Target Switching:** Users can switch backends directly from the UI header (ShellBar > **Backend Target**):
-  1. **Integrated Gateway (`/api/v1`)**: Default dev proxy forwarding to Spring Boot / Node / Qdrant.
-  2. **Direct Java Spring Boot (`http://localhost:8080/api/v1`)**: Point directly to standalone Spring Boot instances.
-  3. **Custom Remote API**: Enter any Base URL (`https://api.mycorp.internal/v1`), optional Bearer token / API Key, and custom timeout.
-  4. **Local Standalone Engine (Offline / In-Memory)**: Runs fully in the browser via `localStorage`, allowing testing without running any backend servers.
+* **No hardcoded endpoints in UI components:** `ListReportView`, `ObjectPageView`, `UploadDialogView`, `VersionOverwriteDialogView`, and `AuthModalView` dispatch typed events on the gateway.
+* **Instant Target Switching:** Users can switch backends directly from the UI header (ShellBar > **Backend Target Settings**):
+  1. **Integrated Gateway (`/api/v1`)**: Default dev proxy forwarding to Spring AI, Qdrant, and Ollama.
+  2. **Direct Java Spring Boot (`http://localhost:8080/api/v1`)**: Point directly to the standalone Spring Boot 3 Java server instance.
+  3. **Custom Remote Backend / Microservice**: Connect to a custom remote API URL (e.g. cloud Kubernetes cluster or custom FastAPI backend) with optional Bearer token / API Key and custom timeout.
+  4. **Local Standalone Engine (Offline / In-Memory)**: Zero-server mock engine storing all documents, summaries, and vector chat in browser `localStorage`.
 * **To plug in a new backend in the future (e.g. Python FastAPI, Go, Supabase, or AWS Lambda):**
   1. Implement the `BackendAdapter` interface (`src/main/frontend/services/backend/types.ts`).
   2. Register the adapter in `src/main/frontend/services/backend/index.ts`.
@@ -266,14 +266,16 @@ below show how to install and verify one.
   2. **Mistral Model:** Executive synthesis highlighting practical business and operational takeaways.
 - Both summaries record creation date and generation duration (formatted in minutes and seconds).
 - Individual "Regenerate" buttons allow users to re-run either model at any time with an active loading spinner.
+- **Parallel Execution:** Both models can be regenerated concurrently in parallel; their in-flight progress, spinners, and document updates operate completely independently without race conditions.
 
 ### 3. Vector-Powered Semantic Search & RAG Chat
 - **Semantic Search:** In the List Report filter bar, enter content terms. The system queries Qdrant vector space for conceptual matches across full text chunks.
 - **Object Page RAG Chat:** Ask natural language questions regarding the document. The Llama model retrieves relevant excerpts from Qdrant and responds with cited evidence.
 
-### 4. Independent GUID Versioning
-- When a document is updated or replaced with a new file, the user sees an overwritten view, while the system creates a new independent record with its own unique GUID.
-- Full lineage is preserved with previous version identifiers and audit timestamps.
+### 4. In-Place Version Overwrite & Lineage
+- Uploading a new physical file version or updated BibTeX metadata from the Object Page overwrites document content and summaries in-place, retaining the document GUID and incrementing the version number (e.g. `v1` -> `v2`).
+- Brand new documents uploaded from the List Report always generate a fresh unique GUID.
+- Lineage, version history, and audit timestamps are tracked across iterations.
 
 ---
 

@@ -1,3 +1,10 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Romanian (Română) dictionary for Personal Library SAP Fiori Horizon UI.
+ */
+
 import { TranslationDictionary } from '../types';
 
 export const ro: TranslationDictionary = {
@@ -90,7 +97,7 @@ export const ro: TranslationDictionary = {
     noDocsSubtitle: 'Ajustați filtrele sau încărcați un nou document în bibliotecă.',
     uploadPrompt: 'Încarcă Primul Document',
     rowsPerPage: 'Rânduri pe pagină:',
-    inspectTooltip: 'Inspectează Documentul (Pagină Obiect)',
+    inspectTooltip: 'Faceți clic pe un rând pentru a naviga la pagina de detalii a documentului selectat',
     deleteTooltip: 'Șterge Documentul',
     newVersionTooltip: 'Încarcă Versiune Nouă / Editare',
     errorTitle: 'Backend Indisponibil',
@@ -184,8 +191,8 @@ export const ro: TranslationDictionary = {
     activeAdapter: 'Driver Backend Activ',
     selectPreset: 'Presetări Arhitecturale',
     presetGateway: 'Gateway Integrat (/api/v1)',
-    presetSpringBoot: 'Backend Spring Boot (:8080)',
-    presetMock: 'Motor Standalone Mock (Offline)',
+    presetSpringBoot: 'Instanță directă Java Spring Boot (http://localhost:8080/api/v1)',
+    presetMock: 'Motor autonom local (Offline / În memorie)',
     presetCustom: 'Endpoint API Personalizat',
     baseUrl: 'URL de bază',
     authToken: 'Token Bearer JWT / API',
@@ -199,6 +206,9 @@ export const ro: TranslationDictionary = {
     architecture: 'Arhitectură Backend Decuplată',
     springAi: 'Spring AI + Ollama (Llama & Mistral)',
     qdrant: 'Bază Vectorială Qdrant',
+    license: 'Licență',
+    licenseInfo: 'Distribuit sub Licența Publică Generală GNU Affero v3.0 (AGPL-3.0-or-later)',
+    viewLicense: 'Vezi Licența (GNU AGPLv3)',
     trademarkDisclaimer: 'SAP, SAP Fiori, SAP Horizon și celelalte produse și servicii SAP menționate aici, precum și logo-urile respective, sunt mărci comerciale sau înregistrate ale SAP SE în Germania și alte țări. Această aplicație independentă nu este afiliată, aprobată sau sponsorizată de SAP SE.'
   }
 };

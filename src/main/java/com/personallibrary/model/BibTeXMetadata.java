@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.model;
 
 import lombok.AllArgsConstructor;
@@ -60,6 +64,10 @@ public class BibTeXMetadata {
     /**
      * Serializes this metadata object into an RFC-compliant raw BibTeX string format.
      *
+     * WHAT: Assembles a standard `@entryType{bibKey, ...}` bibliographic block with indented key-value attributes.
+     * WHY: Enables researchers to copy-paste formatted BibTeX directly into LaTeX manuscripts, Zotero,
+     * Mendeley, or Overleaf workflows without manual syntax reformatting.
+     *
      * @return Formatted multiline BibTeX citation string.
      */
     public String toRawBibTeX() {
@@ -86,3 +94,4 @@ public class BibTeXMetadata {
         return sb.toString();
     }
 }
+

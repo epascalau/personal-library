@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatRequest (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>ChatRequest</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class ChatRequest</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>ChatRequest</strong>
+          
+          
+        </div>
+        <p>Data Transfer Object containing a natural language question and conversation history for the Retrieval-Augmented Generation (RAG) assistant.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>question</code></td>
+                <td class="desc-col">User&#39;s natural language question regarding the document. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private List&lt;ChatMessageDto&gt;</td>
+                <td class="name-col"><code>chatHistory</code></td>
+                <td class="desc-col">Optional conversation turns for contextual multi-turn dialogue. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>role</code></td>
+                <td class="desc-col">Participant role (&quot;user&quot; or &quot;assistant&quot;). */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>text</code></td>
+                <td class="desc-col">Textual content of the dialogue turn. */</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public ChatMessageDto</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">user</a></strong>(String text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Factory method to create a user-role chat message.  WHAT: Instantiates ChatMessageDto with &quot;user&quot; role and specified message text. WHY: Simplifies constructing conversational dialogue turns in unit tests and RAG controllers.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">ChatMessageDto</a></strong>(Object &quot;user&quot;, Object text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ChatMessageDto</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">assistant</a></strong>(String text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Factory method to create an assistant-role chat message.  WHAT: Instantiates ChatMessageDto with &quot;assistant&quot; role and answer text. WHY: Facilitates feeding prior RAG responses back into multi-turn dialogue context windows.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">ChatMessageDto</a></strong>(Object &quot;assistant&quot;, Object text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">user</div>
+            
+            <div class="signature">
+              public ChatMessageDto <strong>user</strong>(String text)
+            </div>
+            <p>Factory method to create a user-role chat message.  WHAT: Instantiates ChatMessageDto with &quot;user&quot; role and specified message text. WHY: Simplifies constructing conversational dialogue turns in unit tests and RAG controllers.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>text</code> - Prompt or question text.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>ChatMessageDto instance representing user turn.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">ChatMessageDto</div>
+            
+            <div class="signature">
+              public new <strong>ChatMessageDto</strong>(Object &quot;user&quot;, Object text)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">assistant</div>
+            
+            <div class="signature">
+              public ChatMessageDto <strong>assistant</strong>(String text)
+            </div>
+            <p>Factory method to create an assistant-role chat message.  WHAT: Instantiates ChatMessageDto with &quot;assistant&quot; role and answer text. WHY: Facilitates feeding prior RAG responses back into multi-turn dialogue context windows.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>text</code> - Model generated answer text.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>ChatMessageDto instance representing assistant turn.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">ChatMessageDto</div>
+            
+            <div class="signature">
+              public new <strong>ChatMessageDto</strong>(Object &quot;assistant&quot;, Object text)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Typed event contract for all communication with the backend.
  *
@@ -196,17 +196,52 @@ export type BackendFailureEventName = `backend:${BackendOperationName}:failure`;
 /** The single bus through which the UI talks to the backend. */
 export const backendBus = createEventBus<BackendEvents>('backend');
 
+/**
+ * Derives the typed request event name for a given backend operation.
+ *
+ * WHAT: Returns string formatted as `backend:${operation}:request`.
+ * WHY: Constructing event names via a typed helper enforces compile-time type safety
+ * and prevents typos when publishing or subscribing to the backend event bus.
+ *
+ * @param operation Name of the backend operation.
+ */
 export const requestEventName = <K extends BackendOperationName>(operation: K): `backend:${K}:request` =>
   `backend:${operation}:request`;
 
+/**
+ * Derives the typed success event name for a given backend operation.
+ *
+ * WHAT: Returns string formatted as `backend:${operation}:success`.
+ * WHY: Provides strongly typed correlation between dispatched requests and their corresponding success envelopes.
+ *
+ * @param operation Name of the backend operation.
+ */
 export const successEventName = <K extends BackendOperationName>(operation: K): `backend:${K}:success` =>
   `backend:${operation}:success`;
 
+/**
+ * Derives the typed failure event name for a given backend operation.
+ *
+ * WHAT: Returns string formatted as `backend:${operation}:failure`.
+ * WHY: Enables targeted failure handling in stores and UI components without error string parsing.
+ *
+ * @param operation Name of the backend operation.
+ */
 export const failureEventName = <K extends BackendOperationName>(operation: K): `backend:${K}:failure` =>
   `backend:${operation}:failure`;
 
 let requestCounter = 0;
 
+/**
+ * Generates an idempotent, chronologically unique correlation identifier for a backend request.
+ *
+ * WHAT: Combines the operation name, monotonic sequence counter, and UUID (or crypto/timestamp fallback).
+ * WHY: Unique request IDs allow asynchronous responses to be matched unambiguously to their triggering call
+ * across multiplexed event-bus listeners, preventing race conditions when requests overlap.
+ *
+ * @param operation Name of the backend operation.
+ * @returns Unique correlation ID string.
+ */
 export const createRequestId = (operation: BackendOperationName): string => {
   requestCounter += 1;
   const unique =
@@ -216,6 +251,16 @@ export const createRequestId = (operation: BackendOperationName): string => {
   return `${operation}#${requestCounter}#${unique}`;
 };
 
+/**
+ * Normalizes any caught rejection value into a standardized `BackendError` envelope.
+ *
+ * WHAT: Extracts the error message from an `Error` instance or string, preserving the raw rejection in `.cause`.
+ * WHY: JavaScript promises can reject with arbitrary values (strings, HTTP response objects, DOMExceptions);
+ * normalizing guarantees that UI toast notifications and error banners always receive clean, printable strings.
+ *
+ * @param value Caught exception or rejection value.
+ * @returns Normalized BackendError object.
+ */
 export const toBackendError = (value: unknown): BackendError => {
   if (value instanceof Error) {
     return { message: value.message, cause: value };

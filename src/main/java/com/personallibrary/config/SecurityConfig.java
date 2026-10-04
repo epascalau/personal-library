@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.config;
 
 import org.springframework.context.annotation.Bean;
@@ -37,6 +41,11 @@ public class SecurityConfig {
     /**
      * Configures the main Spring Security filter chain.
      *
+     * WHAT: Configures stateless session management, disables CSRF for stateless REST operations,
+     * permits public access to documentation, health, and auth endpoints, and configures OAuth2 JWT resource server validation.
+     * WHY: Stateless session policies eliminate server-side session overhead in distributed enterprise environments,
+     * while JWT token verification guarantees that only requests validated by Keycloak OIDC realms are authorized.
+     *
      * @param http Spring Security HTTP builder.
      * @return Configured {@link SecurityFilterChain}.
      * @throws Exception If an error occurs configuring web security.
@@ -70,6 +79,10 @@ public class SecurityConfig {
     /**
      * Configures universal CORS rules allowing browser clients to communicate with the REST API.
      *
+     * WHAT: Permits cross-origin requests with all standard HTTP methods, headers, and credential support.
+     * WHY: Supports decoupled frontends hosted on separate ports (e.g. Vite on 3000, Spring Boot on 8080)
+     * during development and preview deployments without CORS rejection.
+     *
      * @return CORS configuration source.
      */
     @Bean
@@ -89,6 +102,10 @@ public class SecurityConfig {
     /**
      * Converts a decoded Keycloak JWT into Spring Security authentication token with parsed roles.
      *
+     * WHAT: Creates a JwtAuthenticationConverter wired with KeycloakRealmRoleConverter.
+     * WHY: Standard Spring Security JWT decoders look for `SCOPE_` claims, whereas Keycloak encapsulates
+     * realm-level permissions in nested `realm_access.roles` JSON objects.
+     *
      * @return Configured {@link Converter} producing {@link AbstractAuthenticationToken}.
      */
     private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
@@ -101,6 +118,16 @@ public class SecurityConfig {
      * Extracts Keycloak realm_access and resource_access roles from JWT claims.
      */
     static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+        /**
+         * Converts Keycloak JWT claims into Spring Security GrantedAuthority instances.
+         *
+         * WHAT: Reads `realm_access.roles` array from claims, prefixes each role name with `ROLE_`, and wraps in SimpleGrantedAuthority.
+         * WHY: Spring Security role-based access checks (e.g. `@PreAuthorize("hasRole('ADMIN')")`) require authorities
+         * to start with the standard `ROLE_` prefix.
+         *
+         * @param jwt The decoded Keycloak JWT token.
+         * @return Collection of Spring Security GrantedAuthority objects.
+         */
         @Override
         @SuppressWarnings("unchecked")
         public Collection<GrantedAuthority> convert(Jwt jwt) {
@@ -121,3 +148,4 @@ public class SecurityConfig {
         }
     }
 }
+

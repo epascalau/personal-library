@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentChunk (com.personallibrary.model) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.model.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.model.html">com.personallibrary.model</a> &gt;
+      <strong>DocumentChunk</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.model</div>
+        <h2>class DocumentChunk</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>DocumentChunk</strong>
+          
+          
+        </div>
+        <p>Represents a segmented passage chunk from a document stored in the Qdrant vector database for semantic similarity search and Retrieval-Augmented Generation (RAG).  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>id</code></td>
+                <td class="desc-col">Unique vector point identifier or chunk UUID. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>chunkIndex</code></td>
+                <td class="desc-col">Zero-based positional index of the chunk within the parent document. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>text</code></td>
+                <td class="desc-col">Text content of the passage chunk. */</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+        <h3>Constructor Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="name-col">Constructor</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="name-col"><code>DocumentChunk(Object id, Object chunkIndex, Object text)</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public DocumentChunk</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">of</a></strong>(String id, int chunkIndex, String text)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Factory method creating a new indexed DocumentChunk instance.  WHAT: Constructs a DocumentChunk with given id, index, and text payload. WHY: Provides an expressive constructor pattern when partitioning raw document text into vector-ready segments.  /</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">of</div>
+            
+            <div class="signature">
+              public DocumentChunk <strong>of</strong>(String id, int chunkIndex, String text)
+            </div>
+            <p>Factory method creating a new indexed DocumentChunk instance.  WHAT: Constructs a DocumentChunk with given id, index, and text payload. WHY: Provides an expressive constructor pattern when partitioning raw document text into vector-ready segments.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>id</code> - Unique point identifier.</dd><dd><code>chunkIndex</code> - 0-based sequence number within document.</dd><dd><code>text</code> - Passage text.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Initialized DocumentChunk.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

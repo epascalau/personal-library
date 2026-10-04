@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Application entry point. The UI5 runtime (theme assets + the global
  * stylesheet patch) must be ready before the first view renders, otherwise
@@ -15,6 +15,20 @@ import { themeStore } from './stores/themeStore';
 import { i18nStore } from './stores/i18nStore';
 import { AppView } from './views/AppView';
 
+/**
+ * Main application bootstrap coordinator.
+ *
+ * WHAT:
+ * 1. Awaits `bootstrapUi5()` to register web components and shadow root style patches.
+ * 2. Eagerly touches `themeStore` and `i18nStore` to apply persisted dark mode and language classes to `<html>`.
+ * 3. Initializes `backendStore` and `appStore` listeners and initial document fetching.
+ * 4. Mounts the root `AppView` floorplan into `#root`.
+ *
+ * WHY:
+ * Awaiting UI5 runtime and evaluating persisted theme/locale stores before mounting any DOM elements
+ * prevents flashes of unstyled content (FOUC), incorrect language labels, or mismatched dark mode transitions
+ * during initial page load.
+ */
 const start = async (): Promise<void> => {
   await bootstrapUi5();
 

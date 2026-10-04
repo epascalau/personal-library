@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla + UI5 replacement for `components/OpenApiModal.tsx`.
  *
@@ -32,18 +32,46 @@ export class OpenApiModalView extends DialogView {
   /** Guards against a slow response from a previous open overwriting a newer one. */
   private loadToken = 0;
 
+  /**
+   * Initializes OpenApiModalView with OpenAPI dialog styling.
+   *
+   * WHAT: Invokes base DialogView constructor with `plib-dialog--openapi` custom class.
+   * WHY: Scopes dialog sizing and ensures high-contrast code viewer themes display cleanly.
+   */
   constructor() {
-    super(undefined);
+    super(undefined, 'plib-dialog plib-dialog--openapi');
   }
 
+  /**
+   * Determines whether the OpenAPI modal is open.
+   *
+   * WHAT: Returns `appStore.state.openApiModalOpen`.
+   * WHY: Synchronizes modal presentation with application store state triggered from the ShellBar or footer.
+   *
+   * @returns `true` if open, `false` otherwise.
+   */
   protected isOpen(): boolean {
     return appStore.state.openApiModalOpen;
   }
 
+  /**
+   * Handles user requests to close the OpenAPI modal.
+   *
+   * WHAT: Invokes `appStore.closeOpenApi()`.
+   * WHY: Centralized store mutation ensures consistent cleanup and focus restoration.
+   */
   protected requestClose(): void {
     appStore.closeOpenApi();
   }
 
+  /**
+   * Subscribes to modal visibility, backend adapter swaps, and teardown of transient timers.
+   *
+   * WHAT: Sets up reactive watchers on `openApiModalOpen` and `backendStore.config.name`,
+   * automatically refetching the specification whenever the dialog opens or backend changes.
+   * WHY: Different backends (e.g. Integrated Gateway vs Spring Boot) may serve distinct schema revisions,
+   * so re-fetching on adapter change keeps the viewer strictly accurate.
+   */
   protected onMount(): void {
     super.onMount();
     this.track(
@@ -77,6 +105,14 @@ export class OpenApiModalView extends DialogView {
     });
   }
 
+  /**
+   * Asynchronously fetches the OpenAPI 3.0.3 specification from the active backend.
+   *
+   * WHAT: Increments `loadToken`, enters loading state, requests `getOpenApiSpec` from `requestBackend`,
+   * and saves the YAML string.
+   * WHY: Tracking `loadToken` prevents race conditions where an outdated, slow response from an earlier
+   * backend adapter overwrites the result of a more recent request.
+   */
   private async loadSpec(): Promise<void> {
     const token = (this.loadToken += 1);
     this.loading = true;
@@ -101,22 +137,31 @@ export class OpenApiModalView extends DialogView {
     }
   }
 
+  /**
+   * Generates the modal markup including code editor viewport and export actions.
+   *
+   * WHAT: Emits modal header with copy/download controls, dark syntax container (`#1e293b`),
+   * and route footer.
+   * WHY: Displaying raw YAML in a monospaced code viewer allows developers to inspect schemas directly
+   * within the app without needing external API tooling.
+   *
+   * @returns RawHtml modal markup.
+   */
   protected body(): RawHtml {
     return html`
-      <div slot="header" class="w-full">
+      <div class="w-full flex flex-col overflow-hidden bg-white dark:bg-[#1c232b]">
+        <!-- Header -->
         <div
-          class="px-6 py-3.5 border-b border-gray-200 bg-[#f8fafc] flex items-center justify-between"
+          class="px-6 py-4 border-b border-gray-100 dark:border-[#2e3b4a] bg-white dark:bg-[#1c232b] flex items-center justify-between"
         >
-          <div class="flex items-center gap-2">
-            ${icon('FileCode2', { className: 'w-5 h-5 text-[#0070f2]' })}
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-[#0070f2]/10 dark:bg-[#0070f2]/20 flex items-center justify-center text-[#0070f2] dark:text-[#4796ff] shrink-0">
+              ${icon('FileCode2', { className: 'w-4 h-4' })}
+            </div>
             <div>
-              <h3 class="text-base font-bold text-gray-900">
+              <h3 class="text-sm font-bold text-gray-900 dark:text-white leading-tight">
                 Personal Library OpenAPI 3.0.3 Specification
               </h3>
-              <p class="text-xs text-gray-500 font-mono">
-                Endpoints for Documents, BibTeX, Dual Summaries (Llama &amp; Mistral), and Qdrant
-                RAG
-              </p>
             </div>
           </div>
 
@@ -129,14 +174,14 @@ export class OpenApiModalView extends DialogView {
               >${this.copied ? 'Copied' : 'Copy'}</ui5-button
             >
             <ui5-button
-              class="plib-button"
+              class="plib-button plib-button--accent"
               design="Emphasized"
               data-action="download-spec"
               icon="download"
               >Download .yaml</ui5-button
             >
             <ui5-button
-              class="plib-button plib-button--icon ml-2"
+              class="plib-button plib-button--icon ml-1"
               design="Transparent"
               data-action="close"
               icon="decline"
@@ -144,19 +189,19 @@ export class OpenApiModalView extends DialogView {
             ></ui5-button>
           </div>
         </div>
-      </div>
 
-      <div class="p-4 overflow-y-auto flex-1 bg-[#1e293b]" data-scroll-key="openapi-spec">
-        ${this.loading
-          ? html`<div class="py-12 text-center text-gray-400">Loading OpenAPI schema...</div>`
-          : html`<pre
-              class="font-mono text-xs text-[#e2e8f0] leading-relaxed select-all"
-            ><code>${this.yamlContent}</code></pre>`}
-      </div>
+        <!-- Body -->
+        <div class="p-4 overflow-y-auto max-h-[70vh] flex-1 bg-[#1e293b]" data-scroll-key="openapi-spec">
+          ${this.loading
+            ? html`<div class="py-12 text-center text-gray-400">Loading OpenAPI schema...</div>`
+            : html`<pre
+                class="font-mono text-xs text-[#e2e8f0] leading-relaxed select-all"
+              ><code>${this.yamlContent}</code></pre>`}
+        </div>
 
-      <div slot="footer" class="w-full">
+        <!-- Footer -->
         <div
-          class="px-6 py-2.5 bg-[#f8fafc] border-t border-gray-200 text-gray-500 flex justify-between items-center text-[11px]"
+          class="px-6 py-2.5 bg-white dark:bg-[#1c232b] border-t border-gray-100 dark:border-[#2e3b4a] text-gray-500 dark:text-gray-400 flex justify-between items-center text-[11px]"
         >
           <span>Format: OpenAPI 3.0.3 Specification</span>
           <span class="font-mono">Route: /api/v1/openapi.yaml</span>
@@ -165,6 +210,14 @@ export class OpenApiModalView extends DialogView {
     `;
   }
 
+  /**
+   * Binds clipboard copy and file download actions to toolbar buttons.
+   *
+   * WHAT: Attaches click handlers for copying the YAML string to clipboard (with temporary 2s checkmark feedback)
+   * and generating a client-side Blob download URL for `openapi.yaml`.
+   * WHY: In-browser Blob generation enables instant offline file download without requiring a round-trip
+   * to a file-serving backend endpoint.
+   */
   protected bind(): void {
     this.on('[data-action="copy-spec"]', 'click', () => {
       void navigator.clipboard.writeText(this.yamlContent);

@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary;
 
 import org.springframework.boot.SpringApplication;
@@ -24,7 +28,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class PersonalLibraryApplication {
 
     /**
-     * Bootstraps the Spring Boot application container.
+     * Bootstraps the Spring Boot application container and initializes the enterprise context.
+     *
+     * WHAT: Invokes SpringApplication.run() with PersonalLibraryApplication class configuration and startup CLI args.
+     * WHY: Orchestrates component scanning, Spring Data MongoDB repository auto-configuration,
+     * embedded Tomcat startup, Spring Security JWT filter chains, and asynchronous task execution threads
+     * necessary for background RAG embeddings and LLM summarization.
      *
      * @param args Command-line arguments passed during startup.
      */
@@ -32,3 +41,4 @@ public class PersonalLibraryApplication {
         SpringApplication.run(PersonalLibraryApplication.class, args);
     }
 }
+

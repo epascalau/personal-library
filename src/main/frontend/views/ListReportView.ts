@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla + UI5 replacement for `components/ListReport.tsx`.
  *
@@ -12,7 +12,7 @@
  */
 
 import { Component } from '../core/component';
-import { cx, html, raw, RawHtml } from '../core/html';
+import { cx, html, raw, RawHtml, toMarkup } from '../core/html';
 import { shallowEqual, watch } from '../core/store';
 import { appStore } from '../stores/appStore';
 import { backendStore } from '../stores/backendStore';
@@ -84,14 +84,54 @@ const formatUploadDate = (value: string): string =>
     day: 'numeric'
   });
 
+/** Formats edition and year for the List Report table column. */
+const renderEditionYear = (edition?: string, year?: string): RawHtml | string => {
+  const e = (edition || '').trim();
+  const y = (year || '').trim();
+  if (e && y && e !== y) {
+    return html`<div class="flex items-center gap-1.5 whitespace-nowrap">
+      <span class="font-medium text-gray-800 dark:text-gray-200">${e}</span>
+      <span class="text-gray-500 dark:text-gray-400 font-mono text-[11px]">(${y})</span>
+    </div>`;
+  }
+  if (e) {
+    return html`<span class="font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap">${e}</span>`;
+  }
+  if (y) {
+    return html`<span class="text-gray-600 dark:text-gray-300 font-mono text-xs whitespace-nowrap">${y}</span>`;
+  }
+  return '—';
+};
+
 export class ListReportView extends Component {
   /** Local UI state, the counterpart of the former `useState` in ListReport. */
   private filterBarExpanded = true;
+  private filterDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingFilters: Partial<Record<TextFilterKey, string>> = {};
 
+  /**
+   * Initializes the List Report view component with SAP Horizon container classes.
+   *
+   * WHAT: Calls `super(...)` with max-width responsive grid layout classes.
+   * WHY: Provides responsive horizontal margins and spacing matching the SAP Fiori design system.
+   */
   constructor() {
     super(undefined, 'div', 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5');
   }
 
+  /**
+   * Subscribes the view to relevant slices of application state and internationalization.
+   *
+   * WHAT:
+   * 1. Watches table query state (documents, counts, loading, page, sort) to trigger surgical table updates.
+   * 2. Watches filter state to synchronize UI inputs and update the active filter badge.
+   * 3. Subscribes to i18n store to re-render localized column labels and text upon language change.
+   *
+   * WHY:
+   * Fine-grained slicing via `watch()` decouples table re-rendering from filter typing. Typing in a search
+   * input updates `appStore.filters` without touching the table until the debounce interval expires,
+   * avoiding wasted renders and preserving input focus.
+   */
   protected onMount(): void {
     this.track(
       watch(
@@ -101,27 +141,70 @@ export class ListReportView extends Component {
           state.totalCount,
           state.loadingDocs,
           state.fetchError,
-          state.filters,
           state.page,
           state.pageSize,
           state.sortBy,
           state.sortOrder
         ],
-        () => this.requestRender(),
+        () => this.updateTableCard(),
         shallowEqual
       )
     );
-    this.track(i18nStore.subscribe(() => this.requestRender()));
+    this.track(
+      watch(
+        appStore,
+        (state) => [state.filters],
+        () => {
+          this.syncInputsFromState();
+          this.updateActiveFilterBadge();
+        },
+        shallowEqual
+      )
+    );
+    this.track(i18nStore.subscribe(() => this.render()));
+  }
+
+  /**
+   * Cleans up pending debounce timers during view destruction.
+   *
+   * WHAT: Cancels `filterDebounceTimer` if active.
+   * WHY: Prevents scheduled filter evaluations from triggering network fetches after navigation away.
+   */
+  protected onDestroy(): void {
+    if (this.filterDebounceTimer) {
+      clearTimeout(this.filterDebounceTimer);
+      this.filterDebounceTimer = null;
+    }
   }
 
   // ------------------------------------------------------------------
   // Template
   // ------------------------------------------------------------------
 
+  /**
+   * Generates the root markup containing dedicated filter and table card containers.
+   *
+   * WHAT: Returns markup with `[data-ref="filter-container"]` and `[data-ref="table-container"]`.
+   * WHY: Segregating the filter bar and table card into separate containers allows surgical,
+   * non-destructive DOM updates where the table can refresh without touching the filter inputs.
+   */
   protected template(): RawHtml {
-    return html`${this.filterBar()}${this.tableCard()}`;
+    return html`
+      <div data-ref="filter-container">
+        ${this.filterBar()}
+      </div>
+      <div data-ref="table-container">
+        ${this.tableCard()}
+      </div>
+    `;
   }
 
+  /**
+   * Computes the number of non-empty search filters currently applied.
+   *
+   * WHAT: Counts all filter attributes having non-whitespace values (ignoring format 'all').
+   * WHY: Drives the numeric badge count in the Filter Bar header, informing the user how many filters are active.
+   */
   private get activeFilterCount(): number {
     const filters = appStore.state.filters;
     return Object.entries(filters).filter(([key, value]) => {
@@ -132,11 +215,24 @@ export class ListReportView extends Component {
     }).length;
   }
 
+  /**
+   * Calculates total pagination pages based on total document count and page size.
+   *
+   * WHAT: Returns `Math.max(1, Math.ceil(totalCount / pageSize))`.
+   * WHY: Guarantees at least 1 page exists to prevent empty pagination controls.
+   */
   private get totalPages(): number {
     const { totalCount, pageSize } = appStore.state;
     return Math.max(1, Math.ceil(totalCount / pageSize));
   }
 
+  /**
+   * Renders the SAP Horizon Filter Bar card with toggle button, input fields, and action buttons.
+   *
+   * WHAT: Generates collapsible card with inputs for file name, title, author, edition, format, and content keywords.
+   * WHY: Follows the SAP Fiori List Report pattern: researchers can filter by single or combined fields,
+   * collapse the bar to gain vertical screen space, and trigger manual or debounced search.
+   */
   private filterBar(): RawHtml {
     const t = i18nStore.state.t;
     const { filters } = appStore.state;
@@ -159,20 +255,22 @@ export class ListReportView extends Component {
 
     return html`
       <div
-        class="bg-white rounded-lg shadow-sm border border-[#e2e8f0] overflow-hidden transition-all duration-200"
+        class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] overflow-hidden transition-all duration-200"
       >
         <div
-          class="px-5 py-3 border-b border-[#edf2f7] bg-[#f8fafc] flex items-center justify-between"
+          class="px-5 py-3 border-b border-[#edf2f7] dark:border-[#2e3b4a] bg-[#f8fafc] dark:bg-[#232c37] flex items-center justify-between"
         >
           <div class="flex items-center gap-2">
             ${icon('Filter', { className: 'w-4 h-4 text-[#0070f2]' })}
-            <h2 class="text-sm font-semibold text-gray-800">${t.listReport.filterArea}</h2>
-            ${activeCount > 0
-              ? html`<span
-                  class="ml-1.5 px-2 py-0.5 text-xs font-medium bg-[#0070f2] text-white rounded-full"
-                  >${String(activeCount)} ${t.listReport.activeFilters}</span
-                >`
-              : ''}
+            <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">${t.listReport.filterArea}</h2>
+            <span data-ref="active-filter-badge">
+              ${activeCount > 0
+                ? html`<span
+                    class="ml-1.5 px-2 py-0.5 text-xs font-medium bg-[#0070f2] text-white rounded-full"
+                    >${String(activeCount)} ${t.listReport.activeFilters}</span
+                  >`
+                : ''}
+            </span>
           </div>
 
           <div class="flex items-center gap-2">
@@ -267,6 +365,16 @@ export class ListReportView extends Component {
     `;
   }
 
+  /**
+   * Renders a labeled text filter input with persistent focus tracking.
+   *
+   * WHAT: Generates a `<ui5-input>` element configured with placeholder, accessible label, and focus tracking key.
+   * WHY: Binds input changes to reactive filter slices while preserving caret positions across re-renders.
+   *
+   * @param spec Text filter configuration.
+   * @param value Current filter string value.
+   * @returns Rendered input markup string.
+   */
   private textFilterField(spec: TextFilterSpec, value: string): string {
     return html`
       <div>
@@ -283,6 +391,14 @@ export class ListReportView extends Component {
     `.toString();
   }
 
+  /**
+   * Renders the primary SAP Horizon data table container and card shell.
+   *
+   * WHAT: Assembles table header bar, responsive table structure, and bottom pagination bar.
+   * WHY: Encapsulates the entire List Report data grid within a unified SAP Horizon card container.
+   *
+   * @returns RawHtml markup for the complete table card.
+   */
   private tableCard(): RawHtml {
     const t = i18nStore.state.t;
     const { totalCount } = appStore.state;
@@ -322,7 +438,7 @@ export class ListReportView extends Component {
             <thead>
               ${this.tableHead()}
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="bg-white dark:bg-[#1c232b]">
               ${this.tableBody()}
             </tbody>
           </table>
@@ -333,6 +449,14 @@ export class ListReportView extends Component {
     `;
   }
 
+  /**
+   * Generates the table header row with sortable column headers.
+   *
+   * WHAT: Maps Column definitions across file name, title, author, edition, format, size, and date into `<th>` elements.
+   * WHY: Centralizes table header definitions and labels following SAP Fiori List Report layout standards.
+   *
+   * @returns RawHtml representing the table header `<tr>`.
+   */
   private tableHead(): RawHtml {
     const t = i18nStore.state.t;
     const columns: SortableColumn[] = [
@@ -360,6 +484,15 @@ export class ListReportView extends Component {
     `;
   }
 
+  /**
+   * Renders a sortable column header element with click targets and visual indicators.
+   *
+   * WHAT: Generates a `<th>` tag with data-sort attribute and sort chevron icon.
+   * WHY: Allows users to click column headers to toggle ascending/descending order across all query attributes.
+   *
+   * @param column Column definition object.
+   * @returns Header HTML string.
+   */
   private sortableHeader(column: SortableColumn): string {
     return html`
       <th
@@ -373,6 +506,15 @@ export class ListReportView extends Component {
     `.toString();
   }
 
+  /**
+   * Renders sort order glyph indicators (up/down/unsorted) next to header titles.
+   *
+   * WHAT: Renders ArrowUp, ArrowDown, or dual ArrowUpDown depending on active sort column and direction.
+   * WHY: Provides clear visual cues to users regarding current sort column and direction.
+   *
+   * @param columnKey Target column key identifier.
+   * @returns RawHtml sort icon glyph.
+   */
   private sortIndicator(columnKey: string): RawHtml {
     const { sortBy, sortOrder } = appStore.state;
     if (sortBy !== columnKey) {
@@ -385,6 +527,14 @@ export class ListReportView extends Component {
     });
   }
 
+  /**
+   * Evaluates loading, error, empty, and data states to render table rows.
+   *
+   * WHAT: Inspects store states (loadingDocs, fetchError, documents) and branches to loading spinner, errorRow, emptyRow, or documentRow list.
+   * WHY: Encapsulates all asynchronous UI states in the table body while preserving column alignment.
+   *
+   * @returns RawHtml representing table body content.
+   */
   private tableBody(): RawHtml {
     const { loadingDocs, fetchError, documents } = appStore.state;
 
@@ -412,6 +562,15 @@ export class ListReportView extends Component {
     return raw(documents.map((doc) => this.documentRow(doc)).join(''));
   }
 
+  /**
+   * Renders the communication error state banner with recovery actions.
+   *
+   * WHAT: Displays an alert card with error details, retry button, offline engine switch, and settings shortcut.
+   * WHY: Provides actionable self-healing options when remote backend or network connections encounter failures.
+   *
+   * @param message Error description string.
+   * @returns RawHtml error row markup.
+   */
   private errorRow(message: string): RawHtml {
     return html`
       <tr>
@@ -453,6 +612,14 @@ export class ListReportView extends Component {
     `;
   }
 
+  /**
+   * Renders empty state guidance when no documents match active filter queries.
+   *
+   * WHAT: Displays an empty document graphic with reset filter action shortcut.
+   * WHY: Informs users that search criteria yielded 0 results and provides a one-click reset action.
+   *
+   * @returns RawHtml empty state row markup.
+   */
   private emptyRow(): RawHtml {
     return html`
       <tr>
@@ -478,11 +645,21 @@ export class ListReportView extends Component {
     `;
   }
 
+  /**
+   * Renders a single data row displaying document metadata and action buttons.
+   *
+   * WHAT: Generates a table row `<tr>` formatted with document badges, bibliographic title, author,
+   * edition, format extension, byte size, ingestion date, and delete action button.
+   * WHY: Implements the interactive List Report floorplan row with full clickability for Object Page navigation.
+   *
+   * @param doc The document record to render.
+   * @returns Table row HTML string.
+   */
   private documentRow(doc: DocumentRecord): string {
     return html`
       <tr
         data-guid="${doc.guid}"
-        class="hover:bg-[#f1f5f9]/70 cursor-pointer transition-colors group"
+        class="hover:bg-[#f1f5f9]/70 dark:hover:bg-[#26313e] cursor-pointer transition-colors group"
       >
         <td class="py-3 px-4">
           <div class="flex items-center gap-2 font-mono text-[11px] text-gray-800">
@@ -509,7 +686,9 @@ export class ListReportView extends Component {
           ${doc.bibtex.author || '—'}
         </td>
 
-        <td class="py-3 px-3 text-gray-500 whitespace-nowrap">${doc.bibtex.edition || '—'}</td>
+        <td class="py-3 px-3 text-gray-600 dark:text-gray-300">
+          ${renderEditionYear(doc.bibtex.edition, doc.bibtex.year)}
+        </td>
 
         <td class="py-3 px-3 text-gray-600 uppercase font-mono text-[11px]">${doc.format}</td>
 
@@ -535,6 +714,15 @@ export class ListReportView extends Component {
     `.toString();
   }
 
+  /**
+   * Renders the SAP Horizon pagination bar with row count indicators and navigation controls.
+   *
+   * WHAT: Generates page status labels ("Showing X to Y of Z"), page size selector (`ui5-select`),
+   * and directional paging buttons (first, previous, next, last).
+   * WHY: Enables intuitive navigation across large datasets while maintaining server-side slice bounds.
+   *
+   * @returns RawHtml pagination bar markup.
+   */
   private paginationBar(): RawHtml {
     const t = i18nStore.state.t;
     const { page, pageSize, totalCount, documents } = appStore.state;
@@ -593,23 +781,121 @@ export class ListReportView extends Component {
   // Behaviour
   // ------------------------------------------------------------------
 
+  /**
+   * Post-render lifecycle callback that wires event listeners for filter inputs and table interactions.
+   *
+   * WHAT: Invokes `bindFilterEvents()` and `bindTableEvents()`.
+   * WHY: Required after initial template render to attach UI5 Web Component and native DOM listeners.
+   */
   protected afterRender(): void {
+    this.bindFilterEvents();
+    this.bindTableEvents();
+  }
+
+  /**
+   * Surgically re-renders the Filter Bar container without modifying the table.
+   *
+   * WHAT: Replaces `[data-ref="filter-container"]` innerHTML and re-binds filter event listeners.
+   * WHY: Invoked when the filter bar is expanded or collapsed. Keeping this isolated avoids
+   * refreshing or re-scrolling the table underneath.
+   */
+  private updateFilterBar(): void {
+    const container = this.$<HTMLElement>('[data-ref="filter-container"]');
+    if (!container) return;
+    container.innerHTML = toMarkup(this.filterBar());
+    this.bindFilterEvents();
+  }
+
+  /**
+   * Surgically re-renders the Table Card container while preserving table scroll positions.
+   *
+   * WHAT:
+   * 1. Records horizontal and vertical scroll offsets from `[data-scroll-key="list-table"]`.
+   * 2. Replaces `[data-ref="table-container"]` innerHTML with freshly computed markup.
+   * 3. Re-binds table event handlers.
+   * 4. Restores scroll offsets to the new container.
+   *
+   * WHY:
+   * Crucial architectural optimization: By updating only the table container, the filter bar's
+   * DOM nodes remain completely untouched. This guarantees that typing in a search filter never
+   * drops keyboard focus, resets the text cursor, or cancels IME composition during catalog refreshes.
+   */
+  private updateTableCard(): void {
+    const container = this.$<HTMLElement>('[data-ref="table-container"]');
+    if (!container) return;
+    const scrollContainer = this.$<HTMLElement>('[data-scroll-key="list-table"]');
+    const scrollLeft = scrollContainer?.scrollLeft ?? 0;
+    const scrollTop = scrollContainer?.scrollTop ?? 0;
+
+    container.innerHTML = toMarkup(this.tableCard());
+    this.bindTableEvents();
+
+    const newScrollContainer = this.$<HTMLElement>('[data-scroll-key="list-table"]');
+    if (newScrollContainer) {
+      newScrollContainer.scrollLeft = scrollLeft;
+      newScrollContainer.scrollTop = scrollTop;
+    }
+  }
+
+  /**
+   * Binds event listeners for filter inputs, dropdowns, and search triggers.
+   *
+   * WHAT:
+   * 1. Toggle button: Expands/collapses filter bar.
+   * 2. Text inputs: Implements 3-character threshold + 350ms debounce.
+   * 3. Keydown Enter: Immediately triggers search without waiting for debounce.
+   * 4. Format select: Updates format filter immediately.
+   * 5. Reset button: Clears all inputs and resets store filters.
+   * 6. Go button: Dispatches current filter criteria immediately.
+   *
+   * WHY:
+   * The 3-character threshold prevents sending noisy queries to MongoDB and Qdrant for single
+   * letters, while the 350ms debounce ensures smooth typing without network lag.
+   */
+  private bindFilterEvents(): void {
     this.on('[data-action="toggle-filter-bar"]', 'click', () => {
       this.filterBarExpanded = !this.filterBarExpanded;
-      this.render();
+      this.updateFilterBar();
     });
 
-    // Free-text filters refetch on every keystroke, exactly as the React
-    // implementation did by keeping `filters` in the effect dependency array.
+    // 3-character threshold with debounce:
+    // User typing fewer than 3 characters does NOT start search.
+    // Typing >= 3 characters (or clearing to 0) debounces 350ms before searching.
+    // The filter input is NEVER re-rendered, keeping focus active until the user changes it!
     this.onAll('ui5-input[data-filter]', 'input', (event) => {
       const input = event.currentTarget as Input;
       const key = input.dataset.filter as TextFilterKey;
-      appStore.patchFilter(key, input.value);
+      if (!key) return;
+      const val = input.value;
+      const trimmed = val.trim();
+
+      this.pendingFilters[key] = val;
+
+      if (this.filterDebounceTimer) {
+        clearTimeout(this.filterDebounceTimer);
+        this.filterDebounceTimer = null;
+      }
+
+      // If user typed 1 or 2 characters: keep value in input, but do NOT trigger search
+      if (trimmed.length > 0 && trimmed.length < 3) {
+        return;
+      }
+
+      // If user cleared the input (0 chars) or entered at least 3 characters:
+      // Debounce by 350ms before executing the search
+      this.filterDebounceTimer = setTimeout(() => {
+        this.filterDebounceTimer = null;
+        this.applyDebouncedFilters();
+      }, 350);
     });
 
     this.onAll('ui5-input[data-filter]', 'keydown', (event) => {
       if ((event as KeyboardEvent).key === 'Enter') {
-        appStore.applyFilters();
+        if (this.filterDebounceTimer) {
+          clearTimeout(this.filterDebounceTimer);
+          this.filterDebounceTimer = null;
+        }
+        this.applyDirectFilters();
       }
     });
 
@@ -618,8 +904,130 @@ export class ListReportView extends Component {
       appStore.patchFilter('format', select.selectedOption?.value ?? 'all');
     });
 
-    this.onAll('[data-action="reset-filters"]', 'click', () => appStore.resetFilters());
-    this.on('[data-action="apply-filters"]', 'click', () => appStore.applyFilters());
+    this.onAll('[data-action="reset-filters"]', 'click', () => {
+      if (this.filterDebounceTimer) {
+        clearTimeout(this.filterDebounceTimer);
+        this.filterDebounceTimer = null;
+      }
+      this.pendingFilters = {};
+      this.$$<Input>('ui5-input[data-filter]').forEach((input) => {
+        input.value = '';
+      });
+      const formatSelect = this.$<Select>('ui5-select[data-filter="format"]');
+      if (formatSelect) {
+        formatSelect.value = 'all';
+      }
+      appStore.resetFilters();
+    });
+
+    this.on('[data-action="apply-filters"]', 'click', () => {
+      if (this.filterDebounceTimer) {
+        clearTimeout(this.filterDebounceTimer);
+        this.filterDebounceTimer = null;
+      }
+      this.applyDirectFilters();
+    });
+  }
+
+  /**
+   * Evaluates input fields and commits debounced filters to the store.
+   *
+   * WHAT: Compares each input value against store filters and invokes `appStore.setFilters` if changed.
+   * WHY: Only dispatches a store update if an actual change occurred, preventing unnecessary network queries.
+   */
+  private applyDebouncedFilters(): void {
+    const nextFilters: FilterState = { ...appStore.state.filters };
+    let changed = false;
+
+    this.$$<Input>('ui5-input[data-filter]').forEach((input) => {
+      const key = input.dataset.filter as TextFilterKey;
+      if (!key) return;
+      const val = input.value;
+      const trimmed = val.trim();
+      const currentStored = nextFilters[key] || '';
+
+      // Only apply if length >= 3 or length === 0
+      const targetVal = trimmed.length >= 3 ? val : (trimmed.length === 0 ? '' : '');
+      if (targetVal !== currentStored) {
+        nextFilters[key] = targetVal;
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      appStore.setFilters(nextFilters);
+    }
+  }
+
+  /**
+   * Immediately commits all input values to the filter store.
+   *
+   * WHAT: Reads all input and select values directly and calls `appStore.setFilters`.
+   * WHY: Invoked on Enter keypress or "Go" button click to bypass debounce delays.
+   */
+  private applyDirectFilters(): void {
+    const nextFilters: FilterState = { ...appStore.state.filters };
+    this.$$<Input>('ui5-input[data-filter]').forEach((input) => {
+      const key = input.dataset.filter as TextFilterKey;
+      if (!key) return;
+      const val = input.value;
+      const trimmed = val.trim();
+      nextFilters[key] = trimmed.length >= 3 ? val : (trimmed.length === 0 ? '' : val);
+    });
+    const formatSelect = this.$<Select>('ui5-select[data-filter="format"]');
+    if (formatSelect) {
+      nextFilters.format = formatSelect.selectedOption?.value ?? 'all';
+    }
+    appStore.setFilters(nextFilters);
+  }
+
+  /**
+   * Synchronizes input elements with store filter state when updated externally.
+   *
+   * WHAT: Checks if the input is currently focused before setting `input.value`.
+   * WHY: If the user is actively typing in a field, overwriting `input.value` would reset their cursor.
+   * The focus check ensures that only unfocused inputs are updated when external filters change (e.g. on Reset).
+   */
+  private syncInputsFromState(): void {
+    const active = document.activeElement;
+    const { filters } = appStore.state;
+    this.$$<Input>('ui5-input[data-filter]').forEach((input) => {
+      const key = input.dataset.filter as TextFilterKey;
+      if (!key) return;
+      const isFocused = input === active || input.contains(active);
+      if (!isFocused && input.value !== (filters[key] || '')) {
+        input.value = filters[key] || '';
+      }
+    });
+    const formatSelect = this.$<Select>('ui5-select[data-filter="format"]');
+    if (formatSelect && formatSelect.value !== (filters.format || 'all')) {
+      formatSelect.value = filters.format || 'all';
+    }
+  }
+
+  /**
+   * Surgically updates the active filter badge in the Filter Bar header.
+   *
+   * WHAT: Replaces the innerHTML of `[data-ref="active-filter-badge"]`.
+   * WHY: Provides immediate visual feedback for active filter count without re-rendering the filter inputs.
+   */
+  private updateActiveFilterBadge(): void {
+    const badgeContainer = this.$('[data-ref="active-filter-badge"]');
+    if (!badgeContainer) return;
+    const count = this.activeFilterCount;
+    badgeContainer.innerHTML = count > 0
+      ? `<span class="ml-1.5 px-2 py-0.5 text-xs font-medium bg-[#0070f2] text-white rounded-full">${count} ${i18nStore.state.t.listReport.activeFilters}</span>`
+      : '';
+  }
+
+  /**
+   * Binds interaction listeners for table actions, pagination, sorting, and drilldown.
+   *
+   * WHAT: Wires row clicks for navigation, sort headers, upload modal, delete dialog, and pagination buttons.
+   * WHY: Centralizes table interactivity and uses `event.stopPropagation()` on action cells to prevent
+   * opening the Object Page when clicking the delete icon.
+   */
+  private bindTableEvents(): void {
     this.on('[data-action="open-upload"]', 'click', () => appStore.openUpload());
 
     this.on('[data-action="retry"]', 'click', () => void appStore.fetchDocuments());

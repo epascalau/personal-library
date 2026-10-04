@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.repository;
 
 import com.personallibrary.model.DocumentEntity;
@@ -31,6 +35,9 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
     /**
      * Creates the fragment implementation.
      *
+     * WHAT: Initializes custom repository fragment with Spring Data MongoTemplate.
+     * WHY: Injects MongoTemplate dependency for programmatic MongoDB query compilation and execution.
+     *
      * @param mongoTemplate Template used to execute the dynamically assembled query.
      */
     public DocumentRepositoryCustomImpl(MongoTemplate mongoTemplate) {
@@ -39,6 +46,10 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
 
     /**
      * {@inheritDoc}
+     *
+     * WHAT: Builds Criteria conjunction from non-blank filters, counts matching documents, and executes paginated find.
+     * WHY: Running the count against the unpaged query guarantees accurate totalCount calculation for the List Report pager,
+     * while safe regex quoting prevents regex injection attacks.
      */
     @Override
     public Page<DocumentEntity> searchDocuments(
@@ -87,6 +98,9 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
     /**
      * Appends a case-insensitive "contains" criterion when the supplied value carries text.
      *
+     * WHAT: Compiles regex pattern and adds Criteria.where(field).regex(term) if value has text.
+     * WHY: Avoids polluting MongoDB query trees with null criteria branches for empty search inputs.
+     *
      * @param filters Mutable criteria accumulator.
      * @param field   Target MongoDB document field path.
      * @param value   Optional user supplied search term.
@@ -100,6 +114,10 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
     /**
      * Builds a case-insensitive substring pattern from a literal search term.
      *
+     * WHAT: Trims input, applies Pattern.quote(), and compiles with CASE_INSENSITIVE flag.
+     * WHY: Ensures special characters like parentheses, brackets, or dots in user search queries
+     * are treated as exact literal text rather than regex tokens.
+     *
      * @param value Raw user input.
      * @return Compiled pattern matching any occurrence of the literal term.
      */
@@ -109,6 +127,9 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
 
     /**
      * Builds a case-insensitive whole-value pattern from a literal term.
+     *
+     * WHAT: Trims input, quotes with Pattern.quote(), anchors with ^ and $, and compiles with CASE_INSENSITIVE.
+     * WHY: Enforces strict equality for categorical fields such as file format ("pdf", "docx") while ignoring case.
      *
      * @param value Raw user input.
      * @return Compiled anchored pattern matching the complete field value.
@@ -120,6 +141,9 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
     /**
      * Determines whether an optional filter value should be applied.
      *
+     * WHAT: Checks if value is non-null and not blank.
+     * WHY: Safely eliminates empty string queries from generating redundant database predicates.
+     *
      * @param value Candidate filter value.
      * @return {@code true} if the value is non-null and not blank.
      */
@@ -127,3 +151,4 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
         return value != null && !value.isBlank();
     }
 }
+

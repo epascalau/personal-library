@@ -1,5 +1,8 @@
 /**
- * @fileoverview Backend Adapter interface and protocol specifications for the Personal Library Application.
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Backend Adapter interface and protocol specifications for the Personal Library Application.
  * Supports swappable adapters between Integrated Gateway (/api/v1), Spring Boot (:8080),
  * Custom Remote Endpoints, and Standalone In-Memory Mock Engine.
  * @packageDocumentation
@@ -84,6 +87,11 @@ export interface BackendAdapter {
 
   /**
    * Retrieves a paginated list of documents filtered by user query criteria.
+   *
+   * WHAT: Queries documents matching search term, publication type, tag, and sort order.
+   * WHY: Server-side pagination and filtering minimizes memory footprint and network payload
+   * sizes when libraries scale to thousands of academic publications.
+   *
    * @param params Query parameters including pagination, sorting, and filter fields.
    * @returns Promise resolving to a paginated list of documents with total match count.
    */
@@ -97,13 +105,23 @@ export interface BackendAdapter {
 
   /**
    * Retrieves an individual document record by its persistent GUID.
+   *
+   * WHAT: Looks up full document entity, physical file attributes, BibTeX metadata, and dual-model summaries.
+   * WHY: Detailed document attributes and vector citation context are loaded on-demand for the Object Page
+   * rather than bloating the main list report table query.
+   *
    * @param guid Unique document identifier.
    * @returns Promise resolving to the requested document record.
    */
   getDocument(guid: string): Promise<DocumentRecord>;
 
   /**
-   * Ingests a new document asset with metadata and trigger dual-model summaries.
+   * Ingests a new document asset with metadata and triggers dual-model summaries.
+   *
+   * WHAT: Uploads file payload, generates chunks, writes vector embeddings to Qdrant, and runs Ollama summaries.
+   * WHY: Atomic multi-step ingestion guarantees that any document visible in the library is immediately searchable
+   * via semantic vector queries and has verified citation metadata.
+   *
    * @param payload Upload bundle containing physical asset or content with BibTeX info.
    * @returns Promise resolving to the newly created document record.
    */
@@ -120,6 +138,11 @@ export interface BackendAdapter {
 
   /**
    * Overwrites the content and metadata of an existing document while preserving its GUID.
+   *
+   * WHAT: Updates physical file, re-indexes vector embeddings, advances version number, and preserves stable GUID.
+   * WHY: In-place revision advancement ensures external academic references, permanent URLs, and shared citations
+   * continue pointing to the stable document GUID while refreshing obsolete content.
+   *
    * @param guid Unique identifier of the document to overwrite.
    * @param payload Updated content, file, or metadata.
    * @returns Promise resolving to the updated document record.
@@ -140,6 +163,11 @@ export interface BackendAdapter {
 
   /**
    * Permanently deletes a document and its associated vector embeddings.
+   *
+   * WHAT: Purges physical storage file, document entity from database, and vector points from Qdrant.
+   * WHY: Cascading deletion across relational and vector databases prevents orphaned embeddings from appearing
+   * in future semantic RAG search queries.
+   *
    * @param guid Unique document identifier.
    * @returns Promise resolving to operation status.
    */
@@ -147,6 +175,10 @@ export interface BackendAdapter {
 
   /**
    * Triggers re-computation of a summary for a specific Spring AI model.
+   *
+   * WHAT: Submits document text to either Llama 3.3 or Mistral via Ollama and saves regenerated summary.
+   * WHY: Allows researchers to independently benchmark dual LLM summaries or regenerate if prompting rules evolve.
+   *
    * @param guid Document identifier.
    * @param modelKey Target model engine ('llama' | 'mistral').
    * @returns Promise resolving to the newly computed summary record.
@@ -155,6 +187,10 @@ export interface BackendAdapter {
 
   /**
    * Dispatches a user query to the RAG chat engine with vector retrieval.
+   *
+   * WHAT: Performs cosine similarity search over document chunks in Qdrant, constructs prompt with citations, and generates synthesis.
+   * WHY: Grounding answers in verified document chunks with similarity scores eliminates hallucinations and provides direct citations.
+   *
    * @param guid Document identifier context.
    * @param question User question prompt.
    * @param chatHistory Dialogue history turns.
@@ -168,6 +204,10 @@ export interface BackendAdapter {
 
   /**
    * Analyzes document text and filename to suggest extracted BibTeX metadata.
+   *
+   * WHAT: Inspects document headers, DOIs, arXiv patterns, and paper titles using heuristics or fast LLM extraction.
+   * WHY: Automated extraction eliminates manual entry of 15+ bibliographic fields, speeding up researcher workflows.
+   *
    * @param fileName Name of the document file.
    * @param sampleContent Optional text content sample.
    * @param fileData Optional base64-encoded raw file bytes.
@@ -183,6 +223,10 @@ export interface BackendAdapter {
 
   /**
    * Authenticates the user with Keycloak OIDC.
+   *
+   * WHAT: Verifies credentials, retrieves Bearer JWT token, and decodes role and profile claims.
+   * WHY: OpenID Connect provides enterprise Single Sign-On (SSO) and enables role-based access control (RBAC).
+   *
    * @param username User credentials username.
    * @param password Optional password.
    * @param realm Optional tenant realm.
@@ -196,12 +240,20 @@ export interface BackendAdapter {
 
   /**
    * Terminates active Keycloak session.
+   *
+   * WHAT: Clears access tokens and notifies auth provider of session termination.
+   * WHY: Clean session invalidation prevents credential reuse on shared workstations.
+   *
    * @returns Promise resolving once logout complete.
    */
   logout(): Promise<void>;
 
   /**
    * Generates download URL for document asset.
+   *
+   * WHAT: Constructs HTTP URL or data blob link for direct document downloading.
+   * WHY: Direct download links allow browser native streaming for large PDF monographs and technical presentations.
+   *
    * @param guid Unique document identifier.
    * @returns Download link URL.
    */
@@ -209,12 +261,20 @@ export interface BackendAdapter {
 
   /**
    * Retrieves raw OpenAPI 3.0.3 specification YAML document.
+   *
+   * WHAT: Reads and returns the active API schema definition.
+   * WHY: Provides live schema inspection for enterprise integration and API contract verification.
+   *
    * @returns Promise resolving to YAML string.
    */
   getOpenApiSpec(): Promise<string>;
 
   /**
    * Probes the backend endpoint to evaluate connection status and latency.
+   *
+   * WHAT: Sends health ping to `/api/v1/health` and measures round-trip duration.
+   * WHY: Continuous health diagnostics alert administrators immediately if Spring Boot, Qdrant, or Ollama goes offline.
+   *
    * @returns Promise resolving to health diagnostic details.
    */
   testHealth(): Promise<BackendHealthResult>;

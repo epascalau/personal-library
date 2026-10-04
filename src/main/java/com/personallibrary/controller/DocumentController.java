@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +56,12 @@ public class DocumentController {
      * List Report Floorplan query:
      * Supports single or combined filters: file name, document name, author, edition, format, content.
      *
+     * WHAT: Executes a dynamic multi-attribute search across both relational metadata and document full-text,
+     * applying pagination and custom sorting.
+     *
+     * WHY: Paginating and filtering on the database level prevents high-memory overhead on the client,
+     * while supporting fuzzy case-insensitive substring queries aligns with the SAP Fiori List Report standard.
+     *
      * @param fileName  Filter for physical file name.
      * @param title     Filter for bibliographic title.
      * @param author    Filter for author name.
@@ -89,6 +99,13 @@ public class DocumentController {
      * Uploads a single file and triggers automated pipeline:
      * file persistence, BibTeX extraction, Qdrant vector indexing, and dual model summaries.
      *
+     * WHAT: Ingests a multipart physical file, generates text chunks, writes dense embeddings into Qdrant,
+     * computes dual Llama 3.3 and Mistral summaries, and creates a persistent document record with a unique GUID.
+     *
+     * WHY: Performing full ingestion atomically within the backend upload pipeline guarantees that as soon as
+     * the client receives HTTP 201 Created, the document is immediately queryable via semantic vector RAG search
+     * and has complete bibliographic citations.
+     *
      * @param file       Uploaded multipart file.
      * @param bibtexJson Optional JSON-encoded BibTeX metadata.
      * @return {@link DocumentResponse} representing the new document.
@@ -112,6 +129,11 @@ public class DocumentController {
     /**
      * AI extraction preview helper endpoint.
      *
+     * WHAT: Accepts a file name and content sample and infers structured BibTeX metadata fields.
+     *
+     * WHY: Running extraction on a lightweight preview endpoint allows the frontend upload modal
+     * to pre-populate form fields for user review before committing physical file storage or Qdrant embeddings.
+     *
      * @param payload Map containing fileName and contentSample.
      * @return Extracted {@link BibTeXMetadata}.
      */
@@ -127,6 +149,12 @@ public class DocumentController {
     /**
      * Object Page Floorplan: Retrieve document details.
      *
+     * WHAT: Fetches complete document entity by GUID, including physical metadata, BibTeX fields,
+     * and dual model summaries.
+     *
+     * WHY: Provides a single REST lookup for the detailed SAP Fiori Object Page, returning fully
+     * denormalized metadata in a single network round-trip.
+     *
      * @param guid Unique document identifier.
      * @return {@link DocumentResponse} DTO.
      */
@@ -138,6 +166,12 @@ public class DocumentController {
 
     /**
      * Overwrites active document content and metadata in-place while keeping its existing GUID.
+     *
+     * WHAT: Replaces the stored file asset and/or metadata, increments `versionNumber`, re-chunks text,
+     * re-embeds vectors into Qdrant, and updates the existing document entity.
+     *
+     * WHY: Stable GUID preservation ensures existing citation links and external URLs remain valid
+     * across document revisions, reflecting academic library versioning standards.
      *
      * @param guid       Document GUID to overwrite.
      * @param file       Optional replacement file asset.
@@ -163,6 +197,11 @@ public class DocumentController {
     /**
      * Permanently purges a document, its physical asset, and vector embeddings.
      *
+     * WHAT: Cascades deletion across database storage, file system repositories, and Qdrant vector collections.
+     *
+     * WHY: Complete multi-store cascading purge prevents orphaned vector embeddings from polluting
+     * future semantic RAG searches or consuming disk space.
+     *
      * @param guid Unique document identifier.
      * @return Status map confirming purge.
      */
@@ -178,6 +217,11 @@ public class DocumentController {
 
     /**
      * Triggers summary regeneration for a specific model (Llama 3.3 or Mistral Large).
+     *
+     * WHAT: Sends document content to the requested Ollama model engine and updates the document's summary map.
+     *
+     * WHY: Allows researchers to benchmark individual models independently or recompute summaries if model
+     * parameters, system prompts, or upstream context changes.
      *
      * @param guid    Document GUID.
      * @param request {@link SummarizeRequest} indicating target model engine.
@@ -206,6 +250,12 @@ public class DocumentController {
 
     /**
      * Interactive RAG conversational chat scoped to the active document.
+     *
+     * WHAT: Queries Qdrant vector store for semantic citations matching the user's question, constructs
+     * a grounded contextual prompt, and generates an answer via Llama 3.3.
+     *
+     * WHY: RAG grounding constrains the model's responses to verified excerpts from the active document,
+     * returning exact citation snippets and similarity scores to eliminate factual hallucination.
      *
      * @param guid    Document GUID.
      * @param request {@link ChatRequest} with question and conversation history.

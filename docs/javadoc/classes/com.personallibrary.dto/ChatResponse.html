@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatResponse (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>ChatResponse</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class ChatResponse</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>ChatResponse</strong>
+          
+          
+        </div>
+        <p>Data Transfer Object containing the synthesized RAG model answer along with ground-truth citations retrieved from the Qdrant vector database.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>answer</code></td>
+                <td class="desc-col">Synthesized answer markdown. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>modelUsed</code></td>
+                <td class="desc-col">Model engine identifier that synthesized the response. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private List&lt;CitationDto&gt;</td>
+                <td class="name-col"><code>citations</code></td>
+                <td class="desc-col">Cited semantic chunks verifying the factual claims. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>chunkIndex</code></td>
+                <td class="desc-col">Positional index of the referenced document chunk. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private double</td>
+                <td class="name-col"><code>score</code></td>
+                <td class="desc-col">Cosine vector similarity score. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>snippet</code></td>
+                <td class="desc-col">Verbatim passage excerpt. */</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public ChatResponse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">of</a></strong>(String answer, String modelUsed)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Factory method creating a quick ChatResponse without citations.  WHAT: Constructs a ChatResponse with an empty list of citations. WHY: Provides an expressive, clean instantiation pattern for direct model responses or error answers.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public answe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">r</a></strong>(Object answer)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public modelUse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">d</a></strong>(Object modelUsed)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public citation</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">s</a></strong>(Object Collections.emptyList()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">of</div>
+            
+            <div class="signature">
+              public ChatResponse <strong>of</strong>(String answer, String modelUsed)
+            </div>
+            <p>Factory method creating a quick ChatResponse without citations.  WHAT: Constructs a ChatResponse with an empty list of citations. WHY: Provides an expressive, clean instantiation pattern for direct model responses or error answers.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>answer</code> - Synthesized answer markdown.</dd><dd><code>modelUsed</code> - LLM model engine name.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>ChatResponse instance.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public answe <strong>r</strong>(Object answer)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public modelUse <strong>d</strong>(Object modelUsed)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public citation <strong>s</strong>(Object Collections.emptyList()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

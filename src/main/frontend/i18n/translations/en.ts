@@ -1,3 +1,10 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * English (US) dictionary for Personal Library SAP Fiori Horizon UI.
+ */
+
 import { TranslationDictionary } from '../types';
 
 export const en: TranslationDictionary = {
@@ -90,7 +97,7 @@ export const en: TranslationDictionary = {
     noDocsSubtitle: 'Try adjusting your search filters or upload a new document to the library.',
     uploadPrompt: 'Upload First Document',
     rowsPerPage: 'Rows per page:',
-    inspectTooltip: 'Inspect Document (Object Page)',
+    inspectTooltip: 'Click on a row to navigate to the details page of the selected document',
     deleteTooltip: 'Delete Document',
     newVersionTooltip: 'Upload New Version / Edit',
     errorTitle: 'Backend Unavailable',
@@ -184,8 +191,8 @@ export const en: TranslationDictionary = {
     activeAdapter: 'Active Backend Driver',
     selectPreset: 'Architecture Presets',
     presetGateway: 'Integrated Gateway (/api/v1)',
-    presetSpringBoot: 'Spring Boot Backend (:8080)',
-    presetMock: 'Standalone Mock Engine (Offline)',
+    presetSpringBoot: 'Direct Java Spring Boot (http://localhost:8080/api/v1)',
+    presetMock: 'Local Standalone Engine (Offline / In-Memory)',
     presetCustom: 'Custom Remote API Endpoint',
     baseUrl: 'Base URL',
     authToken: 'Bearer JWT / API Token',
@@ -199,6 +206,9 @@ export const en: TranslationDictionary = {
     architecture: 'Decoupled Backend Architecture',
     springAi: 'Spring AI + Ollama (Llama & Mistral)',
     qdrant: 'Qdrant Vector Store',
+    license: 'License',
+    licenseInfo: 'Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)',
+    viewLicense: 'View License (GNU AGPLv3)',
     trademarkDisclaimer: 'SAP, SAP Fiori, SAP Horizon and other SAP products and services mentioned herein as well as their respective logos are trademarks or registered trademarks of SAP SE in Germany and other countries. This independent application is not affiliated with, endorsed by, sponsored by, or associated with SAP SE.'
   }
 };

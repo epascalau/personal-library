@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla + UI5 replacement for `components/AuthModal.tsx`.
  *
@@ -53,22 +53,60 @@ export class AuthModalView extends DialogView {
 
   private errorMsg = '';
 
+  /**
+   * Initializes the AuthModalView component.
+   *
+   * WHAT: Calls base DialogView constructor with `undefined` props.
+   * WHY: The authentication modal's state (open/closed, current user) is driven globally
+   * from `appStore`, eliminating the need for local constructor properties.
+   */
   constructor() {
     super(undefined);
   }
 
+  /**
+   * Checks whether the authentication modal is currently opened.
+   *
+   * WHAT: Queries `appStore.state.authModalOpen`.
+   * WHY: Driving visibility from the central application store allows any part of the UI
+   * (ShellBar login button, HTTP 401 response interceptor, session timeout warning) to prompt the user for credentials.
+   *
+   * @returns `true` if open, `false` otherwise.
+   */
   protected isOpen(): boolean {
     return appStore.state.authModalOpen;
   }
 
+  /**
+   * Determines if the user can dismiss the authentication modal.
+   *
+   * WHAT: Returns `!this.loading`.
+   * WHY: Disallowing dismissal while Keycloak OIDC authentication is in flight prevents orphaned
+   * network requests and indeterminate credential states.
+   *
+   * @returns `true` if safe to close, `false` if authentication is in progress.
+   */
   protected canClose(): boolean {
     return !this.loading;
   }
 
+  /**
+   * Dispatches the store action to dismiss the authentication modal.
+   *
+   * WHAT: Invokes `appStore.closeAuth()`.
+   * WHY: Centralizing the close action in the store ensures any dependent UI triggers
+   * or focus restorations are handled consistently.
+   */
   protected requestClose(): void {
     appStore.closeAuth();
   }
 
+  /**
+   * Subscribes to authentication modal visibility changes.
+   *
+   * WHAT: Tracks `appStore.state.authModalOpen` and re-renders when toggled.
+   * WHY: Enables reactive open/close transitions when triggered by external events.
+   */
   protected onMount(): void {
     super.onMount();
     this.track(
@@ -80,6 +118,17 @@ export class AuthModalView extends DialogView {
     );
   }
 
+  /**
+   * Renders the Keycloak OIDC login form markup.
+   *
+   * WHAT: Generates header banner, quick-connect profile selector buttons, username/password/realm inputs,
+   * error display box, and the submission button.
+   * WHY: Providing preconfigured quick-connect profiles allows instant demonstration of role-based access
+   * control (Administrator vs Academic Fellow) without tedious manual typing, while custom UI5 inputs ensure
+   * accessibility and theme consistency.
+   *
+   * @returns RawHtml modal layout.
+   */
   protected body(): RawHtml {
     return html`
       <div slot="header" class="w-full">
@@ -157,6 +206,16 @@ export class AuthModalView extends DialogView {
     `;
   }
 
+  /**
+   * Generates markup for an individual quick-connect demo profile card.
+   *
+   * WHAT: Returns HTML button formatted with user name, subtitle, and active selection state.
+   * WHY: Visual highlighting of active profiles lets users immediately understand which persona
+   * credentials will be dispatched to the backend.
+   *
+   * @param profile Quick-connect profile record.
+   * @returns HTML string.
+   */
   private quickProfileButton(profile: QuickProfile): string {
     const active = this.username.includes(profile.match);
     return html`
@@ -176,6 +235,19 @@ export class AuthModalView extends DialogView {
     `.toString();
   }
 
+  /**
+   * Generates HTML markup for a branded SAP UI5 text or password input field.
+   *
+   * WHAT: Emits an input container with label, `ui5-input` custom element, slotted leading icon, and focus-key tracking.
+   * WHY: Specifying `data-focus-key` ensures that when re-renders happen, the user's cursor and active focus
+   * remain untouched, avoiding dropped keyboard input while typing.
+   *
+   * @param label Human-readable field label.
+   * @param key State key ('username' | 'password' | 'realm').
+   * @param value Current string value.
+   * @param options Styling and input type parameters.
+   * @returns HTML string.
+   */
   private field(
     label: string,
     key: 'username' | 'password' | 'realm',
@@ -204,6 +276,13 @@ export class AuthModalView extends DialogView {
     `.toString();
   }
 
+  /**
+   * Binds user event listeners to quick profiles, inputs, Enter key presses, and form submissions.
+   *
+   * WHAT: Registers delegated event listeners for click, input, keydown, and submit events.
+   * WHY: Event delegation ensures clean handling of custom UI5 web component input events
+   * and allows keyboard navigation (pressing Enter to submit) to behave seamlessly.
+   */
   protected bind(): void {
     this.onAll('[data-quick-profile]', 'click', (event) => {
       const button = event.currentTarget as HTMLElement;
@@ -231,6 +310,14 @@ export class AuthModalView extends DialogView {
     });
   }
 
+  /**
+   * Executes the authentication request against the active backend adapter.
+   *
+   * WHAT: Validates inputs, sets loading state, calls `requestBackend('login', ...)`, commits token to `appStore`,
+   * and closes the dialog on success or displays an error message on failure.
+   * WHY: Routing authentication through `requestBackend` ensures credentials are processed appropriately whether
+   * the active adapter is the integrated Node server, remote Spring Boot backend, or offline mock sandbox.
+   */
   private async submit(): Promise<void> {
     if (this.loading) {
       return;

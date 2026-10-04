@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Bridges the typed backend event bus to the concrete `BackendAdapter`.
  *
@@ -90,11 +90,25 @@ export class BackendGateway {
   private readonly disposers: Unsubscribe[] = [];
 
   /**
-   * @param resolveAdapter Returns the adapter that is active *at the moment a
-   * request is handled*, so a preset switch takes effect immediately.
+   * Constructs the backend gateway with a dynamic adapter resolver function.
+   *
+   * WHAT: Accepts a getter function `resolveAdapter: () => BackendAdapter`.
+   * WHY: Resolving the adapter lazily at request execution time ensures that when the user
+   * switches environment configurations (e.g. from Integrated Mock to Spring Boot :8080),
+   * the very next dispatched request automatically routes to the new adapter without needing
+   * to rebuild event bus listeners or restart subscribers.
+   *
+   * @param resolveAdapter Callback returning the currently active backend adapter.
    */
   constructor(private readonly resolveAdapter: () => BackendAdapter) {}
 
+  /**
+   * Subscribes the gateway to all backend request topics on the event bus.
+   *
+   * WHAT: Iterates `BACKEND_OPERATION_NAMES`, registers request event listeners, and stores disposers.
+   * WHY: Centralizes request consumption so all business operations (documents, uploads, auth, summaries)
+   * funnel through a uniform pipeline that handles telemetry, error normalization, and timing.
+   */
   start(): void {
     if (this.disposers.length > 0) {
       return;
@@ -108,11 +122,34 @@ export class BackendGateway {
     });
   }
 
+  /**
+   * Unsubscribes all event bus listeners and halts request handling.
+   *
+   * WHAT: Executes and clears all stored disposer callbacks.
+   * WHY: Prevents dangling event listeners when tearing down environments or in automated tests.
+   */
   stop(): void {
     this.disposers.forEach((dispose) => dispose());
     this.disposers.length = 0;
   }
 
+  /**
+   * Executes a received request envelope against the active adapter and publishes the outcome.
+   *
+   * WHAT:
+   * 1. Emits `backend:request:started` telemetry event.
+   * 2. Measures roundtrip latency using high-resolution `performance.now()`.
+   * 3. Invokes the matching method on the active adapter.
+   * 4. Publishes a correlated success envelope on success, or normalizes errors via `toBackendError`
+   *    and publishes a failure envelope on failure.
+   * 5. Emits `backend:request:settled` event with final duration.
+   *
+   * WHY: Standardizes response timing, correlation ID routing, and error classification across
+   * all operations, ensuring UI components receive consistent error messages regardless of whether
+   * an error originated in a fetch network failure or a backend HTTP 500.
+   *
+   * @param envelope Request envelope containing requestId, operation name, and payload.
+   */
   private async execute(envelope: BackendRequestEnvelope): Promise<void> {
     const { requestId, operation, request } = envelope;
     const startedAt = performance.now();
@@ -160,10 +197,22 @@ export class BackendGateway {
 }
 
 /**
- * Promise facade over the request/response event pair.
+ * Dispatches an operation across the backend event bus and awaits its correlated reply.
  *
- * Communication still flows entirely through the bus — this only correlates
- * the reply for call sites that read like ordinary async code.
+ * WHAT:
+ * 1. Generates a unique correlation `requestId`.
+ * 2. Sets up temporary, one-shot event bus subscriptions for success and failure matching the `requestId`.
+ * 3. Publishes the request envelope onto the bus.
+ * 4. Resolves or rejects the returned promise and cleans up temporary listeners immediately.
+ *
+ * WHY:
+ * Combines the architectural decoupling of an event-driven architecture with the developer ergonomics
+ * of standard async/await code. Callers write `await requestBackend('getDocuments', ...)` while
+ * the entire message passes through the observable, swappable event bus.
+ *
+ * @param operation Name of the backend operation.
+ * @param request Typed request arguments.
+ * @returns Promise resolving to the typed operation response.
  */
 export const requestBackend = <K extends BackendOperationName>(
   operation: K,
@@ -204,8 +253,15 @@ export const requestBackend = <K extends BackendOperationName>(
 };
 
 /**
- * Fire-and-forget variant: publishes the request and returns its correlation
- * id so the caller can observe the outcome through the bus.
+ * Dispatches a fire-and-forget request on the event bus without awaiting the result.
+ *
+ * WHAT: Generates a `requestId`, publishes the request envelope, and immediately returns the ID.
+ * WHY: Useful for asynchronous background triggers (such as telemetry, prefetching, or heartbeat pings)
+ * where the calling code does not need to block on the response.
+ *
+ * @param operation Name of the backend operation.
+ * @param request Typed request payload.
+ * @returns The unique correlation requestId generated for this request.
  */
 export const dispatchBackend = <K extends BackendOperationName>(
   operation: K,

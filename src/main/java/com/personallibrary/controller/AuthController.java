@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +30,14 @@ public class AuthController {
 
     /**
      * Retrieves the profile and roles of the currently authenticated Keycloak user.
+     *
+     * WHAT: Resolves claims (subject ID, username, email, full name, realm roles) from the active
+     * Spring Security JWT principal. If running in local mock development without an active OAuth2
+     * authorization server, provides a default administrative persona.
+     *
+     * WHY: Inspecting claims via `@AuthenticationPrincipal Jwt` leverages Spring Security's native
+     * reactive context instead of manual bearer header parsing, while the mock fallback ensures
+     * uninterrupted offline development and automated testing without requiring a live Keycloak Docker container.
      *
      * @param jwt Decoded bearer JWT injected by Spring Security.
      * @return User profile details including user ID, name, email, roles, and active realm.
@@ -58,6 +70,13 @@ public class AuthController {
     /**
      * Direct authentication or mock token exchange for development workflows.
      *
+     * WHAT: Accepts username/password credentials and issues a signed or development bearer JWT
+     * with associated user identity and role scopes.
+     *
+     * WHY: Provides a seamless authentication endpoint for single-page applications and CLI scripts
+     * that prefer direct token issuance over browser redirect-based authorization code flows during
+     * local sandbox evaluation.
+     *
      * @param credentials Map containing username, password, and realm.
      * @return Bearer token response bundle.
      */
@@ -82,6 +101,11 @@ public class AuthController {
 
     /**
      * Invalidates active Keycloak authentication session.
+     *
+     * WHAT: Signals the client that the authentication session is terminated and returns success confirmation.
+     *
+     * WHY: Explicit logout endpoints ensure client applications can cleanly purge stored JWTs, clear
+     * session caches, and prevent unauthorized reuse of lingering tokens on shared multi-user workstations.
      *
      * @return Confirmation response.
      */

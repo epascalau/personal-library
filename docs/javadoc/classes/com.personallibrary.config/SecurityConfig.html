@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SecurityConfig (com.personallibrary.config) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.config.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.config.html">com.personallibrary.config</a> &gt;
+      <strong>SecurityConfig</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.config</div>
+        <h2>class SecurityConfig</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Configuration</span>  <span class="annotation">@EnableWebSecurity</span>  <span class="annotation">@EnableMethodSecurity</span> </div>
+        <div class="signature">
+          public class <strong>SecurityConfig</strong>
+          
+          
+        </div>
+        <p>Spring Security Configuration for Keycloak OpenID Connect JWT Resource Server. Enforces stateless bearer token validation, extracts realm and client roles, and sets up Cross-Origin Resource Sharing (CORS) policies.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>source</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>converter</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public SecurityFilterChain</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">securityFilterChain</a></strong>(HttpSecurity http)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Configures the main Spring Security filter chain.  WHAT: Configures stateless session management, disables CSRF for stateless REST operations, permits public access to documentation, health, and auth endpoints, and configures OAuth2 JWT resource server validation. WHY: Stateless session policies eliminate server-side session overhead in distributed enterprise environments, while JWT token verification guarantees that only requests validated by Keycloak OIDC realms are authorized.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">s</a></strong>(cors -&gt; cors.configurationSource(corsConfigurationSource()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public csr</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">f</a></strong>(csrf -&gt; csrf.disable()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public sessionManagemen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">t</a></strong>(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public authorizeHttpRequest</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">s</a></strong>(auth -&gt; auth // Public endpoints: OpenAPI / Swagger, Health checks, and dev routes .requestMatchers( &quot;/api/v1/auth/**&quot;, Object &quot;/api-docs/**&quot;, Object &quot;/swagger-ui/**&quot;, Object &quot;/swagger-ui.html&quot;, Object &quot;/actuator/health&quot;, Object &quot;/api/v1/openapi.yaml&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public anyReques</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public oauth2ResourceServe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">r</a></strong>(oauth2 -&gt; oauth2 .jwt(jwt -&gt; jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public CorsConfigurationSource</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">corsConfigurationSource</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Configures universal CORS rules allowing browser clients to communicate with the REST API.  WHAT: Permits cross-origin requests with all standard HTTP methods, headers, and credential support. WHY: Supports decoupled frontends hosted on separate ports (e.g. Vite on 3000, Spring Boot on 8080) during development and preview deployments without CORS rejection.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">CorsConfiguration</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setAllowedOriginPattern</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">s</a></strong>(Object List.of(&quot;*&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setAllowedMethod</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">s</a></strong>(Object List.of(&quot;GET&quot;, Object &quot;POST&quot;, Object &quot;PUT&quot;, Object &quot;DELETE&quot;, Object &quot;OPTIONS&quot;, Object &quot;HEAD&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setAllowedHeader</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">s</a></strong>(Object List.of(&quot;*&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setAllowCredential</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">s</a></strong>(Object true)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setMaxAg</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">e</a></strong>(Object 3600L)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">UrlBasedCorsConfigurationSource</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public registerCorsConfiguratio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">n</a></strong>(Object &quot;/**&quot;, Object config)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public AbstractAuthenticationToken&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">jwtAuthenticationConverter</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Converts a decoded Keycloak JWT into Spring Security authentication token with parsed roles.  WHAT: Creates a JwtAuthenticationConverter wired with KeycloakRealmRoleConverter. WHY: Standard Spring Security JWT decoders look for `SCOPE_` claims, whereas Keycloak encapsulates realm-level permissions in nested `realm_access.roles` JSON objects.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">JwtAuthenticationConverter</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setJwtGrantedAuthoritiesConverte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">r</a></strong>(new KeycloakRealmRoleConverter()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Collection&lt;GrantedAuthority&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">convert</a></strong>(Jwt jwt)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Converts Keycloak JWT claims into Spring Security GrantedAuthority instances.  WHAT: Reads `realm_access.roles` array from claims, prefixes each role name with `ROLE_`, and wraps in SimpleGrantedAuthority. WHY: Spring Security role-based access checks (e.g. `@PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)`) require authorities to start with the standard `ROLE_` prefix.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getClaim</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">s</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">f</a></strong>(realmAccess == null || realmAccess.isEmpty()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public emptyLis</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ge</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">t</a></strong>(Object &quot;roles&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">f</a></strong>(roles == null)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public emptyLis</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strea</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">m</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">p</a></strong>(roleName -&gt; &quot;ROLE_&quot; + roleName.toUpperCase()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">p</a></strong>(Object SimpleGrantedAuthority::new)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public collec</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">t</a></strong>(Object Collectors.toList()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">securityFilterChain</div>
+            <div><span class="annotation">@Bean</span> </div>
+            <div class="signature">
+              public SecurityFilterChain <strong>securityFilterChain</strong>(HttpSecurity http)
+            </div>
+            <p>Configures the main Spring Security filter chain.  WHAT: Configures stateless session management, disables CSRF for stateless REST operations, permits public access to documentation, health, and auth endpoints, and configures OAuth2 JWT resource server validation. WHY: Stateless session policies eliminate server-side session overhead in distributed enterprise environments, while JWT token verification guarantees that only requests validated by Keycloak OIDC realms are authorized.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>http</code> - Spring Security HTTP builder.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Configured {@link SecurityFilterChain}.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Throws:</dt>
+                <dd><code>Exception</code> - If an error occurs configuring web security.</dd>
+              </dl>
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public cor <strong>s</strong>(cors -&gt; cors.configurationSource(corsConfigurationSource()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public csr <strong>f</strong>(csrf -&gt; csrf.disable()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public sessionManagemen <strong>t</strong>(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public authorizeHttpRequest <strong>s</strong>(auth -&gt; auth // Public endpoints: OpenAPI / Swagger, Health checks, and dev routes .requestMatchers( &quot;/api/v1/auth/**&quot;, Object &quot;/api-docs/**&quot;, Object &quot;/swagger-ui/**&quot;, Object &quot;/swagger-ui.html&quot;, Object &quot;/actuator/health&quot;, Object &quot;/api/v1/openapi.yaml&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public anyReques <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public oauth2ResourceServe <strong>r</strong>(oauth2 -&gt; oauth2 .jwt(jwt -&gt; jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">corsConfigurationSource</div>
+            <div><span class="annotation">@Bean</span> </div>
+            <div class="signature">
+              public CorsConfigurationSource <strong>corsConfigurationSource</strong>()
+            </div>
+            <p>Configures universal CORS rules allowing browser clients to communicate with the REST API.  WHAT: Permits cross-origin requests with all standard HTTP methods, headers, and credential support. WHY: Supports decoupled frontends hosted on separate ports (e.g. Vite on 3000, Spring Boot on 8080) during development and preview deployments without CORS rejection.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>CORS configuration source.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">CorsConfiguration</div>
+            
+            <div class="signature">
+              public new <strong>CorsConfiguration</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public setAllowedOriginPattern <strong>s</strong>(Object List.of(&quot;*&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public setAllowedMethod <strong>s</strong>(Object List.of(&quot;GET&quot;, Object &quot;POST&quot;, Object &quot;PUT&quot;, Object &quot;DELETE&quot;, Object &quot;OPTIONS&quot;, Object &quot;HEAD&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public setAllowedHeader <strong>s</strong>(Object List.of(&quot;*&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public setAllowCredential <strong>s</strong>(Object true)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public setMaxAg <strong>e</strong>(Object 3600L)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">UrlBasedCorsConfigurationSource</div>
+            
+            <div class="signature">
+              public new <strong>UrlBasedCorsConfigurationSource</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public registerCorsConfiguratio <strong>n</strong>(Object &quot;/**&quot;, Object config)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">jwtAuthenticationConverter</div>
+            
+            <div class="signature">
+              public AbstractAuthenticationToken&gt; <strong>jwtAuthenticationConverter</strong>()
+            </div>
+            <p>Converts a decoded Keycloak JWT into Spring Security authentication token with parsed roles.  WHAT: Creates a JwtAuthenticationConverter wired with KeycloakRealmRoleConverter. WHY: Standard Spring Security JWT decoders look for `SCOPE_` claims, whereas Keycloak encapsulates realm-level permissions in nested `realm_access.roles` JSON objects.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Configured {@link Converter} producing {@link AbstractAuthenticationToken}.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">JwtAuthenticationConverter</div>
+            
+            <div class="signature">
+              public new <strong>JwtAuthenticationConverter</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public setJwtGrantedAuthoritiesConverte <strong>r</strong>(new KeycloakRealmRoleConverter()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">convert</div>
+            <div><span class="annotation">@Override</span>  <span class="annotation">@SuppressWarnings(&quot;unchecked&quot;)</span> </div>
+            <div class="signature">
+              public Collection&lt;GrantedAuthority&gt; <strong>convert</strong>(Jwt jwt)
+            </div>
+            <p>Converts Keycloak JWT claims into Spring Security GrantedAuthority instances.  WHAT: Reads `realm_access.roles` array from claims, prefixes each role name with `ROLE_`, and wraps in SimpleGrantedAuthority. WHY: Spring Security role-based access checks (e.g. `@PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)`) require authorities to start with the standard `ROLE_` prefix.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>jwt</code> - The decoded Keycloak JWT token.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Collection of Spring Security GrantedAuthority objects.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public getClaim <strong>s</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(realmAccess == null || realmAccess.isEmpty()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public emptyLis <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public ge <strong>t</strong>(Object &quot;roles&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(roles == null)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public emptyLis <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">m</div>
+            
+            <div class="signature">
+              public strea <strong>m</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">p</div>
+            
+            <div class="signature">
+              public ma <strong>p</strong>(roleName -&gt; &quot;ROLE_&quot; + roleName.toUpperCase()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">p</div>
+            
+            <div class="signature">
+              public ma <strong>p</strong>(Object SimpleGrantedAuthority::new)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public collec <strong>t</strong>(Object Collectors.toList()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

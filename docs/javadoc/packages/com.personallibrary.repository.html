@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Package com.personallibrary.repository - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../index.html">Overview</a>
+    <a href="#" class="active">Package</a>
+    <a href="../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">All Packages</a> &gt;
+      <strong>com.personallibrary.repository</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <h2>Package com.personallibrary.repository</h2>
+        <p>Classes, entities, and services in <code>com.personallibrary.repository</code>.</p>
+      </div>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th class="name-col" style="width: 30%;">Class / Interface</th>
+            <th class="desc-col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">interface</span>
+                <a href="../classes/com.personallibrary.repository/DocumentRepository.html">DocumentRepository</a>
+              </td>
+              <td class="desc-col">MongoDB Data Repository for {@link DocumentEntity} persistence and querying. Dynamic multi-field search for the SAP Horizon List Report floorplan is contributed by the {@link DocumentRepositoryCustom} fragment.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">interface</span>
+                <a href="../classes/com.personallibrary.repository/DocumentRepositoryCustom.html">DocumentRepositoryCustom</a>
+              </td>
+              <td class="desc-col">Custom repository fragment providing the dynamic multi-predicate document search backing the SAP Horizon List Report floorplan.  &lt;p&gt;The filter combination is genuinely dynamic: every criterion is optional and any subset may be supplied. Such a query cannot be expressed as a static {@link org.springframework.data.mongodb.repository.Query} string, so it is assembled programmatically against {@link org.springframework.data.mongodb.core.MongoTemplate}.&lt;/p&gt;  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.repository/DocumentRepositoryCustomImpl.html">DocumentRepositoryCustomImpl</a>
+              </td>
+              <td class="desc-col">{@link MongoTemplate} backed implementation of the dynamic document search.  &lt;p&gt;Criteria are appended only for the filters the caller actually supplied, which keeps the emitted MongoDB query minimal and index friendly. All user supplied terms are quoted via {@link Pattern#quote(String)} so that regular expression metacharacters in search input are treated as literals rather than altering the query semantics.&lt;/p&gt;  /</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

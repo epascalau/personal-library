@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.dto;
 
 import com.personallibrary.model.BibTeXMetadata;
@@ -58,6 +62,11 @@ public class DocumentResponse {
     /**
      * Converts a database {@link DocumentEntity} domain model to this external API response DTO.
      *
+     * WHAT: Maps all persisted entity attributes (GUID, versioning chain, physical file metrics, BibTeX metadata,
+     * dual summaries, content excerpt, and text chunks) into an immutable, decoupled response representation.
+     * WHY: Prevents internal persistence annotations and sensitive database storage internals (such as raw filesystem
+     * paths) from leaking into external REST contracts, preserving strict separation of concerns.
+     *
      * @param entity Persisted document entity.
      * @return Transformed {@link DocumentResponse} DTO.
      */
@@ -80,3 +89,4 @@ public class DocumentResponse {
                 .build();
     }
 }
+

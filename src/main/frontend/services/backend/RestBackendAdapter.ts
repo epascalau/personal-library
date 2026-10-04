@@ -1,3 +1,13 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * REST backend adapter.
+ * Connects the SAP UI5 frontend to the Spring Boot REST services, handling
+ * Keycloak OIDC bearer token injection, multi-attribute document queries,
+ * file uploads with multipart encoding, BibTeX metadata updates, and Ollama RAG conversational search.
+ */
+
 import {
   BackendAdapter,
   BackendConfig,
@@ -12,6 +22,15 @@ export class RestBackendAdapter implements BackendAdapter {
   readonly name: string;
   readonly config: BackendConfig;
 
+  /**
+   * Initializes the REST adapter with endpoint configuration and timeout defaults.
+   *
+   * WHAT: Merges user config with default 120-second timeout and strips trailing slashes from baseUrl.
+   * WHY: Normalizing baseUrl avoids double-slash errors (`//documents`) when building resource paths,
+   * while a default 120s timeout accommodates long-running LLM and RAG vector operations.
+   *
+   * @param config The backend configuration record.
+   */
   constructor(config: BackendConfig) {
     this.config = {
       timeoutMs: 120000,
@@ -23,6 +42,17 @@ export class RestBackendAdapter implements BackendAdapter {
     this.name = config.name;
   }
 
+  /**
+   * Assembles HTTP request headers including authentication tokens and custom headers.
+   *
+   * WHAT: Sets `Content-Type: application/json`, appends user-defined custom headers,
+   * and injects the Keycloak OIDC `Authorization: Bearer <token>` header from config or localStorage.
+   * WHY: Centralizes authentication token injection so individual REST methods do not need
+   * to manually look up tokens or worry about Bearer prefix formatting.
+   *
+   * @param extra Optional extra headers to merge.
+   * @returns Complete headers record.
+   */
   private getHeaders(extra?: HeadersInit): HeadersInit {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -42,7 +72,26 @@ export class RestBackendAdapter implements BackendAdapter {
   }
 
   /**
-   * Robust HTTP request with configurable timeout and automatic retry on network/timeout errors
+   * Dispatches an HTTP request with configurable timeout and automatic network retry.
+   *
+   * WHAT:
+   * 1. Constructs absolute URL from endpoint.
+   * 2. Sets up an `AbortController` timeout for the requested duration.
+   * 3. Executes `fetch`.
+   * 4. If a GET request fails due to temporary network error, applies exponential backoff and retries.
+   * 5. Unpacks JSON or plain-text payload according to response `Content-Type`.
+   *
+   * WHY:
+   * 1. AbortController: Prevents hanging sockets from permanently freezing UI loading spinners.
+   * 2. Safe retries: Restricts automatic retries to idempotent GET requests to prevent duplicate
+   *    resource creations on mutations.
+   * 3. Dynamic content-type handling: Transparently supports both JSON DTOs and raw YAML files.
+   *
+   * @param endpoint Resource path or full URL.
+   * @param options Fetch options.
+   * @param customTimeoutMs Optional timeout override in milliseconds.
+   * @param retries Number of retry attempts on network error (defaults to 2).
+   * @returns Promise resolving to parsed response payload.
    */
   private async request<T>(
     endpoint: string,
@@ -113,6 +162,16 @@ export class RestBackendAdapter implements BackendAdapter {
     throw lastError || new Error(`Request to ${url} failed after ${retries} retries`);
   }
 
+  /**
+   * Queries the document catalog matching pagination, sort criteria, and multi-attribute filters.
+   *
+   * WHAT: Serializes filter parameters into query string attributes and issues a GET to `/documents`.
+   * WHY: Sending query parameters over standard URL search strings allows server-side MongoDB
+   * indexes and custom regex queries to filter records without transferring entire collections over the wire.
+   *
+   * @param params Pagination, sorting, and filter state.
+   * @returns Paginated document records and total count.
+   */
   async getDocuments(params: {
     page: number;
     pageSize: number;
@@ -149,10 +208,31 @@ export class RestBackendAdapter implements BackendAdapter {
     };
   }
 
+  /**
+   * Fetches the complete document entity including raw text content, chunks, and summaries.
+   *
+   * WHAT: Issues a GET to `/documents/{guid}`.
+   * WHY: Object Page views require complete document representation for RAG chat and summary analysis.
+   *
+   * @param guid Unique document GUID.
+   * @returns Complete DocumentRecord.
+   */
   async getDocument(guid: string): Promise<DocumentRecord> {
     return this.request<DocumentRecord>(`/documents/${guid}`, { method: 'GET' }, 25000, 2);
   }
 
+  /**
+   * Ingests a new document into the library with automated BibTeX extraction and dual-model AI summarization.
+   *
+   * WHAT: Issues a POST to `/documents` with file payload, base64 data, and metadata.
+   * WHY: Ingestion is a computationally intensive pipeline involving file storage, text extraction,
+   * chunk vectorization into Qdrant, and dual LLM synthesis (Llama 3.3 and Mistral Large).
+   * A generous 180-second timeout prevents premature disconnection, while 0 retries ensures
+   * that documents are never accidentally ingested twice.
+   *
+   * @param payload Upload payload including file metadata and contents.
+   * @returns Newly created DocumentRecord.
+   */
   async uploadDocument(payload: {
     file: File;
     fileName: string;
@@ -183,6 +263,18 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Overwrites the physical content and metadata of an existing document while preserving its persistent GUID.
+   *
+   * WHAT: Issues a PUT to `/documents/{guid}` with `isNewVersion: true`.
+   * WHY: Preserving the persistent GUID across version updates maintains citation stability,
+   * permalinks, and bookmark references while updating physical file contents, re-indexing vector embeddings,
+   * and regenerating summaries.
+   *
+   * @param guid Persistent GUID of the document being updated.
+   * @param payload Updated file data and metadata.
+   * @returns Updated DocumentRecord.
+   */
   async overwriteVersion(
     guid: string,
     payload: {
@@ -217,6 +309,15 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Permanently deletes a document and its associated vector embeddings.
+   *
+   * WHAT: Issues a DELETE to `/documents/{guid}`.
+   * WHY: Purges MongoDB entities, physical storage assets, and Qdrant vector index collections.
+   *
+   * @param guid GUID of the document to remove.
+   * @returns Confirmation record.
+   */
   async deleteDocument(guid: string): Promise<{ success: boolean; message: string }> {
     return this.request<{ success: boolean; message: string }>(
       `/documents/${guid}`,
@@ -226,6 +327,17 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Triggers an on-demand re-summarization of a document using a specific LLM model.
+   *
+   * WHAT: Issues a POST to `/documents/{guid}/summarize` specifying the model key.
+   * WHY: Allows researchers to independently re-evaluate summaries with newer prompt instructions
+   * or alternative models (Llama 3.3 vs Mistral Large) without re-uploading the document.
+   *
+   * @param guid Document GUID.
+   * @param model 'llama' or 'mistral'.
+   * @returns Generated SummaryRecord with execution duration and timestamp.
+   */
   async regenerateSummary(guid: string, model: 'llama' | 'mistral'): Promise<SummaryRecord> {
     // 120-second timeout for LLM synthesis
     return this.request<SummaryRecord>(
@@ -239,6 +351,18 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Executes a conversational RAG question-and-answer exchange grounded in the document's indexed content.
+   *
+   * WHAT: Issues a POST to `/documents/{guid}/chat` with the question and prior conversation history.
+   * WHY: Queries Qdrant vectors to find the most relevant document chunks, constructs an augmented prompt,
+   * and invokes the LLM to generate an accurate, grounded answer with cited context chunks.
+   *
+   * @param guid Target document GUID.
+   * @param question User question.
+   * @param chatHistory Prior chat turns for multi-turn conversational context.
+   * @returns Answer text, execution duration, and context chunk references.
+   */
   async chatWithDocument(
     guid: string,
     question: string,
@@ -256,6 +380,19 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Extracts structured BibTeX bibliographic metadata from a file or sample content.
+   *
+   * WHAT: Issues a POST to `/documents/extract-metadata` with file name, sample text, or binary data.
+   * WHY: Pre-fills upload dialogs with automatically resolved title, author, year, and entry type,
+   * saving researcher time and reducing cataloging errors.
+   *
+   * @param fileName File name.
+   * @param sampleContent Optional sample text snippet.
+   * @param fileData Optional base64 file data.
+   * @param mimeType Optional MIME type.
+   * @returns Extracted BibTeX metadata record and full extracted text.
+   */
   async extractMetadata(
     fileName: string,
     sampleContent?: string,
@@ -274,6 +411,17 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Authenticates user credentials with Keycloak / OIDC identity provider.
+   *
+   * WHAT: Issues a POST to `/auth/login` and receives Bearer access token and user profile.
+   * WHY: Establishes security principal and roles for Role-Based Access Control (RBAC).
+   *
+   * @param username Username or email.
+   * @param password Password.
+   * @param realm Target Keycloak realm.
+   * @returns Access token and UserProfile.
+   */
   async login(
     username: string,
     password?: string,
@@ -290,6 +438,12 @@ export class RestBackendAdapter implements BackendAdapter {
     );
   }
 
+  /**
+   * Terminates active authentication session.
+   *
+   * WHAT: Issues a POST to `/auth/logout`.
+   * WHY: Informs Keycloak session manager to invalidate the server-side session token.
+   */
   async logout(): Promise<void> {
     try {
       await this.request('/auth/logout', { method: 'POST' }, 5000, 0);
@@ -298,14 +452,40 @@ export class RestBackendAdapter implements BackendAdapter {
     }
   }
 
+  /**
+   * Generates the direct download URL for a document's physical file asset.
+   *
+   * WHAT: Constructs the full `/documents/{guid}/download` URL.
+   * WHY: Allows native browser anchor tags and download managers to stream binary attachments.
+   *
+   * @param guid Unique document GUID.
+   * @returns Complete download URL string.
+   */
   getDownloadUrl(guid: string): string {
     return `${this.config.baseUrl}/documents/${guid}/download`;
   }
 
+  /**
+   * Retrieves the raw OpenAPI 3.0 specification in YAML format.
+   *
+   * WHAT: Fetches `/openapi.yaml`.
+   * WHY: Powers the interactive OpenAPI schema viewer and developer documentation modals.
+   *
+   * @returns Raw OpenAPI YAML string.
+   */
   async getOpenApiSpec(): Promise<string> {
     return this.request<string>('/openapi.yaml', { method: 'GET' }, 8000, 2);
   }
 
+  /**
+   * Performs a comprehensive latency and availability health check against the backend.
+   *
+   * WHAT: Probes `/health` first; if unavailable, probes `/documents?pageSize=1`, measuring roundtrip ms.
+   * WHY: Dual-level probing ensures that even if custom health endpoints are unavailable,
+   * basic REST database query functionality is tested, giving researchers an accurate status pill.
+   *
+   * @returns Measured BackendHealthResult.
+   */
   async testHealth(): Promise<BackendHealthResult> {
     const start = performance.now();
     try {

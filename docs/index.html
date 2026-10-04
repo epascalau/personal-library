@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Library - Developer Documentation Portal</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --bg: #0b1120;
+        --card-bg: #1e293b;
+        --border: #334155;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #94a3b8;
+      max-width: 750px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.35rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-col;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+      border-color: #3b82f6;
+    }
+
+    .card-icon {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      margin-bottom: 1.25rem;
+      font-family: monospace;
+    }
+
+    .btn {
+      display: inline-block;
+      text-align: center;
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .info-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .info-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-section ul {
+      margin-left: 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .info-section li {
+      margin-bottom: 0.5rem;
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.05);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 0.85em;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>Personal Library Documentation Hub</h1>
+    <p>Comprehensive API References, Architectural Specifications, and Developer Guides for the Enterprise AI Document Management System</p>
+    <div class="badges">
+      <span class="badge">TypeScript 6.0</span>
+      <span class="badge">SAP UI5 Web Components</span>
+      <span class="badge">Java Spring Boot 3.3.4</span>
+      <span class="badge">Spring AI</span>
+      <span class="badge">OpenAPI 3.0.3</span>
+      <span class="badge">GNU AGPLv3</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <!-- 1. TypeScript API Reference -->
+      <div class="card">
+        <div>
+          <div class="card-icon">⚡</div>
+          <h2>TypeScript & Frontend API Reference</h2>
+          <p>
+            Complete API reference for the decoupled frontend layer: observable state stores (<code>appStore</code>, <code>backendStore</code>, <code>i18nStore</code>, <code>themeStore</code>),
+            event-driven <code>BackendGateway</code>, pluggable <code>BackendAdapter</code> drivers, SAP Horizon floorplan views, and lightweight reactive primitives.
+          </p>
+        </div>
+        <div class="card-meta">
+          Engine: TypeDoc • Sources: src/main/frontend/
+        </div>
+        <a href="typescript/index.html" class="btn">Explore TypeScript Docs &rarr;</a>
+      </div>
+
+      <!-- 2. Java Backend Javadoc -->
+      <div class="card">
+        <div>
+          <div class="card-icon">☕</div>
+          <h2>Java Backend API Reference (Javadoc)</h2>
+          <p>
+            Official Javadoc documentation for the Spring Boot 3 backend: REST Controllers (<code>DocumentController</code>, <code>AuthController</code>),
+            Service Layer (<code>DocumentService</code>, <code>AiSummarizationService</code>, <code>VectorRagService</code>),
+            MongoDB entities, BibTeX extraction engine, and Spring Security / Keycloak configuration.
+          </p>
+        </div>
+        <div class="card-meta">
+          Engine: Javadoc Generator • Sources: src/main/java/
+        </div>
+        <a href="javadoc/index.html" class="btn">Explore Javadoc &rarr;</a>
+      </div>
+
+      <!-- 3. OpenAPI REST Specification -->
+      <div class="card">
+        <div>
+          <div class="card-icon">📜</div>
+          <h2>OpenAPI 3.0 REST Specification</h2>
+          <p>
+            Interactive OpenAPI 3.0 contract defining all REST endpoints: document queries with multi-field filtering,
+            file uploads, in-place version overwrite, Qdrant vector retrieval, conversational RAG chat, and Keycloak profile session endpoints.
+          </p>
+        </div>
+        <div class="card-meta">
+          Standard: OpenAPI 3.0.3 • Location: /api/v1/openapi.yaml
+        </div>
+        <a href="/api/v1/openapi.yaml" target="_blank" class="btn btn-secondary">View OpenAPI Spec (YAML) &rarr;</a>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h3>🛠️ Generating Documentation from Source</h3>
+      <p style="margin-bottom: 1rem; color: var(--text-muted);">
+        You can regenerate both documentation suites at any time using the bundled npm scripts:
+      </p>
+      <ul>
+        <li><code>npm run docs:ts</code> — Generates the TypeScript API Reference in <code>docs/typescript/</code> using TypeDoc.</li>
+        <li><code>npm run docs:java</code> — Generates the Java Spring Boot Javadoc in <code>docs/javadoc/</code>.</li>
+        <li><code>npm run docs</code> — Builds both TypeScript and Java documentation concurrently in one command.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    Personal Library &bull; Licensed under GNU Affero General Public License v3.0 (AGPL-3.0-or-later)
+  </footer>
+</body>
+</html>

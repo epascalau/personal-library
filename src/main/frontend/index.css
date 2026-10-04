@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root, [data-sap-theme="sap_horizon"] {
   --sap-bg: #f5f6f8;
   --sap-shell-bg: #354a5f;
@@ -56,16 +58,18 @@
 }
 
 /* ========================================================================= */
-/* SAP Evening Horizon (Dark Theme) Utility Harmonization                     */
+/* SAP Evening Horizon (Dark Theme) Harmonization                             */
 /* ========================================================================= */
 
+/* Surface and Container Backgrounds */
 .dark .bg-white {
   background-color: #1c232b !important;
 }
 
 .dark .bg-slate-50,
 .dark .bg-gray-50,
-.dark .bg-\[\#f8fafc\] {
+.dark .bg-\[\#f8fafc\],
+.dark .bg-\[\#fafafa\] {
   background-color: #232c37 !important;
 }
 
@@ -80,6 +84,50 @@
   background-color: #2f3d4d !important;
 }
 
+.dark .bg-\[\#fafbfc\] {
+  background-color: #161c22 !important;
+}
+
+/* Accent, Banner, and Notification Backgrounds */
+.dark .bg-\[\#eff6ff\] {
+  background-color: #17263b !important;
+  color: #93c5fd !important;
+  border-color: #244166 !important;
+}
+
+.dark .bg-\[\#ebf8ff\] {
+  background-color: #172d4a !important;
+  color: #38bdf8 !important;
+  border-color: #1e4570 !important;
+}
+
+.dark .bg-blue-50,
+.dark .bg-blue-50\/60,
+.dark .bg-blue-50\/70 {
+  background-color: #17263b !important;
+  border-color: #254770 !important;
+}
+
+.dark .bg-amber-50,
+.dark .bg-amber-50\/70 {
+  background-color: #2c2214 !important;
+  border-color: #553e18 !important;
+}
+
+.dark .bg-red-50,
+.dark .bg-red-50\/60,
+.dark .bg-red-50\/70 {
+  background-color: #331619 !important;
+  border-color: #5a2024 !important;
+}
+
+.dark .bg-green-50,
+.dark .bg-green-50\/40 {
+  background-color: #14291e !important;
+  border-color: #22543d !important;
+}
+
+/* Borders */
 .dark .border-gray-200,
 .dark .border-slate-200,
 .dark .border-\[\#e2e8f0\] {
@@ -97,6 +145,24 @@
   border-color: #3b4b5d !important;
 }
 
+.dark .border-\[\#bfdbfe\],
+.dark .border-\[\#b9e5fe\],
+.dark .border-blue-100,
+.dark .border-blue-200 {
+  border-color: #244166 !important;
+}
+
+.dark .border-amber-200,
+.dark .border-amber-100 {
+  border-color: #553e18 !important;
+}
+
+.dark .border-red-100,
+.dark .border-red-200 {
+  border-color: #5a2024 !important;
+}
+
+/* Text Colors */
 .dark .text-gray-900,
 .dark .text-slate-900,
 .dark .text-gray-800,
@@ -109,14 +175,37 @@
 .dark .text-slate-700,
 .dark .text-gray-600,
 .dark .text-slate-600 {
-  color: #9cb0c5 !important;
+  color: #cbd5e1 !important;
 }
 
 .dark .text-gray-500,
-.dark .text-slate-500,
+.dark .text-slate-500 {
+  color: #9cb0c5 !important;
+}
+
 .dark .text-gray-400,
 .dark .text-slate-400 {
   color: #75879a !important;
+}
+
+.dark .text-amber-800,
+.dark .text-amber-700 {
+  color: #fcd34d !important;
+}
+
+.dark .text-red-700,
+.dark .text-red-800 {
+  color: #fca5a5 !important;
+}
+
+.dark .text-green-700,
+.dark .text-emerald-700 {
+  color: #86efac !important;
+}
+
+.dark .text-\[\#1e40af\],
+.dark .text-blue-900 {
+  color: #93c5fd !important;
 }
 
 /* Hover States in Evening Horizon */
@@ -126,13 +215,45 @@
 }
 
 .dark .hover\:bg-gray-100:hover,
-.dark .hover\:bg-slate-100:hover {
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-\[\#f1f5f9\]\/70:hover {
   background-color: #293543 !important;
 }
 
+.dark .hover\:bg-\[\#e2e8f0\]:hover {
+  background-color: #2f3d4d !important;
+}
+
+.dark .hover\:border-gray-300:hover {
+  border-color: #4b5d73 !important;
+}
+
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
 .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
 .dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: #2e3b4a !important;
+}
+
+/* Table Specific Harmonization */
+.dark table thead tr {
+  background-color: #232c37 !important;
+  color: #9cb0c5 !important;
+  border-color: #2e3b4a !important;
+}
+
+.dark table tbody tr[data-guid]:hover {
+  background-color: #26313e !important;
+}
+
+.dark table tbody tr[data-guid] td {
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+table tbody tr[data-guid],
+table tbody tr[data-guid] td,
+table tbody tr[data-guid] td ui5-button {
+  outline: none !important;
 }
 
 /* Input Fields and Selects */
@@ -151,6 +272,22 @@
   outline-color: #4796ff !important;
 }
 
+/* Summary Prose and Content Blocks */
+.dark .prose strong,
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6 {
+  color: #f0f4f8 !important;
+}
+
+.dark .prose p,
+.dark .prose li {
+  color: #cbd5e1 !important;
+}
+
 /* Code & Pre Blocks in Dark Mode */
 .dark pre,
 .dark code {
@@ -159,9 +296,74 @@
 }
 
 /* SAP Evening Horizon ShellBar */
-.dark .sap-shellbar {
+.dark .sap-shellbar,
+.dark header {
   background-color: #161f28 !important;
-  border-bottom-color: #4796ff !important;
+  border-bottom-color: #24303f !important;
+}
+
+/* Dialog and Modal Container Harmonization */
+.dark [slot="header"] > div,
+.dark [slot="footer"] > div {
+  background-color: #232c37 !important;
+  border-color: #2e3b4a !important;
+  color: #f0f4f8 !important;
+}
+
+.dark [slot="header"] h3 {
+  color: #f0f4f8 !important;
+}
+
+.dark [slot="header"] p {
+  color: #9cb0c5 !important;
+}
+
+.dark [data-action="pick-file"] {
+  background-color: #232c37 !important;
+  border-color: #3b4b5d !important;
+}
+
+.dark [data-action="pick-file"]:hover {
+  background-color: #26313e !important;
+  border-color: #4796ff !important;
+}
+
+.dark [data-engine] {
+  background-color: #232c37 !important;
+  border-color: #2e3b4a !important;
+}
+
+.dark [data-engine]:hover {
+  border-color: #4b5d73 !important;
+}
+
+.dark [data-quick-profile] {
+  background-color: #232c37 !important;
+  border-color: #2e3b4a !important;
+}
+
+/* Chat Assistant Bubble & Citations in Dark Mode */
+.dark [data-chat-feed] .bg-white.text-gray-800 {
+  background-color: #1c232b !important;
+  color: #f0f4f8 !important;
+  border-color: #2e3b4a !important;
+}
+
+.dark [data-chat-feed] .bg-gray-50.border-gray-200 {
+  background-color: #232c37 !important;
+  border-color: #2e3b4a !important;
+  color: #cbd5e1 !important;
+}
+
+.dark [data-prompt] {
+  background-color: #232c37 !important;
+  border-color: #2e3b4a !important;
+  color: #cbd5e1 !important;
+}
+
+.dark [data-prompt]:hover {
+  background-color: #2c3846 !important;
+  color: #ffffff !important;
 }
 
 /* Modals Overlay */

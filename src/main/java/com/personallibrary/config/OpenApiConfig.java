@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.config;
 
 import io.swagger.v3.oas.models.Components;
@@ -21,7 +25,12 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     /**
-     * Constructs the root OpenAPI specification document.
+     * Constructs the root OpenAPI specification document with metadata, endpoints, and security schemes.
+     *
+     * WHAT: Assembles the OpenAPI 3.0 descriptor with title, version, contact details, global security requirements,
+     * and a Bearer HTTP JWT security scheme named `KeycloakBearerAuth`.
+     * WHY: Standardizes machine-readable REST API contracts, enabling automated client generation, Swagger UI testing,
+     * and in-app OpenAPI YAML viewer inspection while explicitly documenting Keycloak token expectations.
      *
      * @return Fully configured {@link OpenAPI} object.
      */
@@ -47,3 +56,4 @@ public class OpenApiConfig {
                                         .description("Keycloak OIDC Bearer Token")));
     }
 }
+

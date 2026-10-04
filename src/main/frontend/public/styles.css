@@ -158,6 +158,26 @@
   font-size: 0.6875rem;
   padding-inline: 0.625rem;
   gap: 0.375rem;
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:host(.plib-button--icon) .ui5-button-root:focus-within::after,
+:host(.plib-button--icon) .ui5-button-root:focus-visible::after,
+:host(.plib-button--icon) .ui5-button-root:focus::after,
+:host(.plib-button--icon) .ui5-button-root::after,
+:host(.plib-button--icon) .ui5-button-root::before {
+  display: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+:host(.plib-button--icon) .ui5-button-root:focus,
+:host(.plib-button--icon) .ui5-button-root:active {
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 /* The emphasized "primary action" look used by the Object Page header */
@@ -216,6 +236,36 @@
   box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.35);
 }
 
+:host(.plib-dialog--confirm) {
+  width: 32rem !important;
+  max-width: 92vw !important;
+}
+
+:host(.plib-dialog--upload) {
+  width: 48rem !important;
+  max-width: 94vw !important;
+}
+
+:host(.plib-dialog--openapi) {
+  width: 52rem !important;
+  max-width: 95vw !important;
+}
+
+:host(.plib-dialog--settings),
+:host(.plib-dialog--version) {
+  width: 48rem !important;
+  max-width: 94vw !important;
+}
+
+:host(.plib-dialog--confirm) .ui5-popup-content,
+:host(.plib-dialog--upload) .ui5-popup-content,
+:host(.plib-dialog--openapi) .ui5-popup-content,
+:host(.plib-dialog--settings) .ui5-popup-content,
+:host(.plib-dialog--version) .ui5-popup-content {
+  overflow: visible !important;
+  border-radius: 0.875rem;
+}
+
 :host(.plib-dialog) .ui5-popup-root {
   border-radius: 0.875rem;
   background-color: var(--sap-surface, #ffffff);
@@ -226,6 +276,18 @@
 :host(.plib-dialog) .ui5-popup-footer-root {
   background-color: var(--sap-surface, #ffffff);
   border-color: var(--sap-border, #e2e8f0);
+  padding: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+}
+
+:host(.plib-dialog) ::slotted([slot='header']),
+:host(.plib-dialog) ::slotted([slot='footer']) {
+  height: auto !important;
+  min-height: auto !important;
+  width: 100% !important;
+  display: block !important;
 }
 
 :host(.plib-dialog) .ui5-popup-content {
@@ -371,8 +433,29 @@
 :host-context([data-sap-theme='sap_horizon_dark']) .ui5-input-inner,
 :host-context([data-sap-theme='sap_horizon_dark']) .ui5-textarea-inner,
 :host-context([data-sap-theme='sap_horizon_dark']) input,
-:host-context([data-sap-theme='sap_horizon_dark']) textarea {
+:host-context([data-sap-theme='sap_horizon_dark']) textarea,
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-select-value,
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-select-label {
   color: var(--sap-text-primary, #f0f4f8);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-input-root,
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-select-root,
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-textarea-root {
+  background-color: var(--sap-input-bg, #161c22);
+  border-color: var(--sap-input-border, #354353);
+  color: var(--sap-text-primary, #f0f4f8);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-table-row {
+  background-color: var(--sap-surface, #1c232b);
+  border-color: var(--sap-border, #2e3b4a);
+  color: var(--sap-text-primary, #f0f4f8);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']) .ui5-table-header-row {
+  background-color: var(--sap-surface-secondary, #232c37);
+  border-color: var(--sap-border, #2e3b4a);
 }
 
 :host-context([data-sap-theme='sap_horizon_dark']).plib-dialog .ui5-popup-root,

@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Registers every UI5 Web Component used by the application and prepares the
  * runtime (theme assets + the global stylesheet patch) before the first view
@@ -68,8 +68,21 @@ import { applyGlobalStylesheetPatch, loadGlobalStylesheet } from './globalStyles
 let bootstrapped: Promise<void> | null = null;
 
 /**
- * Must run before any UI5 element is created so that `_initShadowRoot` is
- * already patched for the very first component instance.
+ * Bootstraps the SAP UI5 Web Components runtime and attaches global style patches.
+ *
+ * WHAT:
+ * 1. Invokes `applyGlobalStylesheetPatch()` to intercept UI5's internal `_initShadowRoot` prototype.
+ * 2. Asynchronously fetches and compiles the enterprise theme stylesheet via `loadGlobalStylesheet()`.
+ * 3. Caches the resulting initialization Promise so redundant invocations return the same singleton.
+ *
+ * WHY:
+ * UI5 Web Components isolate their DOM inside Shadow Roots. Applying the shadow root patch before
+ * any UI5 custom elements are parsed or created ensures that enterprise styling (e.g. typography,
+ * dark theme overrides, custom focus outlines) is injected into every shadow root from the very
+ * first element without style flash (FOUC). Wrapping in a singleton Promise prevents duplicate
+ * network fetches when called from both `main.ts` and test harnesses.
+ *
+ * @returns Promise that resolves when UI5 styling is ready.
  */
 export const bootstrapUi5 = (): Promise<void> => {
   if (!bootstrapped) {

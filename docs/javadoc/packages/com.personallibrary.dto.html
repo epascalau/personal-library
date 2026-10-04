@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Package com.personallibrary.dto - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../index.html">Overview</a>
+    <a href="#" class="active">Package</a>
+    <a href="../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">All Packages</a> &gt;
+      <strong>com.personallibrary.dto</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <h2>Package com.personallibrary.dto</h2>
+        <p>Classes, entities, and services in <code>com.personallibrary.dto</code>.</p>
+      </div>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th class="name-col" style="width: 30%;">Class / Interface</th>
+            <th class="desc-col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.dto/ChatRequest.html">ChatRequest</a>
+              </td>
+              <td class="desc-col">Data Transfer Object containing a natural language question and conversation history for the Retrieval-Augmented Generation (RAG) assistant.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.dto/ChatResponse.html">ChatResponse</a>
+              </td>
+              <td class="desc-col">Data Transfer Object containing the synthesized RAG model answer along with ground-truth citations retrieved from the Qdrant vector database.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.dto/DocumentResponse.html">DocumentResponse</a>
+              </td>
+              <td class="desc-col">Data Transfer Object representing an enterprise document response for API clients, the SAP Horizon List Report table, and the Object Page details view.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.dto/DocumentUploadRequest.html">DocumentUploadRequest</a>
+              </td>
+              <td class="desc-col">Data Transfer Object containing document upload metadata and optional content payload when submitting documents via JSON endpoints or API clients.  WHAT: Encapsulates incoming document attributes (file name, format, byte size, raw text, and optional BibTeX metadata). WHY: Decouples multipart form parameters and JSON body payloads from persistence entities, allowing validation and pre-processing before allocating file storage or executing entity persistence.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.dto/PaginatedResponse.html">PaginatedResponse</a>
+              </td>
+              <td class="desc-col">Generic container for paginated query results returning items, total match count, and navigation metadata.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.dto/SummarizeRequest.html">SummarizeRequest</a>
+              </td>
+              <td class="desc-col">Request payload for re-computing an AI executive or analytical summary for an existing document using a designated Spring AI Ollama model.  WHAT: Validates and transmits the target LLM identifier (&quot;llama&quot; for analytical synthesis or &quot;mistral&quot; for executive summary). WHY: Validating the requested model parameter via regular expression prevents invalid inference model names from triggering unexpected exceptions in the summarization service orchestrator.  /</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

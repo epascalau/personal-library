@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.repository;
 
 import com.personallibrary.model.DocumentEntity;
@@ -24,6 +28,10 @@ public interface DocumentRepositoryCustom {
      * fileName, title, author, edition, file format, and full-text content filters.
      * Omitted ({@code null} or blank) criteria are not applied.
      *
+     * WHAT: Compiles an dynamic MongoDB Criteria query combining text predicates with pagination and sort options.
+     * WHY: Users in the SAP Horizon List Report floorplan may filter by one, some, or all available metadata fields
+     * in arbitrary combinations; static Spring Data repository methods cannot support variable combinations of nullable parameters.
+     *
      * @param fileName Optional file name substring (case-insensitive).
      * @param title    Optional bibliographic title substring (case-insensitive).
      * @param author   Optional author substring (case-insensitive).
@@ -44,3 +52,4 @@ public interface DocumentRepositoryCustom {
             Pageable pageable
     );
 }
+

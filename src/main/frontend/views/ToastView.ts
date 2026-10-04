@@ -1,3 +1,11 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Transient toast notification view.
+ * Renders floating success/error alerts in the bottom-right viewport with polite ARIA live announcements.
+ */
+
 import { Component } from '../core/component';
 import { html, raw, RawHtml } from '../core/html';
 import { watch } from '../core/store';
@@ -12,10 +20,24 @@ import { icon } from '../ui5/icons';
  * (3500 ms) lives in appStore.showToast, so this view is purely visual.
  */
 export class ToastView extends Component {
+  /**
+   * Initializes the ToastView host element.
+   *
+   * WHAT: Invokes the base Component constructor without custom tag or initial class parameters.
+   * WHY: The host container acts as an inert mounting anchor while the internal template creates
+   * a viewport-relative fixed position container (`fixed bottom-5 right-5 z-50`) only when an active toast exists.
+   */
   constructor() {
     super(undefined);
   }
 
+  /**
+   * Registers a store watcher on the application's active toast state.
+   *
+   * WHAT: Watches `appStore.state.toast` and triggers `requestRender()` whenever the toast changes or expires.
+   * WHY: Fine-grained property observation prevents re-rendering the toast view when other application
+   * state (such as documents list, active search query, or selected record) changes.
+   */
   protected onMount(): void {
     this.track(
       watch(
@@ -26,6 +48,17 @@ export class ToastView extends Component {
     );
   }
 
+  /**
+   * Generates the accessible HTML markup for the transient toast notification.
+   *
+   * WHAT: Renders a floating notification card styled by toast type (emerald for success, red for error),
+   * containing an SVG status icon, message text, and ARIA live attributes.
+   * WHY: Setting `role="status"` and `aria-live="polite"` ensures screen readers announce the notification
+   * without interrupting existing user speech, complying with accessibility standards. Returning an empty
+   * string when no toast is active keeps the DOM clean and unencumbered.
+   *
+   * @returns RawHtml markup representing the active toast or empty string if none is active.
+   */
   protected template(): RawHtml | string {
     const toast = appStore.state.toast;
     if (!toast) {

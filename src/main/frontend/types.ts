@@ -1,5 +1,8 @@
 /**
- * @fileoverview Domain model definitions for the Personal Library Application.
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Domain model definitions for the Personal Library Application.
  * Includes BibTeX schemas, dual-model summary structures, document chunks for RAG,
  * user authentication profiles, and search filter specifications.
  * @packageDocumentation

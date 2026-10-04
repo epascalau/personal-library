@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentResponse (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>DocumentResponse</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class DocumentResponse</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>DocumentResponse</strong>
+          
+          
+        </div>
+        <p>Data Transfer Object representing an enterprise document response for API clients, the SAP Horizon List Report table, and the Object Page details view.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>guid</code></td>
+                <td class="desc-col">Unique document identifier (UUID). */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>previousVersionGuid</code></td>
+                <td class="desc-col">Historical parent version GUID if versioned. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Integer</td>
+                <td class="name-col"><code>versionNumber</code></td>
+                <td class="desc-col">Sequential version number (e.g. 1, 2). */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileName</code></td>
+                <td class="desc-col">Physical file name with extension. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Long</td>
+                <td class="name-col"><code>fileSize</code></td>
+                <td class="desc-col">File size in bytes. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileSizeFormatted</code></td>
+                <td class="desc-col">Readable file size string (e.g. &quot;2.4 MB&quot;). */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>format</code></td>
+                <td class="desc-col">File format classification. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Instant</td>
+                <td class="name-col"><code>uploadDate</code></td>
+                <td class="desc-col">Ingestion timestamp. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Instant</td>
+                <td class="name-col"><code>editDate</code></td>
+                <td class="desc-col">Last edit or overwrite timestamp. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="name-col"><code>bibtex</code></td>
+                <td class="desc-col">Structured BibTeX metadata. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>bibtexRaw</code></td>
+                <td class="desc-col">Raw formatted BibTeX citation string. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private SummaryRecord&gt;</td>
+                <td class="name-col"><code>summaries</code></td>
+                <td class="desc-col">AI summaries mapped by model engine (&quot;llama&quot;, &quot;mistral&quot;). */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>contentExcerpt</code></td>
+                <td class="desc-col">Short initial excerpt for list view rendering. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private List&lt;DocumentChunk&gt;</td>
+                <td class="name-col"><code>chunks</code></td>
+                <td class="desc-col">Indexed text chunks. */</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public DocumentResponse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">fromEntity</a></strong>(DocumentEntity entity)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Converts a database {@link DocumentEntity} domain model to this external API response DTO.  WHAT: Maps all persisted entity attributes (GUID, versioning chain, physical file metrics, BibTeX metadata, dual summaries, content excerpt, and text chunks) into an immutable, decoupled response representation. WHY: Prevents internal persistence annotations and sensitive database storage internals (such as raw filesystem paths) from leaking into external REST contracts, preserving strict separation of concerns.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public gui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">d</a></strong>(Object entity.getGuid()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public previousVersionGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">d</a></strong>(Object entity.getPreviousVersionGuid()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public versionNumbe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">r</a></strong>(Object entity.getVersionNumber()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fileNam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">e</a></strong>(Object entity.getFileName()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fileSiz</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">e</a></strong>(Object entity.getFileSize()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fileSizeFormatte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">d</a></strong>(Object entity.getFileSizeFormatted()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public forma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">t</a></strong>(Object entity.getFormat()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public uploadDat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">e</a></strong>(Object entity.getUploadDate()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public editDat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">e</a></strong>(Object entity.getEditDate()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public bibte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">x</a></strong>(Object entity.getBibtex()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public bibtexRa</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">w</a></strong>(Object entity.getBibtexRaw()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public summarie</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">s</a></strong>(Object entity.getSummaries()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public contentExcerp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">t</a></strong>(Object entity.getContentExcerpt()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chunk</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">s</a></strong>(Object entity.getChunks()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">fromEntity</div>
+            
+            <div class="signature">
+              public DocumentResponse <strong>fromEntity</strong>(DocumentEntity entity)
+            </div>
+            <p>Converts a database {@link DocumentEntity} domain model to this external API response DTO.  WHAT: Maps all persisted entity attributes (GUID, versioning chain, physical file metrics, BibTeX metadata, dual summaries, content excerpt, and text chunks) into an immutable, decoupled response representation. WHY: Prevents internal persistence annotations and sensitive database storage internals (such as raw filesystem paths) from leaking into external REST contracts, preserving strict separation of concerns.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>entity</code> - Persisted document entity.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Transformed {@link DocumentResponse} DTO.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public gui <strong>d</strong>(Object entity.getGuid()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public previousVersionGui <strong>d</strong>(Object entity.getPreviousVersionGuid()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public versionNumbe <strong>r</strong>(Object entity.getVersionNumber()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public fileNam <strong>e</strong>(Object entity.getFileName()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public fileSiz <strong>e</strong>(Object entity.getFileSize()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public fileSizeFormatte <strong>d</strong>(Object entity.getFileSizeFormatted()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(Object entity.getFormat()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public uploadDat <strong>e</strong>(Object entity.getUploadDate()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public editDat <strong>e</strong>(Object entity.getEditDate()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public bibte <strong>x</strong>(Object entity.getBibtex()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">w</div>
+            
+            <div class="signature">
+              public bibtexRa <strong>w</strong>(Object entity.getBibtexRaw()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public summarie <strong>s</strong>(Object entity.getSummaries()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public contentExcerp <strong>t</strong>(Object entity.getContentExcerpt()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public chunk <strong>s</strong>(Object entity.getChunks()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

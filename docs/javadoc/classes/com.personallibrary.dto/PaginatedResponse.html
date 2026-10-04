@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PaginatedResponse (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>PaginatedResponse</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class PaginatedResponse</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>PaginatedResponse</strong>
+          
+          
+        </div>
+        <p>Generic container for paginated query results returning items, total match count, and navigation metadata.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private List&lt;T&gt;</td>
+                <td class="name-col"><code>items</code></td>
+                <td class="desc-col">Current page content items. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private long</td>
+                <td class="name-col"><code>totalCount</code></td>
+                <td class="desc-col">Total number of items matching the query criteria across all pages. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>page</code></td>
+                <td class="desc-col">1-based page index. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>pageSize</code></td>
+                <td class="desc-col">Page capacity size limit. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>totalPages</code></td>
+                <td class="desc-col">Calculated total page count. */</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public PaginatedResponse&lt;T&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">of</a></strong>(List&lt;T&gt; items, long totalCount, int page, int pageSize)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Factory method computing total pages and constructing a typed PaginatedResponse.  WHAT: Calculates totalPages as `ceil(totalCount / pageSize)` and builds the PaginatedResponse instance. WHY: Centralizes pagination math in one location, avoiding repetitive calculation across services and controllers.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cei</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">l</a></strong>(Object (double)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public &lt;T&gt;builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public item</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">s</a></strong>(Object items)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public totalCoun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">t</a></strong>(Object totalCount)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pag</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">e</a></strong>(Object page)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pageSiz</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">e</a></strong>(Object pageSize)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public totalPage</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">s</a></strong>(Object calculatedPages)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">of</div>
+            
+            <div class="signature">
+              public PaginatedResponse&lt;T&gt; <strong>of</strong>(List&lt;T&gt; items, long totalCount, int page, int pageSize)
+            </div>
+            <p>Factory method computing total pages and constructing a typed PaginatedResponse.  WHAT: Calculates totalPages as `ceil(totalCount / pageSize)` and builds the PaginatedResponse instance. WHY: Centralizes pagination math in one location, avoiding repetitive calculation across services and controllers.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>items</code> - Current page records list.</dd><dd><code>totalCount</code> - Overall matching records across the entire dataset.</dd><dd><code>page</code> - Current 1-based page index.</dd><dd><code>pageSize</code> - Maximum records per page.</dd><dd><code>&lt;T&gt;</code> - Record item type.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Complete PaginatedResponse container.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public cei <strong>l</strong>(Object (double)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public &lt;T&gt;builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public item <strong>s</strong>(Object items)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public totalCoun <strong>t</strong>(Object totalCount)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public pag <strong>e</strong>(Object page)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public pageSiz <strong>e</strong>(Object pageSize)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public totalPage <strong>s</strong>(Object calculatedPages)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

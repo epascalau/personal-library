@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Overview - Personal Library Java Backend API Reference</title>
+  <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference (Javadoc)</h1>
+    <div class="subtitle">Spring Boot 3.3.4 • Spring AI • Ollama Dual-Model • MongoDB • Qdrant Vector Retrieval</div>
+  </header>
+  <nav class="top-nav">
+    <a href="index.html" class="active">Overview</a>
+    <a href="tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript Frontend API ↗</a>
+    <a href="/api/v1/openapi.yaml" target="_blank">OpenAPI 3.0 Spec ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>System Architecture & Package Overview</h2>
+      <p>
+        The Personal Library backend is an enterprise-grade document management and generative AI service
+        orchestrating automated BibTeX metadata extraction, dual-model analytical summaries (Ollama Llama 3.3 and Mistral Large),
+        in-place GUID version management, and high-precision RAG vector retrieval using Qdrant.
+      </p>
+
+      <div style="display: flex; gap: 1rem; margin: 1.5rem 0;">
+        <span class="tag-badge" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">📦 7 Packages</span>
+        <span class="tag-badge" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; background: #fef3c7; color: #92400e;">☕ 25 Java Classes</span>
+        <span class="tag-badge" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; background: #dcfce7; color: #166534;">🛡️ Keycloak OAuth2 Resource Server</span>
+      </div>
+
+      <h3>Packages</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th class="name-col" style="width: 35%;">Package</th>
+            <th class="desc-col">Description & Component Scope</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.html"><strong>com.personallibrary</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">1 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                Application entrypoint and root Spring Boot <code>@SpringBootApplication</code> bootstrap.
+              </td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.config.html"><strong>com.personallibrary.config</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">3 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                Security configuration (Keycloak OIDC JWT validation), OpenAPI documentation, and Spring AI Ollama configuration.
+              </td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.controller.html"><strong>com.personallibrary.controller</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">2 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                REST Controllers implementing the SAP Horizon floorplan endpoints for List Report, Object Page, Upload, and Auth.
+              </td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.dto.html"><strong>com.personallibrary.dto</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">6 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                Data Transfer Objects (DTOs) for requests, responses, pagination, summaries, and conversational chat payloads.
+              </td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.model.html"><strong>com.personallibrary.model</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">5 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                MongoDB document entities, BibTeX metadata records, chunk models for vector indexing, and duration-tracked summary records.
+              </td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.repository.html"><strong>com.personallibrary.repository</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">3 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                Spring Data MongoDB repositories and custom <code>MongoTemplate</code> dynamic search query fragments.
+              </td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <a href="packages/com.personallibrary.service.html"><strong>com.personallibrary.service</strong></a>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">5 classes / interfaces</div>
+              </td>
+              <td class="desc-col">
+                Core business logic: document ingestion, vector RAG indexing, dual-model AI summarization, BibTeX extraction, and asset storage.
+              </td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.dto;
 
 import lombok.AllArgsConstructor;
@@ -5,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,6 +33,24 @@ public class ChatResponse {
     private List<CitationDto> citations;
 
     /**
+     * Factory method creating a quick ChatResponse without citations.
+     *
+     * WHAT: Constructs a ChatResponse with an empty list of citations.
+     * WHY: Provides an expressive, clean instantiation pattern for direct model responses or error answers.
+     *
+     * @param answer Synthesized answer markdown.
+     * @param modelUsed LLM model engine name.
+     * @return ChatResponse instance.
+     */
+    public static ChatResponse of(String answer, String modelUsed) {
+        return ChatResponse.builder()
+                .answer(answer)
+                .modelUsed(modelUsed)
+                .citations(Collections.emptyList())
+                .build();
+    }
+
+    /**
      * Citation metadata item with similarity score and verbatim excerpt snippet.
      */
     @Data
@@ -43,3 +66,4 @@ public class ChatResponse {
         private String snippet;
     }
 }
+

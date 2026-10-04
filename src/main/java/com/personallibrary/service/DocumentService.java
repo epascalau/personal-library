@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.service;
 
 import com.personallibrary.dto.DocumentResponse;
@@ -43,6 +47,11 @@ public class DocumentService {
      * - Auto-extracts BibTeX if not fully provided.
      * - Chunks and indexes vector embeddings into Qdrant.
      * - Generates dual-model summaries (Llama & Mistral).
+     *
+     * WHAT: Orchestrates physical storage, text extraction, automated LLM BibTeX extraction,
+     * semantic vector chunking in Qdrant, dual-model analytical/executive summarization, and MongoDB persistence.
+     * WHY: Consolidates the complete multi-step ingestion lifecycle into an atomic, coherent service call
+     * ensuring document assets, vector indexes, and summaries stay perfectly synchronized.
      *
      * @param file       Uploaded multipart file.
      * @param userBibtex Optional user-provided BibTeX attributes.
@@ -99,6 +108,11 @@ public class DocumentService {
      * Overwrites an existing document's file content and metadata in-place while retaining its persistent GUID.
      * Advances the internal version sequence number.
      *
+     * WHAT: Replaces physical asset on disk, extracts new text content, updates BibTeX metadata,
+     * re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments versionNumber.
+     * WHY: Retaining the existing document GUID preserves deep links, bookmark URLs, and Object Page routes
+     * while accurately reflecting updated revisions and version history.
+     *
      * @param existingGuid   Persistent document GUID to update.
      * @param newFile        Optional replacement physical file.
      * @param updatedBibtex  Optional updated bibliographic metadata.
@@ -150,6 +164,9 @@ public class DocumentService {
     /**
      * Retrieves a single document by its GUID and transforms to response DTO.
      *
+     * WHAT: Finds document entity by GUID in MongoDB and converts to DocumentResponse DTO.
+     * WHY: Enforces read-only DTO boundaries for client layers, throwing standard NoSuchElementException if absent.
+     *
      * @param guid Unique document identifier.
      * @return {@link DocumentResponse} DTO.
      */
@@ -162,6 +179,9 @@ public class DocumentService {
     /**
      * Retrieves the raw persistent entity by its GUID.
      *
+     * WHAT: Directly queries documentRepository for the DocumentEntity matching GUID.
+     * WHY: Required by internal services (e.g. storage downloads, summarization triggers) that need internal fields like physicalFilePath.
+     *
      * @param guid Unique document identifier.
      * @return {@link DocumentEntity} database entity.
      */
@@ -172,6 +192,9 @@ public class DocumentService {
 
     /**
      * Permanently purges a document, its physical disk assets, and vector embeddings.
+     *
+     * WHAT: Deletes disk storage files via storageService, then deletes MongoDB entity record via documentRepository.
+     * WHY: Prevents orphan disk files and stale metadata in the database when documents are deleted by users.
      *
      * @param guid Document GUID to delete.
      */
@@ -185,6 +208,11 @@ public class DocumentService {
     /**
      * Executes dynamic multi-attribute queries supporting single or combined filters
      * across fileName, title, author, edition, format, and content for the List Report floorplan.
+     *
+     * WHAT: Maps client sort keys to MongoDB field paths, assembles Pageable requests, calls dynamic query fragment,
+     * and maps entities to PaginatedResponse of DocumentResponse DTOs.
+     * WHY: Delivers high-performance server-side filtering, sorting, and pagination tailored specifically to
+     * the SAP Fiori Horizon List Report grid specifications.
      *
      * @param fileName  Filter substring for file name.
      * @param title     Filter substring for bibliographic title.
@@ -229,11 +257,29 @@ public class DocumentService {
                 .build();
     }
 
+    /**
+     * Extracts lowercase file extension from filename.
+     *
+     * WHAT: Splits filename by the last dot and returns the trailing string lowercased.
+     * WHY: Normalizes file formats (e.g. "PDF", "pdf") for uniform categorization and UI icon rendering.
+     *
+     * @param fileName Original filename.
+     * @return Lowercase format extension or "unknown".
+     */
     private String getFileExtension(String fileName) {
         if (fileName == null || !fileName.contains(".")) return "unknown";
         return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
     }
 
+    /**
+     * Translates frontend column identifiers into MongoDB document property paths.
+     *
+     * WHAT: Maps UI column property keys ("title", "author", "edition") to nested MongoDB paths ("bibtex.title", etc.).
+     * WHY: Shields frontend components from internal document database nesting conventions while enabling seamless sort delegation.
+     *
+     * @param clientField Frontend column name.
+     * @return Internal MongoDB document property path.
+     */
     private String mapSortField(String clientField) {
         if (clientField == null) return "uploadDate";
         return switch (clientField) {
@@ -248,3 +294,4 @@ public class DocumentService {
         };
     }
 }
+

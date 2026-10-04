@@ -1,6 +1,6 @@
 /**
  * @license
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Vanilla + UI5 replacement for `components/ObjectPage.tsx`.
  *
@@ -94,7 +94,7 @@ const SUMMARY_CARDS: SummaryCardSpec[] = [
     model: 'llama',
     iconKey: 'Cpu',
     iconClass: 'w-4 h-4 text-[#0070f2]',
-    defaultModelName: 'Ollama Llama 3.3 (70B)',
+    defaultModelName: 'Ollama Llama 3.3 (70B Instruct)',
     defaultDuration: '0 min 4.8 sec',
     uncomputedClass: 'bg-slate-100 text-slate-600 border-slate-200',
     timestampIconClass: 'w-3 h-3 text-[#0070f2]',
@@ -145,15 +145,33 @@ export class ObjectPageView extends Component {
   /** Tracks the GUID the local chat state belongs to. */
   private chatDocGuid: string | null = null;
 
+  /**
+   * Initializes the Object Page view component with SAP Horizon container classes.
+   *
+   * WHAT: Sets the host container styling.
+   * WHY: Provides responsive margins and layout spacing consistent with SAP Fiori Object Page floorplans.
+   */
   constructor() {
     super(undefined, 'div', 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6');
   }
 
+  /**
+   * Subscribes the Object Page to document updates and summary generation flags.
+   *
+   * WHAT:
+   * 1. Watches `appStore.activeDocument` and `summarizingModels` to update summary cards and timestamps.
+   * 2. Subscribes to `i18nStore` to update tab headers, action tooltips, and labels on language change.
+   * 3. Registers cleanup for the clipboard copy indicator timer.
+   *
+   * WHY:
+   * Ensures that when an LLM summary completes in the background, the summary tab updates
+   * immediately with duration metrics and timestamps without disturbing active chat scroll state.
+   */
   protected onMount(): void {
     this.track(
       watch(
         appStore,
-        (state) => [state.activeDocument, state.summarizingModel],
+        (state) => [state.activeDocument, state.summarizingModels],
         () => this.requestRender(),
         shallowEqual
       )
@@ -166,11 +184,26 @@ export class ObjectPageView extends Component {
     });
   }
 
+  /**
+   * Retrieves the currently active document from the application store.
+   *
+   * WHAT: Reads `appStore.state.activeDocument`.
+   * WHY: Provides a reactive accessor for document state without manual event listener wiring.
+   */
   private get doc(): DocumentRecord | null {
     return appStore.state.activeDocument;
   }
 
-  /** Mirrors React's `key={activeDocument.guid}` remount semantics. */
+  /**
+   * Synchronizes and resets conversational chat state when switching between different documents.
+   *
+   * WHAT: Compares `chatDocGuid` against `doc.guid`. If different, initializes a fresh welcome message,
+   * clears chat input, resets loading state, and sets `activeTab: 'info'`.
+   * WHY: Mirrors React's `key={activeDocument.guid}` remount semantics. Prevents conversational
+   * context and questions from a previous document from leaking into the chat transcript of a new document.
+   *
+   * @param doc The newly active document record.
+   */
   private syncChatForDocument(doc: DocumentRecord): void {
     if (this.chatDocGuid === doc.guid) {
       return;
@@ -186,6 +219,16 @@ export class ObjectPageView extends Component {
   // Template
   // ------------------------------------------------------------------
 
+  /**
+   * Generates the root markup for the Object Page based on the currently selected tab.
+   *
+   * WHAT: Renders the common document header, key-attributes strip, and the selected tab view
+   * (Overview / BibTeX, Dual-Model Summaries, or Qdrant RAG Chat).
+   * WHY: Tabbed structure avoids information overload on complex academic documents,
+   * organizing metadata, analytical AI models, and interactive vector search into clear workspaces.
+   *
+   * @returns RawHtml markup for the page.
+   */
   protected template(): RawHtml | string {
     const doc = this.doc;
     if (!doc) {
@@ -204,21 +247,31 @@ export class ObjectPageView extends Component {
     `;
   }
 
+  /**
+   * Renders the SAP Horizon Object Page header, navigation bar, actions, and key-value metrics strip.
+   *
+   * WHAT: Renders back button, document format badge, title, author subtitle, action buttons (download, BibTeX copy,
+   * new version overwrite, delete), and tab bar navigation.
+   * WHY: Adheres to the SAP Fiori Horizon Object Page floorplan standard for enterprise asset inspection.
+   *
+   * @param doc The active document record.
+   * @returns RawHtml header markup.
+   */
   private header(doc: DocumentRecord): RawHtml {
     const t = i18nStore.state.t;
 
     return html`
-      <div class="bg-white rounded-lg shadow-sm border border-[#e2e8f0] overflow-hidden">
+      <div class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] overflow-hidden transition-colors">
         <div
-          class="px-6 py-3.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3 bg-[#f8fafc]"
+          class="px-6 py-3.5 border-b border-gray-100 dark:border-[#2e3b4a] flex flex-wrap items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#232c37]"
         >
           <button
             type="button"
             data-action="back"
-            class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 hover:text-[#0070f2] transition-colors group cursor-pointer"
+            class="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2 rounded-md text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-[#0070f2] dark:hover:text-[#4796ff] hover:bg-white dark:hover:bg-[#1a222c] border border-transparent hover:border-gray-200/80 dark:hover:border-[#38495f] hover:shadow-2xs active:scale-[0.98] transition-all duration-150 group cursor-pointer"
           >
             ${icon('NavBack', {
-              className: 'w-4 h-4 text-gray-500 group-hover:text-[#0070f2] transition-colors'
+              className: 'w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-[#0070f2] dark:group-hover:text-[#4796ff] group-hover:-translate-x-0.5 transition-all duration-150'
             })}
             <span>${t.objectPage.backToLibrary}</span>
           </button>
@@ -261,47 +314,47 @@ export class ObjectPageView extends Component {
             <div class="space-y-2 max-w-4xl">
               <div class="flex flex-wrap items-center gap-2">
                 <span
-                  class="px-2 py-0.5 text-xs font-bold rounded bg-[#0070f2] text-white uppercase tracking-wider font-mono"
+                  class="px-2.5 py-0.5 text-xs font-bold rounded bg-[#0070f2] text-white uppercase tracking-wider font-mono shadow-2xs"
                   >${doc.format}</span
                 >
                 <span
-                  class="px-2 py-0.5 text-xs font-semibold rounded bg-[#f1f5f9] text-[#334155] border border-[#cbd5e1] font-mono"
+                  class="px-2.5 py-0.5 text-xs font-semibold rounded-md bg-slate-100 dark:bg-[#253241] text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-[#38495f] font-mono tracking-wide shadow-2xs"
                   >@${doc.bibtex.entryType}</span
                 >
                 <span
-                  class="px-2 py-0.5 text-xs font-medium rounded bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  class="px-2.5 py-0.5 text-xs font-medium rounded-md bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 shadow-2xs"
                   >${t.common.version} ${String(doc.versionNumber || 1)}</span
                 >
-                <span class="text-xs text-gray-400 font-mono">Key: ${doc.bibtex.bibKey}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">Key: ${doc.bibtex.bibKey}</span>
               </div>
 
-              <h1 class="text-2xl font-bold text-gray-900 leading-snug">
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white leading-snug">
                 ${doc.bibtex.title || doc.fileName}
               </h1>
 
-              <div class="text-sm text-gray-600 flex flex-wrap items-center gap-x-4 gap-y-1">
-                <span class="font-medium text-gray-800">${doc.bibtex.author}</span>
-                ${doc.bibtex.year ? html`<span class="text-gray-500">(${doc.bibtex.year})</span>` : ''}
+              <div class="text-sm text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span class="font-medium text-gray-800 dark:text-gray-100">${doc.bibtex.author}</span>
+                ${doc.bibtex.year ? html`<span class="text-gray-500 dark:text-gray-400">(${doc.bibtex.year})</span>` : ''}
                 ${doc.bibtex.journal
-                  ? html`<span class="text-gray-500 italic">${doc.bibtex.journal}</span>`
+                  ? html`<span class="text-gray-500 dark:text-gray-400 italic">${doc.bibtex.journal}</span>`
                   : ''}
                 ${doc.bibtex.booktitle
-                  ? html`<span class="text-gray-500 italic">${doc.bibtex.booktitle}</span>`
+                  ? html`<span class="text-gray-500 dark:text-gray-400 italic">${doc.bibtex.booktitle}</span>`
                   : ''}
               </div>
             </div>
 
             <div
-              class="bg-[#f8fafc] p-3 rounded-lg border border-gray-200 text-right min-w-[200px]"
+              class="bg-[#f8fafc] dark:bg-[#232c37] p-3 rounded-lg border border-gray-200 dark:border-[#2e3b4a] text-right min-w-[200px]"
             >
-              <div class="text-[10px] text-gray-400 uppercase font-semibold">
+              <div class="text-[10px] text-gray-400 dark:text-gray-400 uppercase font-semibold">
                 ${t.objectPage.guid}
               </div>
-              <div class="font-mono text-xs text-gray-700 break-all select-all">${doc.guid}</div>
+              <div class="font-mono text-xs text-gray-700 dark:text-gray-200 break-all select-all">${doc.guid}</div>
               ${doc.previousVersionGuid
-                ? html`<div class="mt-1 pt-1 border-t border-gray-200 text-[10px] text-gray-500">
+                ? html`<div class="mt-1 pt-1 border-t border-gray-200 dark:border-[#2e3b4a] text-[10px] text-gray-500 dark:text-gray-400">
                     <span>Replaced GUID: </span>
-                    <span class="font-mono text-gray-600 truncate block"
+                    <span class="font-mono text-gray-600 dark:text-gray-300 truncate block"
                       >${doc.previousVersionGuid}</span
                     >
                   </div>`
@@ -310,29 +363,29 @@ export class ObjectPageView extends Component {
           </div>
 
           <div
-            class="mt-6 pt-4 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs"
+            class="mt-6 pt-4 border-t border-gray-100 dark:border-[#2e3b4a] grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs"
           >
             <div>
-              <span class="text-gray-400 block">${t.listReport.fileName}</span>
-              <span class="font-mono font-medium text-gray-800 truncate block">${doc.fileName}</span>
+              <span class="text-gray-400 dark:text-gray-400 block">${t.listReport.fileName}</span>
+              <span class="font-mono font-medium text-gray-800 dark:text-gray-200 truncate block">${doc.fileName}</span>
             </div>
             <div>
-              <span class="text-gray-400 block">${t.objectPage.fileSize}</span>
-              <span class="font-medium text-gray-800">${doc.fileSizeFormatted}</span>
+              <span class="text-gray-400 dark:text-gray-400 block">${t.objectPage.fileSize}</span>
+              <span class="font-medium text-gray-800 dark:text-gray-200">${doc.fileSizeFormatted}</span>
             </div>
             <div>
-              <span class="text-gray-400 block">${t.objectPage.uploadedOn}</span>
-              <span class="font-medium text-gray-800">${formatDateTime(doc.uploadDate)}</span>
+              <span class="text-gray-400 dark:text-gray-400 block">${t.objectPage.uploadedOn}</span>
+              <span class="font-medium text-gray-800 dark:text-gray-200">${formatDateTime(doc.uploadDate)}</span>
             </div>
             <div>
-              <span class="text-gray-400 block">${t.objectPage.lastModified}</span>
-              <span class="font-medium text-gray-800">${formatDateTime(doc.editDate)}</span>
+              <span class="text-gray-400 dark:text-gray-400 block">${t.objectPage.lastModified}</span>
+              <span class="font-medium text-gray-800 dark:text-gray-200">${formatDateTime(doc.editDate)}</span>
             </div>
           </div>
         </div>
 
         <div
-          class="flex border-t border-gray-200 bg-[#f8fafc] px-6 gap-6 text-xs font-semibold"
+          class="flex border-t border-gray-200 dark:border-[#2e3b4a] bg-[#f8fafc] dark:bg-[#232c37] px-6 gap-6 text-xs font-semibold"
           role="tablist"
         >
           ${raw(
@@ -350,8 +403,8 @@ export class ObjectPageView extends Component {
                   class="${cx(
                     'py-3 border-b-2 flex items-center gap-1.5 cursor-pointer transition-colors',
                     this.activeTab === tab.id
-                      ? 'border-[#0070f2] text-[#0070f2]'
-                      : 'border-transparent text-gray-500 hover:text-gray-800'
+                      ? 'border-[#0070f2] text-[#0070f2] dark:text-[#4796ff]'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                   )}"
                 >
                   ${icon(tab.iconKey, { className: tab.iconClass })} ${tab.label}
@@ -368,21 +421,31 @@ export class ObjectPageView extends Component {
   // Tab 1 — BibTeX overview
   // ------------------------------------------------------------------
 
+  /**
+   * Renders the BibTeX metadata overview tab content.
+   *
+   * WHAT: Displays formatted fields (Title, Author, Journal, Year, Volume, DOI, ISBN, Publisher)
+   * and the raw, syntax-highlighted BibTeX citation block with copy and export controls.
+   * WHY: Offers researchers a standardized, copy-paste ready bibliographic record adhering to academic conventions.
+   *
+   * @param doc The active document record being viewed.
+   * @returns RawHtml markup for the metadata tab.
+   */
   private infoTab(doc: DocumentRecord): RawHtml {
     const b = doc.bibtex;
 
     return html`
       <div class="space-y-6">
-        <div class="bg-white rounded-lg shadow-sm border border-[#e2e8f0] p-6 space-y-4">
+        <div class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] p-6 space-y-4">
           <h3
-            class="font-semibold text-sm text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3"
+            class="font-semibold text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2 border-b border-gray-100 dark:border-[#2e3b4a] pb-3"
           >
             ${icon('Info', { className: 'w-4 h-4 text-[#0070f2]' })}
             BibTeX Standard Metadata Specification
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-xs">
-            ${raw(this.metaItem('Title', b.title || '—', 'text-gray-900 font-medium'))}
+            ${raw(this.metaItem('Title', b.title || '—', 'text-gray-900 dark:text-gray-100 font-medium'))}
             ${raw(this.metaItem('Author(s)', b.author || '—'))}
             ${raw(
               this.metaItem(
@@ -405,12 +468,12 @@ export class ObjectPageView extends Component {
             ${b.edition ? raw(this.metaItem('Edition', b.edition)) : ''}
             ${b.doi
               ? html`<div>
-                  <span class="font-semibold text-gray-500 block mb-0.5">DOI</span>
+                  <span class="font-semibold text-gray-500 dark:text-gray-400 block mb-0.5">DOI</span>
                   <a
                     href="https://doi.org/${b.doi}"
                     target="_blank"
                     rel="noreferrer"
-                    class="text-[#0070f2] hover:underline flex items-center gap-1 font-mono text-[11px]"
+                    class="text-[#0070f2] dark:text-[#4796ff] hover:underline flex items-center gap-1 font-mono text-[11px]"
                   >
                     ${b.doi} ${icon('ExternalLink', { className: 'w-3 h-3' })}
                   </a>
@@ -418,12 +481,12 @@ export class ObjectPageView extends Component {
               : ''}
             ${b.url
               ? html`<div>
-                  <span class="font-semibold text-gray-500 block mb-0.5">URL</span>
+                  <span class="font-semibold text-gray-500 dark:text-gray-400 block mb-0.5">URL</span>
                   <a
                     href="${b.url}"
                     target="_blank"
                     rel="noreferrer"
-                    class="text-[#0070f2] hover:underline flex items-center gap-1 font-mono text-[11px] truncate max-w-[260px]"
+                    class="text-[#0070f2] dark:text-[#4796ff] hover:underline flex items-center gap-1 font-mono text-[11px] truncate max-w-[260px]"
                   >
                     ${b.url} ${icon('ExternalLink', { className: 'w-3 h-3 shrink-0' })}
                   </a>
@@ -431,14 +494,14 @@ export class ObjectPageView extends Component {
               : ''}
             ${b.keywords
               ? html`<div class="md:col-span-2">
-                  <span class="font-semibold text-gray-500 block mb-0.5">Keywords</span>
+                  <span class="font-semibold text-gray-500 dark:text-gray-400 block mb-0.5">Keywords</span>
                   <div class="flex flex-wrap gap-1 mt-1">
                     ${raw(
                       b.keywords
                         .split(/[,;]/)
                         .map((keyword) =>
                           html`<span
-                            class="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-[11px]"
+                            class="px-2 py-0.5 rounded bg-gray-100 dark:bg-[#253241] text-gray-700 dark:text-gray-200 border border-transparent dark:border-[#38495f] text-[11px]"
                             >${keyword.trim()}</span
                           >`.toString()
                         )
@@ -450,10 +513,10 @@ export class ObjectPageView extends Component {
           </div>
 
           ${b.abstract
-            ? html`<div class="pt-4 border-t border-gray-100">
-                <span class="font-semibold text-gray-500 block mb-1">Abstract</span>
+            ? html`<div class="pt-4 border-t border-gray-100 dark:border-[#2e3b4a]">
+                <span class="font-semibold text-gray-500 dark:text-gray-400 block mb-1">Abstract</span>
                 <p
-                  class="text-xs text-gray-700 leading-relaxed bg-[#f8fafc] p-3 rounded border border-gray-200"
+                  class="text-xs text-gray-700 dark:text-gray-200 leading-relaxed bg-[#f8fafc] dark:bg-[#232c37] p-3 rounded border border-gray-200 dark:border-[#2e3b4a]"
                 >
                   ${b.abstract}
                 </p>
@@ -461,11 +524,11 @@ export class ObjectPageView extends Component {
             : ''}
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-[#e2e8f0] p-6 space-y-3">
-          <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] p-6 space-y-3">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-[#2e3b4a] pb-3">
             <div class="flex items-center gap-2">
               ${icon('FileCode', { className: 'w-4 h-4 text-[#0070f2]' })}
-              <h3 class="font-semibold text-sm text-gray-900">
+              <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
                 Formatted BibTeX Entry (Copy-Ready)
               </h3>
             </div>
@@ -485,10 +548,21 @@ export class ObjectPageView extends Component {
     `;
   }
 
-  private metaItem(label: string, value: string, valueClass = 'text-gray-900'): string {
+  /**
+   * Renders a key-value bibliographic metadata item widget.
+   *
+   * WHAT: Generates an HTML snippet formatting a metadata label with styled text value.
+   * WHY: Keeps metadata layout uniform across fields and supports responsive CSS grid column spanning.
+   *
+   * @param label The descriptive title of the field.
+   * @param value The textual content or placeholder.
+   * @param valueClass Custom CSS classes for typography and color styling.
+   * @returns Stringified HTML element.
+   */
+  private metaItem(label: string, value: string, valueClass = 'text-gray-900 dark:text-gray-200'): string {
     return html`
       <div>
-        <span class="font-semibold text-gray-500 block mb-0.5">${label}</span>
+        <span class="font-semibold text-gray-500 dark:text-gray-400 block mb-0.5">${label}</span>
         <p class="${valueClass}">${value}</p>
       </div>
     `.toString();
@@ -498,6 +572,15 @@ export class ObjectPageView extends Component {
   // Tab 2 — dual-model summaries
   // ------------------------------------------------------------------
 
+  /**
+   * Renders the dual-model AI summaries tab comparing Llama 3.3 and Mistral.
+   *
+   * WHAT: Displays architecture telemetry banner and a grid of summary cards for configured AI models.
+   * WHY: Delivers multi-perspective document analysis allowing side-by-side comparison of deep analysis vs concise synthesis.
+   *
+   * @param doc Active document record.
+   * @returns RawHtml markup for summaries tab.
+   */
   private summariesTab(doc: DocumentRecord): RawHtml {
     return html`
       <div class="space-y-6">
@@ -525,28 +608,37 @@ export class ObjectPageView extends Component {
     `;
   }
 
+  /**
+   * Renders an individual summary card for a specific AI model.
+   *
+   * WHAT: Generates model badge, latency, token count, full summary prose, and regenerate action button.
+   * WHY: Encapsulates model-specific UI states (loading spinner, error messages, copy button, telemetry tags).
+   *
+   * @param spec Specification of the model (key, title, icons).
+   * @param summary Persisted summary record or undefined if not yet generated.
+   * @returns Stringified HTML for the summary card.
+   */
   private summaryCard(spec: SummaryCardSpec, summary: SummaryRecord | undefined): string {
-    const summarizingModel = appStore.state.summarizingModel;
-    const isBusy = summarizingModel === spec.model;
+    const isBusy = Boolean(appStore.state.summarizingModels[spec.model]);
     const hasText = Boolean(summary?.summaryText);
 
     return html`
       <div
-        class="bg-white rounded-lg shadow-sm border border-[#e2e8f0] flex flex-col justify-between overflow-hidden"
+        class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] flex flex-col justify-between overflow-hidden"
       >
-        <div class="p-5 border-b border-gray-100 bg-[#fafafa]">
+        <div class="p-5 border-b border-gray-100 dark:border-[#2e3b4a] bg-[#fafafa] dark:bg-[#232c37]">
           <div class="flex items-start justify-between gap-3">
             <div>
               <div class="flex items-center gap-2">
                 ${icon(spec.iconKey, { className: spec.iconClass })}
-                <h4 class="font-bold text-sm text-gray-900">
+                <h4 class="font-bold text-sm text-gray-900 dark:text-white">
                   ${summary?.modelName || spec.defaultModelName}
                 </h4>
               </div>
-              <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-gray-500">
+              <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
                 ${hasText
                   ? html`<span
-                        class="flex items-center gap-1.5 font-mono bg-[#f1f5f9] px-2 py-0.5 rounded border border-gray-200 text-gray-800"
+                        class="flex items-center gap-1.5 font-mono bg-[#f1f5f9] dark:bg-[#1b2531] px-2 py-0.5 rounded border border-gray-200 dark:border-[#38495f] text-gray-800 dark:text-gray-200"
                         title="${summary?.createdAt
                           ? `ISO: ${summary.createdAt}`
                           : 'Generated on upload'}"
@@ -558,7 +650,7 @@ export class ObjectPageView extends Component {
                           )}</strong
                         >
                       </span>
-                      <span class="text-gray-300">•</span>
+                      <span class="text-gray-300 dark:text-gray-600">•</span>
                       <span class="flex items-center gap-1">
                         ${icon('Clock', { className: 'w-3 h-3 text-gray-400' })} Duration:
                         <strong>${summary?.durationFormatted || spec.defaultDuration}</strong>
@@ -586,7 +678,7 @@ export class ObjectPageView extends Component {
         </div>
 
         <div
-          class="p-6 text-xs text-gray-800 leading-relaxed space-y-3 prose prose-sm max-w-none"
+          class="p-6 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 prose prose-sm max-w-none"
         >
           ${isBusy
             ? html`<div class="py-12 flex flex-col items-center justify-center gap-3 text-gray-500">
@@ -598,7 +690,7 @@ export class ObjectPageView extends Component {
               </div>`
             : hasText
               ? html`<div
-                  class="whitespace-pre-wrap font-sans text-gray-700 leading-relaxed bg-[#f8fafc] p-4 rounded-lg border border-gray-100"
+                  class="whitespace-pre-wrap font-sans text-gray-700 dark:text-gray-200 leading-relaxed bg-[#f8fafc] dark:bg-[#232c37] p-4 rounded-lg border border-gray-100 dark:border-[#2e3b4a]"
                 >
                   ${summary?.summaryText}
                 </div>`
@@ -613,23 +705,24 @@ export class ObjectPageView extends Component {
                   >
                     ${icon(spec.iconKey, { className: 'w-4 h-4' })}
                   </div>
-                  <div class="text-xs font-semibold text-gray-800">${spec.emptyTitle}</div>
-                  <p class="text-[11px] text-gray-500 max-w-sm mx-auto leading-normal">
+                  <div class="text-xs font-semibold text-gray-800 dark:text-gray-200">${spec.emptyTitle}</div>
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400 max-w-sm mx-auto leading-normal">
                     ${spec.emptyBody}
                   </p>
                   <ui5-button
                     class="plib-button mt-1"
                     design="Emphasized"
                     data-regenerate="${spec.model}"
-                    ${summarizingModel ? raw('disabled') : ''}
+                    ${isBusy ? raw('disabled') : ''}
                   >
-                    ${icon('RotateCw', { className: 'w-3.5 h-3.5 mr-1.5' })} ${spec.emptyAction}
+                    ${icon('RotateCw', { className: cx('w-3.5 h-3.5 mr-1.5', isBusy && 'animate-spin') })}
+                    ${isBusy ? 'Generating...' : spec.emptyAction}
                   </ui5-button>
                 </div>`}
         </div>
 
         <div
-          class="px-5 py-2.5 bg-gray-50 border-t border-gray-100 text-[11px] text-gray-400 flex items-center justify-between"
+          class="px-5 py-2.5 bg-gray-50 dark:bg-[#232c37] border-t border-gray-100 dark:border-[#2e3b4a] text-[11px] text-gray-400 dark:text-gray-400 flex items-center justify-between"
         >
           <span>Model Target: Ollama / Spring AI</span>
           <span>${spec.footerType}</span>
@@ -642,6 +735,16 @@ export class ObjectPageView extends Component {
   // Tab 3 — RAG chat
   // ------------------------------------------------------------------
 
+  /**
+   * Renders the interactive Retrieval-Augmented Generation (RAG) chat tab.
+   *
+   * WHAT: Generates Qdrant vector status badge, scrollable message feed, suggested query prompts,
+   * and input field bound to the conversational QA pipeline.
+   * WHY: Enables researchers to interrogate documents interactively with grounded citations from segmented passages.
+   *
+   * @param doc Active document record.
+   * @returns RawHtml markup for chat interface.
+   */
   private chatTab(doc: DocumentRecord): RawHtml {
     const prompts = doc.bibtex.title.toLowerCase().includes('wizard of oz')
       ? WIZARD_PROMPTS
@@ -649,9 +752,9 @@ export class ObjectPageView extends Component {
 
     return html`
       <div
-        class="bg-white rounded-lg shadow-sm border border-[#e2e8f0] overflow-hidden flex flex-col h-[650px]"
+        class="bg-white dark:bg-[#1c232b] rounded-lg shadow-sm border border-[#e2e8f0] dark:border-[#2e3b4a] overflow-hidden flex flex-col h-[650px]"
       >
-        <div class="p-4 bg-[#f8fafc] border-b border-gray-200 flex items-center justify-between">
+        <div class="p-4 bg-[#f8fafc] dark:bg-[#232c37] border-b border-gray-200 dark:border-[#2e3b4a] flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div
               class="w-8 h-8 rounded-full bg-[#0070f2] flex items-center justify-center text-white"
@@ -659,27 +762,27 @@ export class ObjectPageView extends Component {
               ${icon('Bot', { className: 'w-4 h-4' })}
             </div>
             <div>
-              <div class="text-xs font-bold text-gray-900 flex items-center gap-2">
+              <div class="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <span>Chat with Document Assistant</span>
                 <span
-                  class="px-2 py-0.5 text-[10px] font-semibold bg-[#ebf8ff] text-[#0070f2] rounded border border-[#b9e5fe]"
-                  >Active Model: Llama 3.3</span
+                  class="px-2 py-0.5 text-[10px] font-semibold bg-[#ebf8ff] dark:bg-blue-950/60 text-[#0070f2] dark:text-[#38bdf8] rounded border border-[#b9e5fe] dark:border-blue-900/60"
+                  >Active Model: Llama 3.3 (70B Instruct)</span
                 >
               </div>
-              <div class="text-[11px] text-gray-500">
+              <div class="text-[11px] text-gray-500 dark:text-gray-400">
                 Retrieval-Augmented Generation backed by Qdrant vector database chunks
               </div>
             </div>
           </div>
 
-          <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400 font-mono">
+          <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400 dark:text-gray-400 font-mono">
             <span class="w-2 h-2 rounded-full bg-green-500"></span>
             Qdrant Connected
           </div>
         </div>
 
         <div
-          class="flex-1 overflow-y-auto p-5 space-y-4 bg-[#fafbfc]"
+          class="flex-1 overflow-y-auto p-5 space-y-4 bg-[#fafbfc] dark:bg-[#151c24]"
           data-scroll-key="chat-feed"
           data-chat-feed
         >
@@ -692,7 +795,7 @@ export class ObjectPageView extends Component {
                   ${icon('Bot', { className: 'w-3.5 h-3.5' })}
                 </div>
                 <div
-                  class="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-2 shadow-sm"
+                  class="bg-white dark:bg-[#1c232b] border border-gray-200 dark:border-[#2e3b4a] rounded-lg p-3 flex items-center gap-2 shadow-sm text-gray-800 dark:text-gray-200"
                 >
                   <div
                     class="w-4 h-4 border-2 border-[#0070f2] border-t-transparent rounded-full animate-spin"
@@ -703,15 +806,15 @@ export class ObjectPageView extends Component {
             : ''}
         </div>
 
-        <div class="px-5 py-2 border-t border-gray-100 bg-white flex flex-wrap gap-2 text-xs">
-          <span class="text-[11px] text-gray-400 font-medium py-1">Quick prompts:</span>
+        <div class="px-5 py-2 border-t border-gray-100 dark:border-[#2e3b4a] bg-white dark:bg-[#1c232b] flex flex-wrap gap-2 text-xs">
+          <span class="text-[11px] text-gray-400 dark:text-gray-400 font-medium py-1">Quick prompts:</span>
           ${raw(
             prompts
               .map((prompt) =>
                 html`<button
                   type="button"
                   data-prompt="${prompt}"
-                  class="px-2.5 py-1 rounded bg-[#f1f5f9] hover:bg-[#e2e8f0] text-gray-700 text-[11px] transition-colors cursor-pointer border border-gray-200"
+                  class="px-2.5 py-1 rounded bg-[#f1f5f9] dark:bg-[#232c37] hover:bg-[#e2e8f0] dark:hover:bg-[#2b3746] text-gray-700 dark:text-gray-200 text-[11px] transition-colors cursor-pointer border border-gray-200 dark:border-[#38495f]"
                 >
                   ${prompt}
                 </button>`.toString()
@@ -722,7 +825,7 @@ export class ObjectPageView extends Component {
 
         <form
           data-form="chat"
-          class="p-3 bg-white border-t border-gray-200 flex items-center gap-2"
+          class="p-3 bg-white dark:bg-[#1c232b] border-t border-gray-200 dark:border-[#2e3b4a] flex items-center gap-2"
         >
           <ui5-input
             class="plib-input flex-1 text-xs"
@@ -745,6 +848,16 @@ export class ObjectPageView extends Component {
     `;
   }
 
+  /**
+   * Formats a single chat message bubble with role-specific styling and citations.
+   *
+   * WHAT: Distinguishes user prompts (blue pill on right) from assistant responses (white card on left),
+   * rendering timestamp and retrieved vector chunk citations with relevance percentages.
+   * WHY: Provides clear visual attribution and traceability back to source text in the vector database.
+   *
+   * @param message Structured chat message model.
+   * @returns Stringified HTML representing the chat bubble.
+   */
   private chatBubble(message: ChatMessage): string {
     const isUser = message.role === 'user';
 
@@ -763,7 +876,7 @@ export class ObjectPageView extends Component {
             'max-w-2xl rounded-lg p-3.5 text-xs shadow-sm',
             isUser
               ? 'bg-[#0070f2] text-white rounded-br-none'
-              : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
+              : 'bg-white dark:bg-[#1c232b] text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-[#2e3b4a] rounded-bl-none'
           )}"
         >
           <div class="whitespace-pre-wrap leading-relaxed">${message.text}</div>
@@ -806,6 +919,15 @@ export class ObjectPageView extends Component {
   // Behaviour
   // ------------------------------------------------------------------
 
+  /**
+   * Post-render lifecycle callback that wires action buttons, tab navigation, and chat interactions.
+   *
+   * WHAT: Attaches handlers for back button, version modal, asset download, .bib file export,
+   * document deletion, tab switching, BibTeX clipboard copy, summary regeneration, suggested prompt clicks,
+   * and chat form submissions.
+   * WHY: Binds all interactive controls after the template markup is rendered, ensuring that dynamic
+   * UI5 Web Components and buttons correctly trigger state changes and API calls.
+   */
   protected afterRender(): void {
     this.on('[data-action="back"]', 'click', () => appStore.backToList());
     this.on('[data-action="open-version"]', 'click', () => appStore.openVersionModal());
@@ -860,6 +982,13 @@ export class ObjectPageView extends Component {
     this.scrollChatToBottom();
   }
 
+  /**
+   * Scrolls the conversation message feed to the newest message at the bottom.
+   *
+   * WHAT: Sets `feed.scrollTop = feed.scrollHeight`.
+   * WHY: Ensures the researcher immediately sees their sent question and the incoming assistant reply
+   * without needing to manually scroll down.
+   */
   private scrollChatToBottom(): void {
     const feed = this.$('[data-chat-feed]');
     if (feed) {
@@ -867,6 +996,13 @@ export class ObjectPageView extends Component {
     }
   }
 
+  /**
+   * Initiates direct browser download of the document's original physical file.
+   *
+   * WHAT: Directs `window.location.href` to the adapter's download URL.
+   * WHY: Triggers native browser streaming attachment downloads without loading large binary blobs
+   * into JavaScript memory buffers.
+   */
   private downloadAsset(): void {
     const doc = this.doc;
     if (!doc) {
@@ -876,6 +1012,14 @@ export class ObjectPageView extends Component {
     window.location.href = backendStore.adapter.getDownloadUrl(doc.guid);
   }
 
+  /**
+   * Exports the document's BibTeX citation record as a downloadable `.bib` file.
+   *
+   * WHAT: Creates a client-side Blob with `text/plain` content, generates an object URL,
+   * simulates an anchor click, and revokes the URL.
+   * WHY: Enables researchers to save standard BibTeX files directly into their citation managers
+   * (e.g. Zotero, Mendeley, JabRef, LaTeX projects) with zero server overhead.
+   */
   private exportBibtexFile(): void {
     const doc = this.doc;
     if (!doc) {
@@ -890,6 +1034,14 @@ export class ObjectPageView extends Component {
     URL.revokeObjectURL(url);
   }
 
+  /**
+   * Copies raw BibTeX citation text to the operating system clipboard.
+   *
+   * WHAT: Calls `navigator.clipboard.writeText(doc.bibtexRaw)`, sets `copiedBib = true`,
+   * re-renders to display green "Copied!" feedback, and sets a 2-second timer to reset the button state.
+   * WHY: Gives researchers a fast, frictionless way to paste citations into LaTeX documents,
+   * with clear temporary visual confirmation.
+   */
   private copyBibtex(): void {
     const doc = this.doc;
     if (!doc) {
@@ -908,6 +1060,23 @@ export class ObjectPageView extends Component {
     }, COPIED_RESET_MS);
   }
 
+  /**
+   * Sends a user question to the Qdrant-backed RAG service and appends the grounded answer.
+   *
+   * WHAT:
+   * 1. Constructs and appends the user's `ChatMessage` to local state.
+   * 2. Extracts a rolling history window of the previous 6 conversation turns.
+   * 3. Sets loading state and re-renders to show the assistant typing indicator.
+   * 4. Dispatches `chatWithDocument` through the backend gateway.
+   * 5. Appends the model's answer along with retrieved citation chunks and similarity scores.
+   * 6. Recovers cleanly on error, displaying an informative error message.
+   *
+   * WHY:
+   * 1. Multi-turn context: Sending the last 6 turns maintains conversational continuity
+   *    (e.g. answering follow-up questions like "Can you elaborate on that point?").
+   * 2. Grounded citations: Displaying citation chunk indices and similarity percentages
+   *    allows researchers to verify the answer against original document excerpts, preventing hallucinations.
+   */
   private async sendChat(): Promise<void> {
     const doc = this.doc;
     if (!doc || !this.chatInput.trim() || this.chatLoading) {

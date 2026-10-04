@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AiSummarizationService (com.personallibrary.service) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.service.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.service.html">com.personallibrary.service</a> &gt;
+      <strong>AiSummarizationService</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.service</div>
+        <h2>class AiSummarizationService</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Slf4j</span>  <span class="annotation">@Service</span> </div>
+        <div class="signature">
+          public class <strong>AiSummarizationService</strong>
+          
+          
+        </div>
+        <p>Service orchestrating dual-model AI summarization via Spring AI and Ollama: &lt;ul&gt; &lt;li&gt;&lt;b&gt;Llama 3.3 (70B Instruct):&lt;/b&gt; Produces structured, technical and analytical synthesis.&lt;/li&gt; &lt;li&gt;&lt;b&gt;Mistral Large (2411):&lt;/b&gt; Produces high-impact executive and operational overviews.&lt;/li&gt; &lt;/ul&gt; Tracks execution durations in seconds and user-friendly minutes/seconds formatting.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private ChatClient</td>
+                <td class="name-col"><code>llamaChatClient</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private ChatClient</td>
+                <td class="name-col"><code>mistralChatClient</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>summaries</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>summaryText</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>modelName</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private double</td>
+                <td class="name-col"><code>durationSeconds</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public AiSummarizationServic</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">e</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Constructs the summarization service with qualified model chat clients.  WHAT: Injects Spring AI ChatClients specifically bound to Llama and Mistral chat models. WHY: Separates model client references by qualifier name to ensure distinct temperature and model parameters.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public SummaryRecord&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">generateDualSummaries</a></strong>(String title, String content, BibTeXMetadata bibtex)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Computes dual-model summaries automatically upon document ingestion: 1. Llama model: in-depth technical &amp; analytical synthesis 2. Mistral model: high-impact executive operational synthesis  WHAT: Consecutively calls `generateSummaryForModel` for both &quot;llama&quot; and &quot;mistral&quot; and returns a composite map. WHY: Produces both analytical and executive viewpoints in a single pipeline run during document upload, ensuring immediate availability of dual summaries when opening the SAP Horizon Object Page.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public generateSummaryForMode</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">l</a></strong>(Object &quot;llama&quot;, Object title, Object content, Object bibtex)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">t</a></strong>(Object &quot;llama&quot;, Object llamaRecord)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public generateSummaryForMode</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">l</a></strong>(Object &quot;mistral&quot;, Object title, Object content, Object bibtex)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">t</a></strong>(Object &quot;mistral&quot;, Object mistralRecord)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public SummaryRecord</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">generateSummaryForModel</a></strong>(String modelKey, String title, String content, BibTeXMetadata bibtex)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Generates or regenerates a summary for a specific target model with precise duration telemetry.  WHAT: Truncates content to a 6,000 character prompt window, selects model-specific system prompts, executes inference via Spring AI ChatClient, measures execution duration, and constructs a SummaryRecord. WHY: Truncating to 6,000 characters balances representative context coverage with rapid response times; timing telemetry provides users with concrete insight into model inference performance.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public currentTimeMilli</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">s</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public substrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">g</a></strong>(Object 0, Object Math.min(content.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">f</a></strong>(Object &quot;llama&quot;.equalsIgnoreCase(modelKey)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public void</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">3</a></strong>(70B Instruct)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public forma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">t</a></strong>(&quot;&quot;&quot; You are Ollama Llama 3.3 running in Spring AI. Provide an in-depth analytical summary for the document: &quot;%s&quot;. Author: %s, Year: %s. Document Excerpt: %s Include: ### Analytical Synthesis (Llama 3.3)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getAutho</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getYea</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public promp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public use</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">r</a></strong>(Object prompt)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cal</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">l</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public conten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public erro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">r</a></strong>(&quot;Failed to generate Llama summary: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Analytical</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">Synthesis</a></strong>(Llama 3.3)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Mistral</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">Large</a></strong>(Object 2411)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public forma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">t</a></strong>(&quot;&quot;&quot; You are Ollama Mistral Large running in Spring AI. Provide an executive, high-impact operational summary for the document: &quot;%s&quot;. Author: %s, Year: %s. Document Excerpt: %s Include: ### Executive &amp; Operational Summary (Mistral)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getAutho</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getYea</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public promp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public use</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">r</a></strong>(Object prompt)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cal</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">l</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public conten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public erro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">r</a></strong>(&quot;Failed to generate Mistral summary: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Operational</td>
+                <td class="desc-col">
+                  <strong><a href="#method-31">Summary</a></strong>(Object Mistral)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public currentTimeMilli</td>
+                <td class="desc-col">
+                  <strong><a href="#method-32">s</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public formatDuratio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-33">n</a></strong>(Object durationSeconds)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public modelNam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">e</a></strong>(Object modelName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public modelKe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-36">y</a></strong>(Object modelKey.toLowerCase()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public summaryTex</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">t</a></strong>(Object summaryText)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public createdA</td>
+                <td class="desc-col">
+                  <strong><a href="#method-38">t</a></strong>(Object Instant.now()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public timestam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-39">p</a></strong>(Object Instant.now()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public durationSecond</td>
+                <td class="desc-col">
+                  <strong><a href="#method-40">s</a></strong>(Object durationSeconds)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public durationFormatte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-41">d</a></strong>(Object durationFormatted)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-42">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public AiSummarizationServic <strong>e</strong>(Object param)
+            </div>
+            <p>Constructs the summarization service with qualified model chat clients.  WHAT: Injects Spring AI ChatClients specifically bound to Llama and Mistral chat models. WHY: Separates model client references by qualifier name to ensure distinct temperature and model parameters.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>llamaChatClient</code> - Chat client configured for Llama 3.3 inference.</dd><dd><code>mistralChatClient</code> - Chat client configured for Mistral Large inference.</dd>
+              </dl>
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">generateDualSummaries</div>
+            
+            <div class="signature">
+              public SummaryRecord&gt; <strong>generateDualSummaries</strong>(String title, String content, BibTeXMetadata bibtex)
+            </div>
+            <p>Computes dual-model summaries automatically upon document ingestion: 1. Llama model: in-depth technical &amp; analytical synthesis 2. Mistral model: high-impact executive operational synthesis  WHAT: Consecutively calls `generateSummaryForModel` for both &quot;llama&quot; and &quot;mistral&quot; and returns a composite map. WHY: Produces both analytical and executive viewpoints in a single pipeline run during document upload, ensuring immediate availability of dual summaries when opening the SAP Horizon Object Page.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>title</code> - Document title.</dd><dd><code>content</code> - Raw extracted text content.</dd><dd><code>bibtex</code> - Structured bibliographic metadata.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Map containing &quot;llama&quot; and &quot;mistral&quot; {@link SummaryRecord} entries.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public generateSummaryForMode <strong>l</strong>(Object &quot;llama&quot;, Object title, Object content, Object bibtex)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;llama&quot;, Object llamaRecord)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public generateSummaryForMode <strong>l</strong>(Object &quot;mistral&quot;, Object title, Object content, Object bibtex)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;mistral&quot;, Object mistralRecord)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">generateSummaryForModel</div>
+            
+            <div class="signature">
+              public SummaryRecord <strong>generateSummaryForModel</strong>(String modelKey, String title, String content, BibTeXMetadata bibtex)
+            </div>
+            <p>Generates or regenerates a summary for a specific target model with precise duration telemetry.  WHAT: Truncates content to a 6,000 character prompt window, selects model-specific system prompts, executes inference via Spring AI ChatClient, measures execution duration, and constructs a SummaryRecord. WHY: Truncating to 6,000 characters balances representative context coverage with rapid response times; timing telemetry provides users with concrete insight into model inference performance.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>modelKey</code> - Target model engine (&quot;llama&quot; or &quot;mistral&quot;).</dd><dd><code>title</code> - Document title.</dd><dd><code>content</code> - Raw text content.</dd><dd><code>bibtex</code> - Bibliographic metadata.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Completed {@link SummaryRecord} with markdown content and timing metrics.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public currentTimeMilli <strong>s</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public substrin <strong>g</strong>(Object 0, Object Math.min(content.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object &quot;llama&quot;.equalsIgnoreCase(modelKey)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">3</div>
+            
+            <div class="signature">
+              public void <strong>3</strong>(70B Instruct)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(&quot;&quot;&quot; You are Ollama Llama 3.3 running in Spring AI. Provide an in-depth analytical summary for the document: &quot;%s&quot;. Author: %s, Year: %s. Document Excerpt: %s Include: ### Analytical Synthesis (Llama 3.3)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public getAutho <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public getYea <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public promp <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public use <strong>r</strong>(Object prompt)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public cal <strong>l</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public conten <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public erro <strong>r</strong>(&quot;Failed to generate Llama summary: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">Synthesis</div>
+            
+            <div class="signature">
+              public Analytical <strong>Synthesis</strong>(Llama 3.3)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">Large</div>
+            
+            <div class="signature">
+              public Mistral <strong>Large</strong>(Object 2411)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(&quot;&quot;&quot; You are Ollama Mistral Large running in Spring AI. Provide an executive, high-impact operational summary for the document: &quot;%s&quot;. Author: %s, Year: %s. Document Excerpt: %s Include: ### Executive &amp; Operational Summary (Mistral)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public getAutho <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public getYea <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public promp <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public use <strong>r</strong>(Object prompt)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public cal <strong>l</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public conten <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public erro <strong>r</strong>(&quot;Failed to generate Mistral summary: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-31">
+            <div class="detail-title">Summary</div>
+            
+            <div class="signature">
+              public Operational <strong>Summary</strong>(Object Mistral)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-32">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public currentTimeMilli <strong>s</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-33">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public formatDuratio <strong>n</strong>(Object durationSeconds)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-34">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-35">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public modelNam <strong>e</strong>(Object modelName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-36">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public modelKe <strong>y</strong>(Object modelKey.toLowerCase()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-37">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public summaryTex <strong>t</strong>(Object summaryText)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-38">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public createdA <strong>t</strong>(Object Instant.now()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-39">
+            <div class="detail-title">p</div>
+            
+            <div class="signature">
+              public timestam <strong>p</strong>(Object Instant.now()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-40">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public durationSecond <strong>s</strong>(Object durationSeconds)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-41">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public durationFormatte <strong>d</strong>(Object durationFormatted)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-42">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

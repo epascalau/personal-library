@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BibTeXExtractionService (com.personallibrary.service) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.service.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.service.html">com.personallibrary.service</a> &gt;
+      <strong>BibTeXExtractionService</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.service</div>
+        <h2>class BibTeXExtractionService</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Slf4j</span>  <span class="annotation">@Service</span> </div>
+        <div class="signature">
+          public class <strong>BibTeXExtractionService</strong>
+          
+          
+        </div>
+        <p>Service utilizing Spring AI and Ollama LLM to automatically parse document content and extract structured bibliographic metadata adhering to RFC BibTeX specifications.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-09-30</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private ChatClient</td>
+                <td class="name-col"><code>chatClient</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private ObjectMapper</td>
+                <td class="name-col"><code>objectMapper</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public BibTeXExtractionServic</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">e</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Constructs the extraction service with the primary AI chat client.  WHAT: Injects the Llama ChatClient and Jackson ObjectMapper for parsing LLM JSON responses. WHY: Employs Llama 3.3&#39;s analytical comprehension to extract bibliographic fields from messy document text.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public BibTeXMetadata</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">extractMetadata</a></strong>(String fileName, String sampleContent)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Analyzes document text and filename to infer bibliographic attributes and assemble a {@link BibTeXMetadata} record.  WHAT: Sends a structured JSON extraction prompt containing filename and a 4,000-character text sample to Llama, parses the returned JSON, and builds a populated BibTeXMetadata instance; falls back to heuristic metadata on failure. WHY: Eliminates manual data entry by extracting title, authors, year, publication venue, DOI, and keywords directly from document front matter, with graceful fallback ensuring upload operations never fail even if the LLM is offline.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public replaceFirs</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">t</a></strong>(Object &quot;[.][^.]+$&quot;, Object &quot;&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public valueO</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">f</a></strong>(Object Year.now()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public toLowerCas</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">e</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">f</a></strong>(sampleContent == null || sampleContent.trim()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public return</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">fallbackMetadata</a></strong>(Object cleanTitle, Object currentYear, Object defaultKey)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public forma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">t</a></strong>(&quot;&quot;&quot; Extract academic/technical publication metadata from the following document into JSON for BibTeX. File Name: &quot;%s&quot; Text Preview: %s Return ONLY a JSON object with: - entryType: one of &quot;article&quot;, Object &quot;book&quot;, Object &quot;inproceedings&quot;, Object &quot;techreport&quot;, Object &quot;phdthesis&quot;, &quot;misc&quot; - bibKey: short unique key (e.g. author2024title)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">g</a></strong>(if article)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">g</a></strong>(if inproceedings)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public strin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">g</a></strong>(Object optional)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public substrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">g</a></strong>(Object 0, Object Math.min(sampleContent.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public promp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public use</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">r</a></strong>(Object prompt)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cal</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">l</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public conten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">f</a></strong>(response != null)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public cleanJsonRespons</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">e</a></strong>(Object response)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public readValu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">e</a></strong>(Object json, Object Map.class)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public entryTyp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">e</a></strong>(Object BibTeXType.fromString((String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public bibKe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">y</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public titl</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">e</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public autho</td>
+                <td class="desc-col">
+                  <strong><a href="#method-31">r</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public yea</td>
+                <td class="desc-col">
+                  <strong><a href="#method-32">r</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public mont</td>
+                <td class="desc-col">
+                  <strong><a href="#method-33">h</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public journa</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">l</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public booktitl</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">e</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public volum</td>
+                <td class="desc-col">
+                  <strong><a href="#method-36">e</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public numbe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">r</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public page</td>
+                <td class="desc-col">
+                  <strong><a href="#method-38">s</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public publishe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-39">r</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public editio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-40">n</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public institutio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-41">n</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public schoo</td>
+                <td class="desc-col">
+                  <strong><a href="#method-42">l</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public do</td>
+                <td class="desc-col">
+                  <strong><a href="#method-43">i</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ur</td>
+                <td class="desc-col">
+                  <strong><a href="#method-44">l</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public abstract Tex</td>
+                <td class="desc-col">
+                  <strong><a href="#method-45">t</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public keyword</td>
+                <td class="desc-col">
+                  <strong><a href="#method-46">s</a></strong>(Object (String)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-47">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-48">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public war</td>
+                <td class="desc-col">
+                  <strong><a href="#method-49">n</a></strong>(&quot;Ollama BibTeX extraction encountered an error, falling back to heuristics: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public return</td>
+                <td class="desc-col">
+                  <strong><a href="#method-50">fallbackMetadata</a></strong>(Object cleanTitle, Object currentYear, Object defaultKey)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="desc-col">
+                  <strong><a href="#method-51">fallbackMetadata</a></strong>(String title, String year, String key)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Synthesizes sensible fallback bibliographic metadata from filename and system defaults.  WHAT: Constructs a BibTeXMetadata record populated with cleaned file title, current year, and default citation key. WHY: Guarantees that documents uploaded without internet access or with unsupported layouts still receive valid, queryable metadata records in the library catalogue.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-52">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public entryTyp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-53">e</a></strong>(Object BibTeXType.MISC)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public bibKe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-54">y</a></strong>(Object key)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public titl</td>
+                <td class="desc-col">
+                  <strong><a href="#method-55">e</a></strong>(Object title)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public autho</td>
+                <td class="desc-col">
+                  <strong><a href="#method-56">r</a></strong>(&quot;Unknown Author&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public yea</td>
+                <td class="desc-col">
+                  <strong><a href="#method-57">r</a></strong>(Object year)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public publishe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-58">r</a></strong>(&quot;Personal Library Repository&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public editio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-59">n</a></strong>(&quot;1st Edition&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public abstract Tex</td>
+                <td class="desc-col">
+                  <strong><a href="#method-60">t</a></strong>(&quot;Document catalogued for personal research and semantic indexing.&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public keyword</td>
+                <td class="desc-col">
+                  <strong><a href="#method-61">s</a></strong>(Object &quot;document, Object research, Object knowledge-base&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-62">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="desc-col">
+                  <strong><a href="#method-63">cleanJsonResponse</a></strong>(String raw)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Strips Markdown code fence formatting (` ```json ... ``` `) from model responses.  WHAT: Removes leading and trailing Markdown code fences and whitespace from raw LLM outputs. WHY: LLM chat models frequently wrap JSON outputs in Markdown code blocks; stripping fences ensures reliable Jackson deserialization without formatting syntax errors.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public tri</td>
+                <td class="desc-col">
+                  <strong><a href="#method-64">m</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-65">f</a></strong>(Object clean.startsWith(&quot;```json&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public substrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-66">g</a></strong>(Object 7)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public else</td>
+                <td class="desc-col">
+                  <strong><a href="#method-67">if</a></strong>(Object clean.startsWith(&quot;```&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public substrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-68">g</a></strong>(Object 3)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-69">f</a></strong>(Object clean.endsWith(&quot;```&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public substrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-70">g</a></strong>(Object 0, Object clean.length()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public tri</td>
+                <td class="desc-col">
+                  <strong><a href="#method-71">m</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public BibTeXExtractionServic <strong>e</strong>(Object param)
+            </div>
+            <p>Constructs the extraction service with the primary AI chat client.  WHAT: Injects the Llama ChatClient and Jackson ObjectMapper for parsing LLM JSON responses. WHY: Employs Llama 3.3&#39;s analytical comprehension to extract bibliographic fields from messy document text.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>chatClient</code> - Llama AI chat client.</dd><dd><code>objectMapper</code> - Jackson JSON object mapper.</dd>
+              </dl>
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">extractMetadata</div>
+            
+            <div class="signature">
+              public BibTeXMetadata <strong>extractMetadata</strong>(String fileName, String sampleContent)
+            </div>
+            <p>Analyzes document text and filename to infer bibliographic attributes and assemble a {@link BibTeXMetadata} record.  WHAT: Sends a structured JSON extraction prompt containing filename and a 4,000-character text sample to Llama, parses the returned JSON, and builds a populated BibTeXMetadata instance; falls back to heuristic metadata on failure. WHY: Eliminates manual data entry by extracting title, authors, year, publication venue, DOI, and keywords directly from document front matter, with graceful fallback ensuring upload operations never fail even if the LLM is offline.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>fileName</code> - Physical filename of the document.</dd><dd><code>sampleContent</code> - Extracted plain text content excerpt.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Fully populated {@link BibTeXMetadata} object.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public replaceFirs <strong>t</strong>(Object &quot;[.][^.]+$&quot;, Object &quot;&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public valueO <strong>f</strong>(Object Year.now()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public toLowerCas <strong>e</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(sampleContent == null || sampleContent.trim()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">fallbackMetadata</div>
+            
+            <div class="signature">
+              public return <strong>fallbackMetadata</strong>(Object cleanTitle, Object currentYear, Object defaultKey)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(&quot;&quot;&quot; Extract academic/technical publication metadata from the following document into JSON for BibTeX. File Name: &quot;%s&quot; Text Preview: %s Return ONLY a JSON object with: - entryType: one of &quot;article&quot;, Object &quot;book&quot;, Object &quot;inproceedings&quot;, Object &quot;techreport&quot;, Object &quot;phdthesis&quot;, &quot;misc&quot; - bibKey: short unique key (e.g. author2024title)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(if article)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(if inproceedings)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public strin <strong>g</strong>(Object optional)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public substrin <strong>g</strong>(Object 0, Object Math.min(sampleContent.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public promp <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public use <strong>r</strong>(Object prompt)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public cal <strong>l</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public conten <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(response != null)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public cleanJsonRespons <strong>e</strong>(Object response)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">e</div>
+            <div><span class="annotation">@SuppressWarnings(&quot;unchecked&quot;)</span> </div>
+            <div class="signature">
+              public readValu <strong>e</strong>(Object json, Object Map.class)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public entryTyp <strong>e</strong>(Object BibTeXType.fromString((String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public bibKe <strong>y</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public titl <strong>e</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-31">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public autho <strong>r</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-32">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public yea <strong>r</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-33">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public mont <strong>h</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-34">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public journa <strong>l</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-35">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public booktitl <strong>e</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-36">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public volum <strong>e</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-37">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public numbe <strong>r</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-38">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public page <strong>s</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-39">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public publishe <strong>r</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-40">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public editio <strong>n</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-41">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public institutio <strong>n</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-42">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public schoo <strong>l</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-43">
+            <div class="detail-title">i</div>
+            
+            <div class="signature">
+              public do <strong>i</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-44">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public ur <strong>l</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-45">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public abstract Tex <strong>t</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-46">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public keyword <strong>s</strong>(Object (String)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-47">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-48">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-49">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public war <strong>n</strong>(&quot;Ollama BibTeX extraction encountered an error, falling back to heuristics: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-50">
+            <div class="detail-title">fallbackMetadata</div>
+            
+            <div class="signature">
+              public return <strong>fallbackMetadata</strong>(Object cleanTitle, Object currentYear, Object defaultKey)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-51">
+            <div class="detail-title">fallbackMetadata</div>
+            
+            <div class="signature">
+              private BibTeXMetadata <strong>fallbackMetadata</strong>(String title, String year, String key)
+            </div>
+            <p>Synthesizes sensible fallback bibliographic metadata from filename and system defaults.  WHAT: Constructs a BibTeXMetadata record populated with cleaned file title, current year, and default citation key. WHY: Guarantees that documents uploaded without internet access or with unsupported layouts still receive valid, queryable metadata records in the library catalogue.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>title</code> - Sanitized document title.</dd><dd><code>year</code> - Default publication year.</dd><dd><code>key</code> - Generated fallback BibTeX key.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Minimal valid BibTeXMetadata instance.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-52">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-53">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public entryTyp <strong>e</strong>(Object BibTeXType.MISC)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-54">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public bibKe <strong>y</strong>(Object key)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-55">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public titl <strong>e</strong>(Object title)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-56">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public autho <strong>r</strong>(&quot;Unknown Author&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-57">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public yea <strong>r</strong>(Object year)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-58">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public publishe <strong>r</strong>(&quot;Personal Library Repository&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-59">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public editio <strong>n</strong>(&quot;1st Edition&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-60">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public abstract Tex <strong>t</strong>(&quot;Document catalogued for personal research and semantic indexing.&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-61">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public keyword <strong>s</strong>(Object &quot;document, Object research, Object knowledge-base&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-62">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-63">
+            <div class="detail-title">cleanJsonResponse</div>
+            
+            <div class="signature">
+              private String <strong>cleanJsonResponse</strong>(String raw)
+            </div>
+            <p>Strips Markdown code fence formatting (` ```json ... ``` `) from model responses.  WHAT: Removes leading and trailing Markdown code fences and whitespace from raw LLM outputs. WHY: LLM chat models frequently wrap JSON outputs in Markdown code blocks; stripping fences ensures reliable Jackson deserialization without formatting syntax errors.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>raw</code> - Raw response text from the LLM.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Clean JSON string suitable for ObjectMapper parsing.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-64">
+            <div class="detail-title">m</div>
+            
+            <div class="signature">
+              public tri <strong>m</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-65">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object clean.startsWith(&quot;```json&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-66">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public substrin <strong>g</strong>(Object 7)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-67">
+            <div class="detail-title">if</div>
+            
+            <div class="signature">
+              public else <strong>if</strong>(Object clean.startsWith(&quot;```&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-68">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public substrin <strong>g</strong>(Object 3)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-69">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object clean.endsWith(&quot;```&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-70">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public substrin <strong>g</strong>(Object 0, Object clean.length()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-71">
+            <div class="detail-title">m</div>
+            
+            <div class="signature">
+              public tri <strong>m</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

@@ -1,3 +1,10 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Spanish (Español) dictionary for Personal Library SAP Fiori Horizon UI.
+ */
+
 import { TranslationDictionary } from '../types';
 
 export const es: TranslationDictionary = {
@@ -90,7 +97,7 @@ export const es: TranslationDictionary = {
     noDocsSubtitle: 'Ajuste los filtros de búsqueda o suba un nuevo documento a la biblioteca.',
     uploadPrompt: 'Subir primer documento',
     rowsPerPage: 'Filas por página:',
-    inspectTooltip: 'Inspeccionar documento (Página de objeto)',
+    inspectTooltip: 'Haga clic en una fila para navegar a la página de detalles del documento seleccionado',
     deleteTooltip: 'Eliminar documento',
     newVersionTooltip: 'Subir nueva versión / Editar',
     errorTitle: 'Backend no disponible',
@@ -184,8 +191,8 @@ export const es: TranslationDictionary = {
     activeAdapter: 'Controlador backend activo',
     selectPreset: 'Perfiles de arquitectura',
     presetGateway: 'Pasarela integrada (/api/v1)',
-    presetSpringBoot: 'Backend Spring Boot (:8080)',
-    presetMock: 'Motor local independiente (Offline)',
+    presetSpringBoot: 'Instancia directa Java Spring Boot (http://localhost:8080/api/v1)',
+    presetMock: 'Motor independiente local (Fuera de línea / En memoria)',
     presetCustom: 'Punto de conexión API personalizado',
     baseUrl: 'URL base',
     authToken: 'Token Bearer JWT / API',
@@ -199,6 +206,9 @@ export const es: TranslationDictionary = {
     architecture: 'Arquitectura backend desacoplada',
     springAi: 'Spring AI + Ollama (Llama y Mistral)',
     qdrant: 'Base vectorial Qdrant',
+    license: 'Licencia',
+    licenseInfo: 'Distribuido bajo la GNU Affero General Public License v3.0 (AGPL-3.0-or-later)',
+    viewLicense: 'Ver licencia (GNU AGPLv3)',
     trademarkDisclaimer: 'SAP, SAP Fiori, SAP Horizon y otros productos y servicios de SAP mencionados aquí, así como sus respectivos logotipos, son marcas comerciales o marcas registradas de SAP SE en Alemania y otros países. Esta aplicación independiente no está afiliada, respaldada ni patrocinada por SAP SE.'
   }
 };

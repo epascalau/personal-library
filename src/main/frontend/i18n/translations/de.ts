@@ -1,3 +1,10 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * German (Deutsch) dictionary for Personal Library SAP Fiori Horizon UI.
+ */
+
 import { TranslationDictionary } from '../types';
 
 export const de: TranslationDictionary = {
@@ -90,7 +97,7 @@ export const de: TranslationDictionary = {
     noDocsSubtitle: 'Passen Sie die Filter an oder laden Sie ein neues Dokument hoch.',
     uploadPrompt: 'Erstes Dokument hochladen',
     rowsPerPage: 'Zeilen pro Seite:',
-    inspectTooltip: 'Dokument öffnen (Objektseite)',
+    inspectTooltip: 'Klicken Sie auf eine Zeile, um zur Detailseite des ausgewählten Dokuments zu navigieren',
     deleteTooltip: 'Dokument löschen',
     newVersionTooltip: 'Neue Version hochladen / Bearbeiten',
     errorTitle: 'Backend nicht erreichbar',
@@ -184,8 +191,8 @@ export const de: TranslationDictionary = {
     activeAdapter: 'Aktiver Backend-Treiber',
     selectPreset: 'Architektur-Vorlagen',
     presetGateway: 'Integriertes Gateway (/api/v1)',
-    presetSpringBoot: 'Spring Boot Backend (:8080)',
-    presetMock: 'Lokale Standalone-Engine (Offline)',
+    presetSpringBoot: 'Direkte Java Spring Boot-Instanz (http://localhost:8080/api/v1)',
+    presetMock: 'Lokale Standalone-Engine (Offline / In-Memory)',
     presetCustom: 'Benutzerdefinierter API-Endpunkt',
     baseUrl: 'Basis-URL',
     authToken: 'Bearer JWT / API-Token',
@@ -199,6 +206,9 @@ export const de: TranslationDictionary = {
     architecture: 'Entkoppelte Backend-Architektur',
     springAi: 'Spring AI + Ollama (Llama & Mistral)',
     qdrant: 'Qdrant Vektordatenbank',
+    license: 'Lizenz',
+    licenseInfo: 'Lizenziert unter der GNU Affero General Public License v3.0 (AGPL-3.0-or-later)',
+    viewLicense: 'Lizenz anzeigen (GNU AGPLv3)',
     trademarkDisclaimer: 'SAP, SAP Fiori, SAP Horizon und andere erwähnte SAP-Produkte und -Dienstleistungen sowie die entsprechenden Logos sind Marken oder eingetragene Marken der SAP SE in Deutschland und anderen Ländern. Diese unabhängige Anwendung steht in keiner Verbindung zu SAP SE und wird von dieser weder gesponsert noch unterstützt.'
   }
 };

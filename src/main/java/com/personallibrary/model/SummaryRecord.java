@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 package com.personallibrary.model;
 
 import lombok.AllArgsConstructor;
@@ -38,6 +42,10 @@ public class SummaryRecord {
     /**
      * Formats inference execution duration into readable minutes and seconds.
      *
+     * WHAT: Decomposes total elapsed seconds into integral minutes and remaining fractional seconds with one decimal precision.
+     * WHY: Provides user-friendly latency telemetry directly in the UI Object Page summary cards
+     * so researchers understand LLM generation performance benchmarks.
+     *
      * @param totalSeconds Elapsed time in seconds.
      * @return Formatted string representation (e.g. "1 min 14.2 sec").
      */
@@ -47,3 +55,4 @@ public class SummaryRecord {
         return String.format("%d min %.1f sec", minutes, seconds);
     }
 }
+
