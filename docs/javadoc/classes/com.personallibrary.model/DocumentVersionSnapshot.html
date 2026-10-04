@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DocumentVersionSnapshot (com.personallibrary.model) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.model.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.model.html">com.personallibrary.model</a> &gt;
+      <strong>DocumentVersionSnapshot</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.model</div>
+        <h2>class DocumentVersionSnapshot</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>DocumentVersionSnapshot</strong>
+          
+          
+        </div>
+        <p>Preserved immutable snapshot of a prior document version for auditing and rollback.  WHAT: Stores previous revision metadata, text content, summaries, and file attributes. WHY: Enables historical asset downloading and non-destructive rollbacks while maintaining full lineage. /</p>
+        <div class="meta-tags">
+          
+          
+          
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>snapshotGuid</code></td>
+                <td class="desc-col">Unique identifier for this version snapshot. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Integer</td>
+                <td class="name-col"><code>versionNumber</code></td>
+                <td class="desc-col">Historical version sequence number (e.g. 1, 2). /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileName</code></td>
+                <td class="desc-col">Historical file name. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Long</td>
+                <td class="name-col"><code>fileSize</code></td>
+                <td class="desc-col">Historical file size in bytes. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fileSizeFormatted</code></td>
+                <td class="desc-col">Formatted file size string. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>format</code></td>
+                <td class="desc-col">Historical format extension. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Instant</td>
+                <td class="name-col"><code>savedAt</code></td>
+                <td class="desc-col">Timestamp when this snapshot was archived. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private BibTeXMetadata</td>
+                <td class="name-col"><code>bibtex</code></td>
+                <td class="desc-col">Preserved BibTeX metadata. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>bibtexRaw</code></td>
+                <td class="desc-col">Raw BibTeX string entry. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private SummaryRecord&gt;</td>
+                <td class="name-col"><code>summaries</code></td>
+                <td class="desc-col">Dual-model AI summaries preserved at this version. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>contentExcerpt</code></td>
+                <td class="desc-col">Short excerpt snippet. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>fullContent</code></td>
+                <td class="desc-col">Complete extracted full text. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Integer</td>
+                <td class="name-col"><code>chunksCount</code></td>
+                <td class="desc-col">Segmented chunks count at time of snapshot. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>note</code></td>
+                <td class="desc-col">Contextual audit or rollback note. /</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

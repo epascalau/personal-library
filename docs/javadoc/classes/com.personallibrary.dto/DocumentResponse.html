@@ -35,7 +35,7 @@
           
           
         </div>
-        <p>Data Transfer Object representing an enterprise document response for API clients, the SAP Horizon List Report table, and the Object Page details view.  /</p>
+        <p>Data Transfer Object representing an enterprise document response for API clients, the SAP Fiori List Report table, and the Object Page details view.  /</p>
         <div class="meta-tags">
           <span class="tag-badge">Author: Enterprise Architecture Team</span>
           <span class="tag-badge">Version: 1.0.0</span>
@@ -138,6 +138,12 @@
                 <td class="type-col">private List&lt;DocumentChunk&gt;</td>
                 <td class="name-col"><code>chunks</code></td>
                 <td class="desc-col">Indexed text chunks. */</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private List&lt;DocumentVersionSnapshot&gt;</td>
+                <td class="name-col"><code>versionHistory</code></td>
+                <td class="desc-col">Historical version snapshots preserved prior to in-place overwrites or rollbacks. */</td>
               </tr>
             
           </tbody>
@@ -288,9 +294,17 @@
               </tr>
             
               <tr>
+                <td class="type-col">public versionHistor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">y</a></strong>(Object entity.getVersionHistory()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
                 <td class="type-col">public buil</td>
                 <td class="desc-col">
-                  <strong><a href="#method-16">d</a></strong>()
+                  <strong><a href="#method-17">d</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -552,6 +566,21 @@
           </div>
         
           <div class="detail-block" id="method-16">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public versionHistor <strong>y</strong>(Object entity.getVersionHistory()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
             <div class="detail-title">d</div>
             
             <div class="signature">

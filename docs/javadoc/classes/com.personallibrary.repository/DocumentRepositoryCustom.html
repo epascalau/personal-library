@@ -35,7 +35,7 @@
           
           
         </div>
-        <p>Custom repository fragment providing the dynamic multi-predicate document search backing the SAP Horizon List Report floorplan.  &lt;p&gt;The filter combination is genuinely dynamic: every criterion is optional and any subset may be supplied. Such a query cannot be expressed as a static {@link org.springframework.data.mongodb.repository.Query} string, so it is assembled programmatically against {@link org.springframework.data.mongodb.core.MongoTemplate}.&lt;/p&gt;  /</p>
+        <p>Custom repository fragment providing the dynamic multi-predicate document search backing the SAP Fiori List Report floorplan.  &lt;p&gt;The filter combination is genuinely dynamic: every criterion is optional and any subset may be supplied. Such a query cannot be expressed as a static {@link org.springframework.data.mongodb.repository.Query} string, so it is assembled programmatically against {@link org.springframework.data.mongodb.core.MongoTemplate}.&lt;/p&gt;  /</p>
         <div class="meta-tags">
           <span class="tag-badge">Author: Enterprise Architecture Team</span>
           <span class="tag-badge">Version: 1.0.0</span>
@@ -65,7 +65,7 @@
                 <td class="type-col">public Page&lt;DocumentEntity&gt;</td>
                 <td class="desc-col">
                   <strong><a href="#method-0">searchDocuments</a></strong>(String fileName, String title, String author, String edition, String format, String content, Pageable pageable)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Executes a dynamic multi-predicate MongoDB query supporting any combination of fileName, title, author, edition, file format, and full-text content filters. Omitted ({@code null} or blank) criteria are not applied.  WHAT: Compiles an dynamic MongoDB Criteria query combining text predicates with pagination and sort options. WHY: Users in the SAP Horizon List Report floorplan may filter by one, some, or all available metadata fields in arbitrary combinations; static Spring Data repository methods cannot support variable combinations of nullable parameters.  chunks, the abstract, and the keyword list. /</div>
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Executes a dynamic multi-predicate MongoDB query supporting any combination of fileName, title, author, edition, file format, and full-text content filters. Omitted ({@code null} or blank) criteria are not applied.  WHAT: Compiles an dynamic MongoDB Criteria query combining text predicates with pagination and sort options. WHY: Users in the SAP Fiori List Report floorplan may filter by one, some, or all available metadata fields in arbitrary combinations; static Spring Data repository methods cannot support variable combinations of nullable parameters.  chunks, the abstract, and the keyword list. /</div>
                 </td>
               </tr>
             
@@ -81,7 +81,7 @@
             <div class="signature">
               public Page&lt;DocumentEntity&gt; <strong>searchDocuments</strong>(String fileName, String title, String author, String edition, String format, String content, Pageable pageable)
             </div>
-            <p>Executes a dynamic multi-predicate MongoDB query supporting any combination of fileName, title, author, edition, file format, and full-text content filters. Omitted ({@code null} or blank) criteria are not applied.  WHAT: Compiles an dynamic MongoDB Criteria query combining text predicates with pagination and sort options. WHY: Users in the SAP Horizon List Report floorplan may filter by one, some, or all available metadata fields in arbitrary combinations; static Spring Data repository methods cannot support variable combinations of nullable parameters.  chunks, the abstract, and the keyword list. /</p>
+            <p>Executes a dynamic multi-predicate MongoDB query supporting any combination of fileName, title, author, edition, file format, and full-text content filters. Omitted ({@code null} or blank) criteria are not applied.  WHAT: Compiles an dynamic MongoDB Criteria query combining text predicates with pagination and sort options. WHY: Users in the SAP Fiori List Report floorplan may filter by one, some, or all available metadata fields in arbitrary combinations; static Spring Data repository methods cannot support variable combinations of nullable parameters.  chunks, the abstract, and the keyword list. /</p>
 
             
               <dl class="param-list">

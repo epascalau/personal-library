@@ -1755,12 +1755,16 @@ Heading:
  * WHAT: Queries Qdrant vector chunks for semantic relevance, injects citations into context, and prompts Llama 3.3 for synthesis.
  * WHY: Delivers accurate, cited responses to researchers' questions regarding document details while preventing hallucinations.
  */
-app.post('/api/v1/documents/:guid/chat', async (req: Request, res: Response) => {
-  const { guid } = req.params;
+app.post(['/api/v1/documents/:guid/chat', '/api/v1/chat'], async (req: Request, res: Response) => {
+  const guid = req.params.guid || req.body.documentGuid || req.body.guid;
   const { question, chatHistory = [] } = req.body;
 
   if (!question || !question.trim()) {
     return res.status(400).json({ error: 'Question is required' });
+  }
+
+  if (!guid) {
+    return res.status(400).json({ error: 'documentGuid or guid is required' });
   }
 
   const doc = documentsDatabase.find(d => d.guid === guid);
@@ -2218,6 +2222,114 @@ app.get(['/api/v1/diagrams/mindmap.puml', '/mindmap.puml'], (_req: Request, res:
     return res.sendFile(pumlPath);
   }
   return res.status(404).send('Mindmap PUML not found');
+});
+
+// -----------------------------------------------------------------------------
+// Entity-Relationship Diagrams (ERD)
+// -----------------------------------------------------------------------------
+app.get(['/api/v1/diagrams/entity-relationship.svg', '/entity_relationship_diagram.svg'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/entity_relationship_diagram.svg');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('ERD SVG not found');
+});
+
+app.get(['/api/v1/diagrams/entity-relationship.png', '/entity_relationship_diagram.png'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/entity_relationship_diagram.png');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/png');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('ERD PNG not found');
+});
+
+app.get(['/api/v1/diagrams/entity-relationship.pdf', '/entity_relationship_diagram.pdf'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/entity_relationship_diagram.pdf');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="entity_relationship_diagram.pdf"');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('ERD PDF not found');
+});
+
+app.get(['/api/v1/diagrams/entity-relationship.mmd', '/entity_relationship_diagram.mmd'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/entity_relationship_diagram.mmd');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('ERD MMD not found');
+});
+
+app.get(['/api/v1/diagrams/entity-relationship.puml', '/entity_relationship_diagram.puml'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/entity_relationship_diagram.puml');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('ERD PUML not found');
+});
+
+// -----------------------------------------------------------------------------
+// System Ontology & Semantic Knowledge Graph
+// -----------------------------------------------------------------------------
+app.get(['/api/v1/diagrams/ontology.svg', '/system_ontology_diagram.svg'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/system_ontology_diagram.svg');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('Ontology SVG not found');
+});
+
+app.get(['/api/v1/diagrams/ontology.png', '/system_ontology_diagram.png'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/system_ontology_diagram.png');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/png');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('Ontology PNG not found');
+});
+
+app.get(['/api/v1/diagrams/ontology.pdf', '/system_ontology_diagram.pdf'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/system_ontology_diagram.pdf');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="system_ontology_diagram.pdf"');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('Ontology PDF not found');
+});
+
+app.get(['/api/v1/diagrams/ontology.ttl', '/system_ontology.ttl'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/system_ontology.ttl');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/turtle; charset=utf-8');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="system_ontology.ttl"');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('Ontology TTL not found');
+});
+
+app.get(['/api/v1/diagrams/ontology.mmd', '/system_ontology_diagram.mmd'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/system_ontology_diagram.mmd');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('Ontology MMD not found');
+});
+
+app.get(['/api/v1/diagrams/ontology.puml', '/system_ontology_diagram.puml'], (_req: Request, res: Response) => {
+  const filePath = path.resolve(projectRoot, 'docs/diagrams/system_ontology_diagram.puml');
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    return res.sendFile(filePath);
+  }
+  return res.status(404).send('Ontology PUML not found');
 });
 
 /**

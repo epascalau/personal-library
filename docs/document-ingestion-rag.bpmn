@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  @license
+  SPDX-License-Identifier: AGPL-3.0-or-later
+
+  Camunda BPMN 2.0 Process Definition
+  Personal Library: Document Ingestion, Dual-Model Summarization & Qdrant RAG Pipeline
+-->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_PersonalLibrary"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="Camunda Modeler"
+                  exporterVersion="5.28.0">
+
+  <bpmn:collaboration id="Collaboration_PersonalLibrary">
+    <bpmn:participant id="Participant_PersonalLibrary"
+                      name="Personal Library - Enterprise Document Ingestion &amp; RAG Pipeline"
+                      processRef="Process_DocumentIngestionRAG" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_DocumentIngestionRAG"
+                name="Document Ingestion &amp; Dual AI Summarization Pipeline"
+                isExecutable="true"
+                camunda:historyTimeToLive="180">
+
+    <bpmn:documentation>
+      Automated business process orchestrating document ingestion into the Personal Library.
+      Covers plain-text and PDF parsing, academic BibTeX metadata inference, human validation loop,
+      parallel dual-model AI summarization (Ollama Llama 3.3 and Mistral Large), paragraph chunking
+      with Qdrant vector indexing, MongoDB document record persistence, and Keycloak audit telemetry.
+    </bpmn:documentation>
+
+    <bpmn:laneSet id="LaneSet_Ingestion">
+      <bpmn:lane id="Lane_UI_Client" name="SAP UI5 Client &amp; REST Ingestion">
+        <bpmn:flowNodeRef>StartEvent_DocumentUploaded</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UserTask_ReviewMetadata</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SendTask_NotifyClient</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_DocumentReady</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_SpringBoot" name="Spring AI Orchestration Tier">
+        <bpmn:flowNodeRef>ServiceTask_ExtractTextAndBibTeX</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_ValidateBibTeX</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_MetadataValid</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ParallelAI_Fork</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ParallelAI_Join</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_PersistDocument</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_KeycloakAudit</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_DualAI" name="Ollama AI Models (Spring AI)">
+        <bpmn:flowNodeRef>ServiceTask_LlamaSummary</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_MistralSummary</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_VectorStore" name="Qdrant Vector Database">
+        <bpmn:flowNodeRef>ServiceTask_ChunkAndEmbed</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start Event: Document Upload -->
+    <bpmn:startEvent id="StartEvent_DocumentUploaded" name="Document Upload Received">
+      <bpmn:documentation>Initiated by SAP Fiori UploadDialogView or POST /api/v1/documents.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="fileName" label="File Name" type="string" />
+          <camunda:formField id="fileFormat" label="Format" type="string" defaultValue="pdf" />
+          <camunda:formField id="fileSize" label="File Size (Bytes)" type="long" />
+          <camunda:formField id="uploaderUsername" label="Uploaded By" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_Start_to_Extract</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Service Task 1: Extract Text & BibTeX -->
+    <bpmn:serviceTask id="ServiceTask_ExtractTextAndBibTeX"
+                      name="Extract Text &amp; Infer BibTeX"
+                      camunda:delegateExpression="${bibTeXExtractionDelegate}">
+      <bpmn:documentation>
+        WHAT: Uses Apache Tika and Spring AI to extract plain text and infer bibliographic fields.
+        WHY: Automates cataloging and prevents manual metadata entry for research papers.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="extract-bibtex-task" retries="3" />
+        <camunda:inputOutput>
+          <camunda:inputParameter name="rawBuffer">${fileBuffer}</camunda:inputParameter>
+          <camunda:outputParameter name="extractedText">${extractedText}</camunda:outputParameter>
+          <camunda:outputParameter name="bibtexMetadata">${bibtexMetadata}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Start_to_Extract</bpmn:incoming>
+      <bpmn:outgoing>Flow_Extract_to_Validate</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Service Task 2: Validate BibTeX -->
+    <bpmn:serviceTask id="ServiceTask_ValidateBibTeX"
+                      name="Validate BibTeX Quality &amp; Key"
+                      camunda:delegateExpression="${bibTeXValidationDelegate}">
+      <bpmn:documentation>
+        WHAT: Verifies mandatory fields (title, author, entryType) and validates BibTeX citation key syntax.
+        WHY: Guarantees catalog integrity before triggering computationally expensive LLM inferences.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="validate-bibtex-task" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Extract_to_Validate</bpmn:incoming>
+      <bpmn:incoming>Flow_UserReviewed_to_Validate</bpmn:incoming>
+      <bpmn:outgoing>Flow_Validate_to_Gateway</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Exclusive Gateway: Metadata Valid? -->
+    <bpmn:exclusiveGateway id="Gateway_MetadataValid" name="Metadata Complete?" default="Flow_Valid_to_Fork">
+      <bpmn:incoming>Flow_Validate_to_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Valid_to_Fork</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Invalid_to_Review</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- User Task: Librarian Review & Correction -->
+    <bpmn:userTask id="UserTask_ReviewMetadata"
+                   name="Review &amp; Correct Metadata"
+                   camunda:candidateGroups="LIBRARY_ADMIN, RESEARCHER">
+      <bpmn:documentation>
+        WHAT: Displays manual metadata correction form in SAP Fiori ShellBar for unparsable documents.
+        WHY: Fallback human-in-the-loop ensuring 100% metadata accuracy.
+      </bpmn:documentation>
+      <bpmn:incoming>Flow_Invalid_to_Review</bpmn:incoming>
+      <bpmn:outgoing>Flow_UserReviewed_to_Validate</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Parallel Gateway: Fork Dual AI & Vectorization -->
+    <bpmn:parallelGateway id="Gateway_ParallelAI_Fork" name="Fork Dual AI &amp; Vectorization">
+      <bpmn:incoming>Flow_Valid_to_Fork</bpmn:incoming>
+      <bpmn:outgoing>Flow_Fork_to_Llama</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Fork_to_Mistral</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Fork_to_Qdrant</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- Branch A: Ollama Llama 3.3 Summary -->
+    <bpmn:serviceTask id="ServiceTask_LlamaSummary"
+                      name="Generate Analytical Deep Dive (Llama 3.3 70B)"
+                      camunda:asyncBefore="true"
+                      camunda:delegateExpression="${llamaSummarizationDelegate}">
+      <bpmn:documentation>
+        WHAT: Prompts Ollama Llama 3.3 (70B Instruct) via Spring AI ChatModel for analytical breakdown.
+        WHY: Generates structured, methodological critique and empirical findings summary.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="llama-summary-task" retries="3" />
+        <camunda:failedJobRetryTimeCycle>R3/PT10S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Fork_to_Llama</bpmn:incoming>
+      <bpmn:outgoing>Flow_Llama_to_Join</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Branch B: Ollama Mistral Large Summary -->
+    <bpmn:serviceTask id="ServiceTask_MistralSummary"
+                      name="Generate Executive Synthesis (Mistral Large 2411)"
+                      camunda:asyncBefore="true"
+                      camunda:delegateExpression="${mistralSummarizationDelegate}">
+      <bpmn:documentation>
+        WHAT: Prompts Ollama Mistral Large (2411) via Spring AI ChatModel for concise executive summary.
+        WHY: Provides quick, high-level overview and actionable conclusions.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="mistral-summary-task" retries="3" />
+        <camunda:failedJobRetryTimeCycle>R3/PT10S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Fork_to_Mistral</bpmn:incoming>
+      <bpmn:outgoing>Flow_Mistral_to_Join</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Branch C: Qdrant Vector Chunking & Embedding -->
+    <bpmn:serviceTask id="ServiceTask_ChunkAndEmbed"
+                      name="Chunk Text &amp; Upsert Vectors to Qdrant"
+                      camunda:asyncBefore="true"
+                      camunda:delegateExpression="${vectorRagDelegate}">
+      <bpmn:documentation>
+        WHAT: Splits text into ~350 char semantic paragraphs, computes embeddings, and stores in collection `library_embeddings`.
+        WHY: Prepares document for instant cosine similarity search during interactive RAG chat.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="qdrant-vectorization-task" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Fork_to_Qdrant</bpmn:incoming>
+      <bpmn:outgoing>Flow_Qdrant_to_Join</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Parallel Gateway: Join AI Telemetry & Vectors -->
+    <bpmn:parallelGateway id="Gateway_ParallelAI_Join" name="Join AI Telemetry &amp; Vectors">
+      <bpmn:incoming>Flow_Llama_to_Join</bpmn:incoming>
+      <bpmn:incoming>Flow_Mistral_to_Join</bpmn:incoming>
+      <bpmn:incoming>Flow_Qdrant_to_Join</bpmn:incoming>
+      <bpmn:outgoing>Flow_Join_to_Persist</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- Service Task: Persist Document Record in MongoDB -->
+    <bpmn:serviceTask id="ServiceTask_PersistDocument"
+                      name="Persist Document Entity in MongoDB"
+                      camunda:delegateExpression="${documentPersistenceDelegate}">
+      <bpmn:documentation>
+        WHAT: Writes DocumentEntity, both SummaryRecords, BibTeXMetadata, and chunk indices into MongoDB.
+        WHY: Atomic persistence of all enriched document artifacts with unique GUID.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="persist-document-task" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Join_to_Persist</bpmn:incoming>
+      <bpmn:outgoing>Flow_Persist_to_Audit</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Service Task: Keycloak Audit Logging -->
+    <bpmn:serviceTask id="ServiceTask_KeycloakAudit"
+                      name="Log Security Audit Event to Keycloak"
+                      camunda:delegateExpression="${securityAuditDelegate}">
+      <bpmn:documentation>
+        WHAT: Emits document creation event with user claims and tenant realm identifier.
+        WHY: Enforces compliance and auditing requirements in enterprise environments.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="keycloak-audit-task" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Persist_to_Audit</bpmn:incoming>
+      <bpmn:outgoing>Flow_Audit_to_Notify</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Send Task: Broadcast WebSocket / EventBus Notification -->
+    <bpmn:sendTask id="SendTask_NotifyClient"
+                   name="Broadcast Ingestion Complete Notification"
+                   camunda:delegateExpression="${eventBusNotificationDelegate}">
+      <bpmn:documentation>
+        WHAT: Sends event to SAP UI5 EventBus so ListReport table refreshes and Toast appears.
+        WHY: Keeps frontend reactive without full page reloads.
+      </bpmn:documentation>
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-client-task" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Audit_to_Notify</bpmn:incoming>
+      <bpmn:outgoing>Flow_Notify_to_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <!-- End Event: Ready -->
+    <bpmn:endEvent id="EndEvent_DocumentReady" name="Document Indexed &amp; RAG-Ready">
+      <bpmn:documentation>Process successfully finalized. Document is now fully indexed and searchable.</bpmn:documentation>
+      <bpmn:incoming>Flow_Notify_to_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_Start_to_Extract" sourceRef="StartEvent_DocumentUploaded" targetRef="ServiceTask_ExtractTextAndBibTeX" />
+    <bpmn:sequenceFlow id="Flow_Extract_to_Validate" sourceRef="ServiceTask_ExtractTextAndBibTeX" targetRef="ServiceTask_ValidateBibTeX" />
+    <bpmn:sequenceFlow id="Flow_Validate_to_Gateway" sourceRef="ServiceTask_ValidateBibTeX" targetRef="Gateway_MetadataValid" />
+    <bpmn:sequenceFlow id="Flow_Valid_to_Fork" name="Valid" sourceRef="Gateway_MetadataValid" targetRef="Gateway_ParallelAI_Fork" />
+    <bpmn:sequenceFlow id="Flow_Invalid_to_Review" name="Needs Review" sourceRef="Gateway_MetadataValid" targetRef="UserTask_ReviewMetadata">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_UserReviewed_to_Validate" sourceRef="UserTask_ReviewMetadata" targetRef="ServiceTask_ValidateBibTeX" />
+    <bpmn:sequenceFlow id="Flow_Fork_to_Llama" sourceRef="Gateway_ParallelAI_Fork" targetRef="ServiceTask_LlamaSummary" />
+    <bpmn:sequenceFlow id="Flow_Fork_to_Mistral" sourceRef="Gateway_ParallelAI_Fork" targetRef="ServiceTask_MistralSummary" />
+    <bpmn:sequenceFlow id="Flow_Fork_to_Qdrant" sourceRef="Gateway_ParallelAI_Fork" targetRef="ServiceTask_ChunkAndEmbed" />
+    <bpmn:sequenceFlow id="Flow_Llama_to_Join" sourceRef="ServiceTask_LlamaSummary" targetRef="Gateway_ParallelAI_Join" />
+    <bpmn:sequenceFlow id="Flow_Mistral_to_Join" sourceRef="ServiceTask_MistralSummary" targetRef="Gateway_ParallelAI_Join" />
+    <bpmn:sequenceFlow id="Flow_Qdrant_to_Join" sourceRef="ServiceTask_ChunkAndEmbed" targetRef="Gateway_ParallelAI_Join" />
+    <bpmn:sequenceFlow id="Flow_Join_to_Persist" sourceRef="Gateway_ParallelAI_Join" targetRef="ServiceTask_PersistDocument" />
+    <bpmn:sequenceFlow id="Flow_Persist_to_Audit" sourceRef="ServiceTask_PersistDocument" targetRef="ServiceTask_KeycloakAudit" />
+    <bpmn:sequenceFlow id="Flow_Audit_to_Notify" sourceRef="ServiceTask_KeycloakAudit" targetRef="SendTask_NotifyClient" />
+    <bpmn:sequenceFlow id="Flow_Notify_to_End" sourceRef="SendTask_NotifyClient" targetRef="EndEvent_DocumentReady" />
+  </bpmn:process>
+
+  <!-- ===================================================================== -->
+  <!-- Diagram Interchange (BPMNDI) Coordinates for Camunda Modeler Rendering -->
+  <!-- ===================================================================== -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PersonalLibrary">
+    <bpmndi:BPMNPlane id="BPMNPlane_PersonalLibrary" bpmnElement="Collaboration_PersonalLibrary">
+      
+      <!-- Pool: Participant -->
+      <bpmndi:BPMNShape id="Participant_PersonalLibrary_di" bpmnElement="Participant_PersonalLibrary" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1680" height="740" />
+      </bpmndi:BPMNShape>
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="Lane_UI_Client_di" bpmnElement="Lane_UI_Client" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1650" height="170" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SpringBoot_di" bpmnElement="Lane_SpringBoot" isHorizontal="true">
+        <dc:Bounds x="190" y="250" width="1650" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_DualAI_di" bpmnElement="Lane_DualAI" isHorizontal="true">
+        <dc:Bounds x="190" y="450" width="1650" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_VectorStore_di" bpmnElement="Lane_VectorStore" isHorizontal="true">
+        <dc:Bounds x="190" y="650" width="1650" height="170" />
+      </bpmndi:BPMNShape>
+
+      <!-- Nodes -->
+      <!-- Start Event (UI Lane) -->
+      <bpmndi:BPMNShape id="StartEvent_DocumentUploaded_di" bpmnElement="StartEvent_DocumentUploaded">
+        <dc:Bounds x="242" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="220" y="185" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Extract Text & BibTeX (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_ExtractTextAndBibTeX_di" bpmnElement="ServiceTask_ExtractTextAndBibTeX">
+        <dc:Bounds x="330" y="310" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Validate BibTeX (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_ValidateBibTeX_di" bpmnElement="ServiceTask_ValidateBibTeX">
+        <dc:Bounds x="500" y="310" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Exclusive Gateway: Metadata Valid? (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="Gateway_MetadataValid_di" bpmnElement="Gateway_MetadataValid" isMarkerVisible="true">
+        <dc:Bounds x="675" y="325" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="670" y="382" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- User Task: Review Metadata (UI Lane) -->
+      <bpmndi:BPMNShape id="UserTask_ReviewMetadata_di" bpmnElement="UserTask_ReviewMetadata">
+        <dc:Bounds x="640" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Parallel Gateway: Fork (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="Gateway_ParallelAI_Fork_di" bpmnElement="Gateway_ParallelAI_Fork">
+        <dc:Bounds x="785" y="325" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="772" y="288" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Llama Summary (Dual AI Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_LlamaSummary_di" bpmnElement="ServiceTask_LlamaSummary">
+        <dc:Bounds x="900" y="470" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Mistral Summary (Dual AI Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_MistralSummary_di" bpmnElement="ServiceTask_MistralSummary">
+        <dc:Bounds x="900" y="560" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Chunk & Embed (Vector Store Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_ChunkAndEmbed_di" bpmnElement="ServiceTask_ChunkAndEmbed">
+        <dc:Bounds x="900" y="690" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Parallel Gateway: Join (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="Gateway_ParallelAI_Join_di" bpmnElement="Gateway_ParallelAI_Join">
+        <dc:Bounds x="1105" y="325" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1092" y="288" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Persist Document (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_PersistDocument_di" bpmnElement="ServiceTask_PersistDocument">
+        <dc:Bounds x="1210" y="310" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Keycloak Audit (Spring Boot Lane) -->
+      <bpmndi:BPMNShape id="ServiceTask_KeycloakAudit_di" bpmnElement="ServiceTask_KeycloakAudit">
+        <dc:Bounds x="1380" y="310" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Send Task: Broadcast Event (UI Lane) -->
+      <bpmndi:BPMNShape id="SendTask_NotifyClient_di" bpmnElement="SendTask_NotifyClient">
+        <dc:Bounds x="1550" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- End Event: Ready (UI Lane) -->
+      <bpmndi:BPMNShape id="EndEvent_DocumentReady_di" bpmnElement="EndEvent_DocumentReady">
+        <dc:Bounds x="1732" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1710" y="185" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges / Transitions -->
+      <bpmndi:BPMNEdge id="Flow_Start_to_Extract_di" bpmnElement="Flow_Start_to_Extract">
+        <di:waypoint x="278" y="160" />
+        <di:waypoint x="300" y="160" />
+        <di:waypoint x="300" y="350" />
+        <di:waypoint x="330" y="350" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Extract_to_Validate_di" bpmnElement="Flow_Extract_to_Validate">
+        <di:waypoint x="450" y="350" />
+        <di:waypoint x="500" y="350" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Validate_to_Gateway_di" bpmnElement="Flow_Validate_to_Gateway">
+        <di:waypoint x="620" y="350" />
+        <di:waypoint x="675" y="350" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Valid_to_Fork_di" bpmnElement="Flow_Valid_to_Fork">
+        <di:waypoint x="725" y="350" />
+        <di:waypoint x="785" y="350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="744" y="332" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Invalid_to_Review_di" bpmnElement="Flow_Invalid_to_Review">
+        <di:waypoint x="700" y="325" />
+        <di:waypoint x="700" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="705" y="253" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_UserReviewed_to_Validate_di" bpmnElement="Flow_UserReviewed_to_Validate">
+        <di:waypoint x="640" y="160" />
+        <di:waypoint x="560" y="160" />
+        <di:waypoint x="560" y="310" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Fork to Tasks -->
+      <bpmndi:BPMNEdge id="Flow_Fork_to_Llama_di" bpmnElement="Flow_Fork_to_Llama">
+        <di:waypoint x="810" y="375" />
+        <di:waypoint x="810" y="510" />
+        <di:waypoint x="900" y="510" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Fork_to_Mistral_di" bpmnElement="Flow_Fork_to_Mistral">
+        <di:waypoint x="810" y="375" />
+        <di:waypoint x="810" y="600" />
+        <di:waypoint x="900" y="600" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Fork_to_Qdrant_di" bpmnElement="Flow_Fork_to_Qdrant">
+        <di:waypoint x="810" y="375" />
+        <di:waypoint x="810" y="730" />
+        <di:waypoint x="900" y="730" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Tasks to Join -->
+      <bpmndi:BPMNEdge id="Flow_Llama_to_Join_di" bpmnElement="Flow_Llama_to_Join">
+        <di:waypoint x="1030" y="510" />
+        <di:waypoint x="1130" y="510" />
+        <di:waypoint x="1130" y="375" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Mistral_to_Join_di" bpmnElement="Flow_Mistral_to_Join">
+        <di:waypoint x="1030" y="600" />
+        <di:waypoint x="1130" y="600" />
+        <di:waypoint x="1130" y="375" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Qdrant_to_Join_di" bpmnElement="Flow_Qdrant_to_Join">
+        <di:waypoint x="1030" y="730" />
+        <di:waypoint x="1130" y="730" />
+        <di:waypoint x="1130" y="375" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Post-Join Execution -->
+      <bpmndi:BPMNEdge id="Flow_Join_to_Persist_di" bpmnElement="Flow_Join_to_Persist">
+        <di:waypoint x="1155" y="350" />
+        <di:waypoint x="1210" y="350" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Persist_to_Audit_di" bpmnElement="Flow_Persist_to_Audit">
+        <di:waypoint x="1330" y="350" />
+        <di:waypoint x="1380" y="350" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Audit_to_Notify_di" bpmnElement="Flow_Audit_to_Notify">
+        <di:waypoint x="1500" y="350" />
+        <di:waypoint x="1525" y="350" />
+        <di:waypoint x="1525" y="160" />
+        <di:waypoint x="1550" y="160" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Notify_to_End_di" bpmnElement="Flow_Notify_to_End">
+        <di:waypoint x="1670" y="160" />
+        <di:waypoint x="1732" y="160" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
