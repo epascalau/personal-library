@@ -11,6 +11,16 @@
 import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile, DocumentVersionSnapshot } from '../../types';
 
 /**
+ * Default/minimum REST timeout (in milliseconds) for long-running local LLM operations
+ * (dual-model summarization, RAG chat, upload indexing).
+ *
+ * WHY: Local, CPU-bound Ollama inference can take several minutes per model call — far longer
+ * than a cloud-hosted, GPU-backed API would — so this is deliberately generous to avoid
+ * client-side aborts while a model is genuinely still working.
+ */
+export const LLM_TIMEOUT_MS = 600000; // 10 minutes
+
+/**
  * Supported backend architecture driver classifications.
  */
 export type BackendType = 'rest' | 'spring-boot' | 'custom' | 'mock';

@@ -2463,10 +2463,13 @@ async function startServer() {
     console.log(`[Personal Library] Enterprise server running at http://0.0.0.0:${PORT}`);
   });
 
-  // Ample timeout for long-running document ingestion & multi-model LLM indexing
-  server.timeout = 300000; // 5 minutes
-  server.keepAliveTimeout = 300000;
-  server.headersTimeout = 305000;
+  // Ample timeout for long-running document ingestion & multi-model LLM indexing.
+  // Kept comfortably above the frontend's LLM_TIMEOUT_MS (10 minutes) so the Node socket never
+  // closes a connection before the client's own abort controller would, since CPU-bound local
+  // Ollama inference can legitimately take several minutes per call.
+  server.timeout = 660000; // 11 minutes
+  server.keepAliveTimeout = 660000;
+  server.headersTimeout = 665000;
 }
 
 startServer().catch(err => {

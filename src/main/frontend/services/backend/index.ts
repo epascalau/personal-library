@@ -6,7 +6,7 @@
  * Provides initialization logic for swappable REST, Spring Boot, and local Mock adapters.
  */
 
-import { BackendAdapter, BackendConfig, BackendType } from './types';
+import { BackendAdapter, BackendConfig, BackendType, LLM_TIMEOUT_MS } from './types';
 import { RestBackendAdapter } from './RestBackendAdapter';
 import { MockBackendAdapter } from './MockBackendAdapter';
 
@@ -21,13 +21,13 @@ export const BACKEND_PRESETS: Record<string, BackendConfig> = {
     type: 'rest',
     name: 'Integrated Gateway (/api/v1)',
     baseUrl: '/api/v1',
-    timeoutMs: 180000 // 3 minutes for upload and dual-model AI indexing
+    timeoutMs: LLM_TIMEOUT_MS // 10 minutes for upload and dual-model AI indexing on local Ollama
   },
   springBootDirect: {
     type: 'spring-boot',
     name: 'Direct Java Spring Boot (http://localhost:8080/api/v1)',
     baseUrl: 'http://localhost:8080/api/v1',
-    timeoutMs: 180000
+    timeoutMs: LLM_TIMEOUT_MS
   },
   mock: {
     type: 'mock',
@@ -43,13 +43,13 @@ const STORAGE_KEY = 'personal_library_backend_config';
  * Loads the persisted backend adapter configuration from browser localStorage.
  *
  * WHAT:
- * Reads `STORAGE_KEY` from localStorage, parses JSON, enforces a minimum 180,000ms timeout
+ * Reads `STORAGE_KEY` from localStorage, parses JSON, enforces a minimum `LLM_TIMEOUT_MS` timeout
  * for long-running LLM and RAG indexing tasks, and falls back to `BACKEND_PRESETS.integrated`.
  *
  * WHY:
  * 1. Continuity: Retains user preference across browser refreshes (e.g. developing directly against `:8080`).
- * 2. Fault tolerance: Enforcing minimum 3-minute timeouts prevents client-side aborts when Ollama or Spring AI
- * performs heavy document chunking and dual-model summarization.
+ * 2. Fault tolerance: Enforcing a generous minimum timeout prevents client-side aborts while local,
+ * CPU-bound Ollama inference performs heavy document chunking and dual-model summarization.
  *
  * @returns Configured BackendConfig object.
  */
@@ -58,9 +58,9 @@ export function loadSavedBackendConfig(): BackendConfig {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      // Ensure timeoutMs is at least 180,000ms (3 minutes) for uploads and LLM operations
-      if (!parsed.timeoutMs || parsed.timeoutMs < 180000) {
-        parsed.timeoutMs = 180000;
+      // Ensure timeoutMs is at least LLM_TIMEOUT_MS for uploads and LLM operations
+      if (!parsed.timeoutMs || parsed.timeoutMs < LLM_TIMEOUT_MS) {
+        parsed.timeoutMs = LLM_TIMEOUT_MS;
       }
       return parsed;
     } catch (_) {

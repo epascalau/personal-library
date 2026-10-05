@@ -13,7 +13,8 @@ import {
   BackendConfig,
   BackendHealthResult,
   DocumentListResult,
-  ChatResponseResult
+  ChatResponseResult,
+  LLM_TIMEOUT_MS
 } from './types';
 import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile, DocumentVersionSnapshot } from '../../types';
 
@@ -25,15 +26,15 @@ export class RestBackendAdapter implements BackendAdapter {
   /**
    * Initializes the REST adapter with endpoint configuration and timeout defaults.
    *
-   * WHAT: Merges user config with default 120-second timeout and strips trailing slashes from baseUrl.
+   * WHAT: Merges user config with a default `LLM_TIMEOUT_MS` timeout and strips trailing slashes from baseUrl.
    * WHY: Normalizing baseUrl avoids double-slash errors (`//documents`) when building resource paths,
-   * while a default 120s timeout accommodates long-running LLM and RAG vector operations.
+   * while a generous default timeout accommodates long-running, CPU-bound local LLM and RAG vector operations.
    *
    * @param config The backend configuration record.
    */
   constructor(config: BackendConfig) {
     this.config = {
-      timeoutMs: 120000,
+      timeoutMs: LLM_TIMEOUT_MS,
       ...config,
       // Normalize baseUrl: remove trailing slash
       baseUrl: config.baseUrl ? config.baseUrl.replace(/\/+$/, '') : '/api/v1'
@@ -243,7 +244,8 @@ export class RestBackendAdapter implements BackendAdapter {
     mimeType?: string;
     bibtex: BibTeXMetadata;
   }): Promise<DocumentRecord> {
-    // Generous 180-second (3-minute) timeout for full physical upload, Qdrant chunking, and dual Llama/Mistral AI summaries
+    // Generous timeout for full physical upload, Qdrant chunking, and dual Llama/Mistral AI summaries
+    // on CPU-bound local Ollama inference, which can take several minutes per model.
     return this.request<DocumentRecord>(
       '/documents',
       {
@@ -258,7 +260,7 @@ export class RestBackendAdapter implements BackendAdapter {
           bibtex: payload.bibtex
         })
       },
-      180000,
+      LLM_TIMEOUT_MS,
       0
     );
   }
@@ -288,7 +290,7 @@ export class RestBackendAdapter implements BackendAdapter {
       bibtex?: BibTeXMetadata;
     }
   ): Promise<DocumentRecord> {
-    // Generous 180-second timeout for version overwrite and re-indexing
+    // Generous timeout for version overwrite, re-indexing, and local LLM re-summarization
     return this.request<DocumentRecord>(
       `/documents/${guid}`,
       {
@@ -304,7 +306,7 @@ export class RestBackendAdapter implements BackendAdapter {
           bibtex: payload.bibtex
         })
       },
-      180000,
+      LLM_TIMEOUT_MS,
       0
     );
   }
@@ -339,15 +341,17 @@ export class RestBackendAdapter implements BackendAdapter {
    * @returns Generated SummaryRecord with execution duration and timestamp.
    */
   async regenerateSummary(guid: string, model: 'llama' | 'mistral'): Promise<SummaryRecord> {
-    // 120-second timeout for LLM synthesis
+    // Generous timeout for LLM synthesis on CPU-bound local Ollama inference (can take several
+    // minutes per model). Retries disabled: a slow-but-successful summarization should not be
+    // aborted and re-run, doubling wall-clock cost.
     return this.request<SummaryRecord>(
       `/documents/${guid}/summarize`,
       {
         method: 'POST',
         body: JSON.stringify({ model })
       },
-      120000,
-      1
+      LLM_TIMEOUT_MS,
+      0
     );
   }
 
@@ -368,15 +372,16 @@ export class RestBackendAdapter implements BackendAdapter {
     question: string,
     chatHistory: { role: string; text: string }[]
   ): Promise<ChatResponseResult> {
-    // 90-second timeout for Qdrant vector retrieval + Llama 3.3 generation
+    // Generous timeout for Qdrant vector retrieval plus local LLM generation. Retries disabled
+    // to avoid re-running an expensive, slow-but-in-progress generation call.
     return this.request<ChatResponseResult>(
       `/documents/${guid}/chat`,
       {
         method: 'POST',
         body: JSON.stringify({ question, chatHistory })
       },
-      90000,
-      1
+      LLM_TIMEOUT_MS,
+      0
     );
   }
 

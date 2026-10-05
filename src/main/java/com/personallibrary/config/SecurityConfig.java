@@ -60,6 +60,8 @@ public class SecurityConfig {
                 // Public endpoints: OpenAPI / Swagger, Health checks, and dev routes
                 .requestMatchers(
                     "/api/v1/auth/**",
+                    "/api/v1/health",
+                    "/api/v1/status",
                     "/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",

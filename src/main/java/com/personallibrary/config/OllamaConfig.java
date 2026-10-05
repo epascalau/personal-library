@@ -9,9 +9,14 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.web.client.RestClient;
+
+import java.time.Duration;
 
 /**
  * Spring AI Ollama configuration establishing dual model clients:
@@ -27,6 +32,17 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class OllamaConfig {
 
+    /**
+     * Read timeout applied to the underlying HTTP client used to call Ollama.
+     *
+     * WHY: CPU-bound local Ollama inference can legitimately take several minutes per chat
+     * completion (observed ~2.5 minutes for a single Mistral summarization call), so the
+     * default REST client timeout must be raised well above typical cloud-API expectations
+     * to avoid prematurely aborting genuinely in-progress generations.
+     */
+    private static final Duration OLLAMA_READ_TIMEOUT = Duration.ofMinutes(10);
+    private static final Duration OLLAMA_CONNECT_TIMEOUT = Duration.ofSeconds(10);
+
     @Value("${spring.ai.ollama.base-url:http://localhost:11434}")
     private String ollamaBaseUrl;
 
@@ -39,16 +55,24 @@ public class OllamaConfig {
     /**
      * Initializes the low-level Ollama API client.
      *
-     * WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL.
+     * WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL,
+     * using a {@link RestClient} whose request factory applies a generous read timeout.
      * WHY: Centralizes HTTP communication and REST connectivity to the local or remote Ollama daemon,
-     * ensuring connection pooling and uniform base URL resolution across all downstream chat models.
+     * ensuring connection pooling, uniform base URL resolution, and sufficient read timeouts for
+     * slow, CPU-bound local inference across all downstream chat models.
      *
      * @return Configured {@link OllamaApi} pointing to the host server.
      */
     @Bean
     public OllamaApi ollamaApi() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.defaults()
+                .withConnectTimeout(OLLAMA_CONNECT_TIMEOUT)
+                .withReadTimeout(OLLAMA_READ_TIMEOUT);
+        RestClient.Builder restClientBuilder = RestClient.builder()
+                .requestFactory(ClientHttpRequestFactoryBuilder.detect().build(settings));
         return OllamaApi.builder()
                 .baseUrl(ollamaBaseUrl)
+                .restClientBuilder(restClientBuilder)
                 .build();
     }
 

@@ -459,6 +459,13 @@ Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer token
   docker exec -it personal-library-ollama ollama run llama3.2 "Explain the purpose of a cyclone cellar in Kansas."
   ```
 
+* **Expect slow responses without a GPU.** Since removing the Gemini cloud fallback, all summarization, BibTeX extraction, and RAG chat run entirely on local Ollama inference. On CPU-only hosts, a single Mistral/Llama summarization call can take **1–3 minutes** (longer for larger documents). To avoid premature client-side timeouts, the app is configured with generous ceilings end-to-end:
+  * Frontend REST calls (`src/main/frontend/services/backend/`): 10 minutes (`LLM_TIMEOUT_MS`).
+  * Node.js Integrated Gateway HTTP server (`server.ts`): 11 minutes.
+  * Direct Java Spring Boot backend's Ollama client (`OllamaConfig.java`): 10-minute read timeout.
+
+  If you still see timeout errors on a very slow machine, increase `LLM_TIMEOUT_MS` in `src/main/frontend/services/backend/types.ts` and the matching `Duration` values in `OllamaConfig.java`, then rebuild.
+
 ---
 
 ### 6. Docker Maintenance & Lifecycle Commands
