@@ -23,7 +23,7 @@
   <!-- Title Banner -->
   <rect x="0" y="0" width="1600" height="80" fill="url(#headerGrad2)" />
   <text x="40" y="44" font-size="24" font-weight="800" fill="#ffffff" letter-spacing="-0.02em">Dual-Database Retrieval-Augmented Generation (RAG) Architecture &amp; Workflow</text>
-  <text x="40" y="66" font-size="13" font-weight="500" fill="#94a3b8">Spring Boot 3.3.4 • MongoDB 7.0 • Qdrant HNSW • Ollama Llama 3.3 (70B) &amp; Mistral Large • SAP Fiori Horizon UI</text>
+  <text x="40" y="66" font-size="13" font-weight="500" fill="#94a3b8">Spring Boot 3.3.4 • MongoDB 7.0 • Qdrant HNSW • Ollama Llama 3.3 (70B) &amp; Mistral Large • SAP UI5 Web Components-based UI</text>
 
   <!-- Lane 1: Ingestion & Vectorization Flow (Top Lane) -->
   <g transform="translate(40, 110)">

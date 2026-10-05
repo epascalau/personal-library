@@ -65,7 +65,7 @@ package "stores" {
   }
 }
 
-package "views (SAP Fiori Horizon)" {
+package "views (SAP UI5 Web Components)" {
   class AppView extends Component {
     - shellBarView: ShellBarView
     - listReportView: ListReportView

@@ -6,7 +6,7 @@ skinparam packageStyle rectangle
 
 title Personal Library - Enterprise System Architecture (C4 Container Map)
 
-package "1. Client Tier: SAP Fiori Horizon (UI5 Web Components + TypeScript)" as ClientTier #EBF8FF {
+package "1. Client Tier: SAP UI5 Web Components (UI5 Web Components + TypeScript)" as ClientTier #EBF8FF {
   [ShellBar & Router] as ShellBar
   [ListReportView (Table & FilterBar)] as ListReport
   [ObjectPageView (BibTeX & RAG Chat)] as ObjectPage

@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beyond Prompting: Building a Local AI Document Assistant with LLMs and RAG | 1-Hour Presentation Deck</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --card-bg: #1f2937;
+      --border: #374151;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --primary: #38bdf8;
+      --primary-dark: #0284c7;
+      --accent-purple: #c084fc;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #fb7185;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* Top Navigation Toolbar */
+    .deck-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+      font-size: 13px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .badge-session {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--primary);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .deck-title {
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #e5e7eb;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .nav-btn:hover {
+      background: #374151;
+      color: #fff;
+    }
+    .nav-btn-primary {
+      background: var(--primary-dark);
+      border-color: #0284c7;
+      color: #fff;
+    }
+    .nav-btn-primary:hover {
+      background: #0369a1;
+    }
+
+    .timer-badge {
+      font-family: var(--font-mono);
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    /* Main Deck Stage */
+    .stage {
+      position: absolute;
+      top: 52px;
+      bottom: 40px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1320px;
+      height: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      padding: 40px 48px;
+      overflow-y: auto;
+      position: relative;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 16px;
+    }
+    .section-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .pill-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .pill-purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
+    .pill-emerald { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .pill-amber { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+
+    .slide-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .slide-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .slide-timing {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #94a3b8;
+      background: #1f2937;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      border: 1px solid #374151;
+    }
+
+    /* Slide Content Elements */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #d1d5db;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card-highlight {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    h3.card-head {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    ul.bullet-list {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+    ul.bullet-list li {
+      margin-bottom: 8px;
+      color: #e5e7eb;
+    }
+    ul.bullet-list li strong {
+      color: #fff;
+    }
+
+    /* Big Formula Box */
+    .formula-banner {
+      background: #0f172a;
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: #38bdf8;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid #374151;
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+    th {
+      background: #1e293b;
+      color: #93c5fd;
+      padding: 12px 16px;
+      font-weight: 700;
+      border-bottom: 2px solid #374151;
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #2d3748;
+      color: #d1d5db;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Interactive Toy Blocks */
+    .lego-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+    .lego {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .lego-blue { background: #0284c7; color: #fff; }
+    .lego-green { background: #059669; color: #fff; }
+    .lego-yellow { background: #d97706; color: #fff; }
+    .lego-purple { background: #7c3aed; color: #fff; }
+
+    /* Diagram frame */
+    .diagram-frame {
+      border: 1px solid #374151;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+    .diagram-frame img {
+      max-width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    /* Speaker Notes Box */
+    .speaker-notes {
+      display: none;
+      background: #182234;
+      border-left: 4px solid #f59e0b;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #fef3c7;
+      margin-top: 14px;
+    }
+    .speaker-notes.visible {
+      display: block;
+    }
+    .speaker-notes strong {
+      color: #fbbf24;
+    }
+
+    /* Bottom Control Bar */
+    .deck-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: rgba(17, 24, 39, 0.95);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .progress-bar-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #1f2937;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .key-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #374151;
+      color: #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    /* Overview Modal Grid */
+    .overview-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.92);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      padding: 60px 40px;
+      overflow-y: auto;
+    }
+    .overview-modal.open {
+      display: block;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .thumb-card {
+      background: #1f2937;
+      border: 2px solid #374151;
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .thumb-card:hover, .thumb-card.current {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      background: #283548;
+    }
+    .thumb-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .thumb-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        overflow: visible;
+        background: #fff;
+        color: #000;
+      }
+      .deck-nav, .deck-footer, .overview-modal { display: none !important; }
+      .stage {
+        position: static;
+        padding: 0;
+      }
+      .slide {
+        display: block !important;
+        page-break-after: always;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        background: #fff;
+        color: #000;
+        margin-bottom: 20px;
+        height: auto;
+        max-width: 100%;
+        padding: 30px;
+      }
+      .slide-title { color: #000; }
+      .card { background: #f8fafc; border-color: #cbd5e1; color: #000; }
+      th { background: #e2e8f0; color: #000; }
+      td { color: #333; }
+      .speaker-notes { display: block !important; background: #fffbeb; color: #92400e; border-color: #f59e0b; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Toolbar -->
+  <nav class="deck-nav">
+    <div class="nav-left">
+      <span class="badge-session">1-Hour Masterclass</span>
+      <span class="deck-title">Beyond Prompting: Building a Local AI Document Assistant with LLMs and RAG</span>
+    </div>
+    <div class="nav-right">
+      <span class="timer-badge" id="elapsedTimer">&#9201; 00:00 / 60:00</span>
+      <a href="speaker-notes.html" target="_blank" class="nav-btn" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;" title="Open Presenter Side Notes &amp; Script Document">&#128221; Side Notes Doc</a>
+      <button class="nav-btn" onclick="toggleSpeakerNotes()" title="Toggle Speaker Notes (S)">Notes [S]</button>
+      <button class="nav-btn" onclick="toggleOverview()" title="Slide Grid (O)">&#9638; Overview [O]</button>
+      <button class="nav-btn" onclick="toggleFullscreen()" title="Fullscreen (F)">&#x26F6; Fullscreen [F]</button>
+      <button class="nav-btn nav-btn-primary" onclick="window.print()" title="Print / Export PDF">&#128196; Export PDF</button>
+      <a href="index.html" class="nav-btn" title="Back to Docs Portal">&larr; Portal</a>
+    </div>
+  </nav>
+
+  <!-- Presentation Stage -->
+  <main class="stage" id="stage">
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 1: Title & Announced Session Abstract -->
+    <!-- ========================================================================= -->
+    <div class="slide active" id="slide-1">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-blue">Keynote &bull; Systems Architecture &amp; Epistemology</span>
+          <h1 class="slide-title">Beyond Prompting: Building a Local AI Document Assistant with LLMs and RAG</h1>
+          <p class="slide-subtitle">A Concrete Systems Architecture &amp; CS PhD Perspective on Grounded AI, Divergent Exploration, and the Personal Library</p>
+        </div>
+        <div class="slide-timing">00:00 &bull; Welcome</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1; align-items: stretch;">
+          <!-- Left: Announced Abstract & Keywords -->
+          <div class="card card-highlight" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <span style="font-size: 20px;">📜</span>
+                <h3 style="font-size: 17px; color: #fff; font-weight: 700;">Session Abstract</h3>
+              </div>
+              <p style="font-size: 13.5px; line-height: 1.7; color: #cbd5e1; margin-bottom: 12px; text-align: justify;">
+                Large Language Models are very good at generating answers, but they cannot reliably answer questions about documents they have never seen. In this session, we will look at how a local AI document assistant was built to bridge that gap using <strong>Retrieval-Augmented Generation (RAG)</strong>.
+              </p>
+              <p style="font-size: 13.5px; line-height: 1.7; color: #cbd5e1; margin-bottom: 12px; text-align: justify;">
+                Starting from a simple PDF upload, we will walk through the complete processing pipeline: text extraction, chunking, embedding generation, vector storage in Qdrant, and semantic retrieval. We will also explore how local models running through Ollama are used to generate summaries and answer questions grounded in the content of the uploaded documents rather than relying solely on the model's training data.
+              </p>
+              <p style="font-size: 13.5px; line-height: 1.7; color: #cbd5e1; margin-bottom: 0; text-align: justify;">
+                The session focuses on the architectural decisions, trade-offs, and implementation details behind combining LLMs, embeddings, and vector databases into a practical solution. Attendees will gain a better understanding of how RAG works in practice, why retrieval is essential for document-based AI applications, and how open-source components can be combined to build privacy-preserving AI solutions that run entirely on local infrastructure.
+              </p>
+            </div>
+
+            <!-- Keywords Chips -->
+            <div style="border-top: 1px solid #374151; padding-top: 12px; margin-top: 14px;">
+              <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">
+                Session Keywords
+              </span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <span class="badge-session" style="font-size: 10px;">RAG</span>
+                <span class="badge-session" style="font-size: 10px;">LLMs</span>
+                <span class="badge-session" style="font-size: 10px;">Llama 3.3</span>
+                <span class="badge-session" style="font-size: 10px;">Mistral Large</span>
+                <span class="badge-session" style="font-size: 10px;">Ollama</span>
+                <span class="badge-session" style="font-size: 10px;">Qdrant</span>
+                <span class="badge-session" style="font-size: 10px;">Semantic Search</span>
+                <span class="badge-session" style="font-size: 10px;">Vector Databases</span>
+                <span class="badge-session" style="font-size: 10px;">Document Intelligence</span>
+                <span class="badge-session" style="font-size: 10px;">Embeddings</span>
+                <span class="badge-session" style="font-size: 10px;">Local AI</span>
+                <span class="badge-session" style="font-size: 10px;">Enterprise AI</span>
+                <span class="badge-session" style="font-size: 10px;">Spring AI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Core Perspective & Format -->
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(180deg, #1f2937 0%, #111827 100%);">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 22px;">🎓</span>
+                <h3 style="font-size: 17px; color: #38bdf8; font-weight: 700;">The Core Epistemological Perspective</h3>
+              </div>
+              <blockquote style="font-style: italic; font-size: 14.5px; color: #e2e8f0; border-left: 3px solid #38bdf8; padding-left: 14px; margin-bottom: 16px; line-height: 1.6;">
+                &ldquo;As generative models commoditize syntax, boilerplate, and low-level implementation, the ultimate technical leverage shifts from algorithmic execution to divergent problem framing and creative cognitive orchestration.&rdquo;
+              </blockquote>
+              <p style="font-size: 13.5px; color: #94a3b8; line-height: 1.6;">
+                This session explores not only <em>how</em> to wire a vector database to an LLM, but <em>why</em> this shifts the role of the computer scientist: from manual syntax implementer to cognitive architect, intent director, and socio-technical conductor.
+              </p>
+            </div>
+
+            <div style="background: #0f172a; border: 1px solid #374151; border-radius: 8px; padding: 14px; margin-top: 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: #a7f3d0; margin-bottom: 6px;">
+                <span>⏱️ <strong>Session Breakdown:</strong></span>
+                <span>45m Presentation + 15m Technical Q&amp;A</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: #94a3b8;">
+                <span>🏛️ <strong>Live System:</strong></span>
+                <span>Spring Boot 3.3.4 &bull; Qdrant &bull; MongoDB 7 &bull; SAP UI5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note (00:00 - 02:00):</strong> Welcome attendees. Read or summarize the announced abstract: we are addressing the fundamental knowledge boundary of LLMs—they hallucinate when asked about documents outside their training set. Introduce the end-to-end local architecture combining Spring AI, Ollama, Qdrant, and MongoDB.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 2: 1-Hour Presentation Agenda -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-blue">Session Structure</span>
+          <h2 class="slide-title">1-Hour Masterclass Agenda</h2>
+          <p class="slide-subtitle">45-Minute Systematic Talk &bull; 15-Minute Technical Q&amp;A</p>
+        </div>
+        <div class="slide-timing">02:00 &bull; 2 min</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3" style="flex: 1;">
+          <div class="card">
+            <h3 class="card-head" style="color: #38bdf8;">1. Live Demo (7 min)</h3>
+            <p><strong>02:00 &ndash; 09:00</strong></p>
+            <ul class="bullet-list">
+              <li>SAP UI5 Web Components-based UI floorplans</li>
+              <li>PDF ingestion &amp; BibTeX parser</li>
+              <li>Dual Llama 3.3 &amp; Mistral synthesis</li>
+              <li>Grounded RAG chat with citations</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #c084fc;">2. Why This App? (8 min)</h3>
+            <p><strong>09:00 &ndash; 17:00</strong></p>
+            <ul class="bullet-list">
+              <li>The CS PhD perspective</li>
+              <li>Syntax vs. problem formulation</li>
+              <li>Divergent problem discovery</li>
+              <li>Orchestrating the cognitive stack</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #34d399;">3. Architecture (9 min)</h3>
+            <p><strong>17:00 &ndash; 26:00</strong></p>
+            <ul class="bullet-list">
+              <li>Decoupled multi-tier topology</li>
+              <li>MongoDB 7 vs. Qdrant HNSW</li>
+              <li>Camunda BPMN 2.0 orchestration</li>
+              <li>Stateless REST &amp; DOM EventBus</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #fbbf24;">4. RAG from Scratch (11 min)</h3>
+            <p><strong>26:00 &ndash; 37:00</strong></p>
+            <ul class="bullet-list">
+              <li>The Tiny Desk &amp; goldfish memory</li>
+              <li>Tokens as Lego bricks (BPE)</li>
+              <li>GPS coordinates on Map of Meaning</li>
+              <li><em>Wizard of Oz</em> concrete walkthrough</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #fb7185;">5. Statistics &amp; Tables (8 min)</h3>
+            <p><strong>37:00 &ndash; 45:00</strong></p>
+            <ul class="bullet-list">
+              <li><strong>Table 1:</strong> CS PhD vs. Google Lens</li>
+              <li><strong>Table 2:</strong> MongoDB vs. Qdrant</li>
+              <li>Financial Ledger: $16.5k vs. $118.31</li>
+              <li>Context compounding economics</li>
+            </ul>
+          </div>
+          <div class="card" style="border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.08);">
+            <h3 class="card-head" style="color: #fff;">6. Open Q&amp;A (15 min)</h3>
+            <p><strong>45:00 &ndash; 60:00</strong></p>
+            <ul class="bullet-list">
+              <li>Architectural trade-offs</li>
+              <li>Zero-hallucination verification</li>
+              <li>Enterprise security &amp; Keycloak</li>
+              <li>Future roadmap &amp; agentic loops</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Give audience the mental map. Mention that slides flow from visible UI down to cognitive philosophy, then into system architecture, theoretical foundations, and finally business valuation.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 3: Section 1 - Live Demo: User Journey -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-blue">Section 1 &bull; Live Demonstration</span>
+          <h2 class="slide-title">1. Live Demo: End-to-End User Journey</h2>
+          <p class="slide-subtitle">Multi-tier execution in SAP UI5 Web Components-based UI</p>
+        </div>
+        <div class="slide-timing">02:00 &ndash; 05:30 (3.5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1;">
+          <div class="card">
+            <h3 class="card-head" style="color: #38bdf8;">🖥️ Live Application Capabilities</h3>
+            <ul class="bullet-list">
+              <li><strong>Analytical List Page (ALP):</strong> Filter by category, year, author, and search string with instant reactive re-rendering.</li>
+              <li><strong>Flexible Column Layout (FCL):</strong> Seamless split-screen transitions between master list and detailed object page without page reloads.</li>
+              <li><strong>Smart Multipart Document Ingestion:</strong> Drag-and-drop PDF upload triggering automatic BibTeX parsing (DOI, publisher, volume, authors).</li>
+              <li><strong>Version History &amp; Reversion:</strong> In-place binary file updates with cryptographic SHA-256 checks and full document changelogs.</li>
+              <li><strong>Internationalization (i18n):</strong> 5 languages (English, German, French, Spanish, Romanian) switched on-the-fly.</li>
+            </ul>
+          </div>
+          <div class="card" style="background: #0f172a; border-color: #0284c7;">
+            <h3 class="card-head" style="color: #a7f3d0;">⚡ Live Demonstration Script</h3>
+            <ol style="padding-left: 20px; line-height: 1.8; font-size: 14px; color: #e2e8f0;">
+              <li><strong>Step 1:</strong> Navigate to the ALP and search for <em>"Attention"</em> or <em>"Wizard of Oz"</em>.</li>
+              <li><strong>Step 2:</strong> Open the Object Page &rarr; observe metadata facet header with real-time status.</li>
+              <li><strong>Step 3:</strong> Switch to the <strong>Summaries Tab</strong> &rarr; compare Llama 3.3 analytical synthesis against Mistral Large executive takeaways.</li>
+              <li><strong>Step 4:</strong> Click the <strong>Chat &amp; RAG Tab</strong> &rarr; ask: <em>"What does this document propose?"</em> &rarr; observe streaming answer and clickable citation cards.</li>
+            </ol>
+            <div style="margin-top: 16px; text-align: center;">
+              <a href="/" target="_blank" class="nav-btn nav-btn-primary" style="font-size: 13px;">🚀 Open Running Application in New Tab &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Switch briefly to the live app tab. Demonstrate uploading or clicking "The Wonderful Wizard of Oz" and "Attention Is All You Need". Point out the latency metrics and citation sources.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 4: Section 1 - Live Demo: Grounded Verification -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-blue">Section 1 &bull; Live Demonstration</span>
+          <h2 class="slide-title">Zero-Hallucination Grounded Chat in Action</h2>
+          <p class="slide-subtitle">How the researcher interacts with verified document excerpts</p>
+        </div>
+        <div class="slide-timing">05:30 &ndash; 09:00 (3.5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="card-head" style="color: #34d399;">🔍 What Makes It Grounded?</h3>
+            <ul class="bullet-list">
+              <li><strong>Deterministic Extraction:</strong> Qdrant retrieves exact chunk payloads with character offset ranges and chunk indices.</li>
+              <li><strong>Context Boundary Enforcement:</strong> Prompt template instructs model: <em>"Answer strictly from context. Do not speculate."</em></li>
+              <li><strong>Footnote Markers:</strong> Generation includes bracketed references: <code>[Excerpt 1]</code>, <code>[Excerpt 2]</code>.</li>
+              <li><strong>Interactive Excerpt Cards:</strong> Clicking a footnote reveals the raw text chunk, cosine similarity score (e.g. 94.2%), and page number.</li>
+            </ul>
+          </div>
+          <div class="card" style="background: #0b1120; border-color: #334155;">
+            <h3 class="card-head" style="color: #c084fc;">💬 Sample Grounded Chat Response</h3>
+            <div style="background: #1e293b; border-radius: 8px; padding: 16px; font-size: 13.5px; border-left: 4px solid #38bdf8;">
+              <p style="color: #f1f5f9; margin-bottom: 8px;">
+                "The document proposes the <strong>Transformer</strong> architecture, replacing recurrence with <strong>Multi-Head Attention</strong> [Excerpt 1]. It enables significant parallelization, reaching 28.4 BLEU on English-to-German translation [Excerpt 2]."
+              </p>
+              <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <span style="background: #047857; color: #a7f3d0; font-size: 11px; padding: 2px 8px; border-radius: 4px;">✓ Excerpt 1: Chunk #0 (Score: 0.94)</span>
+                <span style="background: #047857; color: #a7f3d0; font-size: 11px; padding: 2px 8px; border-radius: 4px;">✓ Excerpt 2: Chunk #1 (Score: 0.88)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Emphasize that in enterprise research and compliance, an ungrounded answer is worse than useless—it is dangerous. Citations convert generative AI from a novelty into an auditable research tool.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 5: Section 2 - Why This App? The Paradigm Shift -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-purple">Section 2 &bull; The Paradigm Shift</span>
+          <h2 class="slide-title">2. Why This App? The Software Engineering Inversion</h2>
+          <p class="slide-subtitle">A CS PhD Perspective on Technical Leverage in the Age of Generative AI</p>
+        </div>
+        <div class="slide-timing">09:00 &ndash; 12:30 (3.5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="formula-banner">
+          $$\text{Value Bottleneck: } \underbrace{\text{Implementation \& Syntax}}_{\text{Automated by agentic AI}} \longrightarrow \underbrace{\text{Problem Formulation \& Divergent Exploration}}_{\text{Irreplaceable human cognitive edge}}$$
+        </div>
+        <div class="grid-2" style="flex: 1;">
+          <div class="card">
+            <h3 class="card-head" style="color: #fb7185;">❌ The Classical Reflex</h3>
+            <ul class="bullet-list">
+              <li>Equates technical mastery with memorizing syntax, frameworks, and manual boilerplate.</li>
+              <li>Falls into reductionism: optimizes low-level routines while potentially solving the wrong business problem.</li>
+              <li>Treats LLMs as glorified code completion (tab-autocomplete).</li>
+            </ul>
+          </div>
+          <div class="card card-highlight">
+            <h3 class="card-head" style="color: #38bdf8;">✅ The Modern Cognitive Paradigm</h3>
+            <ul class="bullet-list">
+              <li><strong>Continuous Upward Abstraction:</strong> From assembly to C, from C to managed runtimes, from runtimes to natural-language cognitive orchestration.</li>
+              <li><strong>The Divergent Engineer:</strong> Software engineering shifts from mechanical typing to creative architecture, boundary specification, and rigorous contract auditing.</li>
+              <li><strong>AI as Sparring Partner:</strong> Stress-testing hypotheses, generating orthogonal prototypes, discovering edge cases in minutes.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Connect directly to the user's document. Cite the abstraction precedent: nobody writes binary machine code for business logic anymore. High-level cognitive orchestration is the frontier of computer science.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 6: Section 2 - What Are We Learning? The Cognitive Stack -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-purple">Section 2 &bull; Cognitive Architecture</span>
+          <h2 class="slide-title">Orchestrating the Modern Cognitive Stack</h2>
+          <p class="slide-subtitle">Composing specialized modules rather than relying on a brittle black box</p>
+        </div>
+        <div class="slide-timing">12:30 &ndash; 17:00 (4.5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3" style="flex: 1;">
+          <div class="card" style="border-top: 4px solid #38bdf8;">
+            <h3 class="card-head" style="color: #38bdf8;">1. Grounding Layer</h3>
+            <p style="font-size: 13.5px; color: #94a3b8; margin-bottom: 12px;">Anchor in verifiable reality</p>
+            <ul class="bullet-list" style="font-size: 13.5px;">
+              <li>Dense vector extraction (768-D coordinates)</li>
+              <li>Qdrant HNSW graph index</li>
+              <li>Strict top-K cosine similarity thresholding</li>
+              <li>Eliminates hallucinations at the data boundary</li>
+            </ul>
+          </div>
+          <div class="card" style="border-top: 4px solid #c084fc;">
+            <h3 class="card-head" style="color: #c084fc;">2. Reasoning &amp; Synthesis Layer</h3>
+            <p style="font-size: 13.5px; color: #94a3b8; margin-bottom: 12px;">Multi-model lateral perspectives</p>
+            <ul class="bullet-list" style="font-size: 13.5px;">
+              <li><strong>Llama 3.3 (70B):</strong> In-depth academic &amp; methodological breakdown</li>
+              <li><strong>Mistral Large:</strong> Executive synthesis &amp; strategic takeaways</li>
+              <li>Concurrent asynchronous execution</li>
+              <li>Zero cross-model prompt contamination</li>
+            </ul>
+          </div>
+          <div class="card" style="border-top: 4px solid #34d399;">
+            <h3 class="card-head" style="color: #34d399;">3. Orchestration &amp; Governance</h3>
+            <p style="font-size: 13.5px; color: #94a3b8; margin-bottom: 12px;">Production-grade reliability</p>
+            <ul class="bullet-list" style="font-size: 13.5px;">
+              <li>Camunda BPMN 2.0 executable workflow</li>
+              <li>Automated retry boundaries (R3/PT10S)</li>
+              <li>Human librarian review gate</li>
+              <li>Stateless REST + Keycloak OIDC audit trail</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Contrast this with naive "prompt engineering". Enterprise AI requires rigorous software engineering around the model: deterministic persistence, state machines, and fail-safe retry boundaries.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 7: Section 3 - Enterprise Architecture Blueprint -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-emerald">Section 3 &bull; Enterprise Architecture</span>
+          <h2 class="slide-title">3. Multi-Tier Decoupled Architecture</h2>
+          <p class="slide-subtitle">Clean separation of presentation, gateway, business logic, and polyglot persistence</p>
+        </div>
+        <div class="slide-timing">17:00 &ndash; 20:30 (3.5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-4" style="flex: 1;">
+          <div class="card">
+            <h3 class="card-head" style="color: #38bdf8;">Client Tier</h3>
+            <p style="font-size: 13px; font-weight: 700; color: #fff;">SAP UI5 Web Components-based UI</p>
+            <ul class="bullet-list" style="font-size: 12.5px;">
+              <li>ALP &amp; FCL Floorplans</li>
+              <li>Detached-DOM <code>TypedEventBus</code></li>
+              <li>Observable state stores</li>
+              <li>Zero WebSockets overhead</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #c084fc;">Gateway Tier</h3>
+            <p style="font-size: 13px; font-weight: 700; color: #fff;">Express 4.21 (Node 22)</p>
+            <ul class="bullet-list" style="font-size: 12.5px;">
+              <li>Stateless REST proxy</li>
+              <li>Keycloak Bearer JWT auth</li>
+              <li>Diagram asset dispatch</li>
+              <li>OpenAPI 3.0 Contract</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #34d399;">Business Core</h3>
+            <p style="font-size: 13px; font-weight: 700; color: #fff;">Spring Boot 3.3.4 (Java 21)</p>
+            <ul class="bullet-list" style="font-size: 12.5px;">
+              <li><code>RagService</code> &amp; Chunking</li>
+              <li>Spring AI Ollama integration</li>
+              <li>Camunda BPMN 2.0 engine</li>
+              <li>gRPC client to Qdrant</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-head" style="color: #fbbf24;">Persistence Tier</h3>
+            <p style="font-size: 13px; font-weight: 700; color: #fff;">Dual-Store Engine</p>
+            <ul class="bullet-list" style="font-size: 12.5px;">
+              <li><strong>MongoDB 7.0:</strong> System of Record (BSON full text, history)</li>
+              <li><strong>Qdrant DB:</strong> HNSW sub-3ms ANN vector retrieval</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Explain why polyglot persistence is required: MongoDB provides ACID and document versioning, while Qdrant provides sub-millisecond approximate nearest neighbor searches via HNSW.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 8: Section 3 - Workflow & BPMN Governance -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-emerald">Section 3 &bull; Workflow Governance</span>
+          <h2 class="slide-title">Camunda BPMN 2.0 Ingestion Workflow</h2>
+          <p class="slide-subtitle">4 Horizontal Swimlanes with Asynchronous Retries &amp; Human Gates</p>
+        </div>
+        <div class="slide-timing">20:30 &ndash; 23:30 (3 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1;">
+          <div class="card">
+            <h3 class="card-head" style="color: #38bdf8;">BPMN 2.0 Architecture Details</h3>
+            <ul class="bullet-list">
+              <li><strong>4 Swimlanes:</strong> Client User &bull; API Gateway &bull; Spring Boot Engine &bull; AI Subsystems (Qdrant &amp; Ollama).</li>
+              <li><strong>Parallel Fork/Join Gateway:</strong> Concurrently triggers vector chunking + Llama 3.3 analytical summary + Mistral Large executive summary.</li>
+              <li><strong>Failure Compensation:</strong> Boundary timer and error events handle Ollama GPU timeouts via <code>R3/PT10S</code> retries.</li>
+              <li><strong>Librarian Gate:</strong> Low confidence scores (&lt; 0.70) trigger a Camunda User Task for human manual review.</li>
+            </ul>
+          </div>
+          <div class="diagram-frame">
+            <img src="diagrams/rag-workflow.svg" alt="Camunda BPMN & RAG Pipeline" />
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Show how the BPMN model guarantees enterprise reliability. If the local Ollama daemon restarts or runs out of GPU memory, the async retry boundary catches the error and retries up to 3 times before failing gracefully.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 9: Section 3 - Stateless REST & EventBus ADR -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-emerald">Section 3 &bull; Architecture ADR</span>
+          <h2 class="slide-title">Why Stateless REST Beats WebSockets (ADR-004)</h2>
+          <p class="slide-subtitle">Detached DOM EventBus for in-browser reactivity without socket server overhead</p>
+        </div>
+        <div class="slide-timing">23:30 &ndash; 26:00 (2.5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1;">
+          <div class="card">
+            <h3 class="card-head" style="color: #fb7185;">❌ Persistent WebSockets Pitfalls</h3>
+            <ul class="bullet-list">
+              <li>High server memory consumption holding idle TCP sockets.</li>
+              <li>Sticky sessions make horizontal auto-scaling complex on Cloud Run / Kubernetes.</li>
+              <li>Complex OIDC token refresh renegotiation over long-lived frames.</li>
+              <li>Corporate firewalls and proxy caches frequently drop WS handshakes.</li>
+            </ul>
+          </div>
+          <div class="card card-highlight">
+            <h3 class="card-head" style="color: #34d399;">✅ Stateless REST + Detached DOM EventBus</h3>
+            <ul class="bullet-list">
+              <li><strong>Stateless Scalability:</strong> Any Cloud Run container can service any HTTP request.</li>
+              <li><strong>Detached DOM <code>TypedEventBus</code>:</strong> In-browser reactivity using native DOM Comment nodes. Zero GC pressure, instant decoupled event dispatch.</li>
+              <li><strong>Standard OIDC Security:</strong> Every request carries standard Bearer JWT headers verified statelessly against Keycloak JWKS.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Highlight ADR-004: In an enterprise setting, simplicity and stateless scalability trump complex stateful WebSocket architectures every time.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 10: Section 4 - RAG from Scratch: The Intuitive Foundation -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-10">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-amber">Section 4 &bull; RAG from Scratch</span>
+          <h2 class="slide-title">4. RAG from Scratch: The "Tiny Desk" Problem</h2>
+          <p class="slide-subtitle">Why large language models hallucinate and how open-book RAG cures it</p>
+        </div>
+        <div class="slide-timing">26:00 &ndash; 29:00 (3 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1;">
+          <div class="card" style="border-left: 4px solid #f87171;">
+            <h3 class="card-head" style="color: #f87171;">🚫 Closed-Book Exam (Traditional AI)</h3>
+            <p>Imagine hiring the smartest scholar in the world, but their desk only fits <strong>3 pages of paper</strong>.</p>
+            <ul class="bullet-list">
+              <li>If you ask about page 420 of an 800-page book, the pages fall off the desk.</li>
+              <li>The scholar hates saying <em>"I don't know"</em>, so they guess a plausible answer.</li>
+              <li>In AI, this embarrassing habit is called a <strong>Hallucination</strong>.</li>
+            </ul>
+          </div>
+          <div class="card" style="border-left: 4px solid #34d399; background: rgba(52, 211, 153, 0.05);">
+            <h3 class="card-head" style="color: #34d399;">✅ Open-Book Exam (RAG)</h3>
+            <p><strong>Retrieval-Augmented Generation</strong> gives your scholar a super-librarian:</p>
+            <ul class="bullet-list">
+              <li>Before answering, the librarian fetches the exact <strong>2 relevant paragraphs</strong>.</li>
+              <li>The paragraphs are placed directly on the desk with a sticky note.</li>
+              <li>The assistant generates the answer strictly from those 2 verified pages.</li>
+              <li><strong>Result:</strong> Zero guessing, 100% accountable with page citations!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Transition into the intuitive conceptual explanation from the Zero-Knowledge Guide. Use the "Tiny Desk" analogy to make the concept crystal clear to every executive and engineer.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 11: Section 4 - Tokens & Embeddings Deep Dive -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-11">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-amber">Section 4 &bull; Core Primitives</span>
+          <h2 class="slide-title">Tokens (Lego Bricks) &amp; Embeddings (GPS Coordinates)</h2>
+          <p class="slide-subtitle">How words turn into numbers and meanings turn into hyperspace geometry</p>
+        </div>
+        <div class="slide-timing">29:00 &ndash; 33:00 (4 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1;">
+          <!-- Tokens -->
+          <div class="card">
+            <h3 class="card-head" style="color: #38bdf8;">🧱 Tokens: The Syllable Lego Bricks</h3>
+            <p style="font-size: 13.5px;">Computers don't read words. They snap sentences into frequent sub-words:</p>
+            <div class="lego-row">
+              <span class="lego lego-blue">Dorothy #14820</span>
+              <span class="lego lego-green">lived #5829</span>
+              <span class="lego lego-yellow">in #287</span>
+              <span class="lego lego-purple">the #262</span>
+              <span class="lego lego-blue">prair #28411</span>
+              <span class="lego lego-green">ies #592</span>
+            </div>
+            <p style="font-size: 12.5px; color: #94a3b8; margin-top: 8px;">
+              &bull; 1 token &asymp; 4 characters &bull; Inflected words like <em>"prairies"</em> split into 2 Lego bricks!
+            </p>
+          </div>
+
+          <!-- Embeddings -->
+          <div class="card">
+            <h3 class="card-head" style="color: #c084fc;">🌍 Embeddings: The Map of Meaning</h3>
+            <p style="font-size: 13.5px;">Integer IDs have no meaning. Embeddings project tokens into a 768-D coordinate space:</p>
+            <div style="background: #0f172a; padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; color: #c084fc;">
+              v = [ 0.0412, -0.0891, 0.1205, ..., 0.0074 ] &isin; &#8477;<sup>768</sup>
+            </div>
+            <p style="font-size: 12.5px; color: #94a3b8; margin-top: 8px;">
+              &bull; <strong>Geometric Proximity = Semantic Similarity</strong><br>
+              &bull; <em>"puppy"</em> and <em>"dog"</em> are neighbors. <em>"submarine"</em> lives across town in deep water.
+            </p>
+          </div>
+        </div>
+
+        <!-- Cosine Math Box -->
+        <div class="card" style="background: #0b1120; border-color: #0284c7;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <strong style="color: #fff;">Cosine Similarity Metric:</strong>
+              <span style="font-family: var(--font-mono); color: #38bdf8; margin-left: 8px;">cos(&theta;) = (u &bull; v) / (||u|| ||v||) &isin; [-1.0, +1.0]</span>
+            </div>
+            <div style="font-size: 13px; color: #a7f3d0;">
+              High Relevance (&gt; 0.85) &bull; Moderate (&gt; 0.65) &bull; Low / Filtered (&lt; 0.40)
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Explain why keyword search fails: "puppy" and "dog" have zero common letters. Embeddings solve this by assigning GPS coordinates in semantic hyperspace.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 12: Section 4 - The Wizard of Oz Concrete Walkthrough -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-12">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-amber">Section 4 &bull; Concrete Walkthrough</span>
+          <h2 class="slide-title">Case Study: <em>The Wonderful Wizard of Oz</em></h2>
+          <p class="slide-subtitle">Tracing the exact 5-step transformation from raw prose to verified citation</p>
+        </div>
+        <div class="slide-timing">33:00 &ndash; 37:00 (4 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="diagram-frame" style="max-height: 480px;">
+          <img src="diagrams/rag-tokens-embeddings-explained.svg" alt="How RAG Works Diagram: Wizard of Oz" />
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Walk through the 4 steps shown in the SVG: Step 1 text and tokenization, Step 2 768-D embedding hyperspace, Step 3 MongoDB full record vs Qdrant point vector, and Step 4 interactive query retrieval and Llama 3.3 grounded output.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 13: Section 5 - Table 1: CS PhD vs. Leadership Lens -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-13">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-rose">Section 5 &bull; Comparative Statistics</span>
+          <h2 class="slide-title">Table 1: CS PhD Lens vs. Strategic Leadership Lens</h2>
+          <p class="slide-subtitle">Contrasting academic reductionism with planetary-scale generative engineering</p>
+        </div>
+        <div class="slide-timing">37:00 &ndash; 40:00 (3 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="table-container" style="flex: 1;">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Traditional CS PhD / Academic Lens</th>
+                <th>Strategic / Generative Leadership Lens</th>
+                <th>Concrete Personal Library Implementation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Primary Unit of Value</strong></td>
+                <td>Algorithmic rigor, convergence proofs, loss functions</td>
+                <td>System affordances, real-world utility, fast validation</td>
+                <td>Production-grade SAP UI5 Web Components floorplans serving immediate researcher utility</td>
+              </tr>
+              <tr>
+                <td><strong>Operational Bottleneck</strong></td>
+                <td>Computational complexity, theoretical limits, latency</td>
+                <td>Objective function definition, workflow decomposition</td>
+                <td>Decomposing ingestion into Camunda BPMN 2.0 executable tasks with audit gates</td>
+              </tr>
+              <tr>
+                <td><strong>Cognitive Mode</strong></td>
+                <td><strong>Convergent:</strong> Narrowing down to optimal proofs</td>
+                <td><strong>Divergent:</strong> Exploring lateral possibilities, edge cases</td>
+                <td>Dual-model inference (Llama 3.3 analytical method + Mistral Large executive brief)</td>
+              </tr>
+              <tr>
+                <td><strong>Role of the Human</strong></td>
+                <td>Handcrafted implementer, manual syntax debugger</td>
+                <td>Intent director, creative curator, ethical governor</td>
+                <td>Specifying contracts while AI agents synthesize multi-file implementations</td>
+              </tr>
+              <tr>
+                <td><strong>Tool Paradigm</strong></td>
+                <td>Low-level frameworks (PyTorch, Triton, CUDA)</td>
+                <td>Composable cognitive modules (grounding, multi-modal reasoners)</td>
+                <td>Qdrant HNSW vector store, Spring AI Ollama adapters, Keycloak OIDC, Express</td>
+              </tr>
+              <tr>
+                <td><strong>Failure Mode</strong></td>
+                <td>Suboptimal convergence or model drift</td>
+                <td>Solving the wrong business or human problem efficiently</td>
+                <td>Strict zero-hallucination vector grounding guardrails with interactive citations</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Emphasize the row on Cognitive Mode: Convergent vs Divergent. The competitive moat is no longer who writes the loop fastest; it is who frames the objective function best.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 14: Section 5 - Table 2: MongoDB vs. Qdrant & ROI -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-14">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-rose">Section 5 &bull; Database &amp; Financial Statistics</span>
+          <h2 class="slide-title">Table 2: MongoDB vs. Qdrant &amp; Commercial ROI Ledger</h2>
+          <p class="slide-subtitle">Polyglot persistence comparison and 98% economic development savings</p>
+        </div>
+        <div class="slide-timing">40:00 &ndash; 45:00 (5 min)</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2" style="flex: 1;">
+          <!-- Table 2: MongoDB vs Qdrant -->
+          <div class="card">
+            <h3 class="card-head" style="color: #34d399;">🗄️ Database Decomposition</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Capability</th>
+                    <th>MongoDB 7.0</th>
+                    <th>Qdrant Vector DB</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Data Unit</strong></td>
+                    <td>BSON documents</td>
+                    <td>768-D Float32 points</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Querying</strong></td>
+                    <td>B-Tree index, exact key</td>
+                    <td>HNSW ANN Cosine distance</td>
+                  </tr>
+                  <tr>
+                    <td><strong>System Role</strong></td>
+                    <td>Authoritative System of Record</td>
+                    <td>Sub-3ms semantic passage locator</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Contents</strong></td>
+                    <td>Full text, BibTeX, versions, caches</td>
+                    <td>Vectors + chunk text payloads</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Financial / Commercial Valuation -->
+          <div class="card" style="background: rgba(16, 185, 129, 0.05); border-color: #059669;">
+            <h3 class="card-head" style="color: #10b981;">💰 Development Economics &amp; Valuation</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Paradigm</th>
+                    <th>Timeline</th>
+                    <th>Cost Breakdown</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Manual Dev</strong></td>
+                    <td>6&ndash;8 weeks</td>
+                    <td>$12,000 &ndash; $16,500 (Senior Engineer)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>AI Copilot</strong></td>
+                    <td>2&ndash;3 weeks</td>
+                    <td>$5,500 &ndash; $7,000 (Human + Copilot)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Autonomous Agent</strong></td>
+                    <td><strong>1 session</strong></td>
+                    <td><strong style="color: #34d399;">$118.31 (All-in compute tokens)</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="font-size: 13px; color: #a7f3d0; margin-top: 12px;">
+              💡 <strong>Net Economic Advantage:</strong> Over <strong>98% cost reduction</strong> and <strong>50x acceleration</strong>, demonstrating the explosive leverage of creative cognitive orchestration over manual syntax typing.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note:</strong> Close the 45-minute talk with this financial ledger. Show that when implementation marginal cost approaches zero, the engineer's true value is architectural vision, system grounding, and domain framing.
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SLIDE 15: Section 6 - Open Floor Q&A with the Audience -->
+    <!-- ========================================================================= -->
+    <div class="slide" id="slide-15">
+      <div class="slide-header">
+        <div>
+          <span class="section-pill pill-blue">Section 6 &bull; Audience Participation</span>
+          <h2 class="slide-title">6. Open Floor: Questions &amp; Discussion with the Audience</h2>
+          <p class="slide-subtitle">15 Minutes of Unrestricted Dialogue &bull; Ask Anything Across the System, Architecture, or Philosophy</p>
+        </div>
+        <div class="slide-timing">45:00 &ndash; 60:00 (15 min)</div>
+      </div>
+      <div class="slide-body">
+        <!-- Audience Invitation Banner -->
+        <div class="card card-highlight" style="padding: 24px; text-align: center; border-color: #38bdf8; background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(192, 132, 252, 0.1) 100%);">
+          <div style="font-size: 38px; margin-bottom: 8px;">🎙️ 🙋‍♀️ 🙋‍♂️</div>
+          <h3 style="font-size: 22px; color: #fff; font-weight: 800; margin-bottom: 6px;">
+            The Floor is Completely Open to the Audience!
+          </h3>
+          <p style="font-size: 14.5px; color: #cbd5e1; max-width: 820px; margin: 0 auto;">
+            We welcome questions, challenges, and perspectives from any angle: live demo testing, architectural trade-offs, vector math, local privacy, prompt engineering vs. retrieval, or the broader shift from syntax execution to creative cognitive orchestration.
+          </p>
+        </div>
+
+        <!-- 4 Audience Question Prompt Angles -->
+        <div class="grid-4" style="flex: 1;">
+          <div class="card" style="border-top: 3px solid #38bdf8;">
+            <h3 class="card-head" style="color: #38bdf8; font-size: 15px;">🖥️ Live System &amp; Demo</h3>
+            <ul class="bullet-list" style="font-size: 12.5px; color: #94a3b8;">
+              <li>Want to test a live PDF upload or edge-case query?</li>
+              <li>How does BibTeX AST extraction work?</li>
+              <li>Comparing Llama 3.3 vs. Mistral Large responses in real time.</li>
+            </ul>
+          </div>
+          <div class="card" style="border-top: 3px solid #c084fc;">
+            <h3 class="card-head" style="color: #c084fc; font-size: 15px;">🎓 The New Perspective</h3>
+            <ul class="bullet-list" style="font-size: 12.5px; color: #94a3b8;">
+              <li>The CS PhD perspective on generative leverage.</li>
+              <li>Why problem formulation beats boilerplate syntax.</li>
+              <li>The role of the "Divergent Engineer".</li>
+            </ul>
+          </div>
+          <div class="card" style="border-top: 3px solid #34d399;">
+            <h3 class="card-head" style="color: #34d399; font-size: 15px;">⚙️ Architecture &amp; RAG</h3>
+            <ul class="bullet-list" style="font-size: 12.5px; color: #94a3b8;">
+              <li>Qdrant HNSW vs. pgvector vs. Pinecone.</li>
+              <li>MongoDB ACID record vs. vector index.</li>
+              <li>Camunda BPMN 2.0 async retry boundaries.</li>
+              <li>Chunking overlap &amp; 768-D cosine bounds.</li>
+            </ul>
+          </div>
+          <div class="card" style="border-top: 3px solid #fbbf24;">
+            <h3 class="card-head" style="color: #fbbf24; font-size: 15px;">🔒 Privacy &amp; Economics</h3>
+            <ul class="bullet-list" style="font-size: 12.5px; color: #94a3b8;">
+              <li>Running 100% on local hardware (Ollama).</li>
+              <li>Preventing corporate data leakage.</li>
+              <li>Commercial ROI: $118 agentic build vs. $16.5k manual development.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Links Box -->
+        <div class="card" style="background: #0f172a; border-color: #374151; text-align: center; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 13px; color: #94a3b8; text-align: left;">
+              <strong style="color: #fff;">Repository &amp; Documentation Portal:</strong> All guides, math formulations, and architectural diagrams are live and interactive.
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="/" target="_blank" class="nav-btn nav-btn-primary">&#128640; Launch Live App</a>
+              <a href="rag-explained-scratch.html" class="nav-btn" target="_blank">&#128161; Zero-Knowledge Guide</a>
+              <a href="rag-guide.html" class="nav-btn" target="_blank">&#129302; Technical Deep-Dive</a>
+              <a href="cs-phd-perspective.html" class="nav-btn" target="_blank">&#127891; CS PhD Perspective</a>
+              <a href="index.html" class="nav-btn" target="_blank">&#127968; Docs Portal</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes">
+        <strong>Speaker Note (45:00 - 60:00):</strong> Smile and open the floor directly to the audience: "Thank you everyone! The floor is now completely open to you for any questions, thoughts, or discussion points. Feel free to ask about the live application, the code, the RAG math, the local privacy setup, or the philosophical shift towards divergent problem formulation." If there is a momentary pause, invite someone to suggest a live test query in the app.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Control Bar -->
+  <footer class="deck-footer">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div>
+      <span id="slideCounter" style="font-weight: 700; color: #fff;">1 / 15</span>
+      <span style="margin: 0 8px;">&bull;</span>
+      <span id="currentSlideTitle" style="color: #94a3b8;">Title Slide</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span>Use <span class="key-hint">&larr;</span> <span class="key-hint">&rarr;</span> or <span class="key-hint">Space</span> to navigate</span>
+      <button class="nav-btn" onclick="prevSlide()" title="Previous Slide">&larr; Prev</button>
+      <button class="nav-btn nav-btn-primary" onclick="nextSlide()" title="Next Slide">Next &rarr;</button>
+    </div>
+  </footer>
+
+  <!-- Slide Overview Modal -->
+  <div class="overview-modal" id="overviewModal" onclick="if (event.target === this) toggleOverview();">
+    <div style="max-width: 1400px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 20px; color: #fff;">Slide Deck Navigator (15 Slides)</h2>
+      <button class="nav-btn" onclick="toggleOverview()">✕ Close [Esc]</button>
+    </div>
+    <div class="overview-grid" id="overviewGrid"></div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let currentSlideIndex = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    function initDeck() {
+      showSlide(0);
+      buildOverviewGrid();
+      startTimer();
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    function showSlide(index) {
+      if (index < 0 || index >= slides.length) return;
+      slides[currentSlideIndex].classList.remove('active');
+      currentSlideIndex = index;
+      slides[currentSlideIndex].classList.add('active');
+
+      // Update counters & progress
+      const counter = document.getElementById('slideCounter');
+      counter.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+      
+      const titleElem = slides[currentSlideIndex].querySelector('.slide-title');
+      const title = titleElem ? titleElem.textContent : `Slide ${currentSlideIndex + 1}`;
+      document.getElementById('currentSlideTitle').textContent = title;
+
+      const progress = ((currentSlideIndex + 1) / slides.length) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+
+      // Update thumb highlights
+      document.querySelectorAll('.thumb-card').forEach((thumb, i) => {
+        thumb.classList.toggle('current', i === currentSlideIndex);
+      });
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < slides.length - 1) showSlide(currentSlideIndex + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 0) showSlide(currentSlideIndex - 1);
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        showSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        showSlide(slides.length - 1);
+      } else if (e.key.toLowerCase() === 'o') {
+        e.preventDefault();
+        toggleOverview();
+      } else if (e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        toggleSpeakerNotes();
+      } else if (e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        toggleFullscreen();
+      } else if (e.key === 'Escape') {
+        const modal = document.getElementById('overviewModal');
+        if (modal.classList.contains('open')) toggleOverview();
+      }
+    }
+
+    function toggleOverview() {
+      const modal = document.getElementById('overviewModal');
+      modal.classList.toggle('open');
+    }
+
+    function toggleSpeakerNotes() {
+      document.querySelectorAll('.speaker-notes').forEach(note => {
+        note.classList.toggle('visible');
+      });
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    function buildOverviewGrid() {
+      const grid = document.getElementById('overviewGrid');
+      grid.innerHTML = '';
+      slides.forEach((slide, i) => {
+        const titleElem = slide.querySelector('.slide-title');
+        const title = titleElem ? titleElem.textContent : `Slide ${i + 1}`;
+        const timingElem = slide.querySelector('.slide-timing');
+        const timing = timingElem ? timingElem.textContent : '';
+
+        const card = document.createElement('div');
+        card.className = `thumb-card ${i === currentSlideIndex ? 'current' : ''}`;
+        card.innerHTML = `
+          <div class="thumb-num">Slide ${i + 1} &bull; ${timing}</div>
+          <div class="thumb-title">${title}</div>
+        `;
+        card.onclick = () => {
+          showSlide(i);
+          toggleOverview();
+        };
+        grid.appendChild(card);
+      });
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+        const secs = (timerSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('elapsedTimer').innerHTML = `&#9201; ${mins}:${secs} / 60:00`;
+      }, 1000);
+    }
+
+    window.addEventListener('DOMContentLoaded', initDeck);
+  </script>
+</body>
+</html>

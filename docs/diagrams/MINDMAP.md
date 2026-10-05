@@ -46,7 +46,7 @@ Personal Library & AI Research Engine
 │   ├── Semantic Version Comparison & Diff Viewing
 │   └── Historical Document Asset Download & Rollback
 ├── 6. Enterprise UI5 Frontend Experience
-│   ├── SAP Fiori Horizon & Horizon Dark Dual Theming
+│   ├── SAP UI5 Web Components & Horizon Dark Dual Theming
 │   ├── Standard UI5 Web Components (@ui5/webcomponents v2)
 │   ├── ListReport Floorplan with Multi-Field FilterBar
 │   ├── ObjectPage Floorplan with Sticky Header & KPI Facets

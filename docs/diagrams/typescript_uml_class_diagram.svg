@@ -58,7 +58,7 @@
 
   <!-- Package: Views & Dialogs -->
   <rect x="540" y="105" width="1030" height="420" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="555" y="125" font-size="12" font-weight="700" fill="#34d399">PACKAGE: views &amp; dialogs (SAP Fiori Horizon UI5)</text>
+  <text x="555" y="125" font-size="12" font-weight="700" fill="#34d399">PACKAGE: views &amp; dialogs (SAP UI5 Web Components)</text>
 
   <!-- ListReportView Box -->
   <g filter="url(#box-shadow)">

@@ -2436,6 +2436,16 @@ app.get('/api/v1/export.zip', handleZipExport);
 // Static developer documentation hub (TypeScript TypeDoc, Java Javadoc, and Docs Portal)
 app.use('/docs', express.static(path.resolve(projectRoot, 'docs')));
 
+// Slide presentation deck alias
+app.get(['/presentation', '/presentation.html'], (_req: Request, res: Response) => {
+  res.sendFile(path.resolve(projectRoot, 'docs/presentation.html'));
+});
+
+// Presenter side notes document alias
+app.get(['/speaker-notes', '/speaker-notes.html'], (_req: Request, res: Response) => {
+  res.sendFile(path.resolve(projectRoot, 'docs/speaker-notes.html'));
+});
+
 // -----------------------------------------------------------------------------
 // Vite Middleware / Production Static Asset Integration
 // -----------------------------------------------------------------------------
