@@ -7,6 +7,7 @@ package com.personallibrary.dto;
 import com.personallibrary.model.BibTeXMetadata;
 import com.personallibrary.model.DocumentChunk;
 import com.personallibrary.model.DocumentEntity;
+import com.personallibrary.model.DocumentVersionSnapshot;
 import com.personallibrary.model.SummaryRecord;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -92,4 +93,3 @@ public class DocumentResponse {
                 .build();
     }
 }
-

@@ -199,9 +199,21 @@ mvn spring-boot:run
 
 Ensure Docker and Docker Compose are installed.
 
+> **First-time setup — generate the npm lockfile.** The Dockerfile installs
+> dependencies with `npm ci`, which requires an existing `package-lock.json`.
+> The lockfile is intentionally **not committed to the repository**
+> (see `.gitignore`), so generate it locally once before your first build —
+> and again whenever `package.json` dependencies change:
+> ```bash
+> npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+> ```
+> This writes `package-lock.json` into the project root without installing
+> `node_modules` or running any package scripts. Docker Compose will pick it
+> up automatically from the build context on the next step.
+
 ```bash
 # 1. Pull and start all infrastructure containers (MongoDB, Qdrant, Ollama, Keycloak, Web App)
-docker compose up -d
+docker compose up -d --build
 
 # 2. Verify container health status
 docker compose ps
