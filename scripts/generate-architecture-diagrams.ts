@@ -155,8 +155,6 @@ export function generateSystemArchitectureSvg(): string {
   <path d="M 520 510 L 520 550 L 295 550 L 295 610" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-green)" />
   <!-- Controllers -> Mistral Large -->
   <path d="M 635 510 L 635 550 L 780 550 L 780 610" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-green)" />
-  <!-- Controllers -> Gemini Cascade -->
-  <path d="M 750 510 L 750 550 L 1285 550 L 1285 610" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-green)" />
   <rect x="550" y="538" width="180" height="22" rx="4" fill="#0f172a" stroke="#34d399" stroke-width="1" />
   <text x="640" y="553" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">Inference Prompts &amp; Embeddings</text>
 
@@ -174,28 +172,21 @@ export function generateSystemArchitectureSvg(): string {
   <!-- LAYER 3: DUAL-MODEL AI & VECTOR RETRIEVAL TIER                -->
   <!-- ============================================================ -->
   <rect x="40" y="570" width="1520" height="145" rx="12" fill="#1e293b" fill-opacity="0.6" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="65" y="597" font-size="13" font-weight="700" fill="#34d399" letter-spacing="0.5">3. GENERATIVE AI &amp; VECTOR RETRIEVAL TIER (OLLAMA SPRING AI &amp; GEMINI CASCADE FALLBACK)</text>
+  <text x="65" y="597" font-size="13" font-weight="700" fill="#34d399" letter-spacing="0.5">3. GENERATIVE AI &amp; VECTOR RETRIEVAL TIER (LOCAL OLLAMA SPRING AI)</text>
 
   <!-- Model 1: Llama 3.3 -->
-  <rect x="65" y="610" width="460" height="90" rx="8" fill="url(#card-purple)" stroke="#a855f7" stroke-width="1.5" filter="url(#glow)" />
+  <rect x="65" y="610" width="705" height="90" rx="8" fill="url(#card-purple)" stroke="#a855f7" stroke-width="1.5" filter="url(#glow)" />
   <text x="80" y="635" font-size="13" font-weight="700" fill="#ffffff">Ollama Llama 3.3 (70B Instruct)</text>
   <text x="80" y="653" font-size="11" fill="#e9d5ff">Analytical Decomposition &amp; Research Synthesis</text>
   <text x="80" y="675" font-size="10" font-family="monospace" fill="#f3e8ff">• Methodological Critique, Findings &amp; Quantitative Benchmarks</text>
   <text x="80" y="690" font-size="10" font-family="monospace" fill="#f3e8ff">• Duration Tracking, Telemetry &amp; Latency Recording</text>
 
   <!-- Model 2: Mistral Large -->
-  <rect x="550" y="610" width="460" height="90" rx="8" fill="url(#card-purple)" stroke="#a855f7" stroke-width="1.5" filter="url(#glow)" />
-  <text x="565" y="635" font-size="13" font-weight="700" fill="#ffffff">Ollama Mistral Large (2411)</text>
-  <text x="565" y="653" font-size="11" fill="#e9d5ff">Executive Summary &amp; Operational Takeaways</text>
-  <text x="565" y="675" font-size="10" font-family="monospace" fill="#f3e8ff">• High-level Abstraction &amp; Target Audience Recommendations</text>
-  <text x="565" y="690" font-size="10" font-family="monospace" fill="#f3e8ff">• Parallel Asynchronous Branch in Ingestion Pipeline</text>
-
-  <!-- Cascade Fallback: Gemini SDK -->
-  <rect x="1035" y="610" width="500" height="90" rx="8" fill="url(#card-purple)" stroke="#a855f7" stroke-width="1.5" filter="url(#glow)" />
-  <text x="1050" y="635" font-size="13" font-weight="700" fill="#ffffff">Server-Side Cloud Fallback (@google/genai)</text>
-  <text x="1050" y="653" font-size="11" fill="#e9d5ff">Multi-Model Quota Resilience Cascade</text>
-  <text x="1050" y="675" font-size="10" font-family="monospace" fill="#f3e8ff">• Priority: gemini-3.1-flash-lite → gemini-3.8-flash</text>
-  <text x="1050" y="690" font-size="10" font-family="monospace" fill="#f3e8ff">• Seamless Fallback when local Ollama GPUs are offline</text>
+  <rect x="800" y="610" width="705" height="90" rx="8" fill="url(#card-purple)" stroke="#a855f7" stroke-width="1.5" filter="url(#glow)" />
+  <text x="815" y="635" font-size="13" font-weight="700" fill="#ffffff">Ollama Mistral Large (2411)</text>
+  <text x="815" y="653" font-size="11" fill="#e9d5ff">Executive Summary &amp; Operational Takeaways</text>
+  <text x="815" y="675" font-size="10" font-family="monospace" fill="#f3e8ff">• High-level Abstraction &amp; Target Audience Recommendations</text>
+  <text x="815" y="690" font-size="10" font-family="monospace" fill="#f3e8ff">• Parallel Asynchronous Branch in Ingestion Pipeline</text>
 
   <!-- ============================================================ -->
   <!-- LAYER 4: PERSISTENCE, VECTOR STORE & IDENTITY TIER           -->

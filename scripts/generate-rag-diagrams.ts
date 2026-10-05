@@ -401,7 +401,7 @@ export function generateRagWorkflowSvg(): string {
       <rect width="220" height="190" rx="8" fill="#ffffff" stroke="#d8b4fe" stroke-width="1.5" />
       <rect x="0" y="0" width="220" height="32" rx="8" fill="#faf5ff" />
       <text x="14" y="21" font-size="12" font-weight="700" fill="#7c3aed">3. nomic-embed-text</text>
-      <text x="14" y="56" font-size="11" fill="#334155">• Local Ollama or Gemini</text>
+      <text x="14" y="56" font-size="11" fill="#334155">• Local Ollama Embedding Model</text>
       <text x="14" y="76" font-size="11" fill="#334155">• 768-dimensional float32</text>
       <text x="14" y="96" font-size="11" fill="#334155">• Unit L2 normalized</text>
       <text x="14" y="116" font-size="11" fill="#334155">• High-throughput batching</text>

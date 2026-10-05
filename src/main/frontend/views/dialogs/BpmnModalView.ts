@@ -518,7 +518,7 @@ export class BpmnModalView extends DialogView {
               <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
                 <li>• Ollama Llama 3.3 (70B Instruct): Deep academic synthesis and methodology critique</li>
                 <li>• Ollama Mistral Large (2411): Rapid executive summary and core bullet takeaways</li>
-                <li>• Google Gemini API cloud integration for multimodal processing fallback</li>
+                <li>• Fully local inference — no cloud API keys required</li>
                 <li>• Synchronized side-by-side comparator UI with latency/duration telemetry</li>
               </ul>
             </div>

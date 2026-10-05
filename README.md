@@ -35,7 +35,7 @@ Personal Library is an enterprise-grade document management and research platfor
 * **Frontend:** Vanilla TypeScript, Vite, SAP Fiori / UI5 Web Components with light and dark themes.
 * **UI Patterns:** SAP Fiori List Report Floorplan & SAP Fiori Object Page Floorplan.
 * **Authentication & IAM:** Keycloak / OpenID Connect (OIDC) & OAuth 2.0 (Open Authorization) client.
-* **AI & Embeddings:** Spring AI, Ollama Large Language Models (LLMs: `llama` and `mistral` models) / Google Gemini 2.5/3.8 engine.
+* **AI & Embeddings:** Spring AI, local Ollama Large Language Models (LLMs: `llama` and `mistral` models), fully offline — no cloud API keys required.
 * **Databases & Vector Stores:**
   * **MongoDB:** Document records, BibTeX properties, version histories, audit logs.
   * **Qdrant Vector Database:** Embedding index with HNSW (Hierarchical Navigable Small World) graphs for high-precision semantic content search and Retrieval-Augmented Generation (RAG).
@@ -57,7 +57,7 @@ For engineers, architects, and researchers studying this codebase, a comprehensi
 | **1** | [SAP Fiori UI5 Architecture](docs/LEARNING_TOPICS.md#1-enterprise-ui-architecture-with-sap-fiori--ui5-web-components) | Framework-free W3C Web Components (`@ui5/webcomponents` v2), List Report & Object Page floorplans, dynamic Light/Dark theming | `src/main/frontend/views/`, `styles.css` |
 | **2** | [Reactive State Management](docs/LEARNING_TOPICS.md#2-reactive-state-management--decoupled-frontend-patterns) | Observable `Store<T>` micro-framework, fine-grained subscriptions, component lifecycle (`track`, `unmount`), typed `EventBus`, client-side i18n engine | `src/main/frontend/core/`, `stores/`, `i18n/` |
 | **3** | [Pluggable Backend Gateway](docs/LEARNING_TOPICS.md#3-pluggable-backend-gateway--driver-adapter-pattern) | Gateway Facade & Driver Adapter pattern, production REST vs. standalone mock driver, zero-downtime hot-swapping at runtime | `src/main/frontend/services/backend/` |
-| **4** | [Multi-Model LLM Orchestration](docs/LEARNING_TOPICS.md#4-multi-model-llm-orchestration--comparative-benchmarking) | Specialized dual personas (Llama 3.3 70B analytical vs. Mistral Large 2411 executive), Google Gemini cloud fallback, race-condition-safe parallel execution | `src/main/java/.../AiSummarizationService.java`, `server.ts` |
+| **4** | [Multi-Model LLM Orchestration](docs/LEARNING_TOPICS.md#4-multi-model-llm-orchestration--comparative-benchmarking) | Specialized dual personas (Llama 3.3 70B analytical vs. Mistral Large 2411 executive) running fully local via Ollama, race-condition-safe parallel execution | `src/main/java/.../AiSummarizationService.java`, `server.ts` |
 | **5** | [Vector RAG Architecture](docs/LEARNING_TOPICS.md#5-retrieval-augmented-generation-rag--vector-database-architecture) | Sliding-window semantic chunking (500 tokens / 50 overlap), Qdrant HNSW cosine indexing, grounded retrieval, anti-hallucination citation drawer | `src/main/java/.../VectorRagService.java`, `ObjectPageView.ts` |
 | **6** | [Camunda BPMN 2.0 Workflows](docs/LEARNING_TOPICS.md#6-camunda-bpmn-20-workflow-orchestration) | Long-running asynchronous orchestration, service tasks, retry boundaries (`R3/PT10S`), human-in-the-loop review gateway, in-app BPMN viewer | `document-ingestion-rag.bpmn`, `BpmnDialog.ts` |
 | **7** | [Domain Parsing (LaTeX / BibTeX)](docs/LEARNING_TOPICS.md#7-domain-specific-parsing--metadata-engineering-latex--bibtex) | AST lexing/tokenization, 14 standard publication attributes, dynamic schema-driven form generation, bidirectional LaTeX BNF formatting | `src/main/frontend/utils/bibtexParser.ts` |
@@ -74,7 +74,7 @@ To assist developers, researchers, and students, all acronyms used throughout th
 | Acronym | Full Expansion | Architectural Definition & Role in Project |
 |---|---|---|
 | **RAG** | **Retrieval-Augmented Generation** | An AI architecture that combines information retrieval (querying a vector database for relevant text chunks) with generative language modeling, eliminating model hallucinations by grounding answers in verbatim document sources. |
-| **LLM** | **Large Language Model** | Deep learning neural networks trained on extensive text data (e.g., Llama 3.3 70B, Mistral Large 2411, Google Gemini Flash) capable of natural language understanding, synthesis, and summarization. |
+| **LLM** | **Large Language Model** | Deep learning neural networks trained on extensive text data (e.g., Llama 3.3 70B, Mistral Large 2411) capable of natural language understanding, synthesis, and summarization. |
 | **BPMN** | **Business Process Model and Notation (BPMN 2.0)** | An ISO/IEC 19510 standard graphical notation for modeling end-to-end enterprise workflows in an executable XML format. Used by Camunda 7/8 Zeebe engines to orchestrate document ingestion pipelines. |
 | **HNSW** | **Hierarchical Navigable Small World** | A state-of-the-art graph algorithm for Approximate Nearest Neighbor (ANN) vector search used in Qdrant, providing logarithmic $\mathcal{O}(\log N)$ retrieval speed across high-dimensional embedding spaces. |
 | **AST** | **Abstract Syntax Tree** | A hierarchical tree structure representing the abstract syntactic structure of source code or markup. Used in this codebase to parse, validate, and serialize LaTeX BibTeX entries. |

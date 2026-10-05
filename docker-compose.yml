@@ -17,12 +17,12 @@ services:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6334
       - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_LLAMA_MODEL=${OLLAMA_LLAMA_MODEL:-llama3.2}
+      - OLLAMA_MISTRAL_MODEL=${OLLAMA_MISTRAL_MODEL:-mistral}
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
       - KEYCLOAK_REALM=personal-library-realm
       - KEYCLOAK_CLIENT_ID=personal-library-client
       - KEYCLOAK_CLIENT_SECRET=enterprise-library-secret
-      # Injected API keys if hybrid cloud models are selected
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     volumes:
       - library_storage:/app/storage/documents
     healthcheck:

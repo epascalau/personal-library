@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "license": "AGPL-3.0-or-later",
   "type": "module",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
@@ -21,7 +24,6 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/pdf-parse": "^1.1.5",
     "@ui5/webcomponents": "^2.27.2",

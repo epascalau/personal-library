@@ -167,11 +167,9 @@ export function generateArchitectureSvg(): string {
 
   <!-- Orthogonal Connectors: Gateway Tier -> AI Tier (Strict 90-degree perpendicular entry into top of boxes) -->
   <!-- Controllers -> Llama 3.3 -->
-  <path d="M 480 475 L 480 540 L 225 540 L 225 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
+  <path d="M 480 475 L 480 540 L 310 540 L 310 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
   <!-- Controllers -> Mistral Large -->
-  <path d="M 600 475 L 600 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
-  <!-- Controllers -> Gemini Fallback -->
-  <path d="M 720 475 L 720 540 L 985 540 L 985 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
+  <path d="M 600 475 L 600 540 L 870 540 L 870 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
   <!-- Extraction -> Qdrant Vector DB -->
   <path d="M 1120 475 L 1120 540 L 1372 540 L 1372 590" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#mmd-arrow-purple)" />
 
@@ -198,29 +196,20 @@ export function generateArchitectureSvg(): string {
 
   <!-- Llama 3.3 -->
   <g filter="url(#card-shadow)">
-    <rect x="50" y="590" width="350" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
-    <text x="225" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Llama 3.3 (70B Instruct)</text>
-    <text x="225" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Analytical Structural Decomposition</text>
-    <text x="225" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Research Methodologies &amp; Critique</text>
-    <text x="225" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Execution Telemetry (Duration recorded)</text>
+    <rect x="50" y="590" width="520" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
+    <text x="310" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Llama 3.3 (70B Instruct)</text>
+    <text x="310" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Analytical Structural Decomposition</text>
+    <text x="310" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Research Methodologies &amp; Critique</text>
+    <text x="310" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Execution Telemetry (Duration recorded)</text>
   </g>
 
   <!-- Mistral Large -->
   <g filter="url(#card-shadow)">
-    <rect x="425" y="590" width="350" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
-    <text x="600" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Mistral Large (2411)</text>
-    <text x="600" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Executive Summary &amp; Key Takeaways</text>
-    <text x="600" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Recommended Target Audience Matrix</text>
-    <text x="600" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Parallel Asynchronous Branch</text>
-  </g>
-
-  <!-- Gemini Cascade Fallback -->
-  <g filter="url(#card-shadow)">
-    <rect x="800" y="590" width="370" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
-    <text x="985" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Cloud Gemini Fallback (@google/genai)</text>
-    <text x="985" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• gemini-3.1-flash-lite → gemini-3.8-flash</text>
-    <text x="985" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Multi-model Quota Resilience Cascade</text>
-    <text x="985" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Automated failover when GPUs offline</text>
+    <rect x="610" y="590" width="520" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
+    <text x="870" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Mistral Large (2411)</text>
+    <text x="870" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Executive Summary &amp; Key Takeaways</text>
+    <text x="870" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Recommended Target Audience Matrix</text>
+    <text x="870" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Parallel Asynchronous Branch</text>
   </g>
 
   <!-- Qdrant Vector DB -->
@@ -359,8 +348,8 @@ export function generateArchitecturePdf(pngBuffer: Buffer, outputPath: string): 
       '  Analytical decomposition, methodology critique, data highlights.\n\n' +
       '• Ollama Mistral Large\n' +
       '  Executive summary, conclusions, audience recommendations.\n\n' +
-      '• Gemini Cloud Fallback\n' +
-      '  @google/genai cascade fallback when GPU offline.\n\n' +
+      '• Fully Local Inference\n' +
+      '  No cloud API keys; all generation runs via the local Ollama daemon.\n\n' +
       '• Qdrant Vector DB\n' +
       '  Dense cosine similarity retrieval (library_embeddings).\n\n' +
       '• Semantic Chunking\n' +

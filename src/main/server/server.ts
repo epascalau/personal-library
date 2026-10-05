@@ -12,7 +12,6 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
 
 dotenv.config();
 
@@ -20,18 +19,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../..');
 
-// Initialize Gemini Client server-side
-const apiKey = process.env.GEMINI_API_KEY;
-const ai = apiKey
-  ? new GoogleGenAI({
-      apiKey: apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    })
-  : null;
+// Local Ollama engine connection (same daemon used by the Java Spring Boot backend)
+const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+const ollamaModels: Record<'llama' | 'mistral', string> = {
+  llama: process.env.OLLAMA_LLAMA_MODEL || 'llama3.2',
+  mistral: process.env.OLLAMA_MISTRAL_MODEL || 'mistral'
+};
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -620,50 +613,54 @@ let currentSessionUser: UserProfile = {
 };
 
 // -----------------------------------------------------------------------------
-// AI Model Service: Dual Summaries & RAG Retrieval
+// AI Model Service: Dual Summaries & RAG Retrieval (Local Ollama Engine)
 // -----------------------------------------------------------------------------
-let geminiQuotaCooldownUntil = 0;
 
 /**
- * Resilient multi-model fallback executor for AI generation tasks.
+ * Resilient text generation executor backed by the local Ollama daemon.
  *
  * WHAT:
- * Attempts content generation using a prioritized cascade of models (`gemini-3.1-flash-lite`, followed by `gemini-3.8-flash`),
- * returning the generated string or `null` if all attempts fail.
+ * Calls the Ollama `/api/generate` REST endpoint with the given model and prompt,
+ * returning the generated string or `null` if the daemon is unreachable or returns no content.
  *
  * WHY:
- * Cloud model rate limits and transient quota exhaustion can cause individual API calls to fail.
- * Cascading from a fast, high-rate-limit lite model to a larger fallback model maximizes request success rate
- * without failing user upload or summarization tasks.
+ * Keeps the Integrated Gateway 100% local/offline by default — no cloud API key required —
+ * mirroring the same `llama3.2`/`mistral` models used by the Java Spring Boot backend via Spring AI.
  *
- * @param contents Prompt text, images, or structured message content.
- * @param config Optional model configuration overrides (temperature, system instructions).
+ * @param modelKey Logical model selector (`llama` or `mistral`), mapped to the configured Ollama tag.
+ * @param prompt   Prompt text to send to the model.
+ * @param options  Optional generation parameters (e.g. temperature).
  * @returns Generated text output or null if unavailable.
  */
-async function safeGeminiGenerate(
-  contents: any,
-  config?: any
+async function ollamaGenerate(
+  modelKey: 'llama' | 'mistral',
+  prompt: string,
+  options?: { temperature?: number }
 ): Promise<string | null> {
-  if (!ai) return null;
+  try {
+    const response = await fetch(`${ollamaBaseUrl}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: ollamaModels[modelKey],
+        prompt,
+        stream: false,
+        options: {
+          temperature: options?.temperature ?? 0.2
+        }
+      })
+    });
 
-  // Try gemini-3.1-flash-lite first (active free tier quota), then gemini-3.8-flash
-  const models = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
-  for (const model of models) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents,
-        config
-      });
-      if (response && response.text) {
-        return response.text;
-      }
-    } catch (err: any) {
-      // Continue to next available model in cascade
-      continue;
+    if (!response.ok) {
+      return null;
     }
+
+    const data: any = await response.json();
+    return data?.response ? String(data.response).trim() : null;
+  } catch (err) {
+    // Ollama daemon unreachable or request failed; caller falls back to heuristics.
+    return null;
   }
-  return null;
 }
 
 /**
@@ -729,7 +726,7 @@ async function runDualModelSummarization(
       const t0Llama = Date.now();
       let llamaText = '';
 
-      const prompt = `You are an expert literary, academic, and technical analyst (simulating Ollama Llama 3.3 70B Instruct in Spring AI).
+      const prompt = `You are an expert literary, academic, and technical analyst running as a local Ollama Llama model.
 Analyze the following document:
 Title: "${documentTitle}"
 Author/Creator: ${bibtex.author || 'Unknown'}
@@ -761,7 +758,7 @@ Format your response in clean Markdown with these sections:
 **Critical Significance & Audience Impact:**
 [An analytical evaluation of the work's cultural, educational, or scientific significance]`;
 
-      const generated = await safeGeminiGenerate(prompt, { temperature: 0.2 });
+      const generated = await ollamaGenerate('llama', prompt, { temperature: 0.2 });
       if (generated) {
         llamaText = generated;
       }
@@ -774,7 +771,7 @@ Format your response in clean Markdown with these sections:
       const t0Mistral = Date.now();
       let mistralText = '';
 
-      const prompt = `You are an executive knowledge synthesizer (simulating Ollama Mistral Large 2411 in Spring AI).
+      const prompt = `You are an executive knowledge synthesizer running as a local Ollama Mistral model.
 Provide a concise, high-impact executive summary for document: "${documentTitle}".
 Author/Creator: ${bibtex.author || 'Unknown'}
 Publisher: ${bibtex.publisher || 'N/A'}
@@ -803,7 +800,7 @@ Format your response in clean Markdown with these sections:
 **Recommended Audience & Applications:**
 [Specific practical applications for educators, parents, researchers, or practitioners]`;
 
-      const generated = await safeGeminiGenerate(prompt, { temperature: 0.3 });
+      const generated = await ollamaGenerate('mistral', prompt, { temperature: 0.3 });
       if (generated) {
         mistralText = generated;
       }
@@ -920,33 +917,25 @@ async function extractBibTeXFromContent(
     };
   }
 
-  if (ai) {
+  // Local Ollama text-based metadata extraction (used when page text was already
+  // extracted from the PDF/document; no local vision model is available for raw
+  // image-only uploads, so those fall through to the heuristic parser below).
+  if (resolvedText) {
     try {
-      const contents: any[] = [];
-
-      if (fileData) {
-        // Strip data:*;base64, prefix if present
-        const base64Data = fileData.replace(/^data:[^;]+;base64,/, '');
-        const cleanMime = mimeType || (fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
-        contents.push({
-          inlineData: {
-            mimeType: cleanMime,
-            data: base64Data
-          }
-        });
-      }
-
       const prompt = `You are an expert archivist and librarian extracting publication metadata from this uploaded document.
 File name: "${fileName}"
-${resolvedText ? `Preview text:\n"""\n${resolvedText.slice(0, 5000)}\n"""` : ''}
+Preview text:
+"""
+${resolvedText.slice(0, 5000)}
+"""
 
-Carefully inspect all visible pages, cover illustrations, titles, subtitles, author/illustrator credits, publisher marks, and body text:
+Carefully read the titles, subtitles, author/illustrator credits, publisher marks, and body text:
 - The document can be in any language (e.g. Romanian, English, French, German) and can be any genre (such as children's literature/illustrated books, folklore, poetry, novels, technical papers, corporate reports, or scientific articles).
 - Read the real titles and text verbatim (e.g. "The Wonderful Wizard of Oz" by L. Frank Baum, or "Din folclorul copiilor: Cățeluș cu părul creț").
 - DO NOT generate generic enterprise or research placeholder text (e.g. "Research Contributor", "enterprise analysis", "operational protocols", "methodological principles") unless the document is literally about that. Provide a genuine, faithful abstract of the actual document contents.
-- Transcribe the complete text found on all visible pages into "extractedText".
+- Transcribe representative excerpts of the text into "extractedText".
 
-Return valid JSON with these fields:
+Respond with ONLY valid JSON (no markdown fences) with these fields:
 - entryType: one of "book", "article", "inproceedings", "techreport", "phdthesis", "misc" (choose "book" for children's books, novels, or monographs)
 - bibKey: concise citation key (e.g. "baum1900wizard")
 - title: exact full title as written on the cover or pages
@@ -957,12 +946,11 @@ Return valid JSON with these fields:
 - keywords: comma-separated keywords reflecting the true content
 - extractedText: verbatim text or excerpts`;
 
-      contents.push(prompt);
-
-      const generated = await safeGeminiGenerate(contents, { responseMimeType: 'application/json' });
+      const generated = await ollamaGenerate('llama', prompt, { temperature: 0.1 });
 
       if (generated) {
-        const parsed = JSON.parse(generated || '{}');
+        const jsonMatch = generated.match(/\{[\s\S]*\}/);
+        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : generated);
         if (parsed.title) {
           return {
             entryType: parsed.entryType || (fileName.toLowerCase().endsWith('.pdf') ? 'book' : 'article'),
@@ -989,7 +977,7 @@ Return valid JSON with these fields:
         }
       }
     } catch (e) {
-      // ignore
+      // ignore and fall through to heuristic parser
     }
   }
 
@@ -1154,7 +1142,6 @@ app.get('/api/v1/auth/me', (_req: Request, res: Response) => {
  * WHY: Enables frontend telemetry banners and operational monitoring to report real-time backend readiness.
  */
 app.get(['/api/v1/health', '/api/v1/status'], (_req: Request, res: Response) => {
-  const isCooldown = geminiQuotaCooldownUntil > Date.now();
   return res.json({
     status: 'UP',
     timestamp: new Date().toISOString(),
@@ -1170,19 +1157,15 @@ app.get(['/api/v1/health', '/api/v1/status'], (_req: Request, res: Response) => 
         id: 'llama-3.3-70b-instruct',
         name: 'Ollama Llama 3.3 (70B Instruct)',
         status: 'RUNNING',
-        framework: 'Spring AI / Ollama Engine',
+        framework: 'Local Ollama Engine',
         state: 'READY'
       },
       mistralLarge: {
         id: 'mistral-large-2411',
         name: 'Ollama Mistral Large (2411)',
         status: 'RUNNING',
-        framework: 'Spring AI / Ollama Engine',
+        framework: 'Local Ollama Engine',
         state: 'READY'
-      },
-      geminiBridge: {
-        status: isCooldown ? 'COOLDOWN_RECOVERING' : 'OPERATIONAL',
-        cooldownRemainingSec: isCooldown ? Math.max(0, Math.ceil((geminiQuotaCooldownUntil - Date.now()) / 1000)) : 0
       }
     },
     vectorStore: {
@@ -1722,10 +1705,10 @@ CRITICAL: Ground your summary in the real content. If it's a children's book or 
 Heading:
 ### Executive & Operational Summary (Mistral - Regenerated)`;
 
-  const generated = await safeGeminiGenerate(prompt);
+  const generated = await ollamaGenerate(model, prompt, { temperature: model === 'mistral' ? 0.3 : 0.2 });
   if (!generated) {
     return res.status(503).json({
-      error: `Backend summarization service for ${model === 'mistral' ? 'Ollama Mistral Large (2411)' : 'Ollama Llama 3.3 (70B)'} is currently unavailable. No summary could be computed.`
+      error: `Local Ollama model "${ollamaModels[model as 'llama' | 'mistral']}" is currently unavailable. No summary could be computed. Ensure the Ollama container is running and the model has been pulled.`
     });
   }
 
@@ -1793,7 +1776,7 @@ app.post(['/api/v1/documents/:guid/chat', '/api/v1/chat'], async (req: Request, 
   const topCitations = scoredChunks.slice(0, 3);
   const contextPassages = topCitations.map(c => `[Excerpt ${c.chunkIndex + 1}]: ${c.snippet}`).join('\n\n');
 
-  // 2. Chat with Llama model via Spring AI / Gemini
+  // 2. Chat with Llama model via local Ollama
   let answer = '';
   const historyContext = chatHistory
     .slice(-4)
@@ -1815,7 +1798,7 @@ User Question: "${question}"
 
 Provide a precise, authoritative answer grounded in the retrieved document passages. Reference citations like [Excerpt 1] when quoting specific facts.`;
 
-  const generated = await safeGeminiGenerate(prompt);
+  const generated = await ollamaGenerate('llama', prompt, { temperature: 0.2 });
   if (generated) {
     answer = generated;
   }

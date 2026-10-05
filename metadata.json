@@ -2,5 +2,5 @@
   "name": "Personal Library",
   "description": "Educational Sandbox for Enterprise Document Management & RAG, featuring SAP Fiori List Report and Object Page floorplans, BibTeX extraction, dual-model summaries (Llama and Mistral), and Qdrant vector retrieval.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

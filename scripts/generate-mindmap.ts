@@ -81,9 +81,6 @@ export function generateMermaidMindmap(): string {
         Executive Operational Summary
         Core Bulleted Takeaways
         Rapid Abstract Distillation
-      Google Gemini API
-        Cloud Multimodal Processing
-        High-Speed Reasoning Fallback
       Benchmarking UI
         Side-by-Side Comparator
         Synchronized Scrolling
@@ -198,7 +195,7 @@ export function generatePlantUmlMindmap(): string {
 *** Spring AI Multi-Model Orchestration Engine
 *** Llama 3.3 (70B Instruct): Deep Academic & Synthesis Analysis
 *** Mistral Large (2411): Executive Summary & Operational Takeaways
-*** Google Gemini API Cloud Multimodal Integration
+*** Fully Local Ollama Inference (no cloud API keys required)
 *** Real-time Model Execution Telemetry (Duration, Speed, Tokens)
 *** Side-by-Side Synchronized Benchmark Comparator UI
 *** Cached Immutable Summary History per Document Version
@@ -843,7 +840,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         bullets: [
           'Llama 3.3 (70B Instruct): Deep academic synthesis, critique, and methodology breakdown.',
           'Mistral Large (2411): High-speed executive summary and core operational takeaways.',
-          'Google Gemini API cloud integration for multimodal processing fallback.',
+          'Fully local inference via the Ollama daemon — no cloud API keys required.',
           'Synchronized side-by-side comparator UI with latency and duration telemetry.'
         ]
       },
