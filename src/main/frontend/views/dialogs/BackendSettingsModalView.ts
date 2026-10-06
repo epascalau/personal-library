@@ -146,7 +146,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     badge: 'Default',
     badgeClass: 'bg-blue-100 dark:bg-blue-950/70 text-[#0070f2] dark:text-[#38bdf8] dark:border-blue-900/60',
     description:
-      'Built-in Node.js gateway (same container/port as the UI). Requires the server process running; makes real network calls and calls local Ollama directly for genuine AI summaries/chat — only document storage and search are simulated in-memory.'
+      'Default dev mode. Document storage & search are SIMULATED (in-memory, lost on restart — no MongoDB/Qdrant). AI summaries & chat are REAL (genuine calls to local Ollama).'
   },
   {
     // Bypasses the Node gateway entirely and talks straight to the standalone
@@ -165,7 +165,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     badge: 'Port 8080',
     badgeClass: 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 dark:border-indigo-900/60',
     description:
-      'Direct connection to the standalone Spring Boot 3 Java server (`http://localhost:8080/api/v1`).'
+      'The fully real stack. Documents persist in MongoDB, search runs on real Qdrant vectors, and AI summaries/chat call Ollama via Spring AI — nothing here is simulated.'
   },
   {
     // The only option with no `preset` key: selecting it does NOT auto-fill
@@ -182,7 +182,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     badge: 'Custom URL',
     badgeClass: 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 dark:border-emerald-900/60',
     description:
-      'Connect to a custom remote API URL (e.g. cloud Kubernetes cluster or custom FastAPI backend).'
+      'Same wire protocol as the two options above, pointed at any URL you provide. Whether storage/search/AI are real depends entirely on what server answers at that address.'
   },
   {
     // The only option backed by a *different* adapter class (`MockBackendAdapter`
@@ -208,7 +208,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     badge: 'No Backend Required',
     badgeClass: 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 dark:border-amber-900/60',
     description:
-      'Zero-server mock engine: no network calls at all, no AI generation — documents/summaries/chat are pre-seeded or scripted and stored in browser localStorage only.'
+      'Fully offline, no server required. Everything — storage, search, AND AI — is SIMULATED in browser localStorage. Summaries/chat are pre-written canned text; no real model is ever called.'
   }
 ];
 
