@@ -148,6 +148,8 @@ still emitted to `dist/` at the repository root:
   * `ui5/`: UI5 Web Components bootstrap, icon registry, SVG language flags, and the global stylesheet patch.
   * `i18n/`: Translation catalogues (en, de, fr, es, ro).
 
+> 📘 **Deep dive:** see [`docs/FRONTEND_ARCHITECTURE.md`](docs/FRONTEND_ARCHITECTURE.md) for the full rendering-model rationale, state management, the backend adapter event-flow, and a complete `package.json` build-task reference table.
+
 ---
 
 ### Decoupled UI & Pluggable Backend Adapter Architecture
@@ -203,6 +205,8 @@ mvn spring-boot:run
 * `src/main/resources/`
   * `application.yml`: Standard configuration with MongoDB, Qdrant, Ollama, and Keycloak connections.
   * `application-docker.yml`: Docker network profile.
+
+> 📘 **Deep dive:** see [`docs/BACKEND_ARCHITECTURE.md`](docs/BACKEND_ARCHITECTURE.md) for the full package-by-package breakdown, the RAG/AI pipeline, the versioning & rollback engine, security, error handling, and the complete Maven build-task reference.
 
 ---
 
@@ -287,6 +291,8 @@ direct dev-time connections.
 > Java backend**, not the Node mock implementation — nginx intentionally
 > unifies `/api/v1` under one authoritative backend. To exercise the Node
 > mock specifically, load the app directly at `http://localhost:3000`.
+
+> 📘 **Deep dive:** see [`docs/DEVOPS_GUIDE.md`](docs/DEVOPS_GUIDE.md) for the full multi-stage `Dockerfile` breakdown, a service-by-service `docker-compose.yml` reference, the nginx routing table, and the complete `scripts/rebuild.sh` flag reference.
 
 ---
 
