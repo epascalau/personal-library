@@ -82,7 +82,7 @@ export class ShellBarView extends Component<void> {
    * Generates the developer and enterprise tools menu specification.
    *
    * WHAT: Assembles tool definitions for Backend Settings, OpenAPI 3.0, Code Docs (Javadoc/TypeDoc),
-   * AGPLv3 License, and full repository ZIP export.
+   * System Services & Admin Consoles, AGPLv3 License, and full repository ZIP export.
    * WHY: Provides researchers and engineers with direct, single-click access to system internals,
    * specifications, and documentation directly from the user profile popover.
    */
@@ -123,6 +123,14 @@ export class ShellBarView extends Component<void> {
         title: 'Camunda BPMN 2.0 Workflow',
         subtitle: 'Document Ingestion, Dual AI & Qdrant RAG Process',
         action: () => appStore.openBpmnModal()
+      },
+      {
+        id: 'system-links',
+        iconKey: 'Network',
+        tile: 'bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+        title: 'System Services & Admin Consoles',
+        subtitle: 'Swagger, Qdrant, Mongo Express, Keycloak, Ollama, nginx',
+        action: () => appStore.openSystemLinksModal()
       },
       {
         id: 'code-docs',

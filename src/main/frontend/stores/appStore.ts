@@ -55,6 +55,7 @@ export interface AppState {
   openApiModalOpen: boolean;
   bpmnModalOpen: boolean;
   backendSettingsOpen: boolean;
+  systemLinksModalOpen: boolean;
   summarizingModel: SummaryModel | null;
   summarizingModels: Record<SummaryModel, boolean>;
 
@@ -139,6 +140,7 @@ class AppStore extends Store<AppState> {
       openApiModalOpen: false,
       bpmnModalOpen: false,
       backendSettingsOpen: false,
+      systemLinksModalOpen: false,
       summarizingModel: null,
       summarizingModels: {
         llama: false,
@@ -499,6 +501,29 @@ class AppStore extends Store<AppState> {
    */
   closeBpmnModal(): void {
     this.setState({ bpmnModalOpen: false });
+  }
+
+  /**
+   * Opens the "System Services & Admin Consoles" quick-links modal.
+   *
+   * WHAT: Sets `systemLinksModalOpen: true` in application state.
+   * WHY: Gives operators and developers a single, discoverable entry point from the profile popover
+   * to every infrastructure service running behind the app (Swagger Editor, Spring Boot Swagger UI,
+   * Actuator health, Keycloak admin console, Qdrant dashboard, Mongo Express, Ollama API, nginx ingress),
+   * instead of requiring them to memorize or hunt down each container's published port.
+   */
+  openSystemLinksModal(): void {
+    this.setState({ systemLinksModalOpen: true });
+  }
+
+  /**
+   * Closes the "System Services & Admin Consoles" modal.
+   *
+   * WHAT: Sets `systemLinksModalOpen: false` in application state.
+   * WHY: Dismisses the infrastructure quick-links overlay and restores user interface focus.
+   */
+  closeSystemLinksModal(): void {
+    this.setState({ systemLinksModalOpen: false });
   }
 
   /**

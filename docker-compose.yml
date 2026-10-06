@@ -143,6 +143,42 @@ services:
       - library-net
 
   # ==============================================================================
+  # Mongo Express: Lightweight Web-Based MongoDB Admin UI
+  # ==============================================================================
+  # WHAT: Serves a browser-based viewer/editor for the `personal_library` MongoDB
+  # instance, reusing the same root credentials already defined for `mongodb`.
+  # WHY: There is otherwise no web UI for inspecting document metadata, BibTeX
+  # fields, version history snapshots, or AI summaries short of the `mongosh`
+  # one-liners in README.md — this gives the same visibility with a point-and-
+  # click browser tool, mirroring the "System Services" quick-links dialog in
+  # the UI's profile popover.
+  # ==============================================================================
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: personal-library-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8091:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=librarypass
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8081/ > /dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - library-net
+
+  # ==============================================================================
   # Qdrant: High-Performance Vector Database for Embeddings & Semantic RAG Search
   # ==============================================================================
   # ARCHITECTURAL RATIONALE:

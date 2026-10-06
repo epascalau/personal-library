@@ -25,6 +25,7 @@ import { BackendSettingsModalView } from './dialogs/BackendSettingsModalView';
 import { BpmnModalView } from './dialogs/BpmnModalView';
 import { DeleteConfirmDialogView } from './dialogs/DeleteConfirmDialogView';
 import { OpenApiModalView } from './dialogs/OpenApiModalView';
+import { SystemLinksModalView } from './dialogs/SystemLinksModalView';
 import { UploadDialogView } from './dialogs/UploadDialogView';
 import { VersionOverwriteDialogView } from './dialogs/VersionOverwriteDialogView';
 
@@ -42,7 +43,8 @@ export class AppView extends Component {
     this.own(new AuthModalView()),
     this.own(new OpenApiModalView()),
     this.own(new BpmnModalView()),
-    this.own(new BackendSettingsModalView())
+    this.own(new BackendSettingsModalView()),
+    this.own(new SystemLinksModalView())
   ];
 
   /**

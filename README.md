@@ -380,7 +380,9 @@ below show how to install and verify one.
 
 ## 🐳 Docker Inspection: Storage Volumes, Databases & Keycloak Administration
 
-The application stack orchestrates 5 container services bound to persistent Docker volumes. The commands below provide direct visibility into uploaded files, database contents, vector indexes, and Keycloak identity management.
+The application stack orchestrates 8 container services (app, swagger-editor, nginx, mongodb, mongo-express, qdrant, ollama, keycloak) bound to persistent Docker volumes. The commands below provide direct visibility into uploaded files, database contents, vector indexes, and Keycloak identity management.
+
+> 💡 **Quick links in the app:** the ShellBar's user/profile menu includes a **"System Services & Admin Consoles"** entry that opens a dialog with direct, clickable links to every service below (Swagger Editor, Spring Boot Swagger UI, Actuator Health, Keycloak Admin Console, Qdrant Dashboard, Mongo Express, Ollama API, and the nginx single ingress) — handy as an alternative to the CLI commands in this section.
 
 ### 1. Uploaded File Storage & Volume Inspection
 
@@ -449,7 +451,17 @@ MongoDB stores document metadata, LaTeX BibTeX properties, version lineages, and
 
 ---
 
-### 3. Qdrant Vector Database Inspection
+### 3. Mongo Express Web Viewer (MongoDB GUI)
+
+Mongo Express provides a lightweight, browser-based GUI for browsing the `personal_library` database without needing `mongosh`.
+
+* **URL:** [http://localhost:8091](http://localhost:8091)
+* **Authentication:** none at the Mongo Express layer (`ME_CONFIG_BASICAUTH=false`); it connects to MongoDB internally using the same `root`/`librarypass` credentials as above.
+* Use it to browse collections, inspect individual documents, and run ad-hoc queries visually — equivalent to the `mongosh` one-liners in section 2, but point-and-click.
+
+---
+
+### 4. Qdrant Vector Database Inspection
 
 Qdrant stores dense vector embeddings and text chunks in the `library_embeddings` collection for RAG semantic search.
 
@@ -478,7 +490,7 @@ Qdrant stores dense vector embeddings and text chunks in the `library_embeddings
 
 ---
 
-### 4. Keycloak Identity Provider, Users & Passwords
+### 5. Keycloak Identity Provider, Users & Passwords
 
 Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer tokens, and Role-Based Access Control (RBAC).
 
@@ -512,7 +524,7 @@ Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer token
 
 ---
 
-### 5. Ollama LLM Container Inspection
+### 6. Ollama LLM Container Inspection
 
 * **List preloaded and cached models in Ollama:**
   ```bash
@@ -534,7 +546,7 @@ Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer token
 
 ---
 
-### 6. Docker Maintenance & Lifecycle Commands
+### 7. Docker Maintenance & Lifecycle Commands
 
 | Command | Purpose |
 |---|---|

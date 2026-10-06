@@ -252,7 +252,8 @@
 }
 
 :host(.plib-dialog--settings),
-:host(.plib-dialog--version) {
+:host(.plib-dialog--version),
+:host(.plib-dialog--system-links) {
   width: 48rem !important;
   max-width: 94vw !important;
 }
@@ -261,7 +262,8 @@
 :host(.plib-dialog--upload) .ui5-popup-content,
 :host(.plib-dialog--openapi) .ui5-popup-content,
 :host(.plib-dialog--settings) .ui5-popup-content,
-:host(.plib-dialog--version) .ui5-popup-content {
+:host(.plib-dialog--version) .ui5-popup-content,
+:host(.plib-dialog--system-links) .ui5-popup-content {
   overflow: visible !important;
   border-radius: 0.875rem;
 }
