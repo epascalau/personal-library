@@ -4,17 +4,20 @@
 **Consolidation Scope:** Unified Google AI Studio Builds, Cloud Run Runtime, and Developer Credits  
 **Infrastructure Target:** Google Cloud Run & AI Development Sandboxes  
 
+> **Accuracy statement:** This ledger is an engineering estimate intended for educational and comparative analysis. Overall figures are considered approximately **90% accurate**; direct costs and recorded credit usage are stronger than reconstructed time, token-volume, and ROI estimates. This is not audited financial accounting.
+
 ---
 
 ## 1. Unified Financial & Consumption Ledger
 
 | Metric / Parameter | Consolidated Total | Measurement Basis & Technical Details | 
 | ----- | ----- | ----- | 
-| **Total Out-of-Pocket Compute Cost** | **\$118.31 USD** | Direct prepaid balance deductions (\$18.31 United States Dollars) + 10,000 AI developer credits (\$100.00 standard valuation) | 
+| **Total Out-of-Pocket Compute Cost** | **\$160.31 USD (estimated)** | Direct prepaid balance deductions (\$18.31 United States Dollars) + 14,200 AI credits (\$142.00 at the ledger's \$0.01/credit valuation) |
+| **Additional Anonymous Session Usage** | **\~4,200 AI credits** | Reported aggregate from the previous session; no prompts, identifiers, or model-specific details retained |
 | **Gross AI Processing Volume** | **\~32.5M – 34.0M Tokens** | Compounded coding agent context windows, Abstract Syntax Tree (AST) refactorings, multi-file inspections, and prompt iteration | 
 | **Application Runtime Inference** | **102,870 Tokens** | In-app user document chat, embeddings (`text-embedding-004`), and dual-model summarization cascades | 
 | **Total Autonomous Agent Actions** | **284 Invocations** | Compiles, multi-file atomic edits, TypeScript linter executions, AST inspections, and container restarts | 
-| **Active Engineering Turnaround** | **\~10 – 14 Hours** | Total hands-on prompt turns, refactoring cycles, and full integration across sessions | 
+| **Active Engineering Turnaround** | **\~18 – 22 Hours** | Original estimate plus approximately 8 additional hours reported for the previous session; exact CLI duration was unavailable |
 | **Container & Hosting Overhead** | **\$2.14 USD** | Dual Cloud Run instances (dev & preview applets), 4 Docker images, 6.8 GB Artifact Registry storage | 
 
 ---
@@ -27,12 +30,12 @@ To quantify the economic value of the generated application—comprising a 2,309
 | ----- | ----- | ----- | ----- | ----- | 
 | **Traditional Manual Build (No AI)** | 120 – 165 hrs | \$100 / hr | **\$12,000 – \$16,500 USD** | **\~100x – 140x Cheaper** | 
 | **Senior Engineer (with AI Copilot)** | 55 – 70 hrs | \$100 / hr | **\$5,500 – \$7,000 USD** | **\~45x – 60x Cheaper** | 
-| **Autonomous Agent Build (This Project)** | **\~10 – 14 hrs** | **Direct Compute** | **\$118.31 USD** | **Baseline Direct Cost** | 
+| **Autonomous Agent Build (This Project)** | **\~18 – 22 hrs** | **Direct Compute** | **\$160.31 USD (estimated)** | **Baseline Direct Cost** |
 
 ### Financial Leverage Summary
 
-* **Labor Displacement:** Writing over 3,000 lines of functional full-stack code, dual-model pipelines, and container configuration from scratch was compressed from roughly a month of full-time engineering work into **\~10 to 14 active hours**.
-* **Capital Efficiency:** Achieving complete end-to-end functionality for an all-in compute expenditure of **\$118.31 USD** represents a **\~98% to 99% financial savings** compared to conventional contractor or agency rates.
+* **Labor Displacement:** Writing over 3,000 lines of functional full-stack code, dual-model pipelines, and container configuration from scratch was compressed from roughly a month of full-time engineering work into **\~18 to 22 active hours**.
+* **Capital Efficiency:** Achieving complete end-to-end functionality for an estimated all-in compute expenditure of **\$160.31 USD** represents approximately **98.7% to 99.0% savings** compared to conventional contractor or agency rates.
 
 ---
 
@@ -43,8 +46,8 @@ To quantify the economic value of the generated application—comprising a 2,309
 * Because autonomous agents re-submit the conversation history, workspace directory tree, and large files (`server.ts` alone exceeds 2,300 lines) with every tool execution step, prompt lengths rapidly surpassed the 128,000-token threshold into Google Cloud's long-context pricing tier (\$0.15 / 1M prompt tokens).
 
 ### 2. Time Compression Outweighed Iteration Glitches
-* Despite platform resets and the necessity of recreating versions in AI Studio, total project turnaround remained capped at **10–14 hours**.
-* Traditional manual development would have required **120+ hours** to hand-craft the 23 Java microservice classes, vector schemas, and frontend design specifications. The autonomous build delivered an approximate **10x speedup in delivery velocity**.
+* Despite platform resets and the necessity of recreating versions in AI Studio, total active engineering time is now estimated at **18–22 hours**, including the additional previous-session work.
+* Traditional manual development would have required **120–165 hours** to hand-craft the 23 Java microservice classes, vector schemas, and frontend design specifications. The autonomous build delivered an approximate **5.5x–9.2x speedup** in delivery velocity.
 
 ### 3. Production Runtime Remains Negligible Compared to Development
 * The completed application runtime accounted for only **102,870 tokens** and **\~\$0.51 USD** in inference costs.
