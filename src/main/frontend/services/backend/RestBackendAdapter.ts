@@ -52,11 +52,14 @@ export class RestBackendAdapter implements BackendAdapter {
    * to manually look up tokens or worry about Bearer prefix formatting.
    *
    * @param extra Optional extra headers to merge.
+   * @param isMultipart When true, omits the default `Content-Type: application/json` header so the
+   *   browser can set `multipart/form-data; boundary=...` itself; an explicitly-set Content-Type
+   *   on a `FormData` body would strip the required boundary parameter and break parsing server-side.
    * @returns Complete headers record.
    */
-  private getHeaders(extra?: HeadersInit): HeadersInit {
+  private getHeaders(extra?: HeadersInit, isMultipart = false): HeadersInit {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(isMultipart ? {} : { 'Content-Type': 'application/json' }),
       ...(this.config.customHeaders || {})
     };
 
@@ -104,7 +107,7 @@ export class RestBackendAdapter implements BackendAdapter {
       ? endpoint
       : `${this.config.baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
-    const headers = this.getHeaders(options.headers);
+    const headers = this.getHeaders(options.headers, options.body instanceof FormData);
     const timeoutDuration = customTimeoutMs || this.config.timeoutMs || 10000;
 
     let lastError: any = null;
@@ -225,11 +228,16 @@ export class RestBackendAdapter implements BackendAdapter {
   /**
    * Ingests a new document into the library with automated BibTeX extraction and dual-model AI summarization.
    *
-   * WHAT: Issues a POST to `/documents` with file payload, base64 data, and metadata.
+   * WHAT: Issues a multipart/form-data POST to `/documents` carrying the raw `File` under the `file`
+   * field and the BibTeX metadata as a JSON string under the `bibtex` field, matching the Java backend's
+   * `@RequestParam("file") MultipartFile file` / `@RequestParam("bibtex") String bibtexJson` contract.
    * WHY: Ingestion is a computationally intensive pipeline involving file storage, text extraction,
    * chunk vectorization into Qdrant, and dual LLM synthesis (Llama 3.3 and Mistral Large).
    * A generous 180-second timeout prevents premature disconnection, while 0 retries ensures
-   * that documents are never accidentally ingested twice.
+   * that documents are never accidentally ingested twice. Sending the physical `File` directly as
+   * multipart (rather than JSON-encoded base64) avoids ~33% payload bloat and matches what the
+   * Spring Boot endpoint actually accepts (`consumes = MULTIPART_FORM_DATA_VALUE`); a JSON body here
+   * is rejected with HTTP 415 Unsupported Media Type.
    *
    * @param payload Upload payload including file metadata and contents.
    * @returns Newly created DocumentRecord.
@@ -244,21 +252,19 @@ export class RestBackendAdapter implements BackendAdapter {
     mimeType?: string;
     bibtex: BibTeXMetadata;
   }): Promise<DocumentRecord> {
+    const formData = new FormData();
+    formData.append('file', payload.file, payload.fileName);
+    if (payload.bibtex) {
+      formData.append('bibtex', JSON.stringify(payload.bibtex));
+    }
+
     // Generous timeout for full physical upload, Qdrant chunking, and dual Llama/Mistral AI summaries
     // on CPU-bound local Ollama inference, which can take several minutes per model.
     return this.request<DocumentRecord>(
       '/documents',
       {
         method: 'POST',
-        body: JSON.stringify({
-          fileName: payload.fileName,
-          fileFormat: payload.fileFormat,
-          fileSize: payload.fileSize,
-          fileContent: payload.fileContent,
-          fileData: payload.fileData,
-          mimeType: payload.mimeType,
-          bibtex: payload.bibtex
-        })
+        body: formData
       },
       LLM_TIMEOUT_MS,
       0
@@ -268,10 +274,13 @@ export class RestBackendAdapter implements BackendAdapter {
   /**
    * Overwrites the physical content and metadata of an existing document while preserving its persistent GUID.
    *
-   * WHAT: Issues a PUT to `/documents/{guid}` with `isNewVersion: true`.
+   * WHAT: Issues a multipart/form-data PUT to `/documents/{guid}` carrying the optional replacement `File`
+   * under the `file` field and updated BibTeX metadata as a JSON string under the `bibtex` field, matching
+   * the Java backend's `@RequestParam(value = "file", required = false)` / `@RequestParam("bibtex")` contract.
    * WHY: Preserving the persistent GUID across version updates maintains citation stability,
    * permalinks, and bookmark references while updating physical file contents, re-indexing vector embeddings,
-   * and regenerating summaries.
+   * and regenerating summaries. As with initial upload, the Spring Boot endpoint only accepts
+   * `multipart/form-data`; a JSON body is rejected with HTTP 415 Unsupported Media Type.
    *
    * @param guid Persistent GUID of the document being updated.
    * @param payload Updated file data and metadata.
@@ -290,21 +299,20 @@ export class RestBackendAdapter implements BackendAdapter {
       bibtex?: BibTeXMetadata;
     }
   ): Promise<DocumentRecord> {
+    const formData = new FormData();
+    if (payload.file) {
+      formData.append('file', payload.file, payload.fileName);
+    }
+    if (payload.bibtex) {
+      formData.append('bibtex', JSON.stringify(payload.bibtex));
+    }
+
     // Generous timeout for version overwrite, re-indexing, and local LLM re-summarization
     return this.request<DocumentRecord>(
       `/documents/${guid}`,
       {
         method: 'PUT',
-        body: JSON.stringify({
-          isNewVersion: true,
-          fileName: payload.fileName,
-          fileFormat: payload.fileFormat,
-          fileSize: payload.fileSize,
-          fileContent: payload.fileContent,
-          fileData: payload.fileData,
-          mimeType: payload.mimeType,
-          bibtex: payload.bibtex
-        })
+        body: formData
       },
       LLM_TIMEOUT_MS,
       0
