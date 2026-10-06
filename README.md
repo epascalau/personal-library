@@ -17,11 +17,22 @@ Personal Library is an enterprise-grade document management and research platfor
                                   └──────────────┬──────────────┘
                                                  │ JWT / Bearer
                                                  ▼
-┌─────────────────────────┐         ┌─────────────────────────────┐
-│  Personal Library Web   │ ◄─────► │  API Gateway / Spring Boot  │
-│  (SAP Fiori Floorplans: │  HTTP   │  Document Pipeline & RAG    │
-│   List Report & Object) │         └──────────────┬──────────────┘
-└─────────────────────────┘                        │
+                                  ┌─────────────────────────────┐
+                                  │   nginx (single ingress)    │
+                                  │   :80 -> /api/v1 & other    │
+                                  └──────┬───────────────┬──────┘
+                                         │               │
+                           ┌─────────────▼───┐   ┌───────▼──────────────┐
+                           │  Node/Express   │   │  API Gateway /        │
+                           │  Frontend +     │   │  Spring Boot Document │
+                           │  mock backend   │   │  Pipeline & RAG       │
+                           └─────────────────┘   └──────────┬───────────┘
+                                                             │
+┌─────────────────────────┐                                 │
+│  Personal Library Web   │ ◄───────────────────────────────┘
+│  (SAP Fiori Floorplans: │  HTTP
+│   List Report & Object) │
+└─────────────────────────┘
                                    ┌───────────────┼───────────────┐
                                    ▼               ▼               ▼
                         ┌────────────────┐ ┌──────────────┐ ┌──────────────┐
@@ -232,10 +243,49 @@ or pull extra models manually with
 `docker exec -it personal-library-ollama ollama pull <model>`.
 
 Access Points:
-* **Web Application:** `http://localhost:3000`
-* **OpenAPI Spec:** `http://localhost:3000/api/v1/openapi.yaml`
+* **Web Application (via nginx, recommended):** `http://localhost`
+* **Web Application (direct, dev/bypass):** `http://localhost:3000`
+* **OpenAPI Spec:** `http://localhost/api/v1/openapi.yaml`
 * **Keycloak Administration:** `http://localhost:8180` (admin/admin)
 * **Qdrant Vector Dashboard:** `http://localhost:6333/dashboard`
+
+#### Enterprise Single Ingress: Nginx Reverse Proxy
+
+`docker compose up` also starts an `nginx` container that fronts both
+application runtimes behind a single published port (`80`):
+
+| Path | Routed to | Purpose |
+| :--- | :--- | :--- |
+| `/api/v1/*`, `/actuator/*` | Java Spring Boot (`:8080`) | Real, persistent backend (MongoDB/Qdrant/Ollama) |
+| everything else | Node/Express gateway (`:3000`) | Frontend bundle + "Integrated" mock backend routes |
+
+**Why this matters for an enterprise deployment:**
+* **Same-origin API calls** — the frontend and the real backend share one
+  origin, so the Java backend's CORS policy (currently permissive, see
+  `SecurityConfig.corsConfigurationSource()`) can be tightened to same-origin
+  only in environments that route exclusively through nginx.
+* **Single ingress** — only port `80` (or `443` once TLS is configured) needs
+  to be opened on a firewall/load balancer; internal runtime ports are never
+  exposed directly to the network.
+* **Centralized hardening** — gzip, baseline security headers
+  (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`), request
+  size limits, and generous proxy timeouts for long-running LLM calls are all
+  enforced in one place (`nginx/nginx.conf`) instead of being duplicated
+  across runtimes.
+
+`:3000` and `:8080` remain published directly on the host for local
+development and for exercising the **"Direct Java Spring Boot"** backend
+target in the UI's Backend Settings dialog (which always points at the
+absolute `http://localhost:8080/api/v1` URL regardless of nginx). The nginx
+ingress is the recommended production path, not a replacement for those
+direct dev-time connections.
+
+> **Note on the "Integrated" backend preset:** its `baseUrl` is the relative
+> `/api/v1`, which resolves against whatever origin served the page. Loaded
+> through nginx (`http://localhost`), that preset is routed to the **real
+> Java backend**, not the Node mock implementation — nginx intentionally
+> unifies `/api/v1` under one authoritative backend. To exercise the Node
+> mock specifically, load the app directly at `http://localhost:3000`.
 
 ---
 
