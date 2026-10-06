@@ -17,7 +17,7 @@ The platform provides an end-to-end, decoupled enterprise topology featuring:
 - **Dual-Model Parallel AI Summarization**: Concurrent, comparative summarization via open-weights models (**Meta Llama 3.3 70B Instruct** and **Mistral Large 2411**) deployed on Ollama and Spring AI.
 - **Conversational RAG with Verifiable Grounding**: 768-dimensional dense vector embeddings using local **Nomic Embed Text** (`nomic-embed-text`) with **Google `text-embedding-004`** cloud fallback, stored in **Qdrant** with Cosine similarity and interactive citation drawers.
 - **Enterprise Document Lifecycle & Immutable Rollback**: Non-destructive versioning preserving full snapshot history and cryptographic audit logs.
-- **Decoupled Architecture**: Pure TypeScript + SAP `@ui5/webcomponents` v2 (W3C Custom Elements) SPA, Node.js/Express gateway (`:3000`), Spring Boot 3.3.4 microservice (`:8080`), Qdrant Vector Store (`:6333`/`:6334`), MongoDB 7.0 (`:27017`), and Keycloak 24/25 OIDC Identity Provider (`:8180`).
+- **Decoupled Architecture**: Pure TypeScript + SAP `@ui5/webcomponents` v2 (W3C Custom Elements) SPA, Node.js/Express gateway (`:3000`), Spring Boot 4.1.1 microservice (`:8080`), Qdrant Vector Store (`:6333`/`:6334`), MongoDB 7.0 (`:27017`), and Keycloak 24/25 OIDC Identity Provider (`:8180`).
 
 ---
 
@@ -78,7 +78,7 @@ The platform provides an end-to-end, decoupled enterprise topology featuring:
 - **FR-7.3 (Vector SVG Flags)**: National flags in the locale switcher shall be rendered as crisp, scalable vector SVGs (never system emoji).
 
 ### FR-8: Decoupled Multi-Tier Backend Gateway (Hexagonal Driver Adapters)
-- **FR-8.1 (Spring Boot REST Backend)**: Production backend implemented in Spring Boot 3.3.4 (Java 21 Virtual Threads) on Port 8080 across 23 domain classes in `com.personallibrary`.
+- **FR-8.1 (Spring Boot REST Backend)**: Production backend implemented in Spring Boot 4.1.1 (Java 21 Virtual Threads) on Port 8080 across 23 domain classes in `com.personallibrary`.
 - **FR-8.2 (Integrated Node/Express Gateway)**: Express 4 gateway on Port 3000 serving Vite-compiled static assets, local file text extraction, and in-memory export streaming. Despite the "gateway" name, it is a **self-contained simulation** that answers `/api/v1/*` requests itself with a non-persistent, in-memory document store and substring-based semantic search; the only genuine external integration is direct inference calls to the local Ollama daemon. It does not proxy or forward to the Spring Boot backend, MongoDB, or Qdrant.
 - **FR-8.3 (Standalone In-Browser Mock Adapter)**: The frontend shall support zero-infrastructure operation via `MockBackendAdapter`, providing pre-seeded academic literature, in-memory vector search, simulated dual LLM summaries, and local RAG Q&A without requiring Spring Boot, MongoDB, or Docker.
 

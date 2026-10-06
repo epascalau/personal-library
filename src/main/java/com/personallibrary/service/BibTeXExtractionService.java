@@ -4,13 +4,13 @@
  */
 package com.personallibrary.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personallibrary.model.BibTeXMetadata;
 import com.personallibrary.model.BibTeXType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Year;
 import java.util.Map;
@@ -28,20 +28,22 @@ import java.util.Map;
 public class BibTeXExtractionService {
 
     private final ChatClient chatClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     /**
      * Constructs the extraction service with the primary AI chat client.
      *
-     * WHAT: Injects the Llama ChatClient and Jackson ObjectMapper for parsing LLM JSON responses.
+     * WHAT: Injects the Llama ChatClient and Spring Boot's auto-configured Jackson 3 {@link JsonMapper}
+     * (replacing the Jackson 2 {@code ObjectMapper} used prior to the Spring Boot 4 migration) for
+     * parsing LLM JSON responses.
      * WHY: Employs Llama 3.3's analytical comprehension to extract bibliographic fields from messy document text.
      *
-     * @param chatClient   Llama AI chat client.
-     * @param objectMapper Jackson JSON object mapper.
+     * @param chatClient Llama AI chat client.
+     * @param jsonMapper Jackson 3 JSON mapper.
      */
-    public BibTeXExtractionService(@Qualifier("llamaChatClient") ChatClient chatClient, ObjectMapper objectMapper) {
+    public BibTeXExtractionService(@Qualifier("llamaChatClient") ChatClient chatClient, JsonMapper jsonMapper) {
         this.chatClient = chatClient;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     /**
@@ -104,7 +106,7 @@ public class BibTeXExtractionService {
             if (response != null) {
                 String json = cleanJsonResponse(response);
                 @SuppressWarnings("unchecked")
-                Map<String, Object> map = objectMapper.readValue(json, Map.class);
+                Map<String, Object> map = jsonMapper.readValue(json, Map.class);
 
                 return BibTeXMetadata.builder()
                         .entryType(BibTeXType.fromString((String) map.getOrDefault("entryType", "misc")))

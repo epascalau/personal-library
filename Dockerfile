@@ -57,7 +57,11 @@ RUN update-ca-certificates \
 COPY pom.xml ./
 COPY src/main/java ./src/main/java
 COPY src/main/resources ./src/main/resources
-RUN mvn clean package -DskipTests
+# Cache the local Maven repository across builds (BuildKit cache mount) so that
+# transient Maven Central network blips only require re-fetching whatever
+# wasn't already resolved by a previous build, instead of the entire dependency
+# graph every time.
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
 
 # Stage 3: Java 21 & Node.js Production Runtime
 FROM eclipse-temurin:21-jre-jammy

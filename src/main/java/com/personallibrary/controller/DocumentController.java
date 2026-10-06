@@ -4,7 +4,6 @@
  */
 package com.personallibrary.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personallibrary.dto.*;
 import com.personallibrary.model.BibTeXMetadata;
 import com.personallibrary.model.DocumentEntity;
@@ -23,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -50,7 +50,7 @@ public class DocumentController {
     private final AiSummarizationService summarizationService;
     private final VectorRagService vectorRagService;
     private final StorageService storageService;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     /**
      * List Report Floorplan query:
@@ -119,7 +119,7 @@ public class DocumentController {
     ) throws IOException {
         BibTeXMetadata bibtex = null;
         if (bibtexJson != null && !bibtexJson.isBlank()) {
-            bibtex = objectMapper.readValue(bibtexJson, BibTeXMetadata.class);
+            bibtex = jsonMapper.readValue(bibtexJson, BibTeXMetadata.class);
         }
 
         DocumentResponse response = documentService.uploadDocument(file, bibtex);
@@ -188,7 +188,7 @@ public class DocumentController {
     ) throws IOException {
         BibTeXMetadata bibtex = null;
         if (bibtexJson != null && !bibtexJson.isBlank()) {
-            bibtex = objectMapper.readValue(bibtexJson, BibTeXMetadata.class);
+            bibtex = jsonMapper.readValue(bibtexJson, BibTeXMetadata.class);
         }
         DocumentResponse response = documentService.overwriteDocument(guid, file, bibtex);
         return ResponseEntity.ok(response);

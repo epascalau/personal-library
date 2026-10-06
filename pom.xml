@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
 
@@ -28,15 +28,19 @@
 
     <properties>
         <java.version>21</java.version>
-        <spring-ai.version>1.0.0</spring-ai.version>
-        <springdoc.version>2.6.0</springdoc.version>
+        <spring-ai.version>2.0.1</spring-ai.version>
+        <springdoc.version>3.1.1</springdoc.version>
     </properties>
 
     <dependencies>
         <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <!-- Spring Boot 4 renamed the Spring MVC starter from "spring-boot-starter-web" to
+                 "spring-boot-starter-webmvc"; the new name also transitively pulls in
+                 "spring-boot-starter-jackson" (Jackson/JsonMapper auto-configuration), which the
+                 old "web" starter no longer provides automatically. -->
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
