@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  * Backend Adapter interface and protocol specifications for the Personal Library Application.
- * Supports swappable adapters between Integrated Gateway (/api/v1), Spring Boot (:8080),
+ * Supports swappable adapters between Integrated Gateway (/api/v1), Spring Boot (:18080),
  * Custom Remote Endpoints, and Standalone In-Memory Mock Engine.
  * @packageDocumentation
  */

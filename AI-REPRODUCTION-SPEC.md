@@ -26,7 +26,7 @@ Personal Library is an enterprise-grade document intelligence, cataloging, and c
    - Historical version snapshot archiving and asset retrieval.
    - Non-destructive rollback restoring previous document snapshots into a newly incremented HEAD version.
 5. **Decoupled Backend Architecture & Zero-Infrastructure Mock**:
-   - Pluggable `BackendGateway` supporting Spring Boot REST (`:8080`), Integrated Node/Express Gateway (`:3000`), or zero-infrastructure in-browser `MockBackendAdapter`.
+   - Pluggable `BackendGateway` supporting Spring Boot REST (`:18080`), Integrated Node/Express Gateway (`:13000`), or zero-infrastructure in-browser `MockBackendAdapter`.
 6. **Multi-Locale Internationalization (i18n)**:
    - Full localization across 5 languages: English (`en`), German (`de`), French (`fr`), Spanish (`es`), and Romanian (`ro`).
    - SVG vector flags rendered inline (no emoji dependencies).
@@ -41,7 +41,7 @@ The system operates across a C4 container deployment topology:
 
 ```text
 +-----------------------------------------------------------------------------------+
-| 1. CLIENT TIER (Browser :3000)                                                    |
+| 1. CLIENT TIER (Browser :13000)                                                    |
 |    - SAP Fiori UI5 Web Components (@ui5/webcomponents v2.27)                      |
 |    - Vanilla TypeScript (Vite 8.3 / Tailwind CSS v4)                             |
 |    - Reactive Observable Stores & Typed Event Bus                                 |
@@ -49,15 +49,15 @@ The system operates across a C4 container deployment topology:
                                            | HTTP / REST (/api/v1/*)
                                            v
 +-----------------------------------------------------------------------------------+
-| 2. GATEWAY & REVERSE PROXY TIER (Node.js Express :3000)                           |
+| 2. GATEWAY & REVERSE PROXY TIER (Node.js Express :13000)                           |
 |    - Static Asset Delivery (`dist/`)                                              |
-|    - Reverse Proxy forwarding to Spring Boot (:8080)                              |
+|    - Reverse Proxy forwarding to Spring Boot (:18080)                              |
 |    - Autonomous Integrated Mock API Engine (Vector simulation & Document catalog) |
 +------------------------------------------+----------------------------------------+
-                                           | HTTP / JSON (:8080)
+                                           | HTTP / JSON (:18080)
                                            v
 +-----------------------------------------------------------------------------------+
-| 3. ENTERPRISE APPLICATION TIER (Spring Boot 4.1.1 / Spring AI 2.0 Java 21 :8080)  |
+| 3. ENTERPRISE APPLICATION TIER (Spring Boot 4.1.1 / Spring AI 2.0 Java 21 :18080)  |
 |    - Spring Data MongoDB (Documents, Versions, Audit Trail)                       |
 |    - Spring AI Ollama Engine (Llama 3.3 & Mistral Large)                          |
 |    - Spring AI Qdrant Vector Client (Chunk Embeddings & RAG Search)                |
@@ -68,9 +68,9 @@ The system operates across a C4 container deployment topology:
         v                    v                     v                    v
 +---------------+    +---------------+     +---------------+    +---------------+
 | MongoDB 7.0   |    | Qdrant Vector |     | Ollama LLM    |    | Keycloak 24+  |
-| Port: 27017   |    | Ports:        |     | Port: 11434   |    | Port: 8180    |
-| Document Meta |    | 6333 (REST)   |     | llama3.2      |    | OIDC / OAuth2 |
-| Version Tree  |    | 6334 (gRPC)   |     | mistral       |    | JWT Bearer    |
+| Port: 37017   |    | Ports:        |     | Port: 21434   |    | Port: 8180    |
+| Document Meta |    | 16333 (REST)  |     | llama3.2      |    | OIDC / OAuth2 |
+| Version Tree  |    | 16334 (gRPC)  |     | mistral       |    | JWT Bearer    |
 | Audit Trail   |    | HNSW Index    |     | nomic-embed   |    | Tokens        |
 +---------------+    +---------------+     +---------------+    +---------------+
 ```
@@ -114,7 +114,7 @@ personal-library/
 ├── src/
 │   └── main/
 │       ├── server/
-│       │   └── server.ts                      # Express production server (Port 3000), static host, mock REST API
+│       │   └── server.ts                      # Express production server (Port 13000), static host, mock REST API
 │       ├── java/com/personallibrary/
 │       │   ├── PersonalLibraryApplication.java # Spring Boot entrypoint
 │       │   ├── config/
@@ -354,8 +354,8 @@ personal-library/
 
 | Component | Configuration Parameter | Setting / Value | Architectural Rationale |
 | :--- | :--- | :--- | :--- |
-| **Qdrant** | gRPC Port Binding | `6334:6334` | High-throughput binary protocol used by the Spring AI client to stream high-dimensional vectors with minimal serialization latency compared to HTTP/JSON. |
-| **Qdrant** | HTTP REST Port Binding | `6333:6333` | Used for health checks, cluster debugging, snapshot management, and web administrative tooling. |
+| **Qdrant** | gRPC Port Binding | `16334:6334` | High-throughput binary protocol used by the Spring AI client to stream high-dimensional vectors with minimal serialization latency compared to HTTP/JSON. |
+| **Qdrant** | HTTP REST Port Binding | `16333:6333` | Used for health checks, cluster debugging, snapshot management, and web administrative tooling. |
 | **Qdrant** | Distance Metric | `Cosine` | Normalized dot-product distance measuring semantic orientation independent of document passage length. Essential for asymmetric chunk comparison. |
 | **Qdrant** | HNSW Graph Indexing | `M=16, efConstruct=100` | Hierarchical Navigable Small World graphs provide logarithmic search time ($\mathcal{O}(\log N)$) with fast index updates during real-time document ingestion. |
 | **Qdrant** | Schema Auto-Initialization | `true` (local) / `false` (Docker) | Local development auto-provisions collection schemas on cold start; Docker disables it to eliminate schema race conditions across container startup dependencies. |
@@ -438,7 +438,7 @@ npm run lint
 # Compile production frontend bundle into dist/
 npm run build
 
-# Start integrated Node/Express gateway server on port 3000
+# Start integrated Node/Express gateway server on port 13000
 npm run dev
 ```
 
@@ -447,7 +447,7 @@ npm run dev
 # Compile and package Spring Boot JAR (skipping test suite for clean build)
 mvn clean package -DskipTests
 
-# Run Spring Boot application locally on port 8080
+# Run Spring Boot application locally on port 18080
 mvn spring-boot:run
 ```
 
@@ -479,7 +479,7 @@ To guarantee 100% reproduction parity with the authoritative codebase, verify ea
 
 - [ ] **Type Safety & Build**: `npm run lint` (`tsc --noEmit`) passes with 0 errors.
 - [ ] **Bundle Generation**: `npm run build` generates `dist/index.html` and bundled assets.
-- [ ] **Runtime Loading**: Navigating to `http://localhost:3000` renders the SAP Fiori ShellBar and List Report with no console errors.
+- [ ] **Runtime Loading**: Navigating to `http://localhost:13000` renders the SAP Fiori ShellBar and List Report with no console errors.
 - [ ] **Zero React Residue**: No React runtime or JSX imports present in `src/main/frontend/`.
 - [ ] **UI5 Web Components Styling**: UI5 components render with proper SAP Fiori theme tokens, assisted by `applyGlobalStylesheetPatch`.
 - [ ] **Theme Toggling**: Switching between Light and Dark themes dynamically applies `data-sap-theme="sap_horizon"` / `data-sap-theme="sap_horizon_dark"`, toggles the `.dark` class, and invokes `setTheme()`.

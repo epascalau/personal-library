@@ -28,7 +28,7 @@
  *      summarization, BibTeX extraction, and RAG chat all call the local Ollama
  *      daemon's `/api/generate` REST endpoint directly via `ollamaGenerate()`.
  *    - "Direct Java Spring Boot" points at the standalone Java REST API on
- *      `http://localhost:8080/api/v1`, which genuinely persists to MongoDB,
+ *      `http://localhost:18080/api/v1`, which genuinely persists to MongoDB,
  *      indexes/searches real vectors in Qdrant, and calls Ollama through Spring
  *      AI's `OllamaChatModel` beans (see `OllamaConfig.java`).
  *    - "Custom" is the same `RestBackendAdapter` pointed at any arbitrary URL you
@@ -152,7 +152,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     // The DEFAULT option (see `loadSavedBackendConfig()`'s fallback in
     // `services/backend/index.ts`): bypasses the Node gateway's in-memory
     // simulation entirely and talks straight to the standalone Spring Boot 3 /
-    // Java REST API on port 8080. This is the fully real stack — genuine
+    // Java REST API on port 18080. This is the fully real stack — genuine
     // MongoDB persistence, genuine Qdrant vector search, and genuine Ollama
     // inference via Spring AI's `OllamaChatModel` beans (see `OllamaConfig.java`).
     // It exposes its own `/api/v1/health` endpoint (see `HealthController.java`)
@@ -164,7 +164,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     iconKey: 'Cpu',
     iconClass: 'w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0',
     title: 'Direct Java Spring Boot Instance',
-    badge: 'Default · Port 8080',
+    badge: 'Default · Port 18080',
     badgeClass: 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 dark:border-indigo-900/60',
     description:
       'Default. The fully real stack. Documents persist in MongoDB, search runs on real Qdrant vectors, and AI summaries/chat call Ollama via Spring AI — nothing here is simulated.'
@@ -344,7 +344,7 @@ export class BackendSettingsModalView extends DialogView {
    * Checks whether a specific backend engine option is currently selected in the draft.
    *
    * WHAT: Evaluates engine ID against `this.selectedType` and `this.customUrl`.
-   * WHY: Accurately distinguishing between presets (such as Integrated Gateway vs Direct Spring Boot at port 8080)
+   * WHY: Accurately distinguishing between presets (such as Integrated Gateway vs Direct Spring Boot at port 18080)
    * provides clear visual radio-style feedback in the UI.
    *
    * NOTE ON THE HEURISTICS BELOW: `selectedType` alone is not always enough to tell
@@ -355,7 +355,7 @@ export class BackendSettingsModalView extends DialogView {
    *   `/api/v1` (same-origin, no host) — the one unambiguous signature of that preset.
    * - "Direct Spring Boot" is highlighted either when `selectedType === 'spring-boot'`
    *   (a value this dialog itself never sets, but which a persisted/legacy config
-   *   could carry), OR when it's `'rest'` with a URL containing `:8080` — i.e. the
+   *   could carry), OR when it's `'rest'` with a URL containing `:18080` — i.e. the
    *   user manually typed/edited a URL that still points at the well-known Spring
    *   Boot port, even though they arrived there via "Custom".
    * - "Custom" matches any other `'rest'` URL that isn't one of the two cases above.
@@ -371,7 +371,7 @@ export class BackendSettingsModalView extends DialogView {
       case 'springBootDirect':
         return (
           this.selectedType === 'spring-boot' ||
-          (this.selectedType === 'rest' && this.customUrl.includes(':8080'))
+          (this.selectedType === 'rest' && this.customUrl.includes(':18080'))
         );
       case 'custom':
         return this.selectedType === 'custom';
@@ -463,7 +463,7 @@ export class BackendSettingsModalView extends DialogView {
                   data-field="customUrl"
                   data-focus-key="backend-url"
                   value="${this.customUrl}"
-                  placeholder="e.g. /api/v1 or http://localhost:8080/api/v1"
+                  placeholder="e.g. /api/v1 or http://localhost:18080/api/v1"
                   accessible-name="Backend Base URL"
                   ${this.selectedType === 'mock' ? raw('disabled') : ''}
                 ></ui5-input>
@@ -671,7 +671,7 @@ export class BackendSettingsModalView extends DialogView {
    * Updates local draft properties according to the selected engine preset.
    *
    * WHAT: Maps the preset ID to configuration defaults (URL, name, timeout) and triggers re-render.
-   * WHY: Pre-filling sensible defaults for well-known targets (e.g. `:8080` for Spring Boot, `/api/v1` for Integrated)
+   * WHY: Pre-filling sensible defaults for well-known targets (e.g. `:18080` for Spring Boot, `/api/v1` for Integrated)
    * streamlines the developer workflow without requiring manual URL construction.
    *
    * Only the "Custom" option (no `preset`) is handled differently: it intentionally

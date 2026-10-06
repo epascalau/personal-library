@@ -19,7 +19,7 @@ Personal Library is an enterprise-grade document management and research platfor
                                                  ▼
                                   ┌─────────────────────────────┐
                                   │   nginx (single ingress)    │
-                                  │   :80 -> /api/v1 & other    │
+                                  │   :8088 -> /api/v1 & other  │
                                   └──────┬───────────────┬──────┘
                                          │               │
                            ┌─────────────▼───┐   ┌───────▼──────────────┐
@@ -124,10 +124,10 @@ To assist developers, researchers, and students, all acronyms used throughout th
 # 1. Install dependencies
 npm install
 
-# 2. Start the integrated dev server (Port 3000)
+# 2. Start the integrated dev server (Port 13000)
 npm run dev
 ```
-Open your browser at `http://localhost:3000`.
+Open your browser at `http://localhost:13000`.
 
 ---
 
@@ -156,7 +156,7 @@ still emitted to `dist/` at the repository root:
 The UI is decoupled from the backend implementation via the **Backend Adapter Pattern** (`src/main/frontend/services/backend/` and the event-driven `BackendGateway`):
 * **No hardcoded endpoints in UI components:** `ListReportView`, `ObjectPageView`, `UploadDialogView`, `VersionOverwriteDialogView`, and `AuthModalView` dispatch typed events on the gateway.
 * **Instant Target Switching:** Users can switch backends directly from the UI header (ShellBar > **Backend Target Settings**):
-  1. **Direct Java Spring Boot (`http://localhost:8080/api/v1`)**: **Default.** The fully real stack — genuine MongoDB persistence, genuine Qdrant vector search, and genuine Ollama inference via Spring AI.
+  1. **Direct Java Spring Boot (`http://localhost:18080/api/v1`)**: **Default.** The fully real stack — genuine MongoDB persistence, genuine Qdrant vector search, and genuine Ollama inference via Spring AI.
   2. **Integrated Gateway (`/api/v1`)**: Lightweight dev-mode convenience, served by the Node.js gateway (`src/main/server/server.ts`). It is a **self-contained in-memory simulation** — documents, summaries, and "vector search" (plain substring matching) live only in process memory and reset on restart — with the single genuine external integration being direct calls to the local Ollama daemon for summarization/chat. It does **not** talk to MongoDB, Qdrant, or the Java Spring AI stack.
   3. **Custom Remote Backend / Microservice**: Connect to a custom remote API URL (e.g. cloud Kubernetes cluster or custom FastAPI backend) with optional Bearer token / API Key and custom timeout.
   4. **Local Standalone Engine (Offline / In-Memory)**: Zero-server mock engine storing all documents, summaries, and vector chat in browser `localStorage`.
@@ -174,7 +174,7 @@ The full Java Spring Boot project is located in `src/main/java/` and configured 
 # Compile and package the Java Spring Boot JAR
 mvn clean package -DskipTests
 
-# Run the Spring Boot application locally (Port 8080)
+# Run the Spring Boot application locally (Port 18080)
 mvn spring-boot:run
 ```
 
@@ -247,29 +247,32 @@ or pull extra models manually with
 `docker exec -it personal-library-ollama ollama pull <model>`.
 
 Access Points:
-* **Web Application (via nginx, recommended):** `http://localhost`
-* **Web Application (direct, dev/bypass):** `http://localhost:3000`
-* **OpenAPI Spec:** `http://localhost/api/v1/openapi.yaml`
-* **Swagger Editor (interactive OpenAPI viewer):** `http://localhost/swagger/?url=openapi.yaml` (also directly on `http://localhost:8090/?url=openapi.yaml`)
+* **Web Application (via nginx, recommended):** `http://localhost:8088`
+* **Web Application (direct, dev/bypass):** `http://localhost:13000`
+* **OpenAPI Spec:** `http://localhost:8088/api/v1/openapi.yaml`
+* **Swagger Editor (interactive OpenAPI viewer):** `http://localhost:8088/swagger/?url=openapi.yaml` (also directly on `http://localhost:8090/?url=openapi.yaml`)
 * **Keycloak Administration:** `http://localhost:8180` (admin/admin)
-* **Qdrant Vector Dashboard:** `http://localhost:6333/dashboard`
+* **Qdrant Vector Dashboard:** `http://localhost:16333/dashboard`
+* **Mongo Express (MongoDB web viewer):** `http://localhost:8091`
 
 #### Enterprise Single Ingress: Nginx Reverse Proxy
 
 `docker compose up` also starts an `nginx` container that fronts both
-application runtimes behind a single published port (`80`):
+application runtimes behind a single published port (`8088` — deliberately
+not the standard `80`, so this educational stack never collides with
+another local web server already bound to port 80):
 
 | Path | Routed to | Purpose |
 | :--- | :--- | :--- |
-| `/api/v1/*`, `/actuator/*` | Java Spring Boot (`:8080`) | Real, persistent backend (MongoDB/Qdrant/Ollama) |
-| everything else | Node/Express gateway (`:3000`) | Frontend bundle + "Integrated" mock backend routes |
+| `/api/v1/*`, `/actuator/*` | Java Spring Boot (`:18080`) | Real, persistent backend (MongoDB/Qdrant/Ollama) |
+| everything else | Node/Express gateway (`:13000`) | Frontend bundle + "Integrated" mock backend routes |
 
 **Why this matters for an enterprise deployment:**
 * **Same-origin API calls** — the frontend and the real backend share one
   origin, so the Java backend's CORS policy (currently permissive, see
   `SecurityConfig.corsConfigurationSource()`) can be tightened to same-origin
   only in environments that route exclusively through nginx.
-* **Single ingress** — only port `80` (or `443` once TLS is configured) needs
+* **Single ingress** — only port `8088` (or `443` once TLS is configured) needs
   to be opened on a firewall/load balancer; internal runtime ports are never
   exposed directly to the network.
 * **Centralized hardening** — gzip, baseline security headers
@@ -278,19 +281,19 @@ application runtimes behind a single published port (`80`):
   enforced in one place (`nginx/nginx.conf`) instead of being duplicated
   across runtimes.
 
-`:3000` and `:8080` remain published directly on the host for local
+`:13000` and `:18080` remain published directly on the host for local
 development and for exercising the **"Direct Java Spring Boot"** backend
 target in the UI's Backend Settings dialog (which always points at the
-absolute `http://localhost:8080/api/v1` URL regardless of nginx). The nginx
+absolute `http://localhost:18080/api/v1` URL regardless of nginx). The nginx
 ingress is the recommended production path, not a replacement for those
 direct dev-time connections.
 
 > **Note on the "Integrated" backend preset:** its `baseUrl` is the relative
 > `/api/v1`, which resolves against whatever origin served the page. Loaded
-> through nginx (`http://localhost`), that preset is routed to the **real
+> through nginx (`http://localhost:8088`), that preset is routed to the **real
 > Java backend**, not the Node mock implementation — nginx intentionally
 > unifies `/api/v1` under one authoritative backend. To exercise the Node
-> mock specifically, load the app directly at `http://localhost:3000`.
+> mock specifically, load the app directly at `http://localhost:13000`.
 
 > 📘 **Deep dive:** see [`docs/DEVOPS_GUIDE.md`](docs/DEVOPS_GUIDE.md) for the full multi-stage `Dockerfile` breakdown, a service-by-service `docker-compose.yml` reference, the nginx routing table, and the complete `scripts/rebuild.sh` flag reference.
 
@@ -339,7 +342,7 @@ Other useful flags: `--no-cache` (ignore the Docker layer cache), `--pull`
 The script fails fast with a non-zero exit code: a type error aborts the run
 *before* any Docker work starts, and deployment waits on real container health
 checks rather than a fixed sleep, so it is safe to use in CI.
-* **MongoDB Port:** `localhost:27017`
+* **MongoDB Port:** `localhost:37017`
 
 ---
 
@@ -419,7 +422,7 @@ All uploaded binary documents (`.pdf`, `.docx`, `.md`, `.txt`, `.pptx`, `.xlsx`)
 MongoDB stores document metadata, LaTeX BibTeX properties, version lineages, and AI summaries.
 
 * **Database Connection Parameters:**
-  * **Host / Port:** `localhost:27017`
+  * **Host / Port:** `localhost:37017`
   * **Database Name:** `personal_library`
   * **Root Username:** `root`
   * **Root Password:** `librarypass`
@@ -466,19 +469,19 @@ Mongo Express provides a lightweight, browser-based GUI for browsing the `person
 Qdrant stores dense vector embeddings and text chunks in the `library_embeddings` collection for RAG semantic search.
 
 * **Qdrant Connection Ports:**
-  * **HTTP REST API:** `http://localhost:6333`
-  * **Internal gRPC Port:** `localhost:6334`
+  * **HTTP REST API:** `http://localhost:16333`
+  * **Internal gRPC Port:** `localhost:16334`
 
 * **Query Qdrant via HTTP REST API (from host terminal):**
   ```bash
   # 1. View all Qdrant collections
-  curl -s http://localhost:6333/collections | jq .
+  curl -s http://localhost:16333/collections | jq .
 
   # 2. View 'library_embeddings' configuration (vector size, distance metric, HNSW parameters, points count)
-  curl -s http://localhost:6333/collections/library_embeddings | jq .
+  curl -s http://localhost:16333/collections/library_embeddings | jq .
 
   # 3. Scroll through indexed document chunks and payloads (text excerpts, document GUIDs)
-  curl -s -X POST http://localhost:6333/collections/library_embeddings/points/scroll \
+  curl -s -X POST http://localhost:16333/collections/library_embeddings/points/scroll \
     -H 'Content-Type: application/json' \
     -d '{"limit": 5, "with_payload": true, "with_vector": false}' | jq .
   ```
@@ -597,7 +600,7 @@ A bundled **Swagger Editor** container (`swagger-editor` service in
 `docker-compose.yml`) lets you browse, lint, and try out this contract in a
 live UI — mounted directly from the repo's `openapi.yaml` onto the editor's
 own static root, so no rebuild is needed after edits. Reach it at
-`http://localhost/swagger/?url=openapi.yaml` (via nginx) or
+`http://localhost:8088/swagger/?url=openapi.yaml` (via nginx) or
 `http://localhost:8090/?url=openapi.yaml` (direct); the `?url=` query param
 tells the editor to auto-load the spec instead of showing the default
 Petstore example.

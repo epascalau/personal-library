@@ -191,7 +191,7 @@ export const ro: TranslationDictionary = {
     activeAdapter: 'Driver Backend Activ',
     selectPreset: 'Presetări Arhitecturale',
     presetGateway: 'Gateway Integrat (/api/v1)',
-    presetSpringBoot: 'Instanță directă Java Spring Boot (http://localhost:8080/api/v1)',
+    presetSpringBoot: 'Instanță directă Java Spring Boot (http://localhost:18080/api/v1)',
     presetMock: 'Motor autonom local (Offline / În memorie)',
     presetCustom: 'Endpoint API Personalizat',
     baseUrl: 'URL de bază',

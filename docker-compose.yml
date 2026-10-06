@@ -9,8 +9,8 @@ services:
     container_name: personal-library-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
-      - "8080:8080"
+      - "13000:13000"
+      - "18080:18080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATA_MONGODB_URI=mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
@@ -27,8 +27,8 @@ services:
       - library_storage:/app/storage/documents
     healthcheck:
       # Both runtimes must answer before the stack counts as deployed: the Node
-      # gateway on 3000 and the Spring Boot service on 8080.
-      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/ > /dev/null && curl -fsS http://localhost:8080/actuator/health > /dev/null"]
+      # gateway on 13000 and the Spring Boot service on 18080.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:13000/ > /dev/null && curl -fsS http://localhost:18080/actuator/health > /dev/null"]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -83,8 +83,8 @@ services:
   # ==============================================================================
   # Nginx: Enterprise Single Ingress & Reverse Proxy
   # ==============================================================================
-  # WHAT: Fronts both application runtimes (Node/Express on 3000, Java Spring
-  # Boot on 8080) behind one published port, routing /api/v1/* to the Java
+  # WHAT: Fronts both application runtimes (Node/Express on 13000, Java Spring
+  # Boot on 18080) behind one published port, routing /api/v1/* to the Java
   # backend and everything else to the Node gateway/frontend bundle.
   # WHY: A single hardened ingress point is standard enterprise practice —
   # it enables same-origin API calls (so the backend's CORS policy can be
@@ -92,17 +92,20 @@ services:
   # and avoids exposing internal runtime ports directly to the network.
   # See nginx/nginx.conf for the full routing and rationale.
   #
-  # NOTE: :3000 and :8080 remain published on the host for local development
+  # NOTE: :13000 and :18080 remain published on the host for local development
   # and for exercising the "Direct Java Spring Boot" backend target in the
   # UI's Backend Settings dialog; this proxy is the recommended production
-  # ingress, not a replacement for those direct dev-time connections.
+  # ingress, not a replacement for those direct dev-time connections. The
+  # host-published port is deliberately 8088 (not the standard 80) so this
+  # educational stack never collides with another local web server already
+  # bound to port 80.
   # ==============================================================================
   nginx:
     image: nginx:1.27-alpine
     container_name: personal-library-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8088:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -122,12 +125,17 @@ services:
   # ==============================================================================
   # MongoDB: Primary NoSQL Store for Document Metadata & Audit Logs
   # ==============================================================================
+  # NOTE: Host-published on 37017, not MongoDB's standard 27017, so this
+  # educational stack never collides with a MongoDB instance a learner may
+  # already have installed/running locally. Internal container-to-container
+  # traffic (Spring Boot app, mongo-express) still uses the real default
+  # 27017 against the `mongodb` service name, unaffected by this remap.
   mongodb:
     image: mongo:7.0
     container_name: personal-library-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "37017:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=librarypass
@@ -192,6 +200,10 @@ services:
   #    - Port 6333: HTTP REST API used by health checks, debugging, and web dashboards.
   #    - Port 6334: High-throughput gRPC API utilized by the Spring AI Qdrant client
   #      for serialized binary vector streaming, minimizing HTTP serialization overhead.
+  #    - Host-published on 16333/16334, not Qdrant's own 6333/6334 defaults, so this
+  #      educational stack never collides with a Qdrant instance already running
+  #      locally. Internal container-to-container traffic (Spring Boot app) still
+  #      uses the real defaults 6333/6334 against the `qdrant` service name.
   # 3. TLS Setting (QDRANT__SERVICE__ENABLE_TLS=false):
   #    - Traffic resides strictly within the internal, isolated Docker bridge network (library-net).
   #    - TLS overhead is avoided between trusted internal microservices; edge TLS termination
@@ -206,8 +218,8 @@ services:
     container_name: personal-library-qdrant
     restart: unless-stopped
     ports:
-      - "6333:6333" # HTTP REST API
-      - "6334:6334" # gRPC Internal API
+      - "16333:6333" # HTTP REST API
+      - "16334:6334" # gRPC Internal API
     volumes:
       - qdrant_data:/qdrant/storage
     environment:
@@ -246,8 +258,12 @@ services:
     # The stock image starts `ollama serve` directly, leaving no chance to trust
     # a corporate root CA before the first registry call. See ollama-entrypoint.sh.
     entrypoint: ["/bin/sh", "/usr/local/bin/ollama-entrypoint.sh"]
+    # Host-published on 21434, not Ollama's own 11434 default, so this
+    # educational stack never collides with an Ollama daemon already running
+    # locally. Internal container-to-container traffic (Spring Boot app)
+    # still uses the real default 11434 against the `ollama` service name.
     ports:
-      - "11434:11434"
+      - "21434:11434"
     volumes:
       - ollama_models:/root/.ollama
       # Enterprise TLS certificates for the corporate proxy & registry fetching.

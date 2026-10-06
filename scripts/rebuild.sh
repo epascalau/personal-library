@@ -44,9 +44,9 @@ FORCE=false           # required alongside a purge flag in non-interactive shell
 # NEVER deleted by this script.
 readonly GENERATED_DOC_DIRS=(docs/typescript docs/javadoc docs/diagrams)
 
-readonly UI_URL="http://localhost:3000/"
-readonly API_URL="http://localhost:8080/api/v1/documents"
-readonly HEALTH_URL="http://localhost:8080/actuator/health"
+readonly UI_URL="http://localhost:13000/"
+readonly API_URL="http://localhost:18080/api/v1/documents"
+readonly HEALTH_URL="http://localhost:18080/actuator/health"
 
 usage() {
   cat <<'USAGE'
@@ -294,5 +294,5 @@ fi
 printf '\n%s✓ Clean rebuild and deploy completed in %ds.%s\n' \
   "$C_GREEN$C_BOLD" "$((SECONDS - START_TS))" "$C_RESET"
 printf '    UI          %s\n' "$UI_URL"
-printf '    Spring Boot %s\n' "http://localhost:8080/api/v1"
+printf '    Spring Boot %s\n' "http://localhost:18080/api/v1"
 printf '    Logs        %s\n' "docker compose logs -f personal-library-app"

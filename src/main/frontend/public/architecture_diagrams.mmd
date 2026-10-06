@@ -15,7 +15,7 @@ graph TD
         Stores --> Gateway
     end
 
-    subgraph GatewayTier["2. Express / Spring Boot API Gateway (Port 3000)"]
+    subgraph GatewayTier["2. Express / Spring Boot API Gateway (Port 13000)"]
         Express["Express Server<br/>(Vite Dev Middleware / Static SPA Host)"]
         Controllers["REST API Controllers<br/>(/api/v1/documents, /versions, /rollback, /chat, /auth)"]
         Extraction["Extraction & BibTeX Engine<br/>(pdf-parse, LaTeX BNF Formatter, GUID Snapshot Archiving & Rollbacks)"]

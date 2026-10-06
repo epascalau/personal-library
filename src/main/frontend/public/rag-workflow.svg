@@ -85,7 +85,7 @@
       <text x="14" y="19" font-size="11.5" font-weight="700" fill="#166534">&#128194; MongoDB 7.0 (System of Record)</text>
       <text x="14" y="46" font-size="10.5" fill="#334155">• Stores full BSON, BibTeX, versions, PDF asset</text>
       <text x="14" y="64" font-size="10.5" fill="#334155">• Caches dual Llama &amp; Mistral summaries</text>
-      <text x="14" y="82" font-size="10.5" font-weight="700" fill="#047857">ACID Guarantees • B-Tree Index • Port 27017</text>
+      <text x="14" y="82" font-size="10.5" font-weight="700" fill="#047857">ACID Guarantees • B-Tree Index • Port 37017</text>
     </g>
 
     <!-- Step 1.5: Qdrant DB -->
@@ -95,7 +95,7 @@
       <text x="14" y="19" font-size="11.5" font-weight="700" fill="#1e40af">&#9889; Qdrant Vector DB (Vector Index)</text>
       <text x="14" y="46" font-size="10.5" fill="#334155">• Stores 768-D dense vectors + chunk payload</text>
       <text x="14" y="64" font-size="10.5" fill="#334155">• Hierarchical Navigable Small World (HNSW)</text>
-      <text x="14" y="82" font-size="10.5" font-weight="700" fill="#1d4ed8">&lt; 3ms Cosine Distance ANN • Port 6333/6334</text>
+      <text x="14" y="82" font-size="10.5" font-weight="700" fill="#1d4ed8">&lt; 3ms Cosine Distance ANN • Port 16333/16334</text>
     </g>
 
     <!-- Step 1.6: Background Dual-Model Summarization -->

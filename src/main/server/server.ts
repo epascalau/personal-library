@@ -27,7 +27,7 @@ const ollamaModels: Record<'llama' | 'mistral', string> = {
 };
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 13000;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -2493,8 +2493,8 @@ app.get(['/speaker-notes', '/speaker-notes.html'], (_req: Request, res: Response
  * Initializes and starts the Express HTTP server with Vite dev middleware or static dist hosting.
  *
  * WHAT: Binds Vite dev server middlewares in development or static file handler in production,
- * opens port 3000 on 0.0.0.0, and sets extended timeouts for LLM streaming and file uploads.
- * WHY: Unifies frontend and backend onto port 3000 to eliminate cross-origin browser complications
+ * opens port 13000 on 0.0.0.0, and sets extended timeouts for LLM streaming and file uploads.
+ * WHY: Unifies frontend and backend onto port 13000 to eliminate cross-origin browser complications
  * while ensuring resilient long-running connections for Spring AI inference pipelines.
  */
 async function startServer() {

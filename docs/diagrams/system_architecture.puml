@@ -19,15 +19,15 @@ package "1. Client Tier: SAP UI5 Web Components (UI5 Web Components + TypeScript
   Stores --> Gateway
 }
 
-package "2. nginx Single Ingress (Port 80)" as IngressTier #ECFDF5 {
+package "2. nginx Single Ingress (Port 8088)" as IngressTier #ECFDF5 {
   [nginx Reverse Proxy] as Nginx
 }
 
-package "3a. Express Gateway (Port 3000)" as NodeTier #F0FDFA {
+package "3a. Express Gateway (Port 13000)" as NodeTier #F0FDFA {
   [Express Server (Static SPA Host, Mock Backend)] as ExpressServer
 }
 
-package "3b. Spring Boot API Backend (Port 8080)" as JavaTier #F0FDFA {
+package "3b. Spring Boot API Backend (Port 18080)" as JavaTier #F0FDFA {
   [REST API Controllers (/api/v1/*)] as RestControllers
   [Document & BibTeX Extraction Service] as ExtractionEngine
   [Static BPMN 2.0 Export (external Camunda Modeler compatibility, no embedded engine)] as BpmnExport
@@ -39,7 +39,7 @@ package "3b. Spring Boot API Backend (Port 8080)" as JavaTier #F0FDFA {
 package "4. Generative AI & Vector Retrieval Tier" as AITier #FAF5FF {
   [Ollama Llama 3.3 (70B Instruct) - model tag: llama3.2] as LlamaModel
   [Ollama Mistral Large (2411) - model tag: mistral] as MistralModel
-  database "Qdrant Vector DB (HTTP 6333 / gRPC 6334)" as QdrantDB
+  database "Qdrant Vector DB (HTTP 16333 / gRPC 16334)" as QdrantDB
 }
 
 package "5. Persistence & Security Tier" as DataTier #FEF3C7 {

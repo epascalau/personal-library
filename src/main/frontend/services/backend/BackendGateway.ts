@@ -96,7 +96,7 @@ export class BackendGateway {
    *
    * WHAT: Accepts a getter function `resolveAdapter: () => BackendAdapter`.
    * WHY: Resolving the adapter lazily at request execution time ensures that when the user
-   * switches environment configurations (e.g. from Integrated Mock to Spring Boot :8080),
+   * switches environment configurations (e.g. from Integrated Mock to Spring Boot :18080),
    * the very next dispatched request automatically routes to the new adapter without needing
    * to rebuild event bus listeners or restart subscribers.
    *

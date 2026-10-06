@@ -82,7 +82,7 @@ public class SecurityConfig {
      * Configures universal CORS rules allowing browser clients to communicate with the REST API.
      *
      * WHAT: Permits cross-origin requests with all standard HTTP methods, headers, and credential support.
-     * WHY: Supports decoupled frontends hosted on separate ports (e.g. Vite on 3000, Spring Boot on 8080)
+     * WHY: Supports decoupled frontends hosted on separate ports (e.g. Vite on 13000, Spring Boot on 18080)
      * during development and preview deployments without CORS rejection.
      *
      * @return CORS configuration source.

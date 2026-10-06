@@ -191,7 +191,7 @@ export const en: TranslationDictionary = {
     activeAdapter: 'Active Backend Driver',
     selectPreset: 'Architecture Presets',
     presetGateway: 'Integrated Gateway (/api/v1)',
-    presetSpringBoot: 'Direct Java Spring Boot (http://localhost:8080/api/v1)',
+    presetSpringBoot: 'Direct Java Spring Boot (http://localhost:18080/api/v1)',
     presetMock: 'Local Standalone Engine (Offline / In-Memory)',
     presetCustom: 'Custom Remote API Endpoint',
     baseUrl: 'Base URL',

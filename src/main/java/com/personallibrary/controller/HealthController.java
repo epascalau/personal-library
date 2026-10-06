@@ -53,6 +53,9 @@ public class HealthController {
     @Value("${app.models.mistral:mistral}")
     private String mistralModelName;
 
+    @Value("${server.port:18080}")
+    private int serverPort;
+
     @Value("${spring.ai.vectorstore.qdrant.collection-name:personal_library_embeddings}")
     private String qdrantCollectionName;
 
@@ -82,7 +85,7 @@ public class HealthController {
 
         Map<String, Object> server = new LinkedHashMap<>();
         server.put("name", "Personal Library Spring Boot Backend");
-        server.put("port", 8080);
+        server.put("port", serverPort);
         server.put("version", buildProperties.map(BuildProperties::getVersion).orElse("1.0.0"));
         server.put("status", "RUNNING");
         body.put("server", server);

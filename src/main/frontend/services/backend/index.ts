@@ -25,8 +25,8 @@ export const BACKEND_PRESETS: Record<string, BackendConfig> = {
   },
   springBootDirect: {
     type: 'spring-boot',
-    name: 'Direct Java Spring Boot (http://localhost:8080/api/v1)',
-    baseUrl: 'http://localhost:8080/api/v1',
+    name: 'Direct Java Spring Boot (http://localhost:18080/api/v1)',
+    baseUrl: 'http://localhost:18080/api/v1',
     timeoutMs: LLM_TIMEOUT_MS
   },
   mock: {
@@ -47,7 +47,7 @@ const STORAGE_KEY = 'personal_library_backend_config';
  * for long-running LLM and RAG indexing tasks, and falls back to `BACKEND_PRESETS.springBootDirect`.
  *
  * WHY:
- * 1. Continuity: Retains user preference across browser refreshes (e.g. developing directly against `:8080`).
+ * 1. Continuity: Retains user preference across browser refreshes (e.g. developing directly against `:18080`).
  * 2. Fault tolerance: Enforcing a generous minimum timeout prevents client-side aborts while local,
  * CPU-bound Ollama inference performs heavy document chunking and dual-model summarization.
  *

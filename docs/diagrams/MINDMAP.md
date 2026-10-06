@@ -52,7 +52,7 @@ Personal Library & AI Research Engine
 │   ├── 5 Localized Languages (EN, DE, FR, ES, RO)
 │   ├── Observable Reactive State Stores (core Store<T>)
 │   ├── Resilient Backend Gateway Facade (REST vs. Mock Driver)
-│   └── nginx Single Ingress (Port 80) Routing to Spring Boot (8080) & Express (3000)
+│   └── nginx Single Ingress (Port 8088) Routing to Spring Boot (18080) & Express (13000)
 ├── 7. Security, Identity & Governance
 │   ├── Keycloak 24+ OIDC & OAuth2 JWT Bearer Tokens
 │   ├── Role-Based Access Control (LIBRARY_ADMIN, CHIEF_RESEARCHER, VIEWER)

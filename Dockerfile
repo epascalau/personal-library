@@ -106,10 +106,10 @@ COPY openapi.yaml ./
 COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
-# Expose HTTP ports (UI/Gateway: 3000, Spring Boot: 8080)
-EXPOSE 3000 8080
+# Expose HTTP ports (UI/Gateway: 13000, Spring Boot: 18080)
+EXPOSE 13000 18080
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=13000
 
 CMD ["./docker-entrypoint.sh"]

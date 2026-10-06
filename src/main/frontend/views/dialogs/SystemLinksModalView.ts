@@ -54,7 +54,7 @@ const LINKS: SystemLinkEntry[] = [
     tile: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 border-indigo-100 dark:border-indigo-900/50',
     title: 'Spring Boot Swagger UI',
     subtitle: 'Live, controller-generated REST docs (springdoc-openapi)',
-    url: (host) => `http://${host}:8080/swagger-ui.html`
+    url: (host) => `http://${host}:18080/swagger-ui.html`
   },
   {
     id: 'actuator-health',
@@ -62,7 +62,7 @@ const LINKS: SystemLinkEntry[] = [
     tile: 'bg-sky-50 dark:bg-sky-950/50 text-sky-600 border-sky-100 dark:border-sky-900/50',
     title: 'Spring Boot Actuator Health',
     subtitle: 'Aggregated readiness: Ollama, Qdrant, MongoDB connectivity',
-    url: (host) => `http://${host}:8080/actuator/health`
+    url: (host) => `http://${host}:18080/actuator/health`
   },
   {
     id: 'keycloak-admin',
@@ -79,7 +79,7 @@ const LINKS: SystemLinkEntry[] = [
     tile: 'bg-violet-50 dark:bg-violet-950/50 text-violet-600 border-violet-100 dark:border-violet-900/50',
     title: 'Qdrant Dashboard',
     subtitle: 'Browse the library_embeddings collection, points, and HNSW index stats',
-    url: (host) => `http://${host}:6333/dashboard`
+    url: (host) => `http://${host}:16333/dashboard`
   },
   {
     id: 'mongo-express',
@@ -96,15 +96,15 @@ const LINKS: SystemLinkEntry[] = [
     tile: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 border-amber-100 dark:border-amber-900/50',
     title: 'Ollama API (model tags)',
     subtitle: 'Raw JSON list of locally pulled models (no web UI — API only)',
-    url: (host) => `http://${host}:11434/api/tags`
+    url: (host) => `http://${host}:21434/api/tags`
   },
   {
     id: 'nginx-ingress',
     iconKey: 'Network',
     tile: 'bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700',
     title: 'nginx Single Ingress',
-    subtitle: 'Unified entry point (port 80) routing to the Java API & frontend',
-    url: (host) => `http://${host}/`
+    subtitle: 'Unified entry point (port 8088) routing to the Java API & frontend',
+    url: (host) => `http://${host}:8088/`
   }
 ];
 

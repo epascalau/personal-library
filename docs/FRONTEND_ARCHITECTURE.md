@@ -129,7 +129,7 @@ No view or store ever calls `fetch()` directly, and no view ever imports `RestBa
 
 | Preset key | `name` | `baseUrl` | Real or simulated? |
 | :--- | :--- | :--- | :--- |
-| `springBootDirect` | Direct Java Spring Boot | `http://localhost:8080/api/v1` | **Real** — genuine MongoDB, Qdrant, Ollama. **Default.** |
+| `springBootDirect` | Direct Java Spring Boot | `http://localhost:18080/api/v1` | **Real** — genuine MongoDB, Qdrant, Ollama. **Default.** |
 | `integrated` | Integrated Gateway | `/api/v1` | Real when reached through nginx (routes to Java); **simulated** in-memory when the Node gateway answers directly (dev/offline). |
 | `mock` | Local Standalone Engine | `local://offline` | Always simulated — no network calls at all, used for fully offline demos. |
 

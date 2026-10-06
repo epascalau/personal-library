@@ -1,6 +1,6 @@
 # DevOps & Deployment Guide
 
-This document is the authoritative technical reference for how **Personal Library** is built, containerized, networked, and operated: the multi-stage `Dockerfile`, the 7-service `docker-compose.yml` stack, the `nginx` ingress, and the `scripts/rebuild.sh` operational tooling. It complements [FRONTEND_ARCHITECTURE.md](FRONTEND_ARCHITECTURE.md) and [BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md), which cover what is being built; this document covers how it is built, shipped, and run.
+This document is the authoritative technical reference for how **Personal Library** is built, containerized, networked, and operated: the multi-stage `Dockerfile`, the 8-service `docker-compose.yml` stack, the `nginx` ingress, and the `scripts/rebuild.sh` operational tooling. It complements [FRONTEND_ARCHITECTURE.md](FRONTEND_ARCHITECTURE.md) and [BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md), which cover what is being built; this document covers how it is built, shipped, and run.
 
 ---
 
@@ -8,24 +8,25 @@ This document is the authoritative technical reference for how **Personal Librar
 
 ```
                                    ┌─────────────────────────────┐
-   Browser ───▶ :80 (nginx) ───────┤ single ingress / reverse proxy│
+   Browser ───▶ :8088 (nginx) ─────┤ single ingress / reverse proxy│
                                    └───────────┬─────────┬────────┘
                          /api/v1/* ────────────┘         └──────── everything else
                                    ▼                               ▼
                       ┌─────────────────────┐          ┌─────────────────────┐
                       │ personal-library-app │          │ personal-library-app │
-                      │   :8080 (Java/Spring) │          │   :3000 (Node/Express)│
+                      │  :18080 (Java/Spring) │          │  :13000 (Node/Express)│
                       └──────────┬──────────┘          └──────────┬──────────┘
                                  │                                 │ (mock/Integrated preset only)
           ┌──────────┬──────────┼──────────┬──────────┐           │
           ▼          ▼          ▼          ▼          ▼           ▼
       mongodb    qdrant      ollama    keycloak   (storage      serves dist/
-      :27017   :6333/6334   :11434     :8180       volume)      (Vite build)
+      :37017  :16333/16334  :21434     :8180       volume)      (Vite build)
 
                       swagger-editor :8090 ── (also reachable via nginx /swagger/)
+                      mongo-express  :8091 ── (MongoDB web viewer)
 ```
 
-**Key fact**: `personal-library-app` is a **single container image** running **two runtimes side by side** (Node/Express on 3000 *and* the Spring Boot JAR on 8080), started together by `docker-entrypoint.sh`. This is not two separate services — see §3.
+**Key fact**: `personal-library-app` is a **single container image** running **two runtimes side by side** (Node/Express on 13000 *and* the Spring Boot JAR on 18080), started together by `docker-entrypoint.sh`. This is not two separate services — see §3.
 
 ---
 
@@ -57,13 +58,13 @@ This single-container-two-process design was chosen over two separate images/con
 
 | Service | Image | Published Ports | Depends On (`condition`) | Role |
 | :--- | :--- | :--- | :--- | :--- |
-| `personal-library-app` | built locally (`Dockerfile`) | `3000`, `8080` | `mongodb` (healthy), `qdrant` (started), `keycloak` (healthy), `ollama` (healthy) | The application itself — both runtimes (§3). Healthcheck requires **both** `:3000/` and `:8080/actuator/health` to respond before the stack is considered deployed. |
+| `personal-library-app` | built locally (`Dockerfile`) | `13000`, `18080` | `mongodb` (healthy), `qdrant` (started), `keycloak` (healthy), `ollama` (healthy) | The application itself — both runtimes (§3). Healthcheck requires **both** `:13000/` and `:18080/actuator/health` to respond before the stack is considered deployed. |
 | `swagger-editor` | `swaggerapi/swagger-editor:v5.8.10` | `8090` | — | Serves the official Swagger Editor SPA with the repo's `openapi.yaml` **bind-mounted read-only** directly onto its static web root (`/usr/share/nginx/html/openapi.yaml`) — not the older `SWAGGER_FILE` env var mechanism, which this v5.x nginx-based image doesn't actually wire up. Mounting the real file (not a copy) means the spec is always current with zero rebuild, and edits are easy to diff back against source control. |
-| `nginx` | `nginx:1.27-alpine` | `80` | `personal-library-app` (healthy), `swagger-editor` (healthy) | Single ingress — see §5. |
-| `mongodb` | `mongo:7.0` | `27017` | — | Document metadata + version history persistence. |
+| `nginx` | `nginx:1.27-alpine` | `8088→80` | `personal-library-app` (healthy), `swagger-editor` (healthy) | Single ingress — see §5. Host-published on `8088`, not the standard `80`, so this educational stack never collides with another local web server already bound to port 80. |
+| `mongodb` | `mongo:7.0` | `37017→27017` | — | Document metadata + version history persistence. Host-published on `37017`, not MongoDB's own `27017` default, to avoid colliding with a MongoDB instance already running locally; internal service-to-service traffic still uses the real `27017`. |
 | `mongo-express` | `mongo-express:1.0.2` | `8091→8081` | `mongodb` (healthy) | Lightweight browser GUI for `personal_library` (collections, documents, ad-hoc queries) — an alternative to `mongosh` one-liners. `ME_CONFIG_BASICAUTH=false` since it sits behind the same trust boundary as the other dev-time admin ports; connects internally using the `mongodb` service's `root`/`librarypass` credentials. |
-| `qdrant` | `qdrant/qdrant:v1.11.0` | `6333` (REST), `6334` (gRPC) | — | Vector search; Spring AI connects over gRPC (6334) for binary embedding transfer; TLS disabled since traffic never leaves the internal `library-net` bridge network (edge TLS belongs at nginx). |
-| `ollama` | `ollama/ollama:latest` | `11434` | — | Local LLM + embedding inference. Custom `entrypoint: ollama-entrypoint.sh` (not the stock image entrypoint) trusts `./certs` **before** `ollama serve` starts, so the very first model pull can succeed through a corporate TLS-intercepting proxy. `OLLAMA_PRELOAD_MODELS` controls which models are pulled on first boot (default `nomic-embed-text llama3.2 mistral`). |
+| `qdrant` | `qdrant/qdrant:v1.11.0` | `16333→6333` (REST), `16334→6334` (gRPC) | — | Vector search; Spring AI connects over gRPC (6334, internal) for binary embedding transfer; TLS disabled since traffic never leaves the internal `library-net` bridge network (edge TLS belongs at nginx). Host-published on `16333`/`16334`, not Qdrant's own `6333`/`6334` defaults, to avoid colliding with a Qdrant instance already running locally. |
+| `ollama` | `ollama/ollama:latest` | `21434→11434` | — | Local LLM + embedding inference. Custom `entrypoint: ollama-entrypoint.sh` (not the stock image entrypoint) trusts `./certs` **before** `ollama serve` starts, so the very first model pull can succeed through a corporate TLS-intercepting proxy. `OLLAMA_PRELOAD_MODELS` controls which models are pulled on first boot (default `nomic-embed-text llama3.2 mistral`). Host-published on `21434`, not Ollama's own `11434` default, to avoid colliding with an Ollama daemon already running locally; internal service-to-service traffic still uses the real `11434`. |
 | `keycloak` | `quay.io/keycloak/keycloak:24.0.5` | `8180→8080` | — | OIDC identity provider; `start-dev --import-realm` auto-imports `./config/keycloak-realm.json` on first boot. |
 
 ### 4.1 Persistent Volumes
@@ -78,14 +79,14 @@ Unlike every other dependency, `qdrant` has no `healthcheck:` block in Compose �
 
 | Location | Proxies to | Notes |
 | :--- | :--- | :--- |
-| `/api/v1/` | `java_backend` → `personal-library-app:8080` | The real Spring Boot REST contract (JSON + multipart uploads). `proxy_read_timeout 2160s` (36 min) — sized to exceed the **sum** of up to three sequential Ollama calls during upload (BibTeX fallback + Llama summary + Mistral summary, each budgeted up to the backend's 10-minute per-call Ollama read timeout), matching the frontend's `LLM_TIMEOUT_MS` budget (35 min = 3×10min + 5min buffer) with a small margin so nginx is never the layer that cuts off a model still genuinely working. |
+| `/api/v1/` | `java_backend` → `personal-library-app:18080` | The real Spring Boot REST contract (JSON + multipart uploads). `proxy_read_timeout 2160s` (36 min) — sized to exceed the **sum** of up to three sequential Ollama calls during upload (BibTeX fallback + Llama summary + Mistral summary, each budgeted up to the backend's 10-minute per-call Ollama read timeout), matching the frontend's `LLM_TIMEOUT_MS` budget (35 min = 3×10min + 5min buffer) with a small margin so nginx is never the layer that cuts off a model still genuinely working. |
 | `/actuator/` | `java_backend` | Spring Boot Actuator health/readiness, proxied for uniform monitoring through the single ingress port. |
 | `/swagger/` | `swagger_editor` → `swagger-editor:80` | Trailing slash on both the location and `proxy_pass` strips the `/swagger` prefix so the Editor SPA (which expects to be served from `/`) resolves its own assets correctly behind the sub-path. |
-| `/` (catch-all) | `node_gateway` → `personal-library-app:3000` | SPA shell, static assets, and the Node-hosted mock API routes used by the "Integrated" backend preset. Same `2160s` timeout budget as `/api/v1/`, since the mock backend simulates the same long-running flows. |
+| `/` (catch-all) | `node_gateway` → `personal-library-app:13000` | SPA shell, static assets, and the Node-hosted mock API routes used by the "Integrated" backend preset. Same `2160s` timeout budget as `/api/v1/`, since the mock backend simulates the same long-running flows. |
 
 **Baseline security headers** (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-XSS-Protection`) are applied globally to every response regardless of upstream. `client_max_body_size 50m` matches the Express JSON body limit so legitimate large PDF/DOCX uploads are never rejected at the proxy layer before even reaching either backend.
 
-**Why a single ingress at all?** (enterprise rationale, from the file's own header comment): one firewall/load-balancer port instead of two independently-versioned runtimes exposed directly; same-origin API calls let the backend's CORS policy eventually be tightened from "allow any origin" to same-origin-only; TLS termination/headers/gzip/timeouts are enforced in exactly one place instead of duplicated across runtimes; internal container ports/hostnames are never exposed to the browser or outside network. Direct `:3000`/`:8080` access remains published for local development and for exercising the "Direct Java Spring Boot" preset in the UI's Backend Settings dialog — nginx is the **recommended** production ingress, not the only path.
+**Why a single ingress at all?** (enterprise rationale, from the file's own header comment): one firewall/load-balancer port instead of two independently-versioned runtimes exposed directly; same-origin API calls let the backend's CORS policy eventually be tightened from "allow any origin" to same-origin-only; TLS termination/headers/gzip/timeouts are enforced in exactly one place instead of duplicated across runtimes; internal container ports/hostnames are never exposed to the browser or outside network. Direct `:13000`/`:18080` access remains published for local development and for exercising the "Direct Java Spring Boot" preset in the UI's Backend Settings dialog — nginx is the **recommended** production ingress, not the only path.
 
 ---
 
@@ -104,7 +105,7 @@ A single script drives the full clean-rebuild-redeploy-verify cycle. All flags a
 | `--no-cache` | Builds the Docker image without the layer cache (fully reproducible build). |
 | `--pull` | Refreshes third-party base/service images (`mongo`, `mongo-express`, `qdrant`, `ollama`, `keycloak`, `nginx`, `swagger-editor`) before building. |
 | `--clean-only` | Stops after the cleaning phase — no build, no deploy. This is exactly what `npm run clean:generated-docs` invokes (`./scripts/rebuild.sh --deep --clean-only`), reusing the same safe generated-vs-hand-authored doc distinction instead of a separate ad hoc `rm`. |
-| `--skip-verify` | Skips the post-deploy verification phase (checks `http://localhost:3000/`, `http://localhost:8080/api/v1/documents`, `http://localhost:8080/actuator/health`). |
+| `--skip-verify` | Skips the post-deploy verification phase (checks `http://localhost:13000/`, `http://localhost:18080/api/v1/documents`, `http://localhost:18080/actuator/health`). |
 
 **Always removed** regardless of flags: `dist/`, `target/`, `server.js`, and the project's own containers/image. **Always kept** unless explicitly purged: MongoDB data, Qdrant vectors, uploaded files, Ollama models. **Never removed**: hand-authored `docs/` content.
 

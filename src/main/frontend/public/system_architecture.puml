@@ -19,7 +19,7 @@ package "1. Client Tier: SAP Fiori (UI5 Web Components + TypeScript)" as ClientT
   Stores --> Gateway
 }
 
-package "2. API Gateway Tier (Express Node.js on Port 3000 / Spring Boot)" as GatewayTier #F0FDFA {
+package "2. API Gateway Tier (Express Node.js on Port 13000 / Spring Boot on Port 18080)" as GatewayTier #F0FDFA {
   [Express Server / Vite Middleware] as ExpressServer
   [REST API Controllers (/api/v1/*)] as RestControllers
   [Document & BibTeX Extraction Service] as ExtractionEngine
@@ -34,7 +34,7 @@ package "3. Generative AI & Vector Retrieval Tier" as AITier #FAF5FF {
   [Ollama Llama 3.3 (70B Instruct)] as LlamaModel
   [Ollama Mistral Large (2411)] as MistralModel
   [Gemini Cloud Fallback (@google/genai)] as GeminiFallback
-  database "Qdrant Vector DB (Port 6333)" as QdrantDB
+  database "Qdrant Vector DB (Port 16333)" as QdrantDB
 }
 
 package "4. Persistence & Security Tier" as DataTier #FEF3C7 {

@@ -191,7 +191,7 @@ export const es: TranslationDictionary = {
     activeAdapter: 'Controlador backend activo',
     selectPreset: 'Perfiles de arquitectura',
     presetGateway: 'Pasarela integrada (/api/v1)',
-    presetSpringBoot: 'Instancia directa Java Spring Boot (http://localhost:8080/api/v1)',
+    presetSpringBoot: 'Instancia directa Java Spring Boot (http://localhost:18080/api/v1)',
     presetMock: 'Motor independiente local (Fuera de línea / En memoria)',
     presetCustom: 'Punto de conexión API personalizado',
     baseUrl: 'URL base',

@@ -3,7 +3,7 @@
 
 **Format:** 1-Hour Session (45-Minute Keynote Presentation + 15-Minute Open Floor Q&A)  
 **Target Audience:** Software Architects, Senior Engineers, CS Academics, Engineering Leaders, and Technical Researchers  
-**Companion Interactive Deck:** [`presentation.html`](presentation.html) (Live on port 3000 at `/presentation`)
+**Companion Interactive Deck:** [`presentation.html`](presentation.html) (Live on port 13000 at `/presentation`)
 
 ---
 
@@ -63,7 +63,7 @@
 * **Elapsed Time:** `04:00 - 07:30` (3.5 minutes)
 * **Visual Anchor:** Live demonstration script and enterprise UI feature list.
 * **Live Action Choreography:**
-  1. Alt-Tab or open new tab to `http://localhost:3000/`.
+  1. Alt-Tab or open new tab to `http://localhost:13000/`.
   2. Show the **Analytical List Page (ALP)**: filter books by Category (*Computer Science* or *Classics*).
   3. Click *The Wonderful Wizard of Oz* or *Attention Is All You Need* to trigger the **Flexible Column Layout (FCL)** split view.
   4. Point out the automatically extracted BibTeX metadata (authors, year, publisher, DOI).

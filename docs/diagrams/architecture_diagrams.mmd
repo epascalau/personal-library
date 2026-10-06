@@ -15,15 +15,15 @@ graph TD
         Stores --> Gateway
     end
 
-    subgraph IngressTier["2. nginx Single Ingress (Port 80)"]
+    subgraph IngressTier["2. nginx Single Ingress (Port 8088)"]
         Nginx["nginx Reverse Proxy<br/>(/api/v1/*, /actuator/* -&gt; Spring Boot, everything else -&gt; Express)"]
     end
 
-    subgraph NodeTier["3a. Express Gateway (Port 3000)"]
+    subgraph NodeTier["3a. Express Gateway (Port 13000)"]
         Express["Express Server<br/>(Static SPA Host, Mock Backend Adapter, Doc/Diagram Streaming)"]
     end
 
-    subgraph JavaTier["3b. Spring Boot API Backend (Port 8080)"]
+    subgraph JavaTier["3b. Spring Boot API Backend (Port 18080)"]
         Controllers["REST API Controllers<br/>(/api/v1/documents, /versions, /rollback, /chat, /auth)"]
         Extraction["Extraction & BibTeX Engine<br/>(pdf-parse, LaTeX BNF Formatter, GUID Snapshot Archiving & Rollbacks)"]
         Bpmn["Static BPMN 2.0 Export<br/>(Process_DocumentIngestionRAG.bpmn served/downloaded for external Camunda Modeler use - no embedded engine)"]
@@ -35,7 +35,7 @@ graph TD
     subgraph AITier["4. Generative AI & Vector Retrieval Tier"]
         Llama["Ollama Llama 3.3 (70B Instruct)<br/>(model tag: llama3.2, Analytical Decomposition & Methodology)"]
         Mistral["Ollama Mistral Large (2411)<br/>(model tag: mistral, Executive Summary & Key Takeaways)"]
-        Qdrant["Qdrant Vector Database<br/>(Collection: library_embeddings, HTTP 6333 dashboard / gRPC 6334 Spring AI client)"]
+        Qdrant["Qdrant Vector Database<br/>(Collection: library_embeddings, HTTP 16333 dashboard / gRPC 16334 Spring AI client)"]
     end
 
     subgraph DataTier["5. Persistence & Security Tier"]

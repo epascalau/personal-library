@@ -123,13 +123,13 @@ export function generateArchitectureSvg(): string {
   <!-- SUBGRAPH 2: GATEWAY TIER                                     -->
   <!-- ============================================================ -->
   <rect x="30" y="325" width="1540" height="175" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="50" y="350" font-size="12" font-weight="700" fill="#2dd4bf">2. NGINX :80 -&gt; EXPRESS :3000 / SPRING BOOT :8080</text>
+  <text x="50" y="350" font-size="12" font-weight="700" fill="#2dd4bf">2. NGINX :8088 -&gt; EXPRESS :13000 / SPRING BOOT :18080</text>
 
   <!-- Express Server -->
   <g filter="url(#card-shadow)">
     <rect x="50" y="360" width="340" height="115" rx="6" fill="#134e4a" stroke="#14b8a6" stroke-width="1.2" />
     <text x="220" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Express Server (behind nginx)</text>
-    <text x="220" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• server.ts listening on 0.0.0.0:3000</text>
+    <text x="220" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• server.ts listening on 0.0.0.0:13000</text>
     <text x="220" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Static SPA Host / Mock Backend Adapter</text>
     <text x="220" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Docs Portal &amp; Diagram Stream APIs</text>
   </g>
@@ -157,7 +157,7 @@ export function generateArchitectureSvg(): string {
     <rect x="1195" y="360" width="355" height="115" rx="6" fill="#134e4a" stroke="#14b8a6" stroke-width="1.2" />
     <text x="1372" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Static BPMN 2.0 Export</text>
     <text x="1372" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Process_DocumentIngestionRAG.bpmn</text>
-    <text x="1372" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Served/downloaded (Spring Boot :8080)</text>
+    <text x="1372" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Served/downloaded (Spring Boot :18080)</text>
     <text x="1372" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• External Camunda Modeler compatibility</text>
   </g>
 
@@ -216,7 +216,7 @@ export function generateArchitectureSvg(): string {
   <g filter="url(#card-shadow)">
     <rect x="1195" y="590" width="355" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
     <text x="1372" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Qdrant Vector Database</text>
-    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (HTTP 6333/gRPC 6334)</text>
+    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (HTTP 16333/gRPC 16334)</text>
     <text x="1372" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Dense Cosine Similarity Search</text>
     <text x="1372" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Top-K Grounded Citation Retrieval</text>
   </g>
@@ -324,10 +324,10 @@ export function generateArchitecturePdf(pngBuffer: Buffer, outputPath: string): 
     // Tier 2 Card
     doc.rect(36 + (colWidth + colGap) * 1, startY, colWidth, cardHeight).fill('#1e293b');
     doc.rect(36 + (colWidth + colGap) * 1, startY, colWidth, 28).fill('#134e4a');
-    doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('2. API Gateway (Port 3000)', 36 + (colWidth + colGap) * 1 + 10, startY + 8);
+    doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('2. API Gateway (Port 13000)', 36 + (colWidth + colGap) * 1 + 10, startY + 8);
     doc.fillColor('#99f6e4').fontSize(8).font('Helvetica').text(
       '• Express Server\n' +
-      '  Port 3000 on 0.0.0.0, dev Vite middleware, static host.\n\n' +
+      '  Port 13000 on 0.0.0.0, dev Vite middleware, static host.\n\n' +
       '• REST Controllers\n' +
       '  /documents, /versions, /rollback, /chat, /auth.\n\n' +
       '• Extraction Engine\n' +

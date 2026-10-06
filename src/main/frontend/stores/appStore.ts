@@ -155,7 +155,7 @@ class AppStore extends Store<AppState> {
    * Activates application store event listeners and triggers initial data load.
    *
    * WHAT: Subscribes to `backend:adapter:changed` on the event bus and initiates the first document fetch.
-   * WHY: Decouples backend driver switching (e.g. toggling from in-memory mock to Spring Boot :8080)
+   * WHY: Decouples backend driver switching (e.g. toggling from in-memory mock to Spring Boot :18080)
    * from the view layer; whenever the adapter swaps, `scheduleFetch()` automatically queries the new backend.
    */
   start(): void {

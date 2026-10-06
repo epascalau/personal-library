@@ -366,11 +366,11 @@ The platform is architected as an enterprise-grade multi-tier containerized syst
 
 ### Architectural Rationale
 * **Service Topology (`docker-compose.yml`)**:
-  * **API Gateway / Applet (Port 3000)**: Express / Spring Boot serving API routes and the SAP UI5 client.
-  * **MongoDB (Port 27017)**: Document store with GUID keys and ACID transaction support.
-  * **Qdrant (Port 6333)**: Vector similarity search engine.
-  * **Ollama (Port 11434)**: Local GPU/CPU LLM inference engine.
-  * **Keycloak (Port 8080/8180)**: Identity and Access Management (IAM) provider.
+  * **API Gateway / Applet (Ports 13000/18080)**: Express / Spring Boot serving API routes and the SAP UI5 client.
+  * **MongoDB (Port 27017 internal, 37017 host-published)**: Document store with GUID keys and ACID transaction support.
+  * **Qdrant (Port 6333 internal, 16333 host-published)**: Vector similarity search engine.
+  * **Ollama (Port 11434 internal, 21434 host-published)**: Local GPU/CPU LLM inference engine.
+  * **Keycloak (Port 8080 internal, 8180 host-published)**: Identity and Access Management (IAM) provider.
 * **OpenID Connect (OIDC) & OAuth2 JWT Security**:
   Stateless REST APIs validate signed JSON Web Tokens (JWT Bearer tokens) issued by the `personal-library-realm`.
 * **Role-Based Access Control (RBAC)**:
