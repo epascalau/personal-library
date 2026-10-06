@@ -141,7 +141,7 @@
 > *"Let's examine our physical architecture. Notice how cleanly decoupled each tier is:
 > 
 > * **At the presentation layer:** SAP UI5 Web Components, running fully client-side.
-> * **At the gateway layer:** Express 4.21 on Node 22 providing an OpenAPI 3.0 compliant proxy, serving static assets, and terminating client authentication.
+> * **At the gateway layer:** Express 4.21 on Node 22 serving static assets, terminating client authentication, and — in its default dev mode — answering `/api/v1/*` requests itself via a self-contained in-memory simulation (not a true proxy to the Java backend). Switching the UI's Backend Target to "Direct Java Spring Boot" routes requests to the real business core instead.
 > * **At the business core:** Spring Boot 3.3.4 running on Java 21, integrating Spring AI with Ollama and Qdrant gRPC clients.
 > * **At the persistence layer:** A polyglot dual-database topology. MongoDB 7.0 acts as our authoritative System of Record for documents, version history, and BibTeX ASTs. Qdrant acts as our high-speed semantic index for vectors."*
 

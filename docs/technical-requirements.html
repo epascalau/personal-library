@@ -333,7 +333,7 @@
 
       <h3>FR-8: Decoupled Multi-Tier Backend Gateway (Hexagonal Driver Adapters)</h3>
       <div class="req-item"><strong>FR-8.1 (Spring Boot REST Backend):</strong> Java 21 Virtual Threads on Port 8080 with 23 domain classes.</div>
-      <div class="req-item"><strong>FR-8.2 (Integrated Node/Express Gateway):</strong> Express 4 gateway on Port 3000 handling frontend routing, local file parsing, and proxying.</div>
+      <div class="req-item"><strong>FR-8.2 (Integrated Node/Express Gateway):</strong> Express 4 gateway on Port 3000 handling frontend routing and local file parsing. Despite the "gateway" name it is a self-contained in-memory simulation (non-persistent document store, substring-based semantic search) that answers requests itself — it does not proxy to Spring Boot, MongoDB, or Qdrant. The only genuine external call is direct inference against the local Ollama daemon.</div>
       <div class="req-item"><strong>FR-8.3 (Standalone In-Browser Mock Adapter):</strong> Zero-infrastructure operation via <code>MockBackendAdapter</code> with pre-seeded literature and in-memory search.</div>
     </section>
 
