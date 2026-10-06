@@ -246,6 +246,7 @@ Access Points:
 * **Web Application (via nginx, recommended):** `http://localhost`
 * **Web Application (direct, dev/bypass):** `http://localhost:3000`
 * **OpenAPI Spec:** `http://localhost/api/v1/openapi.yaml`
+* **Swagger Editor (interactive OpenAPI viewer):** `http://localhost/swagger/?url=openapi.yaml` (also directly on `http://localhost:8090/?url=openapi.yaml`)
 * **Keycloak Administration:** `http://localhost:8180` (admin/admin)
 * **Qdrant Vector Dashboard:** `http://localhost:6333/dashboard`
 
@@ -573,7 +574,15 @@ Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer token
 
 ## 🔌 REST API Specification
 
-The Personal Library exposes an enterprise OpenAPI 3.0.3 contract (`/openapi.yaml`):
+The Personal Library exposes an enterprise OpenAPI 3.0.3 contract (`/openapi.yaml`).
+A bundled **Swagger Editor** container (`swagger-editor` service in
+`docker-compose.yml`) lets you browse, lint, and try out this contract in a
+live UI — mounted directly from the repo's `openapi.yaml` onto the editor's
+own static root, so no rebuild is needed after edits. Reach it at
+`http://localhost/swagger/?url=openapi.yaml` (via nginx) or
+`http://localhost:8090/?url=openapi.yaml` (direct); the `?url=` query param
+tells the editor to auto-load the spec instead of showing the default
+Petstore example.
 
 | Method | Endpoint | Description |
 |---|---|---|

@@ -46,6 +46,41 @@ services:
       - library-net
 
   # ==============================================================================
+  # Swagger Editor: Interactive OpenAPI 3.0 Contract Viewer/Editor
+  # ==============================================================================
+  # WHAT: Serves the official Swagger Editor SPA pre-loaded with this project's
+  # `openapi.yaml`, so the REST contract can be browsed, validated, and edited
+  # live in a syntax-highlighted UI instead of reading the raw YAML file.
+  # WHY: The OpenAPI contract is maintained by hand (not generated from the Java
+  # controllers), so a quick visual lint/preview tool materially reduces drift
+  # between the spec and the running backend. Mounting the real repo file
+  # read-only (rather than copying it into the image) means edits made in the
+  # Editor's "Download" action are easy to diff back against source control,
+  # and the preview always reflects the current file on disk without a rebuild.
+  # ==============================================================================
+  swagger-editor:
+    image: swaggerapi/swagger-editor:v5.8.10
+    container_name: personal-library-swagger-editor
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    volumes:
+      # Mounted onto the editor's own static web root (NOT /tmp + SWAGGER_FILE,
+      # which this nginx-based v5.x image does not actually wire up despite
+      # older docs) so the spec is served same-origin at /openapi.yaml,
+      # avoiding any CORS issues and working identically whether reached
+      # directly on :8090 or proxied through nginx at /swagger/.
+      - ./openapi.yaml:/usr/share/nginx/html/openapi.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:80/ > /dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - library-net
+
+  # ==============================================================================
   # Nginx: Enterprise Single Ingress & Reverse Proxy
   # ==============================================================================
   # WHAT: Fronts both application runtimes (Node/Express on 3000, Java Spring
@@ -72,6 +107,8 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       personal-library-app:
+        condition: service_healthy
+      swagger-editor:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:80/ > /dev/null 2>&1 || exit 1"]
