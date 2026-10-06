@@ -122,7 +122,7 @@ interface EngineOption {
 
 const ENGINE_OPTIONS: EngineOption[] = [
   {
-    // The default, zero-configuration option. The Node.js Express server in
+    // Zero-configuration dev-mode convenience option. The Node.js Express server in
     // `src/main/server/server.ts` serves the compiled UI AND exposes `/api/v1`
     // REST routes from the *same* process/port — no CORS, no separate service
     // to start. IMPORTANT: this gateway is a self-contained simulation — it
@@ -143,29 +143,31 @@ const ENGINE_OPTIONS: EngineOption[] = [
     iconKey: 'Zap',
     iconClass: 'w-5 h-5 text-[#0070f2] mt-0.5 shrink-0',
     title: 'Integrated Gateway (/api/v1)',
-    badge: 'Default',
+    badge: 'Dev Mode',
     badgeClass: 'bg-blue-100 dark:bg-blue-950/70 text-[#0070f2] dark:text-[#38bdf8] dark:border-blue-900/60',
     description:
-      'Default dev mode. Document storage & search are SIMULATED (in-memory, lost on restart — no MongoDB/Qdrant). AI summaries & chat are REAL (genuine calls to local Ollama).'
+      'Lightweight dev convenience. Document storage & search are SIMULATED (in-memory, lost on restart — no MongoDB/Qdrant). AI summaries & chat are REAL (genuine calls to local Ollama).'
   },
   {
-    // Bypasses the Node gateway entirely and talks straight to the standalone
-    // Spring Boot 3 / Java REST API on port 8080. Useful when developing or
-    // debugging the Java backend in isolation (e.g. via `mvn spring-boot:run`
-    // or a separate container) without rebuilding the Node layer. This backend
-    // uses Spring AI's `OllamaChatModel` beans (see `OllamaConfig.java`) to
-    // reach the same local Ollama daemon, and exposes its own
-    // `/api/v1/health` endpoint (see `HealthController.java`) so the
-    // "Test Connection" probe below works identically to the Integrated option.
+    // The DEFAULT option (see `loadSavedBackendConfig()`'s fallback in
+    // `services/backend/index.ts`): bypasses the Node gateway's in-memory
+    // simulation entirely and talks straight to the standalone Spring Boot 3 /
+    // Java REST API on port 8080. This is the fully real stack — genuine
+    // MongoDB persistence, genuine Qdrant vector search, and genuine Ollama
+    // inference via Spring AI's `OllamaChatModel` beans (see `OllamaConfig.java`).
+    // It exposes its own `/api/v1/health` endpoint (see `HealthController.java`)
+    // so the "Test Connection" probe below works the same as the other options.
+    // Requires the Java container (`personal-library-app`'s embedded Spring Boot
+    // server) to be up, which Docker Compose starts automatically.
     preset: 'springBootDirect',
     id: 'springBootDirect',
     iconKey: 'Cpu',
     iconClass: 'w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0',
     title: 'Direct Java Spring Boot Instance',
-    badge: 'Port 8080',
+    badge: 'Default · Port 8080',
     badgeClass: 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 dark:border-indigo-900/60',
     description:
-      'The fully real stack. Documents persist in MongoDB, search runs on real Qdrant vectors, and AI summaries/chat call Ollama via Spring AI — nothing here is simulated.'
+      'Default. The fully real stack. Documents persist in MongoDB, search runs on real Qdrant vectors, and AI summaries/chat call Ollama via Spring AI — nothing here is simulated.'
   },
   {
     // The only option with no `preset` key: selecting it does NOT auto-fill

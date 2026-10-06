@@ -44,7 +44,7 @@ const STORAGE_KEY = 'personal_library_backend_config';
  *
  * WHAT:
  * Reads `STORAGE_KEY` from localStorage, parses JSON, enforces a minimum `LLM_TIMEOUT_MS` timeout
- * for long-running LLM and RAG indexing tasks, and falls back to `BACKEND_PRESETS.integrated`.
+ * for long-running LLM and RAG indexing tasks, and falls back to `BACKEND_PRESETS.springBootDirect`.
  *
  * WHY:
  * 1. Continuity: Retains user preference across browser refreshes (e.g. developing directly against `:8080`).
@@ -67,7 +67,7 @@ export function loadSavedBackendConfig(): BackendConfig {
       // ignore
     }
   }
-  return BACKEND_PRESETS.integrated;
+  return BACKEND_PRESETS.springBootDirect;
 }
 
 /**
