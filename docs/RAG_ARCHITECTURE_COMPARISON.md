@@ -1,5 +1,7 @@
 # 🔬 Retrieval-Augmented Generation (RAG) Architecture: Comparative Analysis & Reference Evaluation
 
+> **🧠 EXPERT** — Research-grade gap analysis; assumes familiarity with RAG literature (Gao et al. 2024, Lewis et al. 2020) and production retrieval-system design. For a gentler on-ramp, start with the [Foundational](rag-explained-scratch.html) or [Practitioner](rag-guide.html) editions.
+
 This document provides a comprehensive architectural evaluation of the **Personal Library & AI Research Engine's** RAG pipeline compared to a canonical, production-grade **Reference RAG Architecture** (as formalized in *Gao et al., 2024; Lewis et al., 2020; and enterprise LangChain/LlamaIndex standards*).
 
 It details **what** is implemented in our codebase, **how** it contrasts with the industry reference architecture across each pipeline stage, the **underlying mathematics**, and a concrete **roadmap for advanced modular RAG evolution**.

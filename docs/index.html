@@ -91,6 +91,7 @@
     }
 
     .card {
+      position: relative;
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -102,6 +103,27 @@
       justify-content: space-between;
       transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
+
+    /* Reading-level badges: signal how much prior knowledge a document
+       assumes, so a reader can self-select the right entry point before
+       clicking through. Colors intentionally match each card's own accent
+       color (see the RAG trio below) for an at-a-glance visual grouping. */
+    .level-badge {
+      position: absolute;
+      top: -0.6rem;
+      right: 1.25rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      white-space: nowrap;
+    }
+    .level-foundational { background: #0284c7; }
+    .level-practitioner { background: #059669; }
+    .level-expert        { background: #7c3aed; }
 
     .card:hover {
       transform: translateY(-4px);
@@ -301,6 +323,7 @@
 
       <!-- 0C. RAG Architecture Comparison & Benchmark -->
       <div class="card" style="border-color: #8b5cf6; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.04) 100%);">
+        <span class="level-badge level-expert">🧠 EXPERT</span>
         <div>
           <div class="card-icon">🔬</div>
           <h2>RAG Architecture Comparison &amp; Benchmark</h2>
@@ -494,6 +517,7 @@
 
       <!-- 6. RAG Explained from Scratch (Zero-Knowledge Edition) -->
       <div class="card" style="border: 2px solid #0284c7;">
+        <span class="level-badge level-foundational">🌱 FOUNDATIONAL</span>
         <div>
           <div class="card-icon">💡</div>
           <h2>RAG Explained from Scratch (Zero-Knowledge Edition)</h2>
@@ -514,6 +538,7 @@
 
       <!-- 7. How RAG Works: Technical Deep Dive -->
       <div class="card" style="border: 2px solid #059669;">
+        <span class="level-badge level-practitioner">⚙️ PRACTITIONER</span>
         <div>
           <div class="card-icon">📐</div>
           <h2>How RAG Works: Tokens, Embeddings, MongoDB &amp; Qdrant</h2>
