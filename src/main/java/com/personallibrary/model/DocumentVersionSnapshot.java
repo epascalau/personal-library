@@ -51,6 +51,11 @@ public class DocumentVersionSnapshot {
     private String format;
 
     /**
+     * Physical file storage path on server disk where this historical version's asset is preserved.
+     */
+    private String physicalFilePath;
+
+    /**
      * Timestamp when this snapshot was archived.
      */
     private Instant savedAt;

@@ -57,6 +57,8 @@ public class DocumentResponse {
     private Map<String, SummaryRecord> summaries;
     /** Short initial excerpt for list view rendering. */
     private String contentExcerpt;
+    /** Relative API path to download this document's currently active physical asset. */
+    private String downloadUrl;
     /** Indexed text chunks. */
     private List<DocumentChunk> chunks;
     /** Historical version snapshots preserved prior to in-place overwrites or rollbacks. */
@@ -88,6 +90,7 @@ public class DocumentResponse {
                 .bibtexRaw(entity.getBibtexRaw())
                 .summaries(entity.getSummaries())
                 .contentExcerpt(entity.getContentExcerpt())
+                .downloadUrl("/api/v1/documents/" + entity.getGuid() + "/download")
                 .chunks(entity.getChunks())
                 .versionHistory(entity.getVersionHistory())
                 .build();

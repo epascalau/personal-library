@@ -52,26 +52,48 @@ public class StorageService {
     }
 
     /**
-     * Stores a physical uploaded file to the local disk under a unique GUID directory.
+     * Stores a physical uploaded file to the local disk under a unique GUID directory, isolated by version.
      *
-     * WHAT: Cleans original filename, creates subdirectory named by document GUID, and writes stream with REPLACE_EXISTING.
-     * WHY: Subdividing files into GUID-isolated folders prevents filename collision and preserves version isolation
-     * across documents sharing identical original filenames.
+     * WHAT: Cleans original filename, creates a per-version subdirectory (guid/v{version}/), and writes stream
+     * with REPLACE_EXISTING.
+     * WHY: Version-isolated subdirectories ensure each historical revision's physical bytes remain independently
+     * addressable on disk, so overwriting the active version never destroys the asset a prior version snapshot
+     * or rollback needs to stream back to the client.
      *
-     * @param file Uploaded multipart file.
-     * @param guid Unique document identifier.
+     * @param file    Uploaded multipart file.
+     * @param guid    Unique document identifier.
+     * @param version Version sequence number this asset represents.
      * @return Path to the stored physical file on disk.
      * @throws IOException If file writing fails.
      */
-    public Path storeFile(MultipartFile file, String guid) throws IOException {
+    public Path storeFile(MultipartFile file, String guid, int version) throws IOException {
         String cleanFileName = file.getOriginalFilename() != null ? file.getOriginalFilename().replaceAll("[^a-zA-Z0-9._-]", "_") : "document.bin";
-        Path targetDir = this.rootLocation.resolve(guid);
+        Path targetDir = this.rootLocation.resolve(guid).resolve("v" + version);
         Files.createDirectories(targetDir);
         Path destination = targetDir.resolve(cleanFileName);
 
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        log.info("Stored file {} for GUID {} at {}", cleanFileName, guid, destination);
+        log.info("Stored file {} for GUID {} version {} at {}", cleanFileName, guid, version, destination);
         return destination;
+    }
+
+    /**
+     * Detects the MIME content type of a physical file on disk using Apache Tika.
+     *
+     * WHAT: Invokes Apache Tika's magic-byte and extension-based content detection.
+     * WHY: Allows download endpoints to stream the exact original content type (PDF, DOCX, plain text, etc.)
+     * instead of hardcoding or guessing a single MIME type for every document format supported by the library.
+     *
+     * @param filePath Path to the physical file on disk.
+     * @return Detected MIME content type, or "application/octet-stream" on detection failure.
+     */
+    public String detectContentType(Path filePath) {
+        try {
+            return tika.detect(filePath.toFile());
+        } catch (Exception e) {
+            log.warn("Apache Tika could not detect content type for {}: {}", filePath, e.getMessage());
+            return "application/octet-stream";
+        }
     }
 
     /**

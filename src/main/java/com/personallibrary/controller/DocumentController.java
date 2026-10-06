@@ -7,6 +7,7 @@ package com.personallibrary.controller;
 import com.personallibrary.dto.*;
 import com.personallibrary.model.BibTeXMetadata;
 import com.personallibrary.model.DocumentEntity;
+import com.personallibrary.model.DocumentVersionSnapshot;
 import com.personallibrary.model.SummaryRecord;
 import com.personallibrary.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -213,6 +216,103 @@ public class DocumentController {
                 "success", true,
                 "message", "Document " + guid + " purged from MongoDB, local drive, and Qdrant."
         ));
+    }
+
+    /**
+     * Downloads the physical asset of the currently active document version.
+     *
+     * WHAT: Streams the original uploaded file bytes from disk with its detected MIME content type and an
+     * attachment Content-Disposition header carrying the original file name.
+     *
+     * WHY: Allows researchers to download the primary source file directly from the Object Page, matching
+     * exactly the bytes that were originally uploaded (as opposed to the extracted plain-text excerpt).
+     *
+     * @param guid Unique document identifier.
+     * @return Binary file stream.
+     * @throws IOException If the physical asset cannot be read from disk.
+     */
+    @GetMapping("/{guid}/download")
+    @Operation(summary = "Download the physical asset of the currently active document version")
+    public ResponseEntity<Resource> downloadDocument(@PathVariable String guid) throws IOException {
+        return streamAsset(documentService.getDownloadAsset(guid));
+    }
+
+    /**
+     * Retrieves the historical version snapshot list for a document.
+     *
+     * WHAT: Returns every immutable snapshot archived prior to an overwrite or rollback, newest first.
+     *
+     * WHY: Powers the Object Page's version history panel, letting researchers inspect or restore prior
+     * revisions without losing the currently active one.
+     *
+     * @param guid Unique document identifier.
+     * @return List of {@link DocumentVersionSnapshot}; empty if the document was never overwritten.
+     */
+    @GetMapping("/{guid}/versions")
+    @Operation(summary = "Retrieve the historical version snapshot list for a document")
+    public ResponseEntity<List<DocumentVersionSnapshot>> getVersionHistory(@PathVariable String guid) {
+        return ResponseEntity.ok(documentService.getVersionHistory(guid));
+    }
+
+    /**
+     * Downloads the physical asset for a specific historical (or current) version.
+     *
+     * WHAT: Resolves either the active version's file or an archived snapshot's preserved file, then streams it.
+     *
+     * WHY: Lets researchers retrieve the exact original bytes of any prior revision, not only the latest one.
+     *
+     * @param guid    Unique document identifier.
+     * @param version Version sequence number to download.
+     * @return Binary file stream.
+     * @throws IOException If the physical asset cannot be read from disk.
+     */
+    @GetMapping("/{guid}/versions/{version}/download")
+    @Operation(summary = "Download the physical asset for a specific historical version")
+    public ResponseEntity<Resource> downloadHistoricalVersion(@PathVariable String guid, @PathVariable int version) throws IOException {
+        return streamAsset(documentService.getHistoricalDownloadAsset(guid, version));
+    }
+
+    /**
+     * Rolls back the document to a designated historical version snapshot.
+     *
+     * WHAT: Restores metadata, text content, summaries, and file reference from the specified snapshot,
+     * archives the current state as a new snapshot, and advances the version sequence counter.
+     *
+     * WHY: Provides guaranteed non-destructive rollbacks while maintaining full audit integrity.
+     *
+     * @param guid    Document GUID.
+     * @param version Historical version sequence number to restore.
+     * @return Updated {@link DocumentResponse} reflecting the restored (new) active version.
+     */
+    @PostMapping("/{guid}/rollback/{version}")
+    @Operation(summary = "Roll back the document to a designated historical version snapshot")
+    public ResponseEntity<DocumentResponse> rollbackVersion(@PathVariable String guid, @PathVariable int version) {
+        return ResponseEntity.ok(documentService.rollbackToVersion(guid, version));
+    }
+
+    /**
+     * Streams a resolved physical asset to the client with its detected content type and attachment disposition.
+     *
+     * WHAT: Wraps a {@link DownloadAsset} path in a {@link FileSystemResource} and sets the appropriate
+     * Content-Type (via Apache Tika detection) and Content-Disposition headers.
+     *
+     * WHY: Shared by both the current-version and historical-version download endpoints to avoid duplicating
+     * HTTP streaming mechanics.
+     *
+     * @param asset Resolved physical file path and original file name.
+     * @return Binary file stream, or 404 if the physical asset is missing from disk.
+     */
+    private ResponseEntity<Resource> streamAsset(DownloadAsset asset) throws IOException {
+        Path path = Path.of(asset.physicalFilePath());
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+        Resource resource = new FileSystemResource(path);
+        String contentType = storageService.detectContentType(path);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + asset.fileName() + "\"")
+                .body(resource);
     }
 
     /**

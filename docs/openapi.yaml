@@ -200,9 +200,21 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/DocumentUploadRequest'
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Physical document file to upload (PDF, DOCX, DOC, TXT, MD, XLS, XLSX, PPT, PPTX).
+                bibtex:
+                  type: string
+                  description: >
+                    Optional JSON-encoded BibTeXMetadata string. When omitted or incomplete,
+                    metadata is auto-extracted from the file content using Spring AI.
       responses:
         '201':
           description: Document processed and stored successfully
@@ -269,27 +281,35 @@ paths:
     put:
       tags:
         - Documents
-      summary: Update document metadata or upload replacement version
+      summary: Overwrite document content and/or metadata in-place (preserves GUID)
       description: >
-        From end-user perspective, overwrites the active document view.
-        From backend system perspective, creates a new independent GUID record with lineage tracking.
+        Replaces the stored file asset and/or BibTeX metadata while keeping the existing GUID stable.
+        Archives the prior state into `versionHistory` and increments `versionNumber`.
       parameters:
         - name: guid
           in: path
           required: true
-          description: GUID of the document being edited / overwritten
+          description: GUID of the document being overwritten
           schema:
             type: string
             format: uuid
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/DocumentUpdateRequest'
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Optional replacement physical file. When omitted, only metadata is updated.
+                bibtex:
+                  type: string
+                  description: Optional JSON-encoded replacement BibTeXMetadata string.
       responses:
         '200':
-          description: Document updated or new version created
+          description: Document overwritten in-place; new version archived to versionHistory
           content:
             application/json:
               schema:
@@ -816,42 +836,6 @@ components:
         totalPages:
           type: integer
           example: 5
-
-    DocumentUploadRequest:
-      type: object
-      required:
-        - fileName
-        - fileFormat
-        - fileSize
-      properties:
-        fileName:
-          type: string
-        fileFormat:
-          type: string
-        fileSize:
-          type: integer
-        fileContent:
-          type: string
-          description: Text content or base64 encoded document body
-        bibtex:
-          $ref: '#/components/schemas/BibTeXMetadata'
-
-    DocumentUpdateRequest:
-      type: object
-      properties:
-        isNewVersion:
-          type: boolean
-          description: If true, creates a new independent GUID record representing the updated file
-        fileName:
-          type: string
-        fileFormat:
-          type: string
-        fileSize:
-          type: integer
-        fileContent:
-          type: string
-        bibtex:
-          $ref: '#/components/schemas/BibTeXMetadata'
 
     ChatResponse:
       type: object

@@ -6,6 +6,7 @@ package com.personallibrary.service;
 
 import com.personallibrary.dto.DocumentResponse;
 import com.personallibrary.dto.DocumentUploadRequest;
+import com.personallibrary.dto.DownloadAsset;
 import com.personallibrary.dto.PaginatedResponse;
 import com.personallibrary.model.*;
 import com.personallibrary.repository.DocumentRepository;
@@ -64,7 +65,7 @@ public class DocumentService {
         String format = getFileExtension(originalFileName);
 
         // 1. Store physical asset
-        Path storedPath = storageService.storeFile(file, guid);
+        Path storedPath = storageService.storeFile(file, guid, 1);
         String textContent = storageService.extractTextContent(storedPath);
 
         // 2. BibTeX metadata
@@ -106,12 +107,16 @@ public class DocumentService {
 
     /**
      * Overwrites an existing document's file content and metadata in-place while retaining its persistent GUID.
-     * Advances the internal version sequence number.
+     * Advances the internal version sequence number and archives the prior state as an immutable snapshot.
      *
-     * WHAT: Replaces physical asset on disk, extracts new text content, updates BibTeX metadata,
-     * re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments versionNumber.
+     * WHAT: Archives the current state into {@code versionHistory}, replaces physical asset on disk (in a
+     * version-isolated subdirectory so the prior asset's bytes are never touched), extracts new text content,
+     * updates BibTeX metadata, re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments
+     * versionNumber.
      * WHY: Retaining the existing document GUID preserves deep links, bookmark URLs, and Object Page routes
-     * while accurately reflecting updated revisions and version history.
+     * while accurately reflecting updated revisions. Archiving a full snapshot before mutating the entity is
+     * what makes {@link #getVersionHistory(String)}, {@link #getHistoricalDownloadAsset(String, int)}, and
+     * {@link #rollbackToVersion(String, int)} possible.
      *
      * @param existingGuid   Persistent document GUID to update.
      * @param newFile        Optional replacement physical file.
@@ -121,6 +126,10 @@ public class DocumentService {
      */
     public DocumentResponse overwriteDocument(String existingGuid, MultipartFile newFile, BibTeXMetadata updatedBibtex) throws IOException {
         DocumentEntity existing = getEntityByGuid(existingGuid);
+        int newVersionNumber = (existing.getVersionNumber() != null ? existing.getVersionNumber() : 1) + 1;
+
+        // Archive the current active state as an immutable snapshot before mutating it.
+        existing.getVersionHistory().add(0, buildSnapshot(existing, "Archived prior to overwrite to version " + newVersionNumber));
 
         String fileName = newFile != null ? newFile.getOriginalFilename() : existing.getFileName();
         String format = getFileExtension(fileName);
@@ -129,7 +138,7 @@ public class DocumentService {
         String textContent;
         String filePath;
         if (newFile != null) {
-            Path storedPath = storageService.storeFile(newFile, existingGuid);
+            Path storedPath = storageService.storeFile(newFile, existingGuid, newVersionNumber);
             filePath = storedPath.toString();
             textContent = storageService.extractTextContent(storedPath);
         } else {
@@ -148,7 +157,7 @@ public class DocumentService {
         existing.setFormat(format);
         existing.setPhysicalFilePath(filePath);
         existing.setEditDate(Instant.now());
-        existing.setVersionNumber((existing.getVersionNumber() != null ? existing.getVersionNumber() : 1) + 1);
+        existing.setVersionNumber(newVersionNumber);
         existing.setBibtex(finalBibtex);
         existing.setBibtexRaw(finalBibtex.toRawBibTeX());
         existing.setSummaries(summaries);
@@ -159,6 +168,148 @@ public class DocumentService {
         DocumentEntity saved = documentRepository.save(existing);
         log.info("Document content overwritten in-place for GUID: {} (v{})", existingGuid, saved.getVersionNumber());
         return DocumentResponse.fromEntity(saved);
+    }
+
+    /**
+     * Retrieves the archived historical version snapshot list for a document.
+     *
+     * WHAT: Returns the immutable list of {@link DocumentVersionSnapshot} archived prior to each overwrite
+     * or rollback.
+     * WHY: Powers the Object Page's version history panel, letting researchers inspect or restore prior
+     * revisions without losing the currently active one.
+     *
+     * @param guid Unique document identifier.
+     * @return List of historical version snapshots, newest first; empty if never overwritten.
+     */
+    public List<DocumentVersionSnapshot> getVersionHistory(String guid) {
+        return getEntityByGuid(guid).getVersionHistory();
+    }
+
+    /**
+     * Resolves the physical asset for the currently active version of a document.
+     *
+     * WHAT: Looks up the document's current physical file path and original file name.
+     * WHY: Backs the primary "Download" action on the Object Page, decoupled from HTTP streaming concerns.
+     *
+     * @param guid Unique document identifier.
+     * @return {@link DownloadAsset} pointing at the active version's physical file.
+     */
+    public DownloadAsset getDownloadAsset(String guid) {
+        DocumentEntity entity = getEntityByGuid(guid);
+        return new DownloadAsset(entity.getPhysicalFilePath(), entity.getFileName());
+    }
+
+    /**
+     * Resolves the physical asset for a specific historical (or current) version of a document.
+     *
+     * WHAT: Returns the active version's asset directly if it matches the requested version number; otherwise
+     * searches {@code versionHistory} for a matching archived snapshot's preserved physical file path.
+     * WHY: Allows researchers to download any prior revision's exact original bytes, not just the latest one.
+     *
+     * @param guid          Unique document identifier.
+     * @param targetVersion Version sequence number to resolve.
+     * @return {@link DownloadAsset} pointing at the requested version's physical file.
+     */
+    public DownloadAsset getHistoricalDownloadAsset(String guid, int targetVersion) {
+        DocumentEntity entity = getEntityByGuid(guid);
+        int currentVersion = entity.getVersionNumber() != null ? entity.getVersionNumber() : 1;
+        if (currentVersion == targetVersion) {
+            return new DownloadAsset(entity.getPhysicalFilePath(), entity.getFileName());
+        }
+
+        DocumentVersionSnapshot snapshot = entity.getVersionHistory().stream()
+                .filter(v -> Objects.equals(v.getVersionNumber(), targetVersion))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Historical version " + targetVersion + " not found for document " + guid));
+        return new DownloadAsset(snapshot.getPhysicalFilePath(), snapshot.getFileName());
+    }
+
+    /**
+     * Rolls back the document's active state to a previously archived historical version snapshot.
+     *
+     * WHAT: Restores metadata, BibTeX, summaries, text content, and physical file reference from the specified
+     * snapshot, re-indexes Qdrant vector chunks for the restored content, archives the current (about-to-be
+     * replaced) state as a new snapshot, and advances the version sequence counter.
+     * WHY: Provides guaranteed non-destructive rollbacks: nothing is ever deleted, the restored state simply
+     * becomes the new latest version while every prior revision (including the one just replaced) remains in
+     * {@code versionHistory} for full audit integrity.
+     *
+     * @param guid          Document GUID to roll back.
+     * @param targetVersion Historical version sequence number to restore.
+     * @return Updated {@link DocumentResponse} reflecting the restored (new) active version.
+     */
+    public DocumentResponse rollbackToVersion(String guid, int targetVersion) {
+        DocumentEntity existing = getEntityByGuid(guid);
+        int currentVersion = existing.getVersionNumber() != null ? existing.getVersionNumber() : 1;
+        if (currentVersion == targetVersion) {
+            throw new IllegalArgumentException("Document is already at version " + targetVersion);
+        }
+
+        DocumentVersionSnapshot target = existing.getVersionHistory().stream()
+                .filter(v -> Objects.equals(v.getVersionNumber(), targetVersion))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Historical version snapshot " + targetVersion + " not found for document " + guid));
+
+        int newVersionNumber = currentVersion + 1;
+
+        // Archive the current active state (the one being replaced) before restoring.
+        existing.getVersionHistory().add(0, buildSnapshot(existing, "Archived prior to rollback to version " + targetVersion));
+
+        // Re-index vector chunks for the restored content so semantic RAG search reflects the rolled-back text.
+        List<DocumentChunk> chunks = vectorRagService.indexDocumentChunks(guid, target.getFullContent());
+
+        existing.setFileName(target.getFileName());
+        existing.setFileSize(target.getFileSize());
+        existing.setFileSizeFormatted(target.getFileSizeFormatted());
+        existing.setFormat(target.getFormat());
+        existing.setPhysicalFilePath(target.getPhysicalFilePath());
+        existing.setEditDate(Instant.now());
+        existing.setVersionNumber(newVersionNumber);
+        existing.setBibtex(target.getBibtex());
+        existing.setBibtexRaw(target.getBibtexRaw());
+        existing.setSummaries(target.getSummaries());
+        existing.setContentExcerpt(target.getContentExcerpt());
+        existing.setFullContent(target.getFullContent());
+        existing.setChunks(chunks);
+
+        DocumentEntity saved = documentRepository.save(existing);
+        log.info("Document rolled back for GUID: {} to snapshot v{} (new active version v{})", guid, targetVersion, newVersionNumber);
+        return DocumentResponse.fromEntity(saved);
+    }
+
+    /**
+     * Builds an immutable snapshot capturing a document entity's current state, for archival into
+     * {@code versionHistory} prior to an overwrite or rollback mutation.
+     *
+     * WHAT: Copies every user-facing and physical-asset field from the live entity into a
+     * {@link DocumentVersionSnapshot}.
+     * WHY: Centralizes snapshot construction so {@link #overwriteDocument} and {@link #rollbackToVersion}
+     * cannot drift from each other on which fields get preserved.
+     *
+     * @param entity Live document entity to capture.
+     * @param note   Human-readable audit note describing why this snapshot was archived.
+     * @return Immutable {@link DocumentVersionSnapshot}.
+     */
+    private DocumentVersionSnapshot buildSnapshot(DocumentEntity entity, String note) {
+        return DocumentVersionSnapshot.builder()
+                .snapshotGuid("snapshot-" + entity.getGuid() + "-v" + entity.getVersionNumber() + "-" + System.currentTimeMillis())
+                .versionNumber(entity.getVersionNumber())
+                .fileName(entity.getFileName())
+                .fileSize(entity.getFileSize())
+                .fileSizeFormatted(entity.getFileSizeFormatted())
+                .format(entity.getFormat())
+                .physicalFilePath(entity.getPhysicalFilePath())
+                .savedAt(entity.getEditDate() != null ? entity.getEditDate() : Instant.now())
+                .bibtex(entity.getBibtex())
+                .bibtexRaw(entity.getBibtexRaw())
+                .summaries(entity.getSummaries())
+                .contentExcerpt(entity.getContentExcerpt())
+                .fullContent(entity.getFullContent())
+                .chunksCount(entity.getChunks() != null ? entity.getChunks().size() : 0)
+                .note(note)
+                .build();
     }
 
     /**
