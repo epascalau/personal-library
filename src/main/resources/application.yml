@@ -5,9 +5,11 @@ spring:
   application:
     name: personal-library-backend
 
-  data:
-    mongodb:
-      uri: mongodb://${MONGODB_USER:root}:${MONGODB_PASSWORD:librarypass}@${MONGODB_HOST:localhost}:${MONGODB_PORT:27017}/personal_library?authSource=admin
+  # Spring Boot 4 moved Mongo autoconfiguration into its own "spring-boot-mongodb" module and
+  # renamed the property prefix from "spring.data.mongodb" to "spring.mongodb" (the old prefix is
+  # a hard (error-level) deprecation and is silently ignored, not just a soft alias).
+  mongodb:
+    uri: mongodb://${MONGODB_USER:root}:${MONGODB_PASSWORD:librarypass}@${MONGODB_HOST:localhost}:${MONGODB_PORT:27017}/personal_library?authSource=admin
 
   servlet:
     multipart:

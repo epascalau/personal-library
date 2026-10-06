@@ -239,7 +239,7 @@ That is exactly how **Qdrant** uses **HNSW (Hierarchical Navigable Small World)*
 
 ### 3.2 Concrete Inspection: Spring Boot Qdrant Integration & Schema
 
-Our Spring Boot 3 backend (`VectorRagService.java`) configures the Qdrant collection and searches it:
+Our Spring Boot 4 backend (`VectorRagService.java`) configures the Qdrant collection and searches it:
 
 ```java
 // Spring Boot Qdrant Collection Definition

@@ -1,7 +1,7 @@
 spring:
-  data:
-    mongodb:
-      uri: mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
+  # Spring Boot 4: property prefix moved from "spring.data.mongodb" to "spring.mongodb"
+  mongodb:
+    uri: mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
 
   security:
     oauth2:

@@ -7,9 +7,9 @@ package com.personallibrary.config;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,7 +65,7 @@ public class OllamaConfig {
      */
     @Bean
     public OllamaApi ollamaApi() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.defaults()
+        HttpClientSettings settings = HttpClientSettings.defaults()
                 .withConnectTimeout(OLLAMA_CONNECT_TIMEOUT)
                 .withReadTimeout(OLLAMA_READ_TIMEOUT);
         RestClient.Builder restClientBuilder = RestClient.builder()
@@ -91,7 +91,7 @@ public class OllamaConfig {
     public OllamaChatModel llamaChatModel(OllamaApi ollamaApi) {
         return OllamaChatModel.builder()
                 .ollamaApi(ollamaApi)
-                .defaultOptions(OllamaOptions.builder()
+                .options(OllamaChatOptions.builder()
                         .model(llamaModelName)
                         .temperature(0.2)
                         .build())
@@ -112,7 +112,7 @@ public class OllamaConfig {
     public OllamaChatModel mistralChatModel(OllamaApi ollamaApi) {
         return OllamaChatModel.builder()
                 .ollamaApi(ollamaApi)
-                .defaultOptions(OllamaOptions.builder()
+                .options(OllamaChatOptions.builder()
                         .model(mistralModelName)
                         .temperature(0.3)
                         .build())
