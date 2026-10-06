@@ -52,7 +52,7 @@
 > *"Here is our flight plan for the next hour:*
 > 1. *We start right away with a **Live Demo** so you see the running application, the SAP UI5 Web Components-based UI, and what grounded retrieval actually looks like in practice.*
 > 2. *Next, we address **Why This App?**: the CS PhD perspective on why prompt-level hacks fall short, and how the value bottleneck has inverted from coding syntax to cognitive orchestration.*
-> 3. *Then, the **Enterprise Architecture**: our decoupled polyglot stack—Spring Boot 3.3.4, Qdrant, MongoDB 7.0, and Camunda BPMN 2.0 workflows.*
+> 3. *Then, the **Enterprise Architecture**: our decoupled polyglot stack—Spring Boot 4.1.1, Qdrant, MongoDB 7.0, and Camunda BPMN 2.0 workflows.*
 > 4. *In section 4, we explain **RAG from Scratch**: the 'Tiny Desk' analogy, tokens as Lego bricks, embeddings as GPS coordinates in the Map of Meaning, and a step-by-step walkthrough using Chapter 1 of 'The Wonderful Wizard of Oz'.*
 > 5. *We will analyze **Two Comparative Tables**: Academic CS vs. Strategic Leadership, followed by MongoDB vs. Qdrant and our commercial development ROI ledger.*
 > 6. *Finally, the remaining 15 minutes are reserved for an **Open Floor Q&A** with you."*
@@ -134,15 +134,15 @@
 
 ### Slide 7: Section 3 — Multi-Tier Decoupled Architecture
 * **Elapsed Time:** `18:00 - 21:30` (3.5 minutes)
-* **Visual Anchor:** 4-column topology: Client Tier (UI5), Gateway (Express 4.21), Business Core (Spring Boot 3.3.4), Polyglot Persistence (MongoDB + Qdrant).
+* **Visual Anchor:** 4-column topology: Client Tier (UI5), Gateway (Express 4.21), Business Core (Spring Boot 4.1.1), Polyglot Persistence (MongoDB + Qdrant).
 * **Core Takeaway:** Every component is decoupled behind standard contracts, enabling independent scaling and replacement.
 
 #### Verbatim Presenter Script:
 > *"Let's examine our physical architecture. Notice how cleanly decoupled each tier is:
 > 
 > * **At the presentation layer:** SAP UI5 Web Components, running fully client-side.
-> * **At the gateway layer:** Express 4.21 on Node 22 providing an OpenAPI 3.0 compliant proxy, serving static assets, and terminating client authentication.
-> * **At the business core:** Spring Boot 3.3.4 running on Java 21, integrating Spring AI with Ollama and Qdrant gRPC clients.
+> * **At the gateway layer:** `nginx` terminates the single ingress port and routes every `/api/v1/*` request to the real Java business core by default; Express 4.21 on Node 22 serves static assets and only answers `/api/v1/*` itself with a self-contained in-memory simulation when reached directly on its own port (bypassing nginx), used for offline demos without the Java/Mongo/Qdrant stack running.
+> * **At the business core:** Spring Boot 4.1.1 running on Java 21, integrating Spring AI with Ollama and Qdrant gRPC clients.
 > * **At the persistence layer:** A polyglot dual-database topology. MongoDB 7.0 acts as our authoritative System of Record for documents, version history, and BibTeX ASTs. Qdrant acts as our high-speed semantic index for vectors."*
 
 ---

@@ -122,22 +122,21 @@ The complete domain model has been compiled into 5 publication-grade architectur
 
 | Field Name | Type | Key / Constraint | Description |
 | :--- | :--- | :--- | :--- |
-| `snapshotGuid` | `UUID` | **Primary Key** | Unique identifier for the historical snapshot. |
-| `documentGuid` | `UUID` | Foreign Key | Owning document GUID. |
+| `snapshotGuid` | `String` | **Primary Key** | Unique identifier for the historical snapshot. |
 | `versionNumber` | `Integer` | Historical Sequence | Version number archived at the time of the snapshot. |
 | `fileName` | `String` | Non-Null | Physical file name archived at this version. |
 | `fileSize` | `Long` | Bytes | Size of the physical asset at this version. |
+| `fileSizeFormatted` | `String` | Derived | Human-readable formatted size (e.g. `"42 B"`). |
 | `format` | `String` | Enum | File format extension. |
+| `physicalFilePath` | `String` | Path | Server disk path to the version-isolated preserved asset (`.../v{version}/{filename}`), independent of the current active file. |
 | `savedAt` | `Instant` | UTC Timestamp | Moment the snapshot was archived. |
-| `sha256Hash` | `String` | Digest | SHA-256 checksum of the historical file binary. |
+| `bibtex` | `BibTeXMetadata` | Embedded | Structured BibTeX metadata active at this version. |
 | `bibtexRaw` | `Text` | LaTeX BibTeX | Complete formatted BibTeX metadata active at this version. |
-| `llamaSummary` | `Text?` | Markdown | Llama summary state active at this version. |
-| `mistralSummary` | `Text?` | Markdown | Mistral summary state active at this version. |
+| `summaries` | `Map<String, SummaryRecord>` | Keyed by model (`llama`, `mistral`) | Dual-model AI summary state active at this version. |
 | `contentExcerpt` | `String` | Excerpt | Text excerpt active at this version. |
 | `fullContent` | `Text?` | Plain Text | Complete text stream archived for non-destructive restoration. |
 | `chunksCount` | `Integer` | Count | Number of chunks vectorized at this version. |
-| `changeLogNote` | `String` | Mandatory | User audit explanation detailing why the version was modified or rolled back. |
-| `modifiedBy` | `String` | Foreign Key | Authenticated user identity who triggered the version mutation. |
+| `note` | `String` | Audit Note | Contextual explanation of why the snapshot was archived (overwrite vs. rollback). |
 
 ---
 

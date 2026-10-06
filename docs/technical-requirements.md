@@ -178,15 +178,16 @@ The platform provides an end-to-end, decoupled enterprise topology featuring:
 | `POST` | `/api/v1/documents` | Upload & Process Document | Multipart: `file, title, author, bibtex` | `DocumentDetail` |
 | `POST` | `/api/v1/documents/extract-metadata`| Extract BibTeX from Preview | `{ fileName, contentSample }` | `BibTeXMetadata` |
 | `GET` | `/api/v1/documents/{guid}` | Object Page Entity Details | Path: `guid` | `DocumentDetail` |
-| `PUT` | `/api/v1/documents/{guid}` | In-Place Metadata Update | `{ title, author, bibtex, tags }` | `DocumentDetail` |
+| `PUT` | `/api/v1/documents/{guid}` | In-Place Overwrite (file and/or metadata); archives prior state to `versionHistory` | Multipart: `file?, bibtex?` | `DocumentDetail` |
 | `DELETE`| `/api/v1/documents/{guid}` | Purge Document & Vectors | Path: `guid` | `{ success: true, message }` |
+| `GET` | `/api/v1/documents/{guid}/download` | Download Active Physical Asset | Path: `guid` | Binary file stream (`application/octet-stream`) |
 | `GET` | `/api/v1/documents/{guid}/versions` | Historical Snapshot Lineage | Path: `guid` | `List<DocumentVersionSnapshot>` |
 | `GET` | `/api/v1/documents/{guid}/versions/{v}/download` | Download Historical Asset | Path: `guid, version` | Binary file stream (`application/octet-stream`) |
 | `POST` | `/api/v1/documents/{guid}/rollback/{v}` | Non-Destructive Rollback | Path: `guid, version` | `DocumentDetail` |
 | `POST` | `/api/v1/documents/{guid}/summarize` | Trigger AI Summarization | `{ model: "llama" \| "mistral" }` | `SummaryRecord` |
 | `POST` | `/api/v1/documents/{guid}/chat` | RAG Conversational Query | `{ question, chatHistory[] }` | `ChatResponse (answer, citations[])` |
-| `GET` | `/api/v1/documents/{guid}/bibtex` | Export Formatted BibTeX | Path: `guid` | `text/plain` |
-| `GET` | `/export.zip` | Standalone Project ZIP Export | None | In-memory ZIP stream |
+| `POST` | `/api/v1/chat` | Top-Level RAG Query (resolves target document by GUID) | `{ documentGuid, question, chatHistory[] }` | `ChatResponse (answer, citations[])` |
+| `GET` | `/export.zip` | Standalone Project ZIP Export (Integrated Gateway only; not implemented in the Java backend) | None | In-memory ZIP stream |
 
 ---
 *Document Version: 1.1.0 • Formally synchronized with the Personal Library Enterprise Architecture.*

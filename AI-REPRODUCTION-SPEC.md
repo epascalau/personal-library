@@ -57,7 +57,7 @@ The system operates across a C4 container deployment topology:
                                            | HTTP / JSON (:8080)
                                            v
 +-----------------------------------------------------------------------------------+
-| 3. ENTERPRISE APPLICATION TIER (Spring Boot 3.3+ Java 21 :8080)                   |
+| 3. ENTERPRISE APPLICATION TIER (Spring Boot 4.1.1 / Spring AI 2.0 Java 21 :8080)  |
 |    - Spring Data MongoDB (Documents, Versions, Audit Trail)                       |
 |    - Spring AI Ollama Engine (Llama 3.3 & Mistral Large)                          |
 |    - Spring AI Qdrant Vector Client (Chunk Embeddings & RAG Search)                |
@@ -312,7 +312,7 @@ personal-library/
 ### 5.4 Backend Services & Ingestion Pipeline (`src/main/java/` & `src/main/server/`)
 
 #### 1. Ingestion Pipeline
-1. **Upload**: Binary document received via `POST /api/v1/documents/upload`.
+1. **Upload**: Binary document received via `POST /api/v1/documents` (multipart/form-data).
 2. **File Storage**: Binary written to persistent volume (`/data/documents/{guid}/v{version}/{filename}`).
 3. **Extraction**:
    - PDF documents parsed via Apache PDFBox / Tika to extract raw text and structural metadata.
@@ -379,12 +379,13 @@ All endpoints are rooted under `/api/v1`:
 | `GET` | `/health` | Health & infrastructure readiness | None | `{ status: "UP", models: {...}, vectorStore: {...} }` |
 | `GET` | `/documents` | Search and filter catalog | `query, fileType, author, dateFrom, dateTo, page, size, sortField, sortOrder` | `PaginatedResponse<DocumentResponse>` |
 | `GET` | `/documents/{guid}` | Retrieve single document | None | `DocumentResponse` |
-| `POST` | `/documents/upload` | Ingest new document | `multipart/form-data` (`file`, `title`, `author`, `bibtex`) | `DocumentResponse` |
-| `PUT` | `/documents/{guid}` | Update metadata | JSON metadata fields | `DocumentResponse` |
-| `POST` | `/documents/{guid}/version` | In-place version overwrite | `multipart/form-data` (`file`, `bumpType`, `changeSummary`) | `DocumentResponse` |
+| `POST` | `/documents` | Ingest new document | `multipart/form-data` (`file`, `bibtex`) | `DocumentResponse` |
+| `PUT` | `/documents/{guid}` | Overwrite file/metadata in-place; archives prior state to `versionHistory` | `multipart/form-data` (`file`?, `bibtex`?) | `DocumentResponse` |
+| `GET` | `/documents/{guid}/download` | Download the active physical file asset | None | Binary file stream |
 | `GET` | `/documents/{guid}/versions` | List version history | None | `List<DocumentVersionSnapshot>` |
 | `GET` | `/documents/{guid}/versions/{v}/download` | Download historical binary | None | Binary file stream |
 | `POST` | `/documents/{guid}/rollback/{v}` | Non-destructive rollback | None | `DocumentResponse` |
+| `POST` | `/chat` | Top-level conversational RAG query against a resolved document | `{ documentGuid, question, chatHistory[] }` | `ChatResponse` |
 | `DELETE`| `/documents/{guid}` | Soft or hard delete | None | `{ success: true, guid: "..." }` |
 | `POST` | `/documents/{guid}/summarize`| Trigger dual AI summary | `{ model: "llama" \| "mistral" \| "all" }` | `DocumentResponse` |
 | `POST` | `/documents/{guid}/rag` | Conversational RAG query | `{ query: string, topK?: number }` | `ChatResponse` with citations |

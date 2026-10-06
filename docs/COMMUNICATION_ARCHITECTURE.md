@@ -50,8 +50,9 @@ All network operations are orchestrated through `src/main/frontend/services/back
 ```
 
 ### Core REST Endpoints
-* `POST /api/v1/documents/upload`: Multipart upload with automatic text extraction, chunking, and vector indexing. On the Java Spring Boot target this is a real Qdrant upsert; on the default Express gateway target it is simulated with an in-memory substring index.
+* `POST /api/v1/documents`: Multipart upload with automatic text extraction, chunking, and vector indexing. On the default **Direct Java Spring Boot** target this is a real Qdrant upsert; on the "Integrated Gateway" (Express mock) target it is simulated with an in-memory substring index.
 * `GET /api/v1/documents`: Paginated, multi-attribute filter queries with sort expressions.
+* `GET /api/v1/documents/:guid/download`: Streams the active physical file asset.
 * `POST /api/v1/documents/:guid/summarize`: Dual-model comparative inference (`llama` vs. `mistral`).
 * `POST /api/v1/chat`: Conversational RAG with top-$K$ cosine vector retrieval and grounded citations. Likewise, vector retrieval is genuine (Qdrant) on the Java target and simulated (substring match) on the Express gateway target.
 * `POST /api/v1/documents/:guid/rollback/:version`: Non-destructive historical version restoration.
