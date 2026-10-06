@@ -187,6 +187,41 @@ services:
       - library-net
 
   # ==============================================================================
+  # Storage Browser: Read-Only Web Viewer for the Uploaded-Documents Volume
+  # ==============================================================================
+  # WHAT: Serves a plain directory listing of the `library_storage` named volume —
+  # the physical bytes written by StorageService, laid out as
+  # `{documentGuid}/v{versionNumber}/{originalFileName}`.
+  # WHY: MongoDB holds document *metadata* and Qdrant holds *embeddings*, but until
+  # now nothing exposed the actual uploaded files. Learners could not confirm that a
+  # PDF really landed on disk, nor see how version-isolated subdirectories make every
+  # historical revision independently addressable — the mechanism that makes rollback
+  # non-destructive. This turns an invisible volume into a clickable, self-explanatory
+  # artifact, completing the "System Services" quick-links trio (data / vectors / files).
+  #
+  # Mounted `:ro` on purpose: the viewer must never be able to delete or mutate a
+  # stored asset that a version snapshot or rollback still depends on.
+  #
+  # No healthcheck: this image is built FROM scratch (a single static Go binary with
+  # no shell, wget, or curl), so no in-container probe command can be executed.
+  # ==============================================================================
+  storage-browser:
+    image: halverneus/static-file-server:v1.8.10
+    container_name: personal-library-storage-browser
+    restart: unless-stopped
+    ports:
+      - "8092:8080"
+    environment:
+      # Serve the mount point itself, with directory indexes enabled so each
+      # GUID/version folder is navigable rather than returning 404 on a bare path.
+      - FOLDER=/web
+      - SHOW_LISTING=true
+    volumes:
+      - library_storage:/web:ro
+    networks:
+      - library-net
+
+  # ==============================================================================
   # Qdrant: High-Performance Vector Database for Embeddings & Semantic RAG Search
   # ==============================================================================
   # ARCHITECTURAL RATIONALE:

@@ -22,8 +22,9 @@ This document is the authoritative technical reference for how **Personal Librar
       mongodb    qdrant      ollama    keycloak   (storage      serves dist/
       :37017  :16333/16334  :21434     :8180       volume)      (Vite build)
 
-                      swagger-editor :8090 ── (also reachable via nginx /swagger/)
-                      mongo-express  :8091 ── (MongoDB web viewer)
+                      swagger-editor  :8090 ── (also reachable via nginx /swagger/)
+                      mongo-express   :8091 ── (MongoDB web viewer)
+                      storage-browser :8092 ── (read-only view of library_storage)
 ```
 
 **Key fact**: `personal-library-app` is a **single container image** running **two runtimes side by side** (Node/Express on 13000 *and* the Spring Boot JAR on 18080), started together by `docker-entrypoint.sh`. This is not two separate services — see §3.
@@ -63,12 +64,13 @@ This single-container-two-process design was chosen over two separate images/con
 | `nginx` | `nginx:1.27-alpine` | `8088→80` | `personal-library-app` (healthy), `swagger-editor` (healthy) | Single ingress — see §5. Host-published on `8088`, not the standard `80`, so this educational stack never collides with another local web server already bound to port 80. |
 | `mongodb` | `mongo:7.0` | `37017→27017` | — | Document metadata + version history persistence. Host-published on `37017`, not MongoDB's own `27017` default, to avoid colliding with a MongoDB instance already running locally; internal service-to-service traffic still uses the real `27017`. |
 | `mongo-express` | `mongo-express:1.0.2` | `8091→8081` | `mongodb` (healthy) | Lightweight browser GUI for `personal_library` (collections, documents, ad-hoc queries) — an alternative to `mongosh` one-liners. `ME_CONFIG_BASICAUTH=false` since it sits behind the same trust boundary as the other dev-time admin ports; connects internally using the `mongodb` service's `root`/`librarypass` credentials. |
+| `storage-browser` | `halverneus/static-file-server:v1.8.10` | `8092→8080` | — | Read-only directory listing of the `library_storage` volume, exposing the physical uploaded files as `{guid}/v{version}/{fileName}`. Complements `mongo-express` (metadata) and the Qdrant dashboard (embeddings) by making the third persistence tier — the bytes on disk — inspectable too, which is what demonstrates that version-isolated subdirectories keep rollback non-destructive. Mounted `:ro` so the viewer can never mutate an asset a version snapshot depends on. **No healthcheck**: the image is built `FROM scratch` (one static Go binary, no shell/wget/curl), so no in-container probe can run. |
 | `qdrant` | `qdrant/qdrant:v1.11.0` | `16333→6333` (REST), `16334→6334` (gRPC) | — | Vector search; Spring AI connects over gRPC (6334, internal) for binary embedding transfer; TLS disabled since traffic never leaves the internal `library-net` bridge network (edge TLS belongs at nginx). Host-published on `16333`/`16334`, not Qdrant's own `6333`/`6334` defaults, to avoid colliding with a Qdrant instance already running locally. |
 | `ollama` | `ollama/ollama:latest` | `21434→11434` | — | Local LLM + embedding inference. Custom `entrypoint: ollama-entrypoint.sh` (not the stock image entrypoint) trusts `./certs` **before** `ollama serve` starts, so the very first model pull can succeed through a corporate TLS-intercepting proxy. `OLLAMA_PRELOAD_MODELS` controls which models are pulled on first boot (default `nomic-embed-text llama3.2 mistral`). Host-published on `21434`, not Ollama's own `11434` default, to avoid colliding with an Ollama daemon already running locally; internal service-to-service traffic still uses the real `11434`. |
 | `keycloak` | `quay.io/keycloak/keycloak:24.0.5` | `8180→8080` | — | OIDC identity provider; `start-dev --import-realm` auto-imports `./config/keycloak-realm.json` on first boot. |
 
 ### 4.1 Persistent Volumes
-`mongodb_data`, `qdrant_data`, `ollama_models` (~7 GB), `library_storage` (uploaded physical files) — all **named, external-lifetime** volumes that survive `docker compose down` and ordinary rebuilds. Only `scripts/rebuild.sh --purge-data`/`--purge-models` removes them (§6).
+`mongodb_data`, `qdrant_data`, `ollama_models` (~7 GB), `library_storage` (uploaded physical files, browsable read-only at `http://localhost:8092` — see `storage-browser` in §4) — all **named, external-lifetime** volumes that survive `docker compose down` and ordinary rebuilds. Only `scripts/rebuild.sh --purge-data`/`--purge-models` removes them (§6).
 
 ### 4.2 Why `qdrant: condition: service_started` (not `service_healthy`)
 Unlike every other dependency, `qdrant` has no `healthcheck:` block in Compose — `personal-library-app` only waits for the container process to **start**, not for a verified-healthy response. The Spring AI Qdrant client itself handles retry/backoff on first connection, and `VectorRagService`'s RAG chat path gracefully degrades to the document's plain-text excerpt if a Qdrant query fails (see [BACKEND_ARCHITECTURE.md §5.2](BACKEND_ARCHITECTURE.md)) — so the extra startup-ordering guarantee was judged unnecessary for this one dependency.

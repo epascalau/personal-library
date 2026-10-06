@@ -254,6 +254,7 @@ Access Points:
 * **Keycloak Administration:** `http://localhost:8180` (admin/admin)
 * **Qdrant Vector Dashboard:** `http://localhost:16333/dashboard`
 * **Mongo Express (MongoDB web viewer):** `http://localhost:8091`
+* **Document Storage Browser (uploaded files on disk, read-only):** `http://localhost:8092`
 
 #### Enterprise Single Ingress: Nginx Reverse Proxy
 
@@ -390,6 +391,19 @@ The application stack orchestrates 8 container services (app, swagger-editor, ng
 ### 1. Uploaded File Storage & Volume Inspection
 
 All uploaded binary documents (`.pdf`, `.docx`, `.md`, `.txt`, `.pptx`, `.xlsx`) and their historical version archives are stored in the persistent volume `personal-library-file-storage`, mounted inside the app container at `/app/storage/documents`.
+
+Files are laid out as **`{documentGuid}/v{versionNumber}/{originalFileName}`** — one subdirectory per version, which is exactly why rollback is non-destructive: overwriting the active version never touches the bytes an earlier snapshot still points at.
+
+#### Browse the volume in a web browser (easiest)
+
+`docker compose up` starts a `storage-browser` container that serves a **read-only** directory listing of this volume:
+
+* **URL:** [http://localhost:8092](http://localhost:8092)
+* Click through `{guid}/` → `v{n}/` to reach any file; clicking a file streams it (PDFs open inline in most browsers).
+* Also reachable from inside the app: **user avatar → System Services → Document Storage Browser**.
+* The volume is mounted `:ro`, so nothing you do here can delete or alter a stored document.
+
+#### Inspect from the command line
 
 * **List all uploaded files in the storage volume:**
   ```bash

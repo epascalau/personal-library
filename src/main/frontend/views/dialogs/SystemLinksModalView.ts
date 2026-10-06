@@ -7,8 +7,9 @@
  * WHAT: A single, discoverable overlay listing every infrastructure service running
  * behind the application — Swagger Editor, the Java backend's own springdoc Swagger UI,
  * Spring Boot Actuator health, the Keycloak admin console, the Qdrant vector DB dashboard,
- * Mongo Express (MongoDB web viewer), the Ollama inference API, and the nginx single
- * ingress — each as a one-click external link with credentials/usage hints.
+ * Mongo Express (MongoDB web viewer), the read-only document storage browser, the Ollama
+ * inference API, and the nginx single ingress — each as a one-click external link with
+ * credentials/usage hints.
  *
  * WHY: Today these services are only documented in README.md ("Docker Inspection") and
  * scattered docker-compose.yml comments; a developer or operator has to already know every
@@ -89,6 +90,14 @@ const LINKS: SystemLinkEntry[] = [
     subtitle: 'Web viewer/editor for the personal_library MongoDB database',
     credentials: 'root / librarypass',
     url: (host) => `http://${host}:8091/`
+  },
+  {
+    id: 'storage-browser',
+    iconKey: 'HardDrive',
+    tile: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 border-teal-100 dark:border-teal-900/50',
+    title: 'Document Storage Browser',
+    subtitle: 'Read-only listing of the uploaded files on disk ({guid}/v{version}/{fileName})',
+    url: (host) => `http://${host}:8092/`
   },
   {
     id: 'ollama-api',
