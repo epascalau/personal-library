@@ -40,6 +40,37 @@
  *    same interface entirely in browser `localStorage`, useful for offline UI
  *    development/demos with zero backend infrastructure running.
  *
+ * ## "Integrated Gateway" vs. "Local Standalone Engine" — they sound similar, they are NOT
+ * Both options happen to avoid MongoDB/Qdrant, which makes them easy to confuse. The actual
+ * differences are night and day:
+ *
+ * | Aspect                      | 1. Integrated Gateway (`/api/v1`)                | 4. Local Standalone Engine (Mock)             |
+ * |-----------------------------|---------------------------------------------------|-------------------------------------------------|
+ * | Adapter class                | `RestBackendAdapter` (real HTTP `fetch` calls)     | `MockBackendAdapter` (zero network calls)        |
+ * | Requires a server process?   | YES — the Node/Express server in `server.ts`       | NO — works with no backend/Docker running        |
+ * |                               | must be running (started by `npm run dev` or       | at all; everything executes inside the           |
+ * |                               | the Docker container).                             | browser tab itself.                              |
+ * | Where data lives              | Server-side, in that Node process's memory         | Client-side, in *this browser's* `localStorage`  |
+ * |                               | (`documentsDatabase` array in `server.ts`).        | (key `personal_library_mock_docs`).              |
+ * | Survives a page reload?      | Yes (server process keeps running).                | Yes (localStorage persists across reloads).      |
+ * | Survives a server restart/   | NO — in-memory array resets to the seed data.      | N/A — there is no server to restart; data only   |
+ * | container rebuild?           |                                                     | disappears if the user clears browser storage.   |
+ * | AI summarization              | **REAL** — makes an actual HTTP call to the        | **FAKE** — `regenerateSummary()` immediately     |
+ * |                               | local Ollama daemon and waits for genuine          | throws an error telling the user to switch to a  |
+ * |                               | model inference (can take minutes on CPU).         | live backend; only pre-seeded, hardcoded summary |
+ * |                               |                                                     | text is ever shown.                              |
+ * | RAG chat answers              | **REAL** — Ollama generates the answer from        | **FAKE** — `chatWithDocument()` matches question |
+ * |                               | whatever the substring "search" found.             | keywords against a small hardcoded script (e.g.  |
+ * |                               |                                                     | "Wizard of Oz" characters) and returns canned    |
+ * |                               |                                                     | text — no model is invoked at all.               |
+ * | Typical use                   | Everyday local development against a realistic    | Zero-infrastructure demos, offline UI/UX work, or |
+ * |                               | REST contract without juggling MongoDB/Qdrant.     | when no Docker/Ollama is available at all.        |
+ *
+ * In short: Integrated Gateway means real network calls to a real (but simplified)
+ * server that talks to a real Ollama daemon, while Local Standalone Engine means no
+ * network calls whatsoever — entirely scripted/canned responses, running purely in
+ * the browser tab.
+ *
  * None of these options involve Google Gemini or any other cloud LLM API —
  * Gemini was removed entirely; every "live" option above ultimately calls a
  * locally running Ollama daemon, whether through the Node gateway or the Java
@@ -100,6 +131,13 @@ const ENGINE_OPTIONS: EngineOption[] = [
     // MongoDB/Qdrant integration. The one genuine network call it makes is to
     // the local Ollama daemon's `/api/generate` endpoint for summarization,
     // BibTeX extraction, and RAG chat.
+    //
+    // vs. "Local Standalone Engine" (#4, below): this option still makes REAL
+    // HTTP requests over the network to a server process that must be running
+    // (`npm run dev` / Docker container) and gets back REAL Ollama-generated
+    // summaries/chat answers — only the document "database" and "search" are
+    // simulated. #4 makes NO network requests at all and returns only
+    // pre-scripted/canned text; it cannot generate new AI content.
     preset: 'integrated',
     id: 'integrated',
     iconKey: 'Zap',
@@ -108,7 +146,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     badge: 'Default',
     badgeClass: 'bg-blue-100 dark:bg-blue-950/70 text-[#0070f2] dark:text-[#38bdf8] dark:border-blue-900/60',
     description:
-      'Built-in Node.js gateway (same container/port as the UI) with in-memory storage and simulated search; calls local Ollama directly for AI.'
+      'Built-in Node.js gateway (same container/port as the UI). Requires the server process running; makes real network calls and calls local Ollama directly for genuine AI summaries/chat — only document storage and search are simulated in-memory.'
   },
   {
     // Bypasses the Node gateway entirely and talks straight to the standalone
@@ -153,6 +191,15 @@ const ENGINE_OPTIONS: EngineOption[] = [
     // BibTeX metadata, summaries, and RAG chat are all synthesized and persisted
     // in the browser's `localStorage`. No Docker stack, Ollama, MongoDB, or
     // Qdrant needs to be running at all. Ideal for offline UI/UX work or demos.
+    //
+    // vs. "Integrated Gateway" (#1, above): both options skip real MongoDB/Qdrant,
+    // which is why they're easy to mix up — but #1 still requires a running
+    // server process and makes real HTTP calls that hit a real Ollama daemon for
+    // genuine AI text. This option (#4) runs entirely inside the browser tab with
+    // NO server and NO network traffic whatsoever: `regenerateSummary()` always
+    // throws (new AI summaries cannot be computed offline) and `chatWithDocument()`
+    // only returns a handful of hardcoded, keyword-matched canned answers — no
+    // model is ever invoked.
     preset: 'mock',
     id: 'mock',
     iconKey: 'HardDrive',
@@ -161,7 +208,7 @@ const ENGINE_OPTIONS: EngineOption[] = [
     badge: 'No Backend Required',
     badgeClass: 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 dark:border-amber-900/60',
     description:
-      'Zero-server mock engine storing all documents, summaries, and vector chat in browser localStorage.'
+      'Zero-server mock engine: no network calls at all, no AI generation — documents/summaries/chat are pre-seeded or scripted and stored in browser localStorage only.'
   }
 ];
 
