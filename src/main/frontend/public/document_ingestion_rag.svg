@@ -17,10 +17,10 @@
 
   <!-- Title & Metadata Banner -->
   <rect x="15" y="10" width="1710" height="45" rx="6" fill="#0f172a" />
-  <text x="35" y="38" font-size="16" font-weight="700" fill="#ffffff" letter-spacing="-0.3">Personal Library · Camunda BPMN 2.0 Process Definition</text>
-  <text x="630" y="38" font-size="12" font-weight="500" fill="#94a3b8">Process ID: Process_DocumentIngestionRAG · Specification Version: 1.0.0 · Dual AI &amp; Qdrant RAG</text>
-  <rect x="1570" y="21" width="140" height="23" rx="4" fill="#0070f2" />
-  <text x="1640" y="37" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Camunda 7 &amp; 8 Ready</text>
+  <text x="35" y="38" font-size="16" font-weight="700" fill="#ffffff" letter-spacing="-0.3">Personal Library · BPMN 2.0 Process Definition (Static Export)</text>
+  <text x="710" y="38" font-size="12" font-weight="500" fill="#94a3b8">Process ID: Process_DocumentIngestionRAG · Spec Version: 1.0.0 · Dual AI &amp; Qdrant RAG</text>
+  <rect x="1500" y="21" width="210" height="23" rx="4" fill="#64748b" />
+  <text x="1605" y="37" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Not Executed · View/Download Only</text>
 
   <!-- Master Collaboration Pool -->
   <rect x="15" y="65" width="1710" height="740" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />

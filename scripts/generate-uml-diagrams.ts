@@ -39,18 +39,15 @@ package "com.personallibrary.controller" {
     - summarizationService: AiSummarizationService
     - vectorRagService: VectorRagService
     - storageService: StorageService
-    - objectMapper: ObjectMapper
-    + queryDocuments(fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder): ResponseEntity<PaginatedResponse<DocumentResponse>>
-    + getDocumentByGuid(guid: String): ResponseEntity<DocumentResponse>
+    - jsonMapper: JsonMapper
+    + getDocuments(fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder): ResponseEntity<PaginatedResponse<DocumentResponse>>
+    + getDocument(guid: String): ResponseEntity<DocumentResponse>
     + uploadDocument(file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
-    + overwriteDocumentVersion(guid: String, file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
-    + deleteDocument(guid: String): ResponseEntity<Map<String, String>>
-    + summarizeDocument(guid: String, request: SummarizeRequest): ResponseEntity<SummaryRecord>
-    + conversationalChat(request: ChatRequest): ResponseEntity<ChatResponse>
-    + downloadPhysicalAsset(guid: String): ResponseEntity<Resource>
-    + getVersionHistory(guid: String): ResponseEntity<List<DocumentVersionSnapshot>>
-    + downloadHistoricalAsset(guid: String, version: int): ResponseEntity<Resource>
-    + rollbackDocumentVersion(guid: String, version: int): ResponseEntity<DocumentResponse>
+    + extractMetadata(payload: Map<String, String>): ResponseEntity<BibTeXMetadata>
+    + overwriteVersion(guid: String, file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
+    + deleteDocument(guid: String): ResponseEntity<Map<String, Object>>
+    + regenerateSummary(guid: String, request: SummarizeRequest): ResponseEntity<SummaryRecord>
+    + chatWithDocument(guid: String, request: ChatRequest): ResponseEntity<ChatResponse>
   }
 
   class AuthController <<RestController>> {
@@ -68,60 +65,55 @@ package "com.personallibrary.service" {
     - summarizationService: AiSummarizationService
     - vectorRagService: VectorRagService
     + uploadDocument(file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse
-    + overwriteVersion(guid: String, file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse
-    + queryDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse<DocumentResponse>
-    + getDocument(guid: String): DocumentResponse
+    + overwriteDocument(existingGuid: String, newFile: MultipartFile, updatedBibtex: BibTeXMetadata): DocumentResponse
+    + getDocumentByGuid(guid: String): DocumentResponse
+    + getEntityByGuid(guid: String): DocumentEntity
     + deleteDocument(guid: String): void
-    + getVersionHistory(guid: String): List<DocumentVersionSnapshot>
-    + rollbackVersion(guid: String, targetVersion: int): DocumentResponse
+    + searchDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse<DocumentResponse>
   }
 
   class AiSummarizationService <<Service>> {
-    - llamaChatModel: ChatModel
-    - mistralChatModel: ChatModel
-    + generateLlamaSummary(title: String, content: String): SummaryRecord
-    + generateMistralSummary(title: String, content: String): SummaryRecord
+    - llamaChatClient: ChatClient
+    - mistralChatClient: ChatClient
     + generateDualSummaries(title: String, content: String, bibtex: BibTeXMetadata): Map<String, SummaryRecord>
+    + generateSummaryForModel(modelKey: String, title: String, content: String, bibtex: BibTeXMetadata): SummaryRecord
   }
 
   class VectorRagService <<Service>> {
-    - qdrantClient: QdrantClient
-    - embeddingModel: EmbeddingModel
-    + indexDocument(docId: String, content: String): List<DocumentChunk>
-    + searchSimilarChunks(query: String, topK: int, docFilter: String): List<DocumentChunk>
-    + deleteDocumentVectors(docId: String): void
+    - vectorStore: VectorStore
+    - llamaChatClient: ChatClient
+    + indexDocumentChunks(docGuid: String, text: String): List<DocumentChunk>
+    + chatWithDocument(docEntity: DocumentEntity, request: ChatRequest): ChatResponse
   }
 
   class BibTeXExtractionService <<Service>> {
-    - chatModel: ChatModel
-    + extractMetadata(fileName: String, content: String): BibTeXMetadata
-    + validateBibTeX(bibtex: BibTeXMetadata): boolean
-    + formatToRawBibTeX(bibtex: BibTeXMetadata): String
+    - chatClient: ChatClient
+    - jsonMapper: JsonMapper
+    + extractMetadata(fileName: String, sampleContent: String): BibTeXMetadata
   }
 
   class StorageService <<Service>> {
-    - storagePath: Path
+    - rootLocation: Path
+    - tika: Tika
     + storeFile(file: MultipartFile, guid: String): Path
-    + loadAsResource(guid: String, fileName: String): Resource
     + extractTextContent(filePath: Path): String
-    + deleteFile(guid: String): void
+    + deletePhysicalAsset(guid: String): void
   }
 }
 
 package "com.personallibrary.repository" {
   interface DocumentRepository <<Repository>> {
     + findByGuid(guid: String): Optional<DocumentEntity>
-    + deleteByGuid(guid: String): void
-    + findByPreviousVersionGuid(guid: String): List<DocumentEntity>
+    + findByPreviousVersionGuid(previousVersionGuid: String): List<DocumentEntity>
   }
 
   interface DocumentRepositoryCustom {
-    + searchDocuments(criteria: Map<String, Object>, pageable: Pageable): Page<DocumentEntity>
+    + searchDocuments(fileName, title, author, edition, format, content: String, pageable: Pageable): Page<DocumentEntity>
   }
 
   class DocumentRepositoryCustomImpl {
     - mongoTemplate: MongoTemplate
-    + searchDocuments(criteria: Map<String, Object>, pageable: Pageable): Page<DocumentEntity>
+    + searchDocuments(fileName, title, author, edition, format, content: String, pageable: Pageable): Page<DocumentEntity>
   }
 
   DocumentRepository --|> DocumentRepositoryCustom
@@ -223,8 +215,10 @@ package "com.personallibrary.config" {
   }
 
   class OllamaConfig <<Configuration>> {
-    + llamaChatModel(): ChatModel
-    + mistralChatModel(): ChatModel
+    + llamaChatModel(): OllamaChatModel
+    + mistralChatModel(): OllamaChatModel
+    + llamaChatClient(): ChatClient
+    + mistralChatClient(): ChatClient
     + embeddingModel(): EmbeddingModel
   }
 
@@ -395,17 +389,22 @@ package "services/backend" {
   }
 
   interface BackendAdapter {
-    + getHealth(): Promise<BackendHealthResult>
+    + testHealth(): Promise<BackendHealthResult>
     + getDocuments(params: DocumentQueryParams): Promise<DocumentListResult>
     + getDocument(guid: String): Promise<DocumentRecord>
     + uploadDocument(req: DocumentUploadPayload): Promise<DocumentRecord>
-    + overwriteDocument(guid: String, req: DocumentUploadPayload): Promise<DocumentRecord>
-    + deleteDocument(guid: String): Promise<boolean>
-    + summarizeDocument(guid: String, model: String): Promise<SummaryRecord>
-    + chat(req: ChatRequestPayload): Promise<ChatResponseResult>
+    + overwriteVersion(guid: String, req: DocumentUploadPayload): Promise<DocumentRecord>
+    + deleteDocument(guid: String): Promise<{success: boolean, message: String}>
+    + extractMetadata(fileName: String, sampleContent: String): Promise<BibTeXMetadata>
+    + regenerateSummary(guid: String, modelKey: String): Promise<SummaryRecord>
+    + chatWithDocument(guid: String, req: ChatRequestPayload): Promise<ChatResponseResult>
+    + login(username: String, password: String): Promise<...>
+    + logout(): Promise<void>
+    + getDownloadUrl(guid: String): String
     + getVersionHistory(guid: String): Promise<DocumentVersionSnapshot[]>
     + rollbackVersion(guid: String, targetVersion: number): Promise<DocumentRecord>
     + getHistoricalDownloadUrl(guid: String, versionNumber: number): String
+    + getOpenApiSpec(): Promise<String>
   }
 
   interface DocumentVersionSnapshot {
@@ -462,17 +461,14 @@ export function generateJavaMermaid(): string {
       -AiSummarizationService summarizationService
       -VectorRagService vectorRagService
       -StorageService storageService
-      +queryDocuments()
-      +getDocumentByGuid(guid)
+      +getDocuments()
+      +getDocument(guid)
       +uploadDocument(file, metadata)
-      +overwriteDocumentVersion(guid, file, metadata)
+      +extractMetadata(payload)
+      +overwriteVersion(guid, file, metadata)
       +deleteDocument(guid)
-      +summarizeDocument(guid, request)
-      +conversationalChat(request)
-      +downloadPhysicalAsset(guid)
-      +getVersionHistory(guid)
-      +downloadHistoricalAsset(guid, version)
-      +rollbackDocumentVersion(guid, version)
+      +regenerateSummary(guid, request)
+      +chatWithDocument(guid, request)
     }
 
     class DocumentService {
@@ -482,50 +478,45 @@ export function generateJavaMermaid(): string {
       -AiSummarizationService summarizationService
       -VectorRagService vectorRagService
       +uploadDocument(file, bibtex)
-      +overwriteVersion(guid, file, bibtex)
-      +queryDocuments(criteria, pageable)
-      +getDocument(guid)
+      +overwriteDocument(existingGuid, newFile, bibtex)
+      +getDocumentByGuid(guid)
+      +getEntityByGuid(guid)
       +deleteDocument(guid)
-      +getVersionHistory(guid)
-      +rollbackVersion(guid, targetVersion)
+      +searchDocuments(criteria, pageable)
     }
 
     class AiSummarizationService {
-      -ChatModel llamaChatModel
-      -ChatModel mistralChatModel
-      +generateLlamaSummary(title, content)
-      +generateMistralSummary(title, content)
+      -ChatClient llamaChatClient
+      -ChatClient mistralChatClient
       +generateDualSummaries(title, content, bibtex)
+      +generateSummaryForModel(modelKey, title, content, bibtex)
     }
 
     class VectorRagService {
-      -QdrantClient qdrantClient
-      -EmbeddingModel embeddingModel
-      +indexDocument(docId, content)
-      +searchSimilarChunks(query, topK, filter)
-      +deleteDocumentVectors(docId)
+      -VectorStore vectorStore
+      -ChatClient llamaChatClient
+      +indexDocumentChunks(docGuid, text)
+      +chatWithDocument(docEntity, request)
     }
 
     class BibTeXExtractionService {
-      -ChatModel chatModel
-      +extractMetadata(fileName, content)
-      +validateBibTeX(bibtex)
-      +formatToRawBibTeX(bibtex)
+      -ChatClient chatClient
+      -JsonMapper jsonMapper
+      +extractMetadata(fileName, sampleContent)
     }
 
     class StorageService {
-      -Path storagePath
+      -Path rootLocation
+      -Tika tika
       +storeFile(file, guid)
-      +loadAsResource(guid, fileName)
       +extractTextContent(path)
-      +deleteFile(guid)
+      +deletePhysicalAsset(guid)
     }
 
     class DocumentRepository {
       <<interface>>
       +findByGuid(guid)
-      +deleteByGuid(guid)
-      +findByPreviousVersionGuid(guid)
+      +findByPreviousVersionGuid(previousVersionGuid)
     }
 
     class DocumentEntity {
@@ -645,8 +636,10 @@ export function generateTypeScriptMermaid(): string {
       +getDocuments(params)
       +getDocument(guid)
       +uploadDocument(payload)
-      +summarizeDocument(guid, model)
-      +chat(payload)
+      +overwriteVersion(guid, payload)
+      +extractMetadata(fileName, content)
+      +regenerateSummary(guid, modelKey)
+      +chatWithDocument(guid, payload)
       +getVersionHistory(guid)
       +rollbackVersion(guid, version)
     }
@@ -717,8 +710,8 @@ export function generateJavaUmlSvg(): string {
 
   <!-- Title -->
   <rect x="30" y="20" width="1540" height="65" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
-  <text x="50" y="52" font-size="20" font-weight="800" fill="#f8fafc">Java Spring Boot 3 Backend — UML Class Diagram</text>
-  <text x="50" y="72" font-size="12" font-weight="500" fill="#94a3b8">Spring Boot 3.3.4 • Spring AI Dual Models (Llama 3.3 &amp; Mistral) • MongoDB Repository • Qdrant Vector Retrieval</text>
+  <text x="50" y="52" font-size="20" font-weight="800" fill="#f8fafc">Java Spring Boot 4 Backend — UML Class Diagram</text>
+  <text x="50" y="72" font-size="12" font-weight="500" fill="#94a3b8">Spring Boot 4.1.1 • Spring AI 2.0.1 Dual Models (Llama 3.3 &amp; Mistral) • MongoDB Repository • Qdrant Vector Retrieval</text>
 
   <!-- Package: Controller -->
   <rect x="30" y="105" width="750" height="340" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 4" />
@@ -741,16 +734,14 @@ export function generateJavaUmlSvg(): string {
 
     <!-- Operations -->
     <line x1="45" y1="246" x2="765" y2="246" stroke="#3b82f6" stroke-width="1" />
-    <text x="55" y="262" font-size="10" font-family="monospace" fill="#e2e8f0">+ queryDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): ResponseEntity&lt;PaginatedResponse&gt;</text>
-    <text x="55" y="278" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocumentByGuid(guid: String): ResponseEntity&lt;DocumentResponse&gt;</text>
+    <text x="55" y="262" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocuments(fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder): ResponseEntity&lt;PaginatedResponse&gt;</text>
+    <text x="55" y="278" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocument(guid: String): ResponseEntity&lt;DocumentResponse&gt;</text>
     <text x="55" y="294" font-size="10" font-family="monospace" fill="#e2e8f0">+ uploadDocument(file: MultipartFile, metadataJson: String): ResponseEntity&lt;DocumentResponse&gt;</text>
     <text x="55" y="310" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteDocumentVersion(guid: String, file: MultipartFile, metadata: String): ResponseEntity&lt;DocumentResponse&gt;</text>
-    <text x="55" y="326" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteDocument(guid: String): ResponseEntity&lt;Map&lt;String, String&gt;&gt;</text>
-    <text x="55" y="342" font-size="10" font-family="monospace" fill="#e2e8f0">+ summarizeDocument(guid: String, request: SummarizeRequest): ResponseEntity&lt;SummaryRecord&gt;</text>
-    <text x="55" y="358" font-size="10" font-family="monospace" fill="#e2e8f0">+ conversationalChat(request: ChatRequest): ResponseEntity&lt;ChatResponse&gt;</text>
-    <text x="55" y="374" font-size="10" font-family="monospace" fill="#e2e8f0">+ downloadPhysicalAsset(guid: String): ResponseEntity&lt;Resource&gt;</text>
-    <text x="55" y="390" font-size="10" font-family="monospace" fill="#e2e8f0">+ getVersionHistory(guid: String): ResponseEntity&lt;List&lt;DocumentVersionSnapshot&gt;&gt;</text>
-    <text x="55" y="406" font-size="10" font-family="monospace" fill="#e2e8f0">+ rollbackDocumentVersion(guid: String, version: int): ResponseEntity&lt;DocumentResponse&gt;</text>
+    <text x="55" y="326" font-size="10" font-family="monospace" fill="#e2e8f0">+ extractMetadata(payload: Map&lt;String, String&gt;): ResponseEntity&lt;BibTeXMetadata&gt;</text>
+    <text x="55" y="342" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteDocument(guid: String): ResponseEntity&lt;Map&lt;String, Object&gt;&gt;</text>
+    <text x="55" y="358" font-size="10" font-family="monospace" fill="#e2e8f0">+ regenerateSummary(guid: String, request: SummarizeRequest): ResponseEntity&lt;SummaryRecord&gt;</text>
+    <text x="55" y="374" font-size="10" font-family="monospace" fill="#e2e8f0">+ chatWithDocument(guid: String, request: ChatRequest): ResponseEntity&lt;ChatResponse&gt;</text>
   </g>
 
   <!-- Package: Service -->
@@ -771,9 +762,9 @@ export function generateJavaUmlSvg(): string {
     <text x="840" y="236" font-size="10" font-family="monospace" fill="#94a3b8">- vectorRagService: VectorRagService</text>
     <line x1="830" y1="244" x2="1555" y2="244" stroke="#10b981" stroke-width="1" />
     <text x="840" y="260" font-size="10" font-family="monospace" fill="#e2e8f0">+ uploadDocument(file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse</text>
-    <text x="840" y="276" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteVersion(guid: String, file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse</text>
-    <text x="840" y="292" font-size="10" font-family="monospace" fill="#e2e8f0">+ queryDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse&lt;DocumentResponse&gt;</text>
-    <text x="840" y="308" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocument(guid: String): DocumentResponse</text>
+    <text x="840" y="276" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteDocument(existingGuid: String, newFile: MultipartFile, updatedBibtex: BibTeXMetadata): DocumentResponse</text>
+    <text x="840" y="292" font-size="10" font-family="monospace" fill="#e2e8f0">+ searchDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse&lt;DocumentResponse&gt;</text>
+    <text x="840" y="308" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocumentByGuid(guid: String): DocumentResponse</text>
   </g>
 
   <!-- AiSummarizationService -->
@@ -782,12 +773,11 @@ export function generateJavaUmlSvg(): string {
     <rect x="830" y="340" width="350" height="28" rx="6" fill="#064e3b" />
     <text x="1005" y="358" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">AiSummarizationService</text>
     <line x1="830" y1="368" x2="1180" y2="368" stroke="#10b981" stroke-width="1" />
-    <text x="840" y="384" font-size="10" font-family="monospace" fill="#94a3b8">- llamaChatModel: ChatModel</text>
-    <text x="840" y="398" font-size="10" font-family="monospace" fill="#94a3b8">- mistralChatModel: ChatModel</text>
+    <text x="840" y="384" font-size="10" font-family="monospace" fill="#94a3b8">- llamaChatClient: ChatClient</text>
+    <text x="840" y="398" font-size="10" font-family="monospace" fill="#94a3b8">- mistralChatClient: ChatClient</text>
     <line x1="830" y1="406" x2="1180" y2="406" stroke="#10b981" stroke-width="1" />
-    <text x="840" y="422" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ generateLlamaSummary(title, text): SummaryRecord</text>
-    <text x="840" y="438" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ generateMistralSummary(title, text): SummaryRecord</text>
-    <text x="840" y="454" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ generateDualSummaries(title, text, b): Map</text>
+    <text x="840" y="422" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ generateDualSummaries(title, text, bibtex): Map</text>
+    <text x="840" y="438" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ generateSummaryForModel(modelKey, title, text, bibtex): SummaryRecord</text>
   </g>
 
   <!-- VectorRagService -->
@@ -796,12 +786,11 @@ export function generateJavaUmlSvg(): string {
     <rect x="1195" y="340" width="360" height="28" rx="6" fill="#064e3b" />
     <text x="1375" y="358" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">VectorRagService</text>
     <line x1="1195" y1="368" x2="1555" y2="368" stroke="#10b981" stroke-width="1" />
-    <text x="1205" y="384" font-size="10" font-family="monospace" fill="#94a3b8">- qdrantClient: QdrantClient</text>
-    <text x="1205" y="398" font-size="10" font-family="monospace" fill="#94a3b8">- embeddingModel: EmbeddingModel</text>
+    <text x="1205" y="384" font-size="10" font-family="monospace" fill="#94a3b8">- vectorStore: VectorStore</text>
+    <text x="1205" y="398" font-size="10" font-family="monospace" fill="#94a3b8">- llamaChatClient: ChatClient</text>
     <line x1="1195" y1="406" x2="1555" y2="406" stroke="#10b981" stroke-width="1" />
-    <text x="1205" y="422" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ indexDocument(docId, text): List&lt;Chunk&gt;</text>
-    <text x="1205" y="438" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ searchSimilarChunks(q, k, filter): List&lt;Chunk&gt;</text>
-    <text x="1205" y="454" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ deleteDocumentVectors(docId): void</text>
+    <text x="1205" y="422" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ indexDocumentChunks(docGuid, text): List&lt;Chunk&gt;</text>
+    <text x="1205" y="438" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ chatWithDocument(docEntity, request): ChatResponse</text>
   </g>
 
   <!-- BibTeXExtractionService & StorageService -->
@@ -810,9 +799,7 @@ export function generateJavaUmlSvg(): string {
     <rect x="830" y="490" width="350" height="26" rx="6" fill="#064e3b" />
     <text x="1005" y="508" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">BibTeXExtractionService</text>
     <line x1="830" y1="516" x2="1180" y2="516" stroke="#10b981" stroke-width="1" />
-    <text x="840" y="534" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ extractMetadata(fileName, content): BibTeXMetadata</text>
-    <text x="840" y="552" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ validateBibTeX(bibtex: BibTeXMetadata): boolean</text>
-    <text x="840" y="570" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ formatToRawBibTeX(bibtex): String</text>
+    <text x="840" y="534" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ extractMetadata(fileName, sampleContent): BibTeXMetadata</text>
   </g>
 
   <g filter="url(#box-shadow)">
@@ -821,8 +808,8 @@ export function generateJavaUmlSvg(): string {
     <text x="1375" y="508" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">StorageService</text>
     <line x1="1195" y1="516" x2="1555" y2="516" stroke="#10b981" stroke-width="1" />
     <text x="1205" y="534" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ storeFile(file: MultipartFile, guid: String): Path</text>
-    <text x="1205" y="552" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ loadAsResource(guid, fileName): Resource</text>
-    <text x="1205" y="570" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ extractTextContent(path: Path): String</text>
+    <text x="1205" y="552" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ extractTextContent(path: Path): String</text>
+    <text x="1205" y="570" font-size="9.5" font-family="monospace" fill="#e2e8f0">+ deletePhysicalAsset(guid): void</text>
   </g>
 
   <!-- Package: Repository -->
@@ -837,8 +824,7 @@ export function generateJavaUmlSvg(): string {
     <text x="220" y="520" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">DocumentRepository</text>
     <line x1="45" y1="525" x2="395" y2="525" stroke="#f59e0b" stroke-width="1" />
     <text x="55" y="542" font-size="10" font-family="monospace" fill="#e2e8f0">+ findByGuid(guid: String): Optional&lt;DocumentEntity&gt;</text>
-    <text x="55" y="560" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteByGuid(guid: String): void</text>
-    <text x="55" y="578" font-size="10" font-family="monospace" fill="#e2e8f0">+ findByPreviousVersionGuid(guid): List&lt;DocumentEntity&gt;</text>
+    <text x="55" y="560" font-size="10" font-family="monospace" fill="#e2e8f0">+ findByPreviousVersionGuid(guid): List&lt;DocumentEntity&gt;</text>
   </g>
 
   <!-- DocumentRepositoryCustomImpl -->
@@ -850,7 +836,7 @@ export function generateJavaUmlSvg(): string {
     <line x1="415" y1="525" x2="765" y2="525" stroke="#f59e0b" stroke-width="1" />
     <text x="425" y="542" font-size="10" font-family="monospace" fill="#94a3b8">- mongoTemplate: MongoTemplate</text>
     <line x1="415" y1="550" x2="765" y2="550" stroke="#f59e0b" stroke-width="1" />
-    <text x="425" y="568" font-size="10" font-family="monospace" fill="#e2e8f0">+ searchDocuments(criteria, pageable): Page&lt;DocumentEntity&gt;</text>
+    <text x="425" y="568" font-size="10" font-family="monospace" fill="#e2e8f0">+ searchDocuments(fileName, title, author, edition, format, content, pageable): Page&lt;DocumentEntity&gt;</text>
   </g>
 
   <!-- Package: Model -->
@@ -1138,14 +1124,14 @@ export function generateTypeScriptUmlSvg(): string {
     <text x="770" y="602" font-size="9.5" font-style="italic" fill="#e9d5ff" text-anchor="middle">&lt;&lt;interface&gt;&gt;</text>
     <text x="770" y="615" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">BackendAdapter</text>
     <line x1="525" y1="620" x2="1015" y2="620" stroke="#a855f7" stroke-width="1" />
-    <text x="535" y="638" font-size="10" font-family="monospace" fill="#e2e8f0">+ getHealth(): Promise&lt;BackendHealthResult&gt;</text>
+    <text x="535" y="638" font-size="10" font-family="monospace" fill="#e2e8f0">+ testHealth(): Promise&lt;BackendHealthResult&gt;</text>
     <text x="535" y="656" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocuments(params: DocumentQueryParams): Promise&lt;DocumentListResult&gt;</text>
     <text x="535" y="674" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocument(guid: String): Promise&lt;DocumentRecord&gt;</text>
     <text x="535" y="692" font-size="10" font-family="monospace" fill="#e2e8f0">+ uploadDocument(req: DocumentUploadPayload): Promise&lt;DocumentRecord&gt;</text>
-    <text x="535" y="710" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteDocument(guid, req): Promise&lt;DocumentRecord&gt;</text>
-    <text x="535" y="728" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteDocument(guid: String): Promise&lt;boolean&gt;</text>
-    <text x="535" y="746" font-size="10" font-family="monospace" fill="#e2e8f0">+ getVersionHistory(guid): Promise&lt;DocumentVersionSnapshot[]&gt;</text>
-    <text x="535" y="764" font-size="10" font-family="monospace" fill="#e2e8f0">+ rollbackVersion(guid, ver): Promise&lt;DocumentRecord&gt;</text>
+    <text x="535" y="710" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteVersion(guid, req): Promise&lt;DocumentRecord&gt;</text>
+    <text x="535" y="728" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteDocument(guid): Promise&lt;{success, message}&gt;</text>
+    <text x="535" y="746" font-size="10" font-family="monospace" fill="#e2e8f0">+ regenerateSummary(guid, modelKey): Promise&lt;SummaryRecord&gt;</text>
+    <text x="535" y="764" font-size="10" font-family="monospace" fill="#e2e8f0">+ chatWithDocument(guid, req): Promise&lt;ChatResponseResult&gt;</text>
   </g>
 
   <!-- Concrete Drivers: RestBackendAdapter & MockBackendAdapter -->

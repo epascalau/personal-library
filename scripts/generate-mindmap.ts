@@ -38,9 +38,9 @@ export function generateMermaidMindmap(): string {
         Instant File Validation
         Progress Tracking
         Client-Side BibTeX Parser
-      Camunda BPMN 2.0
-        7-Step Orchestration
-        Automated Extraction Task
+      Static BPMN 2.0 Export
+        Process_DocumentIngestionRAG.bpmn
+        External Camunda Modeler Compatibility
         Human Review Task Loop
         Parallel Dual AI Workers
         Qdrant Vector Embedding Task
@@ -153,7 +153,7 @@ export function generateMermaidMindmap(): string {
         Spring Web REST Controllers
       Visual Diagrams
         C4 Architecture Diagrams
-        Camunda BPMN Ingestion Flow
+        Static BPMN 2.0 Export
         Dual UML Class Diagrams
         RAG Pipeline Data Flow
       Multi-Format Exports
@@ -177,7 +177,7 @@ export function generatePlantUmlMindmap(): string {
 **[#059669] 1. Ingestion & Pipeline
 *** Multi-Format Ingestion (PDF, DOCX, Markdown, LaTeX, Plain Text)
 *** Drag-and-Drop Upload Modal with Real-time Progress
-*** Camunda BPMN 2.0 Ingestion Workflow (7 Orchestrated Tasks)
+*** Static BPMN 2.0 Export (external Camunda Modeler compatibility, no embedded engine)
 *** Human Review & Correction Gateway Loop
 *** SHA-256 Content Fingerprinting & De-duplication
 *** Physical Asset Storage with Versioned Archiving
@@ -322,7 +322,7 @@ export function generateMindmapSvg(): string {
   <g transform="translate(60, 35)">
     <rect x="0" y="0" width="2280" height="70" rx="10" fill="#1e293b" fill-opacity="0.7" stroke="#334155" stroke-width="1.5" />
     <text x="35" y="38" font-size="22" font-weight="900" fill="#ffffff" letter-spacing="0.5">PERSONAL LIBRARY &amp; AI RESEARCH ENGINE — COMPLETE FUNCTIONALITY MINDMAP</text>
-    <text x="35" y="58" font-size="12" font-weight="600" fill="#38bdf8">100% Comprehensive Capability Matrix: Spring Boot 3 • Spring AI • UI5 Web Components • Qdrant Vector RAG • Camunda BPMN • Keycloak OIDC</text>
+    <text x="35" y="58" font-size="12" font-weight="600" fill="#38bdf8">100% Comprehensive Capability Matrix: Spring Boot 4 • Spring AI 2 • UI5 Web Components • Qdrant Vector RAG • nginx Ingress • Keycloak OIDC</text>
     <rect x="2020" y="18" width="220" height="34" rx="6" fill="#0f172a" stroke="#0284c7" stroke-width="1" />
     <text x="2130" y="39" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">AGPL-3.0-or-later • Enterprise</text>
   </g>
@@ -382,7 +382,7 @@ export function generateMindmapSvg(): string {
     <rect width="400" height="52" rx="8" fill="url(#g-ingest)" stroke="#10b981" stroke-width="1.5" />
     <text x="20" y="32" font-size="15" font-weight="800" fill="#ffffff">1. INGESTION &amp; PIPELINE</text>
     <rect x="290" y="14" width="95" height="24" rx="4" fill="#064e3b" stroke="#34d399" />
-    <text x="337" y="30" font-size="10" font-weight="700" fill="#6ee7b7" text-anchor="middle">Camunda BPMN</text>
+    <text x="337" y="30" font-size="10" font-weight="700" fill="#6ee7b7" text-anchor="middle">Static BPMN</text>
 
     <!-- Sub-feature Nodes -->
     <!-- Node 1.1 -->
@@ -407,9 +407,9 @@ export function generateMindmapSvg(): string {
     <path d="M 200 52 L 200 155 L 60 155 L 60 170" fill="none" stroke="#10b981" stroke-width="1.5" />
     <g transform="translate(10, 170)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
-      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Camunda BPMN 2.0 Ingestion Process</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• 7 Orchestrated tasks with parallel fork</text>
-      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• User Task review loop on invalid metadata</text>
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Static BPMN 2.0 Export</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Process_DocumentIngestionRAG.bpmn, no embedded engine</text>
+      <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Served for external Camunda Modeler compatibility</text>
     </g>
 
     <!-- Node 1.4 -->
@@ -774,7 +774,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         Title: 'Personal Library — Complete Functionality Mindmap',
         Author: 'Personal Library Architecture Team',
         Subject: 'Full Platform Capability Matrix & Functional Decomposition',
-        Keywords: 'Mindmap, Spring Boot, Spring AI, Qdrant, Camunda, Keycloak, UI5',
+        Keywords: 'Mindmap, Spring Boot, Spring AI, Qdrant, nginx, Keycloak, UI5',
         CreationDate: new Date()
       }
     });
@@ -817,7 +817,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         lead: 'Multi-format document processing with automated orchestration.',
         bullets: [
           'Binary formats: PDF, DOCX, Markdown, LaTeX, Plain Text with MIME validation.',
-          'Camunda BPMN 2.0 7-step orchestrated pipeline with human review loop.',
+          'Static BPMN 2.0 export served for external Camunda Modeler compatibility; human review loop runs in-app.',
           'SHA-256 fingerprinting for atomic de-duplication and integrity verification.',
           'Physical versioned file system with secure streaming endpoint delivery.'
         ]

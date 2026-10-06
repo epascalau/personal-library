@@ -140,8 +140,8 @@
     rdfs:label "Keycloak Authenticated User"@en .
 
 :BPMNWorkflowProcess a owl:Class ;
-    rdfs:subClassOf prov:Activity ;
-    rdfs:label "Camunda BPMN Ingestion Workflow"@en .
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Static BPMN 2.0 Process Definition (external Camunda Modeler export, no embedded engine)"@en .
 
 ### Object Properties
 

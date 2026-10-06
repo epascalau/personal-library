@@ -358,7 +358,7 @@ export function generateRagWorkflowSvg(): string {
   <!-- Title Banner -->
   <rect x="0" y="0" width="1600" height="80" fill="url(#headerGrad2)" />
   <text x="40" y="44" font-size="24" font-weight="800" fill="#ffffff" letter-spacing="-0.02em">Dual-Database Retrieval-Augmented Generation (RAG) Architecture &amp; Workflow</text>
-  <text x="40" y="66" font-size="13" font-weight="500" fill="#94a3b8">Spring Boot 3.3.4 • MongoDB 7.0 • Qdrant HNSW • Ollama Llama 3.3 (70B) &amp; Mistral Large • SAP Fiori Horizon UI</text>
+  <text x="40" y="66" font-size="13" font-weight="500" fill="#94a3b8">Spring Boot 4.1.1 • Spring AI 2.0.1 • MongoDB 7.0 • Qdrant HNSW • Ollama Llama 3.3 (70B) &amp; Mistral Large • SAP Fiori Horizon UI</text>
 
   <!-- Lane 1: Ingestion & Vectorization Flow (Top Lane) -->
   <g transform="translate(40, 110)">
@@ -470,7 +470,7 @@ export function generateRagWorkflowSvg(): string {
       <rect x="12" y="230" width="226" height="70" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1" />
       <text x="125" y="254" text-anchor="middle" font-size="10" font-weight="700" fill="#0284c7">RestBackendAdapter</text>
       <text x="125" y="272" text-anchor="middle" font-size="9" fill="#64748b">Keycloak Bearer JWT Header</text>
-      <text x="125" y="286" text-anchor="middle" font-size="9" fill="#64748b">Gateway Proxy / Express</text>
+      <text x="125" y="286" text-anchor="middle" font-size="9" fill="#64748b">nginx Ingress -&gt; Spring Boot</text>
     </g>
 
     <line x1="286" y1="210" x2="330" y2="210" stroke="#0070f2" stroke-width="3" marker-end="url(#flowArrow)" />

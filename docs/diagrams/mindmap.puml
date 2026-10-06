@@ -4,7 +4,7 @@
 **[#059669] 1. Ingestion & Pipeline
 *** Multi-Format Ingestion (PDF, DOCX, Markdown, LaTeX, Plain Text)
 *** Drag-and-Drop Upload Modal with Real-time Progress
-*** Camunda BPMN 2.0 Ingestion Workflow (7 Orchestrated Tasks)
+*** Static BPMN 2.0 Export (external Camunda Modeler compatibility, no embedded engine)
 *** Human Review & Correction Gateway Loop
 *** SHA-256 Content Fingerprinting & De-duplication
 *** Physical Asset Storage with Versioned Archiving
@@ -22,7 +22,7 @@
 *** Spring AI Multi-Model Orchestration Engine
 *** Llama 3.3 (70B Instruct): Deep Academic & Synthesis Analysis
 *** Mistral Large (2411): Executive Summary & Operational Takeaways
-*** Google Gemini API Cloud Multimodal Integration
+*** Fully Local Ollama Inference (no cloud API keys required)
 *** Real-time Model Execution Telemetry (Duration, Speed, Tokens)
 *** Side-by-Side Synchronized Benchmark Comparator UI
 *** Cached Immutable Summary History per Document Version
@@ -46,7 +46,7 @@ left side
 *** Historical Document Asset Download & Rollback
 
 **[#0d9488] 6. Enterprise UI5 Frontend
-*** SAP UI5 Web Components & Horizon Dark Dual Theming
+*** SAP Fiori Horizon & Horizon Dark Dual Theming
 *** Standard UI5 Web Components (@ui5/webcomponents v2)
 *** ListReport Floorplan with Multi-Field FilterBar
 *** ObjectPage Floorplan with Sticky Header & KPI Facets

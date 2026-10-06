@@ -50,7 +50,7 @@ export function generateArchitectureSvg(): string {
   <!-- Title Banner -->
   <rect x="30" y="20" width="1540" height="65" rx="8" fill="url(#hdr-grad)" stroke="#334155" stroke-width="1.5" />
   <text x="55" y="52" font-size="20" font-weight="800" fill="#f8fafc">Personal Library — End-to-End System Architecture</text>
-  <text x="55" y="72" font-size="12" font-weight="500" fill="#94a3b8">Source: architecture_diagrams.mmd • SAP UI5 Client • Express/Spring Boot Gateway • Dual AI (Ollama Llama/Mistral) • Qdrant Vector DB • MongoDB</text>
+  <text x="55" y="72" font-size="12" font-weight="500" fill="#94a3b8">Source: architecture_diagrams.mmd • SAP UI5 Client • nginx -&gt; Express/Spring Boot • Dual AI (Ollama Llama/Mistral) • Qdrant Vector DB • MongoDB</text>
   <rect x="1410" y="38" width="140" height="28" rx="6" fill="#0070f2" />
   <text x="1480" y="56" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Mermaid Specification</text>
 
@@ -93,7 +93,7 @@ export function generateArchitectureSvg(): string {
     <text x="925" y="175" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Modal Dialogs</text>
     <text x="925" y="195" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Upload Pipeline Dialog</text>
     <text x="925" y="212" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Version Overwrite Modal</text>
-    <text x="925" y="229" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Camunda BPMN Inspector</text>
+    <text x="925" y="229" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Static BPMN Viewer/Download</text>
   </g>
 
   <!-- Reactive Stores -->
@@ -123,14 +123,14 @@ export function generateArchitectureSvg(): string {
   <!-- SUBGRAPH 2: GATEWAY TIER                                     -->
   <!-- ============================================================ -->
   <rect x="30" y="325" width="1540" height="175" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="50" y="350" font-size="12" font-weight="700" fill="#2dd4bf">2. EXPRESS / SPRING BOOT API GATEWAY (PORT 3000)</text>
+  <text x="50" y="350" font-size="12" font-weight="700" fill="#2dd4bf">2. NGINX :80 -&gt; EXPRESS :3000 / SPRING BOOT :8080</text>
 
   <!-- Express Server -->
   <g filter="url(#card-shadow)">
     <rect x="50" y="360" width="340" height="115" rx="6" fill="#134e4a" stroke="#14b8a6" stroke-width="1.2" />
-    <text x="220" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Express Server</text>
+    <text x="220" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Express Server (behind nginx)</text>
     <text x="220" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• server.ts listening on 0.0.0.0:3000</text>
-    <text x="220" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Vite Dev Middleware / Static SPA Host</text>
+    <text x="220" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Static SPA Host / Mock Backend Adapter</text>
     <text x="220" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Docs Portal &amp; Diagram Stream APIs</text>
   </g>
 
@@ -152,13 +152,13 @@ export function generateArchitectureSvg(): string {
     <text x="985" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• GUID Snapshot Archiving &amp; Rollback</text>
   </g>
 
-  <!-- Camunda BPMN 2.0 Engine -->
+  <!-- Static BPMN 2.0 Export (Spring Boot, no embedded engine) -->
   <g filter="url(#card-shadow)">
     <rect x="1195" y="360" width="355" height="115" rx="6" fill="#134e4a" stroke="#14b8a6" stroke-width="1.2" />
-    <text x="1372" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Camunda BPMN 2.0 Engine</text>
-    <text x="1372" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Process_DocumentIngestionRAG</text>
-    <text x="1372" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• JavaDelegate &amp; Zeebe @JobWorker</text>
-    <text x="1372" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• R3/PT10S Retry Boundary Policies</text>
+    <text x="1372" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Static BPMN 2.0 Export</text>
+    <text x="1372" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Process_DocumentIngestionRAG.bpmn</text>
+    <text x="1372" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Served/downloaded (Spring Boot :8080)</text>
+    <text x="1372" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• External Camunda Modeler compatibility</text>
   </g>
 
   <!-- Intra-Tier Horizontal Perpendicular Connectors -->
@@ -182,7 +182,7 @@ export function generateArchitectureSvg(): string {
   <path d="M 430 475 L 430 515 L 412 515 L 412 760 L 285 760 L 285 810" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#mmd-arrow-amber)" />
   <!-- Controllers -> Keycloak via Gutter 2 (x=787) -->
   <path d="M 670 475 L 670 515 L 787 515 L 787 760 L 780 760 L 780 810" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#mmd-arrow-amber)" />
-  <!-- Camunda -> File Asset Store via Gutter 3 (x=1182) -->
+  <!-- Extraction -> File Asset Store via Gutter 3 (x=1182) -->
   <path d="M 1372 475 L 1372 515 L 1182 515 L 1182 760 L 1295 760 L 1295 810" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#mmd-arrow-amber)" />
 
   <rect x="710" y="748" width="150" height="22" rx="4" fill="#0f172a" stroke="#fbbf24" stroke-width="1" />
@@ -216,7 +216,7 @@ export function generateArchitectureSvg(): string {
   <g filter="url(#card-shadow)">
     <rect x="1195" y="590" width="355" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
     <text x="1372" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Qdrant Vector Database</text>
-    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (Port 6333)</text>
+    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (HTTP 6333/gRPC 6334)</text>
     <text x="1372" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Dense Cosine Similarity Search</text>
     <text x="1372" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Top-K Grounded Citation Retrieval</text>
   </g>
@@ -334,8 +334,8 @@ export function generateArchitecturePdf(pngBuffer: Buffer, outputPath: string): 
       '  pdf-parse binary stream extractor, LaTeX BNF formatter.\n\n' +
       '• Version Control & Rollback\n' +
       '  In-place version overwrite, snapshot archiving, non-destructive rollbacks.\n\n' +
-      '• Camunda BPMN Engine\n' +
-      '  Execution delegates & Zeebe workers for RAG pipeline.',
+      '• Static BPMN 2.0 Export\n' +
+      '  Served for external Camunda Modeler compatibility; no embedded engine.',
       36 + (colWidth + colGap) * 1 + 10, startY + 40, { width: colWidth - 20, lineGap: 3 }
     );
 

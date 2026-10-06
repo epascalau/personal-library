@@ -5,11 +5,23 @@
  * Automated Diagram Generation Engine for Personal Library.
  *
  * WHAT: Generates high-fidelity vector SVG, rasterized 2x PNG (via @resvg/resvg-js),
- * and multi-page enterprise architectural PDF specification (via pdfkit) for the
- * Camunda BPMN 2.0 Document Ingestion & RAG Pipeline.
+ * and a multi-page PDF specification (via pdfkit) that visualizes
+ * `src/main/resources/bpmn/document_ingestion_rag.bpmn` — a static BPMN 2.0 XML process
+ * definition file shipped with this repository.
  *
- * WHY: Provides architects, compliance auditors, and engineers with instant,
- * downloadable visual assets for Camunda Modeler, documentation portals, and enterprise review.
+ * IMPORTANT — this is documentation only: the running application does NOT embed a Camunda
+ * (or any other) process engine. No JavaDelegate/Zeebe worker classes exist in the Java
+ * codebase, and nothing in `pom.xml` depends on Camunda. The real document-ingestion pipeline
+ * executes as a plain sequential/async call chain inside `DocumentService` (upload → extract
+ * text → BibTeX extraction → dual Ollama summarization → Qdrant vector upsert → MongoDB
+ * persistence). The `.bpmn` file is provided purely so the same logical flow can be opened,
+ * inspected, or imported in an external tool such as Camunda Modeler/Zeebe for architecture
+ * discussions, compliance reviews, or an optional future migration — it is never deployed to
+ * or run by this application. `BpmnModalView.ts` in the frontend only displays/downloads this
+ * static XML; it never calls a BPMN engine API.
+ *
+ * WHY: Provides architects, compliance auditors, and engineers with an accurate, instantly
+ * downloadable visual reference for the static process definition and documentation portals.
  */
 
 import fs from 'fs';
@@ -25,12 +37,15 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 /**
- * Generates the vector SVG string representation of the Camunda BPMN 2.0 process.
+ * Generates the vector SVG string representation of the static BPMN 2.0 process definition.
  *
  * WHAT: Emits an SVG document containing a collaboration pool, 4 swimlanes, start/end events,
- * service/user/send tasks, exclusive and parallel gateways, and orthogonal sequence flow arrows.
+ * service/user/send tasks, exclusive and parallel gateways, and orthogonal sequence flow arrows,
+ * mirroring the activities, lanes, and `camunda:*` attributes literally present in
+ * `document_ingestion_rag.bpmn`.
  * WHY: Provides an infinitely scalable, standards-compliant vector graphic for embedding in web views
- * and converting into high-density raster images.
+ * and converting into high-density raster images. The diagram is a read-only visualization of the
+ * static XML file — it does not imply this application executes the process via a running engine.
  *
  * @returns Fully formatted SVG markup string.
  */
@@ -54,10 +69,10 @@ export function generateBpmnSvg(): string {
 
   <!-- Title & Metadata Banner -->
   <rect x="15" y="10" width="1710" height="45" rx="6" fill="#0f172a" />
-  <text x="35" y="38" font-size="16" font-weight="700" fill="#ffffff" letter-spacing="-0.3">Personal Library · Camunda BPMN 2.0 Process Definition</text>
-  <text x="630" y="38" font-size="12" font-weight="500" fill="#94a3b8">Process ID: Process_DocumentIngestionRAG · Specification Version: 1.0.0 · Dual AI &amp; Qdrant RAG</text>
-  <rect x="1570" y="21" width="140" height="23" rx="4" fill="#0070f2" />
-  <text x="1640" y="37" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Camunda 7 &amp; 8 Ready</text>
+  <text x="35" y="38" font-size="16" font-weight="700" fill="#ffffff" letter-spacing="-0.3">Personal Library · BPMN 2.0 Process Definition (Static Export)</text>
+  <text x="710" y="38" font-size="12" font-weight="500" fill="#94a3b8">Process ID: Process_DocumentIngestionRAG · Spec Version: 1.0.0 · Dual AI &amp; Qdrant RAG</text>
+  <rect x="1500" y="21" width="210" height="23" rx="4" fill="#64748b" />
+  <text x="1605" y="37" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Not Executed · View/Download Only</text>
 
   <!-- Master Collaboration Pool -->
   <rect x="15" y="65" width="1710" height="740" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
@@ -301,15 +316,17 @@ export function generatePngFromSvg(svgMarkup: string, outputPath: string): void 
 }
 
 /**
- * Generates an enterprise-grade multi-page PDF specification document.
+ * Generates a multi-page PDF specification document describing the static BPMN export.
  *
  * WHAT: Assembles a landscape PDF document featuring:
- * 1. Title, architecture synopsis, and metrics summary.
- * 2. Vector-rendered BPMN 2.0 Process Diagram with full swimlanes.
- * 3. Camunda Task Catalog & Execution Matrix table.
- * 4. Technical Integration guide with JavaDelegate and Zeebe Worker code.
+ * 1. Title, a factual synopsis, and a clear "not executed by this application" disclaimer.
+ * 2. Vector-rendered BPMN 2.0 Process Diagram with full swimlanes (visualizing the real .bpmn file).
+ * 3. Process Task Catalog documenting the activities/attributes present in the .bpmn XML.
+ * 4. Optional reference-only Camunda integration sample code, clearly labeled as illustrative
+ *    and not present anywhere in this codebase today.
  *
- * WHY: Provides enterprise architects with a formal, archivable PDF deliverable.
+ * WHY: Provides an archivable PDF deliverable for teams evaluating the static BPMN export,
+ * without misrepresenting it as a feature the running application currently executes.
  *
  * @param pngBuffer Rasterized diagram image buffer for page embedding.
  * @param outputPath Destination filesystem path for the PDF.
@@ -332,20 +349,20 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     doc.rect(0, 0, 842, 595).fill('#0f172a');
 
     // Header Tag
-    doc.rect(36, 40, 180, 24).fill('#0070f2');
-    doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('ENTERPRISE ARCHITECTURE', 46, 47);
+    doc.rect(36, 40, 220, 24).fill('#64748b');
+    doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('STATIC EXPORT · NOT EXECUTED', 46, 47);
 
     // Title
-    doc.fillColor('#ffffff').fontSize(26).font('Helvetica-Bold').text('Personal Library — Camunda BPMN 2.0 Specification', 36, 85);
-    doc.fillColor('#94a3b8').fontSize(14).font('Helvetica').text('Automated Document Ingestion, Parallel Dual AI Summarization & Qdrant Vector RAG', 36, 120);
+    doc.fillColor('#ffffff').fontSize(26).font('Helvetica-Bold').text('Personal Library — BPMN 2.0 Process Definition (Static Export)', 36, 85);
+    doc.fillColor('#94a3b8').fontSize(14).font('Helvetica').text('Reference visualization of document_ingestion_rag.bpmn — not run by an embedded engine', 36, 120);
 
     // Metadata Grid
     doc.rect(36, 155, 770, 75).fill('#1e293b');
     doc.fillColor('#38bdf8').fontSize(10).font('Helvetica-Bold').text('PROCESS IDENTIFIER', 50, 170);
     doc.fillColor('#ffffff').fontSize(12).font('Helvetica').text('Process_DocumentIngestionRAG', 50, 185);
 
-    doc.fillColor('#38bdf8').fontSize(10).font('Helvetica-Bold').text('ENGINE COMPATIBILITY', 280, 170);
-    doc.fillColor('#ffffff').fontSize(12).font('Helvetica').text('Camunda 7 (Spring Boot) & Camunda 8 (Zeebe)', 280, 185);
+    doc.fillColor('#38bdf8').fontSize(10).font('Helvetica-Bold').text('EXECUTION STATUS', 280, 170);
+    doc.fillColor('#ffffff').fontSize(12).font('Helvetica').text('Not executed — no embedded Camunda/Zeebe engine in this app', 280, 185);
 
     doc.fillColor('#38bdf8').fontSize(10).font('Helvetica-Bold').text('LICENSE & STANDARD', 570, 170);
     doc.fillColor('#ffffff').fontSize(12).font('Helvetica').text('GNU AGPLv3 · BPMN 2.0 with BPMNDI', 570, 185);
@@ -355,20 +372,21 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     doc.fillColor('#0f172a').fontSize(14).font('Helvetica-Bold').text('Executive Summary & Pipeline Architecture', 55, 270);
     
     doc.fillColor('#334155').fontSize(10.5).font('Helvetica').text(
-      'The Personal Library Ingestion Engine orchestrates the lifecycle of research documents from initial upload to vector retrieval. ' +
-      'Implemented as an executable BPMN 2.0 process, it bridges the SAP Fiori UI, Spring AI orchestration, Ollama local inference models, ' +
-      'and the Qdrant vector database into a fault-tolerant workflow with built-in human fallback.\n\n' +
-      'Key Architectural Tenets:\n' +
+      'This BPMN 2.0 file is a static process definition exported from the real document-ingestion logic for architecture ' +
+      'documentation, compliance review, and optional future Camunda Modeler import. It is NOT deployed to or executed by an ' +
+      'embedded process engine — the running Spring Boot application has no Camunda/Zeebe dependency and performs these same ' +
+      'steps as a plain sequential/async Java service call chain inside DocumentService.\n\n' +
+      'What the Diagram Documents (mirroring the real pipeline):\n' +
       '• 4 Horizontal Swimlanes: Client Ingestion (UI5/REST), Spring AI Orchestrator, Ollama Dual Models, and Qdrant Vector Store.\n' +
-      '• Parallel Asynchronous Execution: Forks dual-model summarization across Ollama Llama 3.3 (70B Instruct) for analytical breakdown ' +
-      'and Mistral Large (2411) for executive synthesis concurrently with paragraph semantic chunking.\n' +
-      '• Human-in-the-Loop Quality Gate: An Exclusive XOR Gateway routes incomplete or malformed bibliographic extractions to a ' +
-      'Librarian Review User Task, preventing corrupted metadata from reaching downstream indexing.\n' +
-      '• Enterprise Governance: Atomic persistence in MongoDB coupled with tenant-scoped security audit logging in Keycloak and ' +
-      'real-time push notifications over the SAP UI5 EventBus.\n\n' +
-      'Engine Support:\n' +
-      '• Camunda 7: JavaDelegate expression binding via Spring Boot Starter with asynchronous continuation.\n' +
-      '• Camunda 8: Non-blocking Zeebe JobWorkers with automated backoff retry policies (R3/PT10S).',
+      '• Parallel Dual-Model Summarization: Ollama Llama 3.3 (70B Instruct) for an analytical deep dive and Mistral Large (2411) for ' +
+      'an executive synthesis, run concurrently alongside paragraph-based semantic chunking for Qdrant.\n' +
+      '• Metadata Quality Gate: An exclusive gateway branch represents the path taken when BibTeX extraction is incomplete, requiring ' +
+      'librarian/researcher review before indexing — in the real app this is a validation check inside the same request, not a ' +
+      'separate human task queue.\n' +
+      '• Governance: Persistence in MongoDB plus security audit logging and real-time push notifications over the SAP UI5 EventBus.\n\n' +
+      'Reference-Only Engine Compatibility (illustrative, not implemented in this repository):\n' +
+      '• Camunda 7: Would require JavaDelegate classes bound via camunda:delegateExpression, none of which exist in this codebase.\n' +
+      '• Camunda 8: Would require Zeebe JobWorkers, none of which exist in this codebase.',
       55, 295, { width: 730, lineGap: 4 }
     );
 
@@ -378,13 +396,13 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     doc.addPage();
     doc.rect(0, 0, 842, 595).fill('#f8fafc');
 
-    doc.fillColor('#0f172a').fontSize(16).font('Helvetica-Bold').text('Camunda BPMN 2.0 Process Diagram', 36, 30);
-    doc.fillColor('#64748b').fontSize(10).font('Helvetica').text('Complete Visual Workflow with Horizontal Swimlanes & Orthogonal Waypoints', 36, 50);
+    doc.fillColor('#0f172a').fontSize(16).font('Helvetica-Bold').text('BPMN 2.0 Process Diagram (Static Export)', 36, 30);
+    doc.fillColor('#64748b').fontSize(10).font('Helvetica').text('Visualization of the swimlanes and tasks defined in the .bpmn XML file — not a live running workflow', 36, 50);
 
     // Embed rendered PNG diagram (scaled to fit landscape viewport)
     doc.image(pngBuffer, 36, 75, { width: 770 });
 
-    doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('BPMN 2.0 Diagram Interchange (BPMNDI) · Generated from src/main/resources/bpmn/document_ingestion_rag.bpmn', 36, 560);
+    doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('BPMN 2.0 Diagram Interchange (BPMNDI) · Rendered from src/main/resources/bpmn/document_ingestion_rag.bpmn (static file, not executed)', 36, 560);
 
     // ==========================================
     // PAGE 3: Task Catalog & Execution Matrix
@@ -392,8 +410,8 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     doc.addPage();
     doc.rect(0, 0, 842, 595).fill('#ffffff');
 
-    doc.fillColor('#0f172a').fontSize(16).font('Helvetica-Bold').text('Process Task Catalog & Execution Matrix', 36, 30);
-    doc.fillColor('#64748b').fontSize(10).font('Helvetica').text('Technical specification of process activities, delegates, and execution modes', 36, 50);
+    doc.fillColor('#0f172a').fontSize(16).font('Helvetica-Bold').text('Process Task Catalog (From the Static .bpmn XML)', 36, 30);
+    doc.fillColor('#64748b').fontSize(10).font('Helvetica').text('Attribute values literally present in the XML file; none are bound to running Java classes or workers', 36, 50);
 
     // Table Header
     const colX = [36, 180, 360, 520, 640, 720];
@@ -402,8 +420,8 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     doc.rect(36, tableY, 770, 24).fill('#0f172a');
     doc.fillColor('#ffffff').fontSize(9).font('Helvetica-Bold');
     doc.text('ACTIVITY / TASK NAME', colX[0] + 6, tableY + 7);
-    doc.text('CAMUNDA 7 DELEGATE', colX[1] + 6, tableY + 7);
-    doc.text('ZEEBE TASK TYPE (C8)', colX[2] + 6, tableY + 7);
+    doc.text('XML: camunda:delegateExpression', colX[1] + 6, tableY + 7);
+    doc.text('XML: zeebe task type', colX[2] + 6, tableY + 7);
     doc.text('SWIMLANE', colX[3] + 6, tableY + 7);
     doc.text('EXECUTION', colX[4] + 6, tableY + 7);
     doc.text('RETRIES', colX[5] + 6, tableY + 7);
@@ -439,12 +457,13 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     // Technical note
     tableY += 20;
     doc.rect(36, tableY, 770, 110).fill('#eff6ff');
-    doc.fillColor('#1e40af').fontSize(11).font('Helvetica-Bold').text('Asynchronous Continuation & Failure Boundary Semantics', 50, tableY + 14);
+    doc.fillColor('#1e40af').fontSize(11).font('Helvetica-Bold').text('What These XML Attributes Mean (Reference Only)', 50, tableY + 14);
     doc.fillColor('#334155').fontSize(9.5).font('Helvetica').text(
-      'Both AI inference service tasks (Llama 3.3 and Mistral Large) and the Qdrant vectorization task are configured with ' +
-      'camunda:asyncBefore="true". This isolates intensive LLM calculations onto separate background worker threads managed by ' +
-      'the Camunda Job Executor. If transient hardware latency or token limits cause a model failure, Camunda\'s automated retry ' +
-      'cycle (R3/PT10S) performs exponential backoff retries without aborting the parent process instance.',
+      'The AI inference and Qdrant vectorization activities are annotated with camunda:asyncBefore="true" and ' +
+      'camunda:failedJobRetryTimeCycle (R3/PT10S) in the static XML, describing how these steps WOULD behave if this definition ' +
+      'were ever deployed to a real Camunda engine. This application does not do so: there is no Camunda Job Executor, no Zeebe ' +
+      'broker, and no delegate/worker bean in the running Spring Boot process. In the real app, retries and async execution for ' +
+      'these steps are handled by ordinary Java exception handling and the Spring @Async/thread-pool mechanisms instead.',
       50, tableY + 35, { width: 740, lineGap: 3 }
     );
 
@@ -454,13 +473,14 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
     doc.addPage();
     doc.rect(0, 0, 842, 595).fill('#ffffff');
 
-    doc.fillColor('#0f172a').fontSize(16).font('Helvetica-Bold').text('Developer Integration: Camunda 7 & 8 Handlers', 36, 30);
-    doc.fillColor('#64748b').fontSize(10).font('Helvetica').text('Spring Boot JavaDelegate and Camunda 8 Zeebe Worker source code examples', 36, 50);
+    doc.fillColor('#0f172a').fontSize(16).font('Helvetica-Bold').text('Illustrative Only: Optional Future Camunda Integration', 36, 30);
+    doc.fillColor('#64748b').fontSize(10).font('Helvetica').text('Neither class below exists in this repository today. Shown only as a starting point for teams who want to deploy this ' +
+      '.bpmn file to a real Camunda engine, wired to the actual AiSummarizationService/VectorRagService APIs.', 36, 50, { width: 760 });
 
     // Box 1: Camunda 7
     doc.rect(36, 75, 375, 460).fill('#1e293b');
-    doc.fillColor('#38bdf8').fontSize(12).font('Helvetica-Bold').text('Camunda 7: Spring Boot JavaDelegate', 50, 95);
-    doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('Package: com.personallibrary.workflow.delegate', 50, 112);
+    doc.fillColor('#38bdf8').fontSize(12).font('Helvetica-Bold').text('Camunda 7 (Illustrative, NOT in this repo)', 50, 95);
+    doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('Hypothetical package: com.personallibrary.workflow.delegate', 50, 112);
     
     doc.fillColor('#f8fafc').fontSize(8).font('Courier').text(
       '@Component("llamaSummarizationDelegate")\n' +
@@ -475,7 +495,7 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
       '        BibTeXMetadata bibtex = (BibTeXMetadata) execution.getVariable("bibtex");\n' +
       '\n' +
       '        SummaryRecord summary = summarizationService\n' +
-      '            .generateAnalyticalSummary(title, content, bibtex);\n' +
+      '            .generateSummaryForModel("llama", title, content, bibtex);\n' +
       '\n' +
       '        execution.setVariable("llamaSummary", summary);\n' +
       '    }\n' +
@@ -491,7 +511,7 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
       '        String docId = (String) execution.getVariable("documentGuid");\n' +
       '        String text = (String) execution.getVariable("fullContent");\n' +
       '\n' +
-      '        List<DocumentChunk> chunks = vectorRagService.index(docId, text);\n' +
+      '        List<DocumentChunk> chunks = vectorRagService.indexDocumentChunks(docId, text);\n' +
       '        execution.setVariable("vectorChunks", chunks);\n' +
       '    }\n' +
       '}',
@@ -500,8 +520,8 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
 
     // Box 2: Camunda 8
     doc.rect(431, 75, 375, 460).fill('#1e293b');
-    doc.fillColor('#34d399').fontSize(12).font('Helvetica-Bold').text('Camunda 8: Zeebe JobWorker', 50 + 395, 95);
-    doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('Package: com.personallibrary.workflow.worker', 50 + 395, 112);
+    doc.fillColor('#34d399').fontSize(12).font('Helvetica-Bold').text('Camunda 8 (Illustrative, NOT in this repo)', 50 + 395, 95);
+    doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('Hypothetical package: com.personallibrary.workflow.worker', 50 + 395, 112);
 
     doc.fillColor('#f8fafc').fontSize(8).font('Courier').text(
       '@Component\n' +
@@ -518,7 +538,7 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
       '        String content = (String) vars.get("fullContent");\n' +
       '\n' +
       '        SummaryRecord summary = summarizationService\n' +
-      '            .generateAnalyticalSummary(title, content, null);\n' +
+      '            .generateSummaryForModel("llama", title, content, null);\n' +
       '        return Map.of("llamaSummary", summary);\n' +
       '    }\n' +
       '\n' +
@@ -528,7 +548,7 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
       '        String docId = (String) vars.get("documentGuid");\n' +
       '        String text = (String) vars.get("fullContent");\n' +
       '\n' +
-      '        int chunks = vectorRagService.index(docId, text).size();\n' +
+      '        int chunks = vectorRagService.indexDocumentChunks(docId, text).size();\n' +
       '        return Map.of("chunksCount", chunks, "status", "INDEXED");\n' +
       '    }\n' +
       '}',
@@ -551,7 +571,7 @@ export function generateBpmnPdf(pngBuffer: Buffer, outputPath: string): Promise<
  * WHY: Automates creation and synchronization of all visual and documentary assets during build time.
  */
 export async function generateAllDiagrams(): Promise<void> {
-  console.log('🎨 Starting Camunda BPMN Diagram Generation...');
+  console.log('🎨 Starting Static BPMN 2.0 Export Diagram Generation...');
 
   const docsDir = path.resolve(projectRoot, 'docs/diagrams');
   const publicDir = path.resolve(projectRoot, 'src/main/frontend/public');

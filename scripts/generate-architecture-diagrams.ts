@@ -61,7 +61,7 @@ export function generateSystemArchitectureSvg(): string {
   <!-- Title Banner -->
   <rect x="40" y="24" width="1520" height="70" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
   <text x="70" y="60" font-size="22" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">Personal Library — End-to-End System Architecture</text>
-  <text x="70" y="80" font-size="12" font-weight="500" fill="#94a3b8">C4 Container Architecture: SAP Fiori Horizon UI5 Client • Express/Spring Boot Gateway • Dual AI (Ollama Llama/Mistral) • Qdrant Vector RAG • MongoDB</text>
+  <text x="70" y="80" font-size="12" font-weight="500" fill="#94a3b8">C4 Container Architecture: SAP Fiori Horizon UI5 Client • nginx -&gt; Express/Spring Boot • Dual AI (Ollama Llama/Mistral) • Qdrant Vector RAG • MongoDB</text>
   <rect x="1420" y="44" width="115" height="28" rx="6" fill="#0070f2" />
   <text x="1477" y="62" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Full Stack Tier</text>
 
@@ -106,26 +106,26 @@ export function generateSystemArchitectureSvg(): string {
   <!-- Orthogonal Connection: Client Gateway -> REST Controllers (Perpendicular downward into top border) -->
   <path d="M 1337 270 L 1337 305 L 635 305 L 635 365" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow)" />
   <rect x="910" y="294" width="220" height="22" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="1" />
-  <text x="1020" y="309" font-size="10" font-weight="700" fill="#38bdf8" text-anchor="middle">REST / JSON / Multipart (Port 3000)</text>
+  <text x="1020" y="309" font-size="10" font-weight="700" fill="#38bdf8" text-anchor="middle">REST / JSON / Multipart (nginx :80)</text>
 
   <!-- ============================================================ -->
   <!-- LAYER 2: GATEWAY & BACKEND ORCHESTRATION TIER                 -->
   <!-- ============================================================ -->
   <rect x="40" y="325" width="1520" height="205" rx="12" fill="#1e293b" fill-opacity="0.6" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="65" y="352" font-size="13" font-weight="700" fill="#38bdf8" letter-spacing="0.5">2. API GATEWAY &amp; SERVICE ORCHESTRATION TIER (EXPRESS.JS NODE.JS &amp; SPRING BOOT)</text>
+  <text x="65" y="352" font-size="13" font-weight="700" fill="#38bdf8" letter-spacing="0.5">2. INGRESS &amp; SERVICE ORCHESTRATION TIER (NGINX :80 &amp; EXPRESS.JS :3000 &amp; SPRING BOOT :8080)</text>
 
   <!-- Express Server Gateway -->
   <rect x="65" y="365" width="370" height="145" rx="8" fill="url(#card-teal)" stroke="#14b8a6" stroke-width="1.5" filter="url(#glow)" />
-  <text x="80" y="390" font-size="13" font-weight="700" fill="#ffffff">Express Gateway Server</text>
-  <text x="80" y="410" font-size="11" fill="#99f6e4">Full-Stack Bridge &amp; Static Host</text>
-  <text x="80" y="432" font-size="10" font-family="monospace" fill="#ccfbf1">• server.ts (Port 3000 on 0.0.0.0)</text>
-  <text x="80" y="450" font-size="10" font-family="monospace" fill="#ccfbf1">• Vite Middleware Mode (Dev SPA)</text>
+  <text x="80" y="390" font-size="13" font-weight="700" fill="#ffffff">nginx + Express Gateway Server</text>
+  <text x="80" y="410" font-size="11" fill="#99f6e4">Single Ingress (nginx :80) &amp; Static Host</text>
+  <text x="80" y="432" font-size="10" font-family="monospace" fill="#ccfbf1">• nginx routes /api/v1/*, /actuator/* -&gt; :8080</text>
+  <text x="80" y="450" font-size="10" font-family="monospace" fill="#ccfbf1">• server.ts (Express, Port 3000 on 0.0.0.0)</text>
   <text x="80" y="468" font-size="10" font-family="monospace" fill="#ccfbf1">• /docs Static Hub (Javadoc &amp; TypeDoc)</text>
   <text x="80" y="486" font-size="10" font-family="monospace" fill="#ccfbf1">• Stream Endpoints (ZIP, BPMN, PNG, PDF)</text>
 
   <!-- REST Controllers & Routes -->
   <rect x="460" y="365" width="350" height="145" rx="8" fill="url(#card-teal)" stroke="#14b8a6" stroke-width="1.5" filter="url(#glow)" />
-  <text x="475" y="390" font-size="13" font-weight="700" fill="#ffffff">REST API Controllers</text>
+  <text x="475" y="390" font-size="13" font-weight="700" fill="#ffffff">REST API Controllers (Spring Boot :8080)</text>
   <text x="475" y="410" font-size="11" fill="#99f6e4">Endpoints conforming to OpenAPI 3.0</text>
   <text x="475" y="432" font-size="10" font-family="monospace" fill="#ccfbf1">• GET/POST /api/v1/documents</text>
   <text x="475" y="450" font-size="10" font-family="monospace" fill="#ccfbf1">• POST /api/v1/documents/:id/summarize</text>
@@ -141,14 +141,14 @@ export function generateSystemArchitectureSvg(): string {
   <text x="850" y="468" font-size="10" font-family="monospace" fill="#ccfbf1">• LaTeX BNF Key &amp; Entry Formatter</text>
   <text x="850" y="486" font-size="10" font-family="monospace" fill="#ccfbf1">• GUID &amp; In-Place Version Management</text>
 
-  <!-- Camunda BPMN Workflow Engine -->
+  <!-- Static BPMN 2.0 Export (no embedded engine) -->
   <rect x="1205" y="365" width="330" height="145" rx="8" fill="url(#card-teal)" stroke="#14b8a6" stroke-width="1.5" filter="url(#glow)" />
-  <text x="1220" y="390" font-size="13" font-weight="700" fill="#ffffff">Camunda BPMN 2.0 Engine</text>
-  <text x="1220" y="410" font-size="11" fill="#99f6e4">Execution Delegates &amp; JobWorkers</text>
-  <text x="1220" y="432" font-size="10" font-family="monospace" fill="#ccfbf1">• Process_DocumentIngestionRAG</text>
-  <text x="1220" y="450" font-size="10" font-family="monospace" fill="#ccfbf1">• Camunda 7 JavaDelegate Expressions</text>
-  <text x="1220" y="468" font-size="10" font-family="monospace" fill="#ccfbf1">• Camunda 8 Zeebe @JobWorker Handlers</text>
-  <text x="1220" y="486" font-size="10" font-family="monospace" fill="#ccfbf1">• R3/PT10S Exponential Retry Policy</text>
+  <text x="1220" y="390" font-size="13" font-weight="700" fill="#ffffff">Static BPMN 2.0 Export</text>
+  <text x="1220" y="410" font-size="11" fill="#99f6e4">Served/Downloaded, No Embedded Engine</text>
+  <text x="1220" y="432" font-size="10" font-family="monospace" fill="#ccfbf1">• Process_DocumentIngestionRAG.bpmn</text>
+  <text x="1220" y="450" font-size="10" font-family="monospace" fill="#ccfbf1">• External Camunda Modeler Compatibility</text>
+  <text x="1220" y="468" font-size="10" font-family="monospace" fill="#ccfbf1">• BpmnModalView.ts (View / Download XML)</text>
+  <text x="1220" y="486" font-size="10" font-family="monospace" fill="#ccfbf1">• No JavaDelegate / Zeebe Runtime Present</text>
 
   <!-- Orthogonal Connectors: Gateway -> AI Tier (90-degree perpendicular into top of Llama and Mistral) -->
   <!-- Controllers -> Llama 3.3 -->
@@ -163,7 +163,7 @@ export function generateSystemArchitectureSvg(): string {
   <path d="M 880 510 L 880 540 L 535 540 L 535 745 L 295 745 L 295 780" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#arrow-purple)" />
   <!-- Extraction -> MongoDB Document Repository -->
   <path d="M 1010 510 L 1010 745 L 780 745 L 780 780" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#arrow-purple)" />
-  <!-- Camunda -> Keycloak OIDC -->
+  <!-- BPMN Export -> Keycloak OIDC -->
   <path d="M 1370 510 L 1370 745 L 1285 745 L 1285 780" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#arrow-purple)" />
   <rect x="710" y="734" width="160" height="22" rx="4" fill="#0f172a" stroke="#c084fc" stroke-width="1" />
   <text x="790" y="749" font-size="10" font-weight="700" fill="#c084fc" text-anchor="middle">Persistence &amp; Audit Logs</text>
@@ -198,7 +198,7 @@ export function generateSystemArchitectureSvg(): string {
   <rect x="65" y="780" width="460" height="125" rx="8" fill="url(#card-amber)" stroke="#f59e0b" stroke-width="1.5" filter="url(#glow)" />
   <text x="80" y="805" font-size="13" font-weight="700" fill="#ffffff">Qdrant Vector Database</text>
   <text x="80" y="825" font-size="11" fill="#fde68a">Dense Semantic Search &amp; Cosine Retrieval</text>
-  <text x="80" y="847" font-size="10" font-family="monospace" fill="#fef3c7">• Collection: library_embeddings (Port 6333)</text>
+  <text x="80" y="847" font-size="10" font-family="monospace" fill="#fef3c7">• Collection: library_embeddings (HTTP 6333 / gRPC 6334)</text>
   <text x="80" y="865" font-size="10" font-family="monospace" fill="#fef3c7">• Paragraph Chunking (~350 characters/chunk)</text>
   <text x="80" y="883" font-size="10" font-family="monospace" fill="#fef3c7">• Top-K Retrieval with Excerpt Citations</text>
 
@@ -413,7 +413,7 @@ export function generateFrontendArchitectureSvg(): string {
   <rect x="1120" y="145" width="410" height="90" rx="6" fill="#172554" stroke="#3b82f6" />
   <text x="1135" y="170" font-size="12" font-weight="700" fill="#ffffff">Modal Dialogs Hierarchy</text>
   <text x="1135" y="190" font-size="10" fill="#93c5fd">• UploadDialogView (Multi-file pipeline)</text>
-  <text x="1135" y="205" font-size="10" fill="#93c5fd">• BpmnModalView (Camunda Visual Flow &amp; XML)</text>
+  <text x="1135" y="205" font-size="10" fill="#93c5fd">• BpmnModalView (Static BPMN XML View/Download)</text>
   <text x="1135" y="220" font-size="10" fill="#93c5fd">• OpenApiModalView &amp; BackendSettings</text>
 
   <!-- Mid Layer: Observable Stores -->

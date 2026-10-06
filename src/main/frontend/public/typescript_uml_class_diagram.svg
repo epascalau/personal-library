@@ -58,7 +58,7 @@
 
   <!-- Package: Views & Dialogs -->
   <rect x="540" y="105" width="1030" height="420" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="555" y="125" font-size="12" font-weight="700" fill="#34d399">PACKAGE: views &amp; dialogs (SAP Fiori UI5)</text>
+  <text x="555" y="125" font-size="12" font-weight="700" fill="#34d399">PACKAGE: views &amp; dialogs (SAP Fiori Horizon UI5)</text>
 
   <!-- ListReportView Box -->
   <g filter="url(#box-shadow)">
@@ -172,14 +172,14 @@
     <text x="770" y="602" font-size="9.5" font-style="italic" fill="#e9d5ff" text-anchor="middle">&lt;&lt;interface&gt;&gt;</text>
     <text x="770" y="615" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">BackendAdapter</text>
     <line x1="525" y1="620" x2="1015" y2="620" stroke="#a855f7" stroke-width="1" />
-    <text x="535" y="638" font-size="10" font-family="monospace" fill="#e2e8f0">+ getHealth(): Promise&lt;BackendHealthResult&gt;</text>
+    <text x="535" y="638" font-size="10" font-family="monospace" fill="#e2e8f0">+ testHealth(): Promise&lt;BackendHealthResult&gt;</text>
     <text x="535" y="656" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocuments(params: DocumentQueryParams): Promise&lt;DocumentListResult&gt;</text>
     <text x="535" y="674" font-size="10" font-family="monospace" fill="#e2e8f0">+ getDocument(guid: String): Promise&lt;DocumentRecord&gt;</text>
     <text x="535" y="692" font-size="10" font-family="monospace" fill="#e2e8f0">+ uploadDocument(req: DocumentUploadPayload): Promise&lt;DocumentRecord&gt;</text>
-    <text x="535" y="710" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteDocument(guid, req): Promise&lt;DocumentRecord&gt;</text>
-    <text x="535" y="728" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteDocument(guid: String): Promise&lt;boolean&gt;</text>
-    <text x="535" y="746" font-size="10" font-family="monospace" fill="#e2e8f0">+ getVersionHistory(guid): Promise&lt;DocumentVersionSnapshot[]&gt;</text>
-    <text x="535" y="764" font-size="10" font-family="monospace" fill="#e2e8f0">+ rollbackVersion(guid, ver): Promise&lt;DocumentRecord&gt;</text>
+    <text x="535" y="710" font-size="10" font-family="monospace" fill="#e2e8f0">+ overwriteVersion(guid, req): Promise&lt;DocumentRecord&gt;</text>
+    <text x="535" y="728" font-size="10" font-family="monospace" fill="#e2e8f0">+ deleteDocument(guid): Promise&lt;{success, message}&gt;</text>
+    <text x="535" y="746" font-size="10" font-family="monospace" fill="#e2e8f0">+ regenerateSummary(guid, modelKey): Promise&lt;SummaryRecord&gt;</text>
+    <text x="535" y="764" font-size="10" font-family="monospace" fill="#e2e8f0">+ chatWithDocument(guid, req): Promise&lt;ChatResponseResult&gt;</text>
   </g>
 
   <!-- Concrete Drivers: RestBackendAdapter & MockBackendAdapter -->

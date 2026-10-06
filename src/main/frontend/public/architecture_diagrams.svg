@@ -26,7 +26,7 @@
   <!-- Title Banner -->
   <rect x="30" y="20" width="1540" height="65" rx="8" fill="url(#hdr-grad)" stroke="#334155" stroke-width="1.5" />
   <text x="55" y="52" font-size="20" font-weight="800" fill="#f8fafc">Personal Library — End-to-End System Architecture</text>
-  <text x="55" y="72" font-size="12" font-weight="500" fill="#94a3b8">Source: architecture_diagrams.mmd • SAP UI5 Client • Express/Spring Boot Gateway • Dual AI (Ollama Llama/Mistral) • Qdrant Vector DB • MongoDB</text>
+  <text x="55" y="72" font-size="12" font-weight="500" fill="#94a3b8">Source: architecture_diagrams.mmd • SAP UI5 Client • nginx -&gt; Express/Spring Boot • Dual AI (Ollama Llama/Mistral) • Qdrant Vector DB • MongoDB</text>
   <rect x="1410" y="38" width="140" height="28" rx="6" fill="#0070f2" />
   <text x="1480" y="56" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Mermaid Specification</text>
 
@@ -34,7 +34,7 @@
   <!-- SUBGRAPH 1: CLIENT TIER                                      -->
   <!-- ============================================================ -->
   <rect x="30" y="105" width="1540" height="175" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="50" y="130" font-size="12" font-weight="700" fill="#60a5fa">1. SAP FIORI CLIENT TIER (UI5 WEB COMPONENTS + TYPESCRIPT)</text>
+  <text x="50" y="130" font-size="12" font-weight="700" fill="#60a5fa">1. SAP FIORI HORIZON CLIENT TIER (UI5 WEB COMPONENTS + TYPESCRIPT)</text>
 
   <!-- ShellBarView -->
   <g filter="url(#card-shadow)">
@@ -69,7 +69,7 @@
     <text x="925" y="175" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Modal Dialogs</text>
     <text x="925" y="195" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Upload Pipeline Dialog</text>
     <text x="925" y="212" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Version Overwrite Modal</text>
-    <text x="925" y="229" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Camunda BPMN Inspector</text>
+    <text x="925" y="229" font-size="10.5" fill="#bfdbfe" text-anchor="middle">• Static BPMN Viewer/Download</text>
   </g>
 
   <!-- Reactive Stores -->
@@ -99,14 +99,14 @@
   <!-- SUBGRAPH 2: GATEWAY TIER                                     -->
   <!-- ============================================================ -->
   <rect x="30" y="325" width="1540" height="175" rx="8" fill="#1e293b" fill-opacity="0.4" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="6 4" />
-  <text x="50" y="350" font-size="12" font-weight="700" fill="#2dd4bf">2. EXPRESS / SPRING BOOT API GATEWAY (PORT 3000)</text>
+  <text x="50" y="350" font-size="12" font-weight="700" fill="#2dd4bf">2. NGINX :80 -&gt; EXPRESS :3000 / SPRING BOOT :8080</text>
 
   <!-- Express Server -->
   <g filter="url(#card-shadow)">
     <rect x="50" y="360" width="340" height="115" rx="6" fill="#134e4a" stroke="#14b8a6" stroke-width="1.2" />
-    <text x="220" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Express Server</text>
+    <text x="220" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Express Server (behind nginx)</text>
     <text x="220" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• server.ts listening on 0.0.0.0:3000</text>
-    <text x="220" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Vite Dev Middleware / Static SPA Host</text>
+    <text x="220" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Static SPA Host / Mock Backend Adapter</text>
     <text x="220" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Docs Portal &amp; Diagram Stream APIs</text>
   </g>
 
@@ -128,13 +128,13 @@
     <text x="985" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• GUID Snapshot Archiving &amp; Rollback</text>
   </g>
 
-  <!-- Camunda BPMN 2.0 Engine -->
+  <!-- Static BPMN 2.0 Export (Spring Boot, no embedded engine) -->
   <g filter="url(#card-shadow)">
     <rect x="1195" y="360" width="355" height="115" rx="6" fill="#134e4a" stroke="#14b8a6" stroke-width="1.2" />
-    <text x="1372" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Camunda BPMN 2.0 Engine</text>
-    <text x="1372" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Process_DocumentIngestionRAG</text>
-    <text x="1372" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• JavaDelegate &amp; Zeebe @JobWorker</text>
-    <text x="1372" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• R3/PT10S Retry Boundary Policies</text>
+    <text x="1372" y="390" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Static BPMN 2.0 Export</text>
+    <text x="1372" y="410" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Process_DocumentIngestionRAG.bpmn</text>
+    <text x="1372" y="427" font-size="10.5" fill="#99f6e4" text-anchor="middle">• Served/downloaded (Spring Boot :8080)</text>
+    <text x="1372" y="444" font-size="10.5" fill="#99f6e4" text-anchor="middle">• External Camunda Modeler compatibility</text>
   </g>
 
   <!-- Intra-Tier Horizontal Perpendicular Connectors -->
@@ -143,11 +143,9 @@
 
   <!-- Orthogonal Connectors: Gateway Tier -> AI Tier (Strict 90-degree perpendicular entry into top of boxes) -->
   <!-- Controllers -> Llama 3.3 -->
-  <path d="M 480 475 L 480 540 L 225 540 L 225 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
+  <path d="M 480 475 L 480 540 L 310 540 L 310 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
   <!-- Controllers -> Mistral Large -->
-  <path d="M 600 475 L 600 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
-  <!-- Controllers -> Gemini Fallback -->
-  <path d="M 720 475 L 720 540 L 985 540 L 985 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
+  <path d="M 600 475 L 600 540 L 870 540 L 870 590" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#mmd-arrow-green)" />
   <!-- Extraction -> Qdrant Vector DB -->
   <path d="M 1120 475 L 1120 540 L 1372 540 L 1372 590" fill="none" stroke="#c084fc" stroke-width="2" marker-end="url(#mmd-arrow-purple)" />
 
@@ -160,7 +158,7 @@
   <path d="M 430 475 L 430 515 L 412 515 L 412 760 L 285 760 L 285 810" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#mmd-arrow-amber)" />
   <!-- Controllers -> Keycloak via Gutter 2 (x=787) -->
   <path d="M 670 475 L 670 515 L 787 515 L 787 760 L 780 760 L 780 810" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#mmd-arrow-amber)" />
-  <!-- Camunda -> File Asset Store via Gutter 3 (x=1182) -->
+  <!-- Extraction -> File Asset Store via Gutter 3 (x=1182) -->
   <path d="M 1372 475 L 1372 515 L 1182 515 L 1182 760 L 1295 760 L 1295 810" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#mmd-arrow-amber)" />
 
   <rect x="710" y="748" width="150" height="22" rx="4" fill="#0f172a" stroke="#fbbf24" stroke-width="1" />
@@ -174,36 +172,27 @@
 
   <!-- Llama 3.3 -->
   <g filter="url(#card-shadow)">
-    <rect x="50" y="590" width="350" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
-    <text x="225" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Llama 3.3 (70B Instruct)</text>
-    <text x="225" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Analytical Structural Decomposition</text>
-    <text x="225" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Research Methodologies &amp; Critique</text>
-    <text x="225" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Execution Telemetry (Duration recorded)</text>
+    <rect x="50" y="590" width="520" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
+    <text x="310" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Llama 3.3 (70B Instruct)</text>
+    <text x="310" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Analytical Structural Decomposition</text>
+    <text x="310" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Research Methodologies &amp; Critique</text>
+    <text x="310" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Execution Telemetry (Duration recorded)</text>
   </g>
 
   <!-- Mistral Large -->
   <g filter="url(#card-shadow)">
-    <rect x="425" y="590" width="350" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
-    <text x="600" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Mistral Large (2411)</text>
-    <text x="600" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Executive Summary &amp; Key Takeaways</text>
-    <text x="600" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Recommended Target Audience Matrix</text>
-    <text x="600" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Parallel Asynchronous Branch</text>
-  </g>
-
-  <!-- Gemini Cascade Fallback -->
-  <g filter="url(#card-shadow)">
-    <rect x="800" y="590" width="370" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
-    <text x="985" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Cloud Gemini Fallback (@google/genai)</text>
-    <text x="985" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• gemini-3.1-flash-lite → gemini-3.8-flash</text>
-    <text x="985" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Multi-model Quota Resilience Cascade</text>
-    <text x="985" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Automated failover when GPUs offline</text>
+    <rect x="610" y="590" width="520" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
+    <text x="870" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Ollama Mistral Large (2411)</text>
+    <text x="870" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Executive Summary &amp; Key Takeaways</text>
+    <text x="870" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Recommended Target Audience Matrix</text>
+    <text x="870" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Parallel Asynchronous Branch</text>
   </g>
 
   <!-- Qdrant Vector DB -->
   <g filter="url(#card-shadow)">
     <rect x="1195" y="590" width="355" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
     <text x="1372" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Qdrant Vector Database</text>
-    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (Port 6333)</text>
+    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (HTTP 6333/gRPC 6334)</text>
     <text x="1372" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Dense Cosine Similarity Search</text>
     <text x="1372" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Top-K Grounded Citation Retrieval</text>
   </g>

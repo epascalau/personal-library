@@ -65,7 +65,7 @@ package "stores" {
   }
 }
 
-package "views (SAP UI5 Web Components)" {
+package "views (SAP Fiori Horizon)" {
   class AppView extends Component {
     - shellBarView: ShellBarView
     - listReportView: ListReportView
@@ -139,17 +139,22 @@ package "services/backend" {
   }
 
   interface BackendAdapter {
-    + getHealth(): Promise<BackendHealthResult>
+    + testHealth(): Promise<BackendHealthResult>
     + getDocuments(params: DocumentQueryParams): Promise<DocumentListResult>
     + getDocument(guid: String): Promise<DocumentRecord>
     + uploadDocument(req: DocumentUploadPayload): Promise<DocumentRecord>
-    + overwriteDocument(guid: String, req: DocumentUploadPayload): Promise<DocumentRecord>
-    + deleteDocument(guid: String): Promise<boolean>
-    + summarizeDocument(guid: String, model: String): Promise<SummaryRecord>
-    + chat(req: ChatRequestPayload): Promise<ChatResponseResult>
+    + overwriteVersion(guid: String, req: DocumentUploadPayload): Promise<DocumentRecord>
+    + deleteDocument(guid: String): Promise<{success: boolean, message: String}>
+    + extractMetadata(fileName: String, sampleContent: String): Promise<BibTeXMetadata>
+    + regenerateSummary(guid: String, modelKey: String): Promise<SummaryRecord>
+    + chatWithDocument(guid: String, req: ChatRequestPayload): Promise<ChatResponseResult>
+    + login(username: String, password: String): Promise<...>
+    + logout(): Promise<void>
+    + getDownloadUrl(guid: String): String
     + getVersionHistory(guid: String): Promise<DocumentVersionSnapshot[]>
     + rollbackVersion(guid: String, targetVersion: number): Promise<DocumentRecord>
     + getHistoricalDownloadUrl(guid: String, versionNumber: number): String
+    + getOpenApiSpec(): Promise<String>
   }
 
   interface DocumentVersionSnapshot {

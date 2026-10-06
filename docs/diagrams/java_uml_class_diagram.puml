@@ -15,18 +15,15 @@ package "com.personallibrary.controller" {
     - summarizationService: AiSummarizationService
     - vectorRagService: VectorRagService
     - storageService: StorageService
-    - objectMapper: ObjectMapper
-    + queryDocuments(fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder): ResponseEntity<PaginatedResponse<DocumentResponse>>
-    + getDocumentByGuid(guid: String): ResponseEntity<DocumentResponse>
+    - jsonMapper: JsonMapper
+    + getDocuments(fileName, title, author, edition, format, content, page, pageSize, sortBy, sortOrder): ResponseEntity<PaginatedResponse<DocumentResponse>>
+    + getDocument(guid: String): ResponseEntity<DocumentResponse>
     + uploadDocument(file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
-    + overwriteDocumentVersion(guid: String, file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
-    + deleteDocument(guid: String): ResponseEntity<Map<String, String>>
-    + summarizeDocument(guid: String, request: SummarizeRequest): ResponseEntity<SummaryRecord>
-    + conversationalChat(request: ChatRequest): ResponseEntity<ChatResponse>
-    + downloadPhysicalAsset(guid: String): ResponseEntity<Resource>
-    + getVersionHistory(guid: String): ResponseEntity<List<DocumentVersionSnapshot>>
-    + downloadHistoricalAsset(guid: String, version: int): ResponseEntity<Resource>
-    + rollbackDocumentVersion(guid: String, version: int): ResponseEntity<DocumentResponse>
+    + extractMetadata(payload: Map<String, String>): ResponseEntity<BibTeXMetadata>
+    + overwriteVersion(guid: String, file: MultipartFile, metadata: String): ResponseEntity<DocumentResponse>
+    + deleteDocument(guid: String): ResponseEntity<Map<String, Object>>
+    + regenerateSummary(guid: String, request: SummarizeRequest): ResponseEntity<SummaryRecord>
+    + chatWithDocument(guid: String, request: ChatRequest): ResponseEntity<ChatResponse>
   }
 
   class AuthController <<RestController>> {
@@ -44,60 +41,55 @@ package "com.personallibrary.service" {
     - summarizationService: AiSummarizationService
     - vectorRagService: VectorRagService
     + uploadDocument(file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse
-    + overwriteVersion(guid: String, file: MultipartFile, userBibtex: BibTeXMetadata): DocumentResponse
-    + queryDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse<DocumentResponse>
-    + getDocument(guid: String): DocumentResponse
+    + overwriteDocument(existingGuid: String, newFile: MultipartFile, updatedBibtex: BibTeXMetadata): DocumentResponse
+    + getDocumentByGuid(guid: String): DocumentResponse
+    + getEntityByGuid(guid: String): DocumentEntity
     + deleteDocument(guid: String): void
-    + getVersionHistory(guid: String): List<DocumentVersionSnapshot>
-    + rollbackVersion(guid: String, targetVersion: int): DocumentResponse
+    + searchDocuments(criteria: DocumentQueryCriteria, pageable: Pageable): PaginatedResponse<DocumentResponse>
   }
 
   class AiSummarizationService <<Service>> {
-    - llamaChatModel: ChatModel
-    - mistralChatModel: ChatModel
-    + generateLlamaSummary(title: String, content: String): SummaryRecord
-    + generateMistralSummary(title: String, content: String): SummaryRecord
+    - llamaChatClient: ChatClient
+    - mistralChatClient: ChatClient
     + generateDualSummaries(title: String, content: String, bibtex: BibTeXMetadata): Map<String, SummaryRecord>
+    + generateSummaryForModel(modelKey: String, title: String, content: String, bibtex: BibTeXMetadata): SummaryRecord
   }
 
   class VectorRagService <<Service>> {
-    - qdrantClient: QdrantClient
-    - embeddingModel: EmbeddingModel
-    + indexDocument(docId: String, content: String): List<DocumentChunk>
-    + searchSimilarChunks(query: String, topK: int, docFilter: String): List<DocumentChunk>
-    + deleteDocumentVectors(docId: String): void
+    - vectorStore: VectorStore
+    - llamaChatClient: ChatClient
+    + indexDocumentChunks(docGuid: String, text: String): List<DocumentChunk>
+    + chatWithDocument(docEntity: DocumentEntity, request: ChatRequest): ChatResponse
   }
 
   class BibTeXExtractionService <<Service>> {
-    - chatModel: ChatModel
-    + extractMetadata(fileName: String, content: String): BibTeXMetadata
-    + validateBibTeX(bibtex: BibTeXMetadata): boolean
-    + formatToRawBibTeX(bibtex: BibTeXMetadata): String
+    - chatClient: ChatClient
+    - jsonMapper: JsonMapper
+    + extractMetadata(fileName: String, sampleContent: String): BibTeXMetadata
   }
 
   class StorageService <<Service>> {
-    - storagePath: Path
+    - rootLocation: Path
+    - tika: Tika
     + storeFile(file: MultipartFile, guid: String): Path
-    + loadAsResource(guid: String, fileName: String): Resource
     + extractTextContent(filePath: Path): String
-    + deleteFile(guid: String): void
+    + deletePhysicalAsset(guid: String): void
   }
 }
 
 package "com.personallibrary.repository" {
   interface DocumentRepository <<Repository>> {
     + findByGuid(guid: String): Optional<DocumentEntity>
-    + deleteByGuid(guid: String): void
-    + findByPreviousVersionGuid(guid: String): List<DocumentEntity>
+    + findByPreviousVersionGuid(previousVersionGuid: String): List<DocumentEntity>
   }
 
   interface DocumentRepositoryCustom {
-    + searchDocuments(criteria: Map<String, Object>, pageable: Pageable): Page<DocumentEntity>
+    + searchDocuments(fileName, title, author, edition, format, content: String, pageable: Pageable): Page<DocumentEntity>
   }
 
   class DocumentRepositoryCustomImpl {
     - mongoTemplate: MongoTemplate
-    + searchDocuments(criteria: Map<String, Object>, pageable: Pageable): Page<DocumentEntity>
+    + searchDocuments(fileName, title, author, edition, format, content: String, pageable: Pageable): Page<DocumentEntity>
   }
 
   DocumentRepository --|> DocumentRepositoryCustom
@@ -199,8 +191,10 @@ package "com.personallibrary.config" {
   }
 
   class OllamaConfig <<Configuration>> {
-    + llamaChatModel(): ChatModel
-    + mistralChatModel(): ChatModel
+    + llamaChatModel(): OllamaChatModel
+    + mistralChatModel(): OllamaChatModel
+    + llamaChatClient(): ChatClient
+    + mistralChatClient(): ChatClient
     + embeddingModel(): EmbeddingModel
   }
 

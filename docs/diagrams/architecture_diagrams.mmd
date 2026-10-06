@@ -15,36 +15,42 @@ graph TD
         Stores --> Gateway
     end
 
-    subgraph GatewayTier["2. Express / Spring Boot API Gateway (Port 3000)"]
-        Express["Express Server<br/>(Vite Dev Middleware / Static SPA Host)"]
+    subgraph IngressTier["2. nginx Single Ingress (Port 80)"]
+        Nginx["nginx Reverse Proxy<br/>(/api/v1/*, /actuator/* -&gt; Spring Boot, everything else -&gt; Express)"]
+    end
+
+    subgraph NodeTier["3a. Express Gateway (Port 3000)"]
+        Express["Express Server<br/>(Static SPA Host, Mock Backend Adapter, Doc/Diagram Streaming)"]
+    end
+
+    subgraph JavaTier["3b. Spring Boot API Backend (Port 8080)"]
         Controllers["REST API Controllers<br/>(/api/v1/documents, /versions, /rollback, /chat, /auth)"]
         Extraction["Extraction & BibTeX Engine<br/>(pdf-parse, LaTeX BNF Formatter, GUID Snapshot Archiving & Rollbacks)"]
-        Camunda["Camunda BPMN 2.0 Engine<br/>(Process_DocumentIngestionRAG)"]
-        
-        Express --> Controllers
+        Bpmn["Static BPMN 2.0 Export<br/>(Process_DocumentIngestionRAG.bpmn served/downloaded for external Camunda Modeler use - no embedded engine)"]
+
         Controllers --> Extraction
-        Controllers --> Camunda
+        Controllers --> Bpmn
     end
 
-    subgraph AITier["3. Generative AI & Vector Retrieval Tier"]
-        Llama["Ollama Llama 3.3 (70B Instruct)<br/>(Analytical Decomposition & Methodology)"]
-        Mistral["Ollama Mistral Large (2411)<br/>(Executive Summary & Key Takeaways)"]
-        Gemini["Server-Side Gemini Fallback (@google/genai)<br/>(gemini-3.1-flash-lite & 3.8-flash)"]
-        Qdrant["Qdrant Vector Database<br/>(Dense Cosine Similarity, Collection: library_embeddings)"]
+    subgraph AITier["4. Generative AI & Vector Retrieval Tier"]
+        Llama["Ollama Llama 3.3 (70B Instruct)<br/>(model tag: llama3.2, Analytical Decomposition & Methodology)"]
+        Mistral["Ollama Mistral Large (2411)<br/>(model tag: mistral, Executive Summary & Key Takeaways)"]
+        Qdrant["Qdrant Vector Database<br/>(Collection: library_embeddings, HTTP 6333 dashboard / gRPC 6334 Spring AI client)"]
     end
 
-    subgraph DataTier["4. Persistence & Security Tier"]
+    subgraph DataTier["5. Persistence & Security Tier"]
         MongoDB[("MongoDB Document Store<br/>(Collection: documents, GUID Primary Key)")]
         Keycloak["Keycloak OIDC Server<br/>(Realm: personal-library-realm, JWT Bearer)"]
         FileStore["Raw File Asset Store<br/>(PDF, DOCX, Markdown Files)"]
     end
 
-    Gateway -->|HTTP REST / JSON / Multipart| Controllers
+    Gateway -->|HTTP REST / JSON / Multipart| Nginx
+    Nginx -->|/api/v1/*, /actuator/*| Controllers
+    Nginx -->|everything else| Express
     Controllers -->|Async Service Task| Llama
     Controllers -->|Async Service Task| Mistral
-    Controllers -->|Fallback Cascade| Gemini
     Extraction -->|Upsert Chunks & Embeddings| Qdrant
     Controllers -->|Search Top-K Excerpts| Qdrant
     Controllers -->|DocumentEntity CRUD| MongoDB
-    Controllers -->|OAuth2 Bearer Token Validation| Keycloak
+    Controllers -->|OAuth2 ****** Validation| Keycloak
     Controllers -->|Download / Stream| FileStore

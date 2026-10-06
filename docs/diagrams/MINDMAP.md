@@ -11,7 +11,7 @@ Personal Library & AI Research Engine
 ├── 1. Ingestion & Document Pipeline
 │   ├── Multi-Format Ingestion (PDF, DOCX, Markdown, LaTeX, Plain Text)
 │   ├── Drag-and-Drop Upload Modal with Real-time Progress & Preview
-│   ├── Camunda BPMN 2.0 Ingestion Workflow (7 Orchestrated Tasks)
+│   ├── Static BPMN 2.0 Export (Process_DocumentIngestionRAG.bpmn, for external Camunda Modeler compatibility — no embedded engine)
 │   ├── Human Review & Correction Gateway Loop
 │   ├── SHA-256 Content Fingerprinting & De-duplication
 │   └── Physical Asset Storage with Versioned Archiving
@@ -25,9 +25,8 @@ Personal Library & AI Research Engine
 │   └── Multi-Criteria Faceted Filtering & Fulltext Search
 ├── 3. Dual AI Models & Benchmarking
 │   ├── Spring AI Multi-Model Orchestration Engine
-│   ├── Ollama Llama 3.3 (70B Instruct): Deep Academic & Research Critique
-│   ├── Ollama Mistral Large (2411): Executive Summary & Operational Takeaways
-│   ├── Google Gemini API Cloud Multimodal Integration Fallback
+│   ├── Ollama Llama 3.3 (70B Instruct) — model tag `llama3.2`: Deep Academic & Research Critique
+│   ├── Ollama Mistral Large (2411) — model tag `mistral`: Executive Summary & Operational Takeaways
 │   ├── Real-time Model Execution Telemetry (Duration, Speed, Tokens)
 │   ├── Side-by-Side Synchronized Benchmark Comparator UI
 │   └── Cached Immutable Summary History per Document Version
@@ -52,7 +51,8 @@ Personal Library & AI Research Engine
 │   ├── ObjectPage Floorplan with Sticky Header & KPI Facets
 │   ├── 5 Localized Languages (EN, DE, FR, ES, RO)
 │   ├── Observable Reactive State Stores (core Store<T>)
-│   └── Resilient Backend Gateway Facade (REST vs. Mock Driver)
+│   ├── Resilient Backend Gateway Facade (REST vs. Mock Driver)
+│   └── nginx Single Ingress (Port 80) Routing to Spring Boot (8080) & Express (3000)
 ├── 7. Security, Identity & Governance
 │   ├── Keycloak 24+ OIDC & OAuth2 JWT Bearer Tokens
 │   ├── Role-Based Access Control (LIBRARY_ADMIN, CHIEF_RESEARCHER, VIEWER)

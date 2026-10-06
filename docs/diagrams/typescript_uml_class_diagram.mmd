@@ -64,8 +64,10 @@ classDiagram
       +getDocuments(params)
       +getDocument(guid)
       +uploadDocument(payload)
-      +summarizeDocument(guid, model)
-      +chat(payload)
+      +overwriteVersion(guid, payload)
+      +extractMetadata(fileName, content)
+      +regenerateSummary(guid, modelKey)
+      +chatWithDocument(guid, payload)
       +getVersionHistory(guid)
       +rollbackVersion(guid, version)
     }

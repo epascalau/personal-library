@@ -7,17 +7,14 @@ classDiagram
       -AiSummarizationService summarizationService
       -VectorRagService vectorRagService
       -StorageService storageService
-      +queryDocuments()
-      +getDocumentByGuid(guid)
+      +getDocuments()
+      +getDocument(guid)
       +uploadDocument(file, metadata)
-      +overwriteDocumentVersion(guid, file, metadata)
+      +extractMetadata(payload)
+      +overwriteVersion(guid, file, metadata)
       +deleteDocument(guid)
-      +summarizeDocument(guid, request)
-      +conversationalChat(request)
-      +downloadPhysicalAsset(guid)
-      +getVersionHistory(guid)
-      +downloadHistoricalAsset(guid, version)
-      +rollbackDocumentVersion(guid, version)
+      +regenerateSummary(guid, request)
+      +chatWithDocument(guid, request)
     }
 
     class DocumentService {
@@ -27,50 +24,45 @@ classDiagram
       -AiSummarizationService summarizationService
       -VectorRagService vectorRagService
       +uploadDocument(file, bibtex)
-      +overwriteVersion(guid, file, bibtex)
-      +queryDocuments(criteria, pageable)
-      +getDocument(guid)
+      +overwriteDocument(existingGuid, newFile, bibtex)
+      +getDocumentByGuid(guid)
+      +getEntityByGuid(guid)
       +deleteDocument(guid)
-      +getVersionHistory(guid)
-      +rollbackVersion(guid, targetVersion)
+      +searchDocuments(criteria, pageable)
     }
 
     class AiSummarizationService {
-      -ChatModel llamaChatModel
-      -ChatModel mistralChatModel
-      +generateLlamaSummary(title, content)
-      +generateMistralSummary(title, content)
+      -ChatClient llamaChatClient
+      -ChatClient mistralChatClient
       +generateDualSummaries(title, content, bibtex)
+      +generateSummaryForModel(modelKey, title, content, bibtex)
     }
 
     class VectorRagService {
-      -QdrantClient qdrantClient
-      -EmbeddingModel embeddingModel
-      +indexDocument(docId, content)
-      +searchSimilarChunks(query, topK, filter)
-      +deleteDocumentVectors(docId)
+      -VectorStore vectorStore
+      -ChatClient llamaChatClient
+      +indexDocumentChunks(docGuid, text)
+      +chatWithDocument(docEntity, request)
     }
 
     class BibTeXExtractionService {
-      -ChatModel chatModel
-      +extractMetadata(fileName, content)
-      +validateBibTeX(bibtex)
-      +formatToRawBibTeX(bibtex)
+      -ChatClient chatClient
+      -JsonMapper jsonMapper
+      +extractMetadata(fileName, sampleContent)
     }
 
     class StorageService {
-      -Path storagePath
+      -Path rootLocation
+      -Tika tika
       +storeFile(file, guid)
-      +loadAsResource(guid, fileName)
       +extractTextContent(path)
-      +deleteFile(guid)
+      +deletePhysicalAsset(guid)
     }
 
     class DocumentRepository {
       <<interface>>
       +findByGuid(guid)
-      +deleteByGuid(guid)
-      +findByPreviousVersionGuid(guid)
+      +findByPreviousVersionGuid(previousVersionGuid)
     }
 
     class DocumentEntity {

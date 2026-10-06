@@ -171,8 +171,8 @@ export function generateOntologyTurtle(): string {
     rdfs:label "Keycloak Authenticated User"@en .
 
 :BPMNWorkflowProcess a owl:Class ;
-    rdfs:subClassOf prov:Activity ;
-    rdfs:label "Camunda BPMN Ingestion Workflow"@en .
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Static BPMN 2.0 Process Definition (external Camunda Modeler export, no embedded engine)"@en .
 
 ### Object Properties
 
@@ -517,7 +517,7 @@ export function generateOntologyMermaid(): string {
       +set roles
     }
     class BPMNWorkflowProcess {
-      <<Camunda>>
+      <<Static BPMN Export>>
       +string processId
     }
 
@@ -848,11 +848,11 @@ export function generateOntologySvg(): string {
     <rect x="1270" y="725" width="270" height="155" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="1.5" />
     <rect x="1270" y="725" width="270" height="30" rx="8" fill="#92400e" />
     <text x="1405" y="745" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">BPMNWorkflowProcess</text>
-    <text x="1285" y="775" font-size="11" font-family="monospace" fill="#fbbf24">&lt;&lt;prov:Activity, Camunda 2.0&gt;&gt;</text>
+    <text x="1285" y="775" font-size="11" font-family="monospace" fill="#fbbf24">&lt;&lt;prov:Entity, Static BPMN 2.0 Export&gt;&gt;</text>
     <text x="1285" y="795" font-size="11" font-family="monospace" fill="#e2e8f0">+ processId: xsd:string</text>
-    <text x="1285" y="815" font-size="11" font-family="monospace" fill="#e2e8f0">+ retryPolicy: "R3/PT10S"</text>
-    <text x="1285" y="835" font-size="11" font-family="monospace" fill="#e2e8f0">+ swimlanes: 4 (Librarian/AI)</text>
-    <text x="1285" y="855" font-size="11" font-family="monospace" fill="#e2e8f0">+ status: Active | Completed</text>
+    <text x="1285" y="815" font-size="11" font-family="monospace" fill="#e2e8f0">+ fileName: "Process_DocumentIngestionRAG.bpmn"</text>
+    <text x="1285" y="835" font-size="11" font-family="monospace" fill="#e2e8f0">+ purpose: External Camunda Modeler export</text>
+    <text x="1285" y="855" font-size="11" font-family="monospace" fill="#e2e8f0">+ embeddedEngine: false</text>
   </g>
 
   <!-- SecurityPrincipal -->
@@ -884,7 +884,7 @@ export function generateOntologySvg(): string {
     <text x="1005" y="1125" font-size="11" font-weight="600" fill="#fbbf24">SHA-256 Cryptographic Digest</text>
 
     <rect x="1270" y="1100" width="270" height="42" rx="6" fill="#0f172a" stroke="#fbbf24" stroke-width="1" />
-    <text x="1285" y="1125" font-size="11" font-weight="600" fill="#fbbf24">Camunda Sagas: Compensation Ready</text>
+    <text x="1285" y="1125" font-size="11" font-weight="600" fill="#fbbf24">Static BPMN Export: No Embedded Engine</text>
 
     <rect x="1560" y="1100" width="260" height="42" rx="6" fill="#0f172a" stroke="#fbbf24" stroke-width="1" />
     <text x="1575" y="1125" font-size="11" font-weight="600" fill="#fbbf24">RBAC: LIBRARY_ADMIN, CHIEF_RESEARCHER</text>
