@@ -13,6 +13,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 // @ts-ignore
 import { Resvg } from '@resvg/resvg-js';
+// @ts-ignore
+import PDFDocument from 'pdfkit';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1182,6 +1184,34 @@ export function generateTypeScriptUmlSvg(): string {
 // =============================================================================
 // 6. MAIN GENERATION ENGINE
 // =============================================================================
+/**
+ * Renders a single full-bleed PDF page embedding the given PNG at its native aspect ratio.
+ *
+ * WHAT: Creates a PDFKit document sized to match the PNG's aspect ratio (scaled to a fixed
+ * page width) and embeds the image edge-to-edge.
+ * WHY: Provides an archivable, print-ready PDF counterpart for diagrams that are otherwise
+ * only available as .svg/.png, reusing the same rendered raster for visual consistency.
+ *
+ * @param pngBuffer Rendered PNG buffer to embed.
+ * @param aspectRatio Width-to-height ratio of the source SVG/PNG (width / height).
+ * @param outputPath Destination filesystem path for the PDF.
+ */
+function renderSvgPagePdf(pngBuffer: Buffer, aspectRatio: number, outputPath: string): Promise<void> {
+  const pageWidth = 1600;
+  const pageHeight = Math.round(pageWidth / aspectRatio);
+
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: [pageWidth, pageHeight], margin: 0 });
+    const writeStream = fs.createWriteStream(outputPath);
+    doc.pipe(writeStream);
+    doc.image(pngBuffer, 0, 0, { width: pageWidth, height: pageHeight });
+    doc.end();
+
+    writeStream.on('finish', () => resolve());
+    writeStream.on('error', (err: any) => reject(err));
+  });
+}
+
 export async function generateAllUmlDiagrams(): Promise<void> {
   console.log('📐 Generating Technology-Specific UML Class Diagrams (Java & TypeScript)...');
 
@@ -1208,7 +1238,12 @@ export async function generateAllUmlDiagrams(): Promise<void> {
   const javaPng = resvgJava.render().asPng();
   fs.writeFileSync(path.join(docsDir, 'java_uml_class_diagram.png'), javaPng);
   fs.writeFileSync(path.join(publicDir, 'java_uml_class_diagram.png'), javaPng);
-  console.log('✅ Generated Java UML Class Diagrams (.puml, .mmd, .svg, .png)');
+
+  const javaPdfDocs = path.join(docsDir, 'java_uml_class_diagram.pdf');
+  const javaPdfPublic = path.join(publicDir, 'java_uml_class_diagram.pdf');
+  await renderSvgPagePdf(javaPng, 1600 / 1100, javaPdfDocs);
+  fs.copyFileSync(javaPdfDocs, javaPdfPublic);
+  console.log('✅ Generated Java UML Class Diagrams (.puml, .mmd, .svg, .png, .pdf)');
 
   // 2. TYPESCRIPT UML
   const tsPuml = generateTypeScriptPuml();
@@ -1227,7 +1262,12 @@ export async function generateAllUmlDiagrams(): Promise<void> {
   const tsPng = resvgTs.render().asPng();
   fs.writeFileSync(path.join(docsDir, 'typescript_uml_class_diagram.png'), tsPng);
   fs.writeFileSync(path.join(publicDir, 'typescript_uml_class_diagram.png'), tsPng);
-  console.log('✅ Generated TypeScript UML Class Diagrams (.puml, .mmd, .svg, .png)');
+
+  const tsPdfDocs = path.join(docsDir, 'typescript_uml_class_diagram.pdf');
+  const tsPdfPublic = path.join(publicDir, 'typescript_uml_class_diagram.pdf');
+  await renderSvgPagePdf(tsPng, 1600 / 1100, tsPdfDocs);
+  fs.copyFileSync(tsPdfDocs, tsPdfPublic);
+  console.log('✅ Generated TypeScript UML Class Diagrams (.puml, .mmd, .svg, .png, .pdf)');
 
   console.log('🎉 UML Diagram generation completed successfully!');
 }

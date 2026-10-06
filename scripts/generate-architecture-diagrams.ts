@@ -13,6 +13,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 // @ts-ignore
 import { Resvg } from '@resvg/resvg-js';
+// @ts-ignore
+import PDFDocument from 'pdfkit';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -484,6 +486,34 @@ export function generateFrontendArchitectureSvg(): string {
 </svg>`;
 }
 
+/**
+ * Renders a single full-bleed PDF page embedding the given PNG at its native aspect ratio.
+ *
+ * WHAT: Creates a PDFKit document sized to match the PNG's aspect ratio (scaled to a fixed
+ * page width) and embeds the image edge-to-edge.
+ * WHY: Provides an archivable, print-ready PDF counterpart for diagrams that are otherwise
+ * only available as .svg/.png, reusing the same rendered raster for visual consistency.
+ *
+ * @param pngBuffer Rendered PNG buffer to embed.
+ * @param aspectRatio Width-to-height ratio of the source SVG/PNG (width / height).
+ * @param outputPath Destination filesystem path for the PDF.
+ */
+function renderSvgPagePdf(pngBuffer: Buffer, aspectRatio: number, outputPath: string): Promise<void> {
+  const pageWidth = 1600;
+  const pageHeight = Math.round(pageWidth / aspectRatio);
+
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: [pageWidth, pageHeight], margin: 0 });
+    const writeStream = fs.createWriteStream(outputPath);
+    doc.pipe(writeStream);
+    doc.image(pngBuffer, 0, 0, { width: pageWidth, height: pageHeight });
+    doc.end();
+
+    writeStream.on('finish', () => resolve());
+    writeStream.on('error', (err: any) => reject(err));
+  });
+}
+
 export async function generateAllArchitectureDiagrams(): Promise<void> {
   console.log('🏗️ Generating Complete Suite of Architecture Diagrams...');
 
@@ -504,7 +534,12 @@ export async function generateAllArchitectureDiagrams(): Promise<void> {
   const sysPng = resvgSys.render().asPng();
   fs.writeFileSync(path.join(docsDir, 'system_architecture.png'), sysPng);
   fs.writeFileSync(path.join(publicDir, 'system_architecture.png'), sysPng);
-  console.log('✅ Generated system_architecture.svg and system_architecture.png');
+
+  const sysPdfDocs = path.join(docsDir, 'system_architecture.pdf');
+  const sysPdfPublic = path.join(publicDir, 'system_architecture.pdf');
+  await renderSvgPagePdf(sysPng, 1600 / 960, sysPdfDocs);
+  fs.copyFileSync(sysPdfDocs, sysPdfPublic);
+  console.log('✅ Generated system_architecture.svg, .png, and .pdf');
 
   // 2. RAG & Pipeline Data Flow
   const ragSvg = generateRagFlowSvg();
@@ -517,7 +552,12 @@ export async function generateAllArchitectureDiagrams(): Promise<void> {
   const ragPng = resvgRag.render().asPng();
   fs.writeFileSync(path.join(docsDir, 'rag_data_flow.png'), ragPng);
   fs.writeFileSync(path.join(publicDir, 'rag_data_flow.png'), ragPng);
-  console.log('✅ Generated rag_data_flow.svg and rag_data_flow.png');
+
+  const ragPdfDocs = path.join(docsDir, 'rag_data_flow.pdf');
+  const ragPdfPublic = path.join(publicDir, 'rag_data_flow.pdf');
+  await renderSvgPagePdf(ragPng, 1600 / 780, ragPdfDocs);
+  fs.copyFileSync(ragPdfDocs, ragPdfPublic);
+  console.log('✅ Generated rag_data_flow.svg, .png, and .pdf');
 
   // 3. Frontend Architecture
   const feSvg = generateFrontendArchitectureSvg();
@@ -530,7 +570,12 @@ export async function generateAllArchitectureDiagrams(): Promise<void> {
   const fePng = resvgFe.render().asPng();
   fs.writeFileSync(path.join(docsDir, 'frontend_architecture.png'), fePng);
   fs.writeFileSync(path.join(publicDir, 'frontend_architecture.png'), fePng);
-  console.log('✅ Generated frontend_architecture.svg and frontend_architecture.png');
+
+  const fePdfDocs = path.join(docsDir, 'frontend_architecture.pdf');
+  const fePdfPublic = path.join(publicDir, 'frontend_architecture.pdf');
+  await renderSvgPagePdf(fePng, 1600 / 700, fePdfDocs);
+  fs.copyFileSync(fePdfDocs, fePdfPublic);
+  console.log('✅ Generated frontend_architecture.svg, .png, and .pdf');
 
   console.log('🎉 All architecture diagrams generated successfully!');
 }

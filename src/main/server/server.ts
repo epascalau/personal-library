@@ -1991,6 +1991,18 @@ app.get(['/api/v1/diagrams/system.png', '/system_architecture.png'], (_req: Requ
   return res.status(404).send('System architecture PNG not found');
 });
 
+app.get(['/api/v1/diagrams/system.pdf', '/system_architecture.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/system_architecture.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="system_architecture.pdf"');
+    }
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('System architecture PDF not found');
+});
+
 /**
  * Serves Vector RAG & Summarization Pipeline Data Flow diagrams.
  */
@@ -2016,6 +2028,18 @@ app.get(['/api/v1/diagrams/rag.png', '/rag_data_flow.png'], (_req: Request, res:
     return res.sendFile(pngPath);
   }
   return res.status(404).send('RAG data flow PNG not found');
+});
+
+app.get(['/api/v1/diagrams/rag.pdf', '/rag_data_flow.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/rag_data_flow.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="rag_data_flow.pdf"');
+    }
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('RAG data flow PDF not found');
 });
 
 // -----------------------------------------------------------------------------
@@ -2107,6 +2131,18 @@ app.get(['/api/v1/diagrams/frontend.png', '/frontend_architecture.png'], (_req: 
   return res.status(404).send('Frontend architecture PNG not found');
 });
 
+app.get(['/api/v1/diagrams/frontend.pdf', '/frontend_architecture.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/frontend_architecture.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') {
+      res.setHeader('Content-Disposition', 'attachment; filename="frontend_architecture.pdf"');
+    }
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('Frontend architecture PDF not found');
+});
+
 /**
  * Serves Java Backend UML Class Diagram (SVG, PNG, PUML).
  */
@@ -2128,6 +2164,16 @@ app.get(['/api/v1/diagrams/java-uml.png', '/java_uml_class_diagram.png'], (_req:
     return res.sendFile(pngPath);
   }
   return res.status(404).send('Java UML PNG not found');
+});
+
+app.get(['/api/v1/diagrams/java-uml.pdf', '/java_uml_class_diagram.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/java_uml_class_diagram.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="java_uml_class_diagram.pdf"');
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('Java UML PDF not found');
 });
 
 app.get(['/api/v1/diagrams/java-uml.puml', '/java_uml_class_diagram.puml'], (_req: Request, res: Response) => {
@@ -2161,6 +2207,16 @@ app.get(['/api/v1/diagrams/typescript-uml.png', '/typescript_uml_class_diagram.p
     return res.sendFile(pngPath);
   }
   return res.status(404).send('TypeScript UML PNG not found');
+});
+
+app.get(['/api/v1/diagrams/typescript-uml.pdf', '/typescript_uml_class_diagram.pdf'], (_req: Request, res: Response) => {
+  const pdfPath = path.resolve(projectRoot, 'docs/diagrams/typescript_uml_class_diagram.pdf');
+  if (fs.existsSync(pdfPath)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    if (_req.query.download === 'true') res.setHeader('Content-Disposition', 'attachment; filename="typescript_uml_class_diagram.pdf"');
+    return res.sendFile(pdfPath);
+  }
+  return res.status(404).send('TypeScript UML PDF not found');
 });
 
 app.get(['/api/v1/diagrams/typescript-uml.puml', '/typescript_uml_class_diagram.puml'], (_req: Request, res: Response) => {
