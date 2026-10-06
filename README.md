@@ -517,12 +517,13 @@ Keycloak manages OAuth2 / OpenID Connect (OIDC) authentication, JWT Bearer token
   docker exec -it personal-library-ollama ollama run llama3.2 "Explain the purpose of a cyclone cellar in Kansas."
   ```
 
-* **Expect slow responses without a GPU.** Since removing the Gemini cloud fallback, all summarization, BibTeX extraction, and RAG chat run entirely on local Ollama inference. On CPU-only hosts, a single Mistral/Llama summarization call can take **1–3 minutes** (longer for larger documents). To avoid premature client-side timeouts, the app is configured with generous ceilings end-to-end:
-  * Frontend REST calls (`src/main/frontend/services/backend/`): 10 minutes (`LLM_TIMEOUT_MS`).
-  * Node.js Integrated Gateway HTTP server (`server.ts`): 11 minutes.
-  * Direct Java Spring Boot backend's Ollama client (`OllamaConfig.java`): 10-minute read timeout.
+* **Expect slow responses without a GPU.** Since removing the Gemini cloud fallback, all summarization, BibTeX extraction, and RAG chat run entirely on local Ollama inference. On CPU-only hosts, a single Mistral/Llama summarization call can take **1–3 minutes** (longer for larger documents). Critically, document **upload** chains up to **three sequential** Ollama calls in one request (BibTeX extraction, then a Llama summary, then a Mistral summary), and **overwrite** chains two (Llama + Mistral) — so the end-to-end timeout budget must cover the SUM of those calls, not just one. The app is configured with generous ceilings end-to-end:
+  * Direct Java Spring Boot backend's Ollama client (`OllamaConfig.java`): 10-minute read timeout **per individual Ollama call**.
+  * Frontend REST calls (`src/main/frontend/services/backend/types.ts`, `LLM_TIMEOUT_MS`): 35 minutes — sized for the worst case (3 x 10-minute calls during upload) plus a 5-minute buffer for storage/extraction/vector indexing.
+  * nginx reverse proxy (`nginx/nginx.conf`, `proxy_read_timeout`/`proxy_send_timeout`): 36 minutes — kept just above the frontend's budget so nginx is never the first layer to cut off a model that's still genuinely working.
+  * Node.js Integrated Gateway HTTP server (`server.ts`): 36 minutes, matching nginx.
 
-  If you still see timeout errors on a very slow machine, increase `LLM_TIMEOUT_MS` in `src/main/frontend/services/backend/types.ts` and the matching `Duration` values in `OllamaConfig.java`, then rebuild.
+  If you still see timeout errors on a very slow machine, increase all four values in lockstep: `LLM_TIMEOUT_MS` in `types.ts`, the `proxy_read_timeout`/`proxy_send_timeout` values in `nginx/nginx.conf`, `server.timeout`/`keepAliveTimeout` in `server.ts`, and `OLLAMA_READ_TIMEOUT` in `OllamaConfig.java` — then rebuild. Each outer layer must stay greater than or equal to the inner one it wraps, and must account for however many sequential Ollama calls the slowest endpoint (upload) can chain.
 
 ---
 

@@ -39,6 +39,17 @@ public class OllamaConfig {
      * completion (observed ~2.5 minutes for a single Mistral summarization call), so the
      * default REST client timeout must be raised well above typical cloud-API expectations
      * to avoid prematurely aborting genuinely in-progress generations.
+     *
+     * IMPORTANT — this is a PER-CALL timeout, not a per-request one: {@code uploadDocument()}
+     * chains up to THREE sequential Ollama calls within a single HTTP request (BibTeX
+     * extraction, then Llama summary, then Mistral summary — see
+     * {@code DocumentService.uploadDocument()} / {@code AiSummarizationService}), and
+     * {@code overwriteDocument()} chains two (Llama + Mistral). Every timeout further out in
+     * the request path (the frontend's fetch abort controller, the nginx reverse proxy, and
+     * the Node gateway's HTTP server) MUST budget for the full worst-case SUM of these
+     * sequential calls, not just one multiple of this constant. See
+     * {@code LLM_TIMEOUT_MS} in {@code types.ts} and {@code nginx/nginx.conf} for the
+     * corresponding end-to-end budget.
      */
     private static final Duration OLLAMA_READ_TIMEOUT = Duration.ofMinutes(10);
     private static final Duration OLLAMA_CONNECT_TIMEOUT = Duration.ofSeconds(10);

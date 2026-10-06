@@ -2464,12 +2464,17 @@ async function startServer() {
   });
 
   // Ample timeout for long-running document ingestion & multi-model LLM indexing.
-  // Kept comfortably above the frontend's LLM_TIMEOUT_MS (10 minutes) so the Node socket never
-  // closes a connection before the client's own abort controller would, since CPU-bound local
-  // Ollama inference can legitimately take several minutes per call.
-  server.timeout = 660000; // 11 minutes
-  server.keepAliveTimeout = 660000;
-  server.headersTimeout = 665000;
+  // Document upload/overwrite chains up to THREE sequential Ollama calls within one
+  // request (BibTeX extraction + Llama summary + Mistral summary — see the Java
+  // DocumentService.uploadDocument() for the real backend, and the equivalent
+  // simulated flow here for the "Integrated"/mock backend target), each of which can
+  // legitimately take several minutes on CPU-bound local inference. Kept comfortably
+  // above the frontend's own LLM_TIMEOUT_MS (35 minutes, see
+  // services/backend/types.ts) so the Node socket never closes a connection before
+  // the client's own abort controller would.
+  server.timeout = 2160000; // 36 minutes
+  server.keepAliveTimeout = 2160000;
+  server.headersTimeout = 2165000;
 }
 
 startServer().catch(err => {

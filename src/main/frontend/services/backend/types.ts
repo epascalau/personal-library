@@ -15,10 +15,27 @@ import { DocumentRecord, FilterState, BibTeXMetadata, SummaryRecord, UserProfile
  * (dual-model summarization, RAG chat, upload indexing).
  *
  * WHY: Local, CPU-bound Ollama inference can take several minutes per model call — far longer
- * than a cloud-hosted, GPU-backed API would — so this is deliberately generous to avoid
- * client-side aborts while a model is genuinely still working.
+ * than a cloud-hosted, GPU-backed API would. Crucially, `uploadDocument()` on the Java backend
+ * chains up to THREE sequential Ollama calls within a single HTTP request/response cycle
+ * (BibTeX extraction, then a Llama summary, then a Mistral summary — see
+ * `DocumentService.uploadDocument()`), and `overwriteVersion()` chains two (Llama + Mistral).
+ * Each individual call may legitimately take up to the backend's per-call Ollama read timeout
+ * (`OllamaConfig.OLLAMA_READ_TIMEOUT`, currently 10 minutes), so this client-side timeout must
+ * cover the worst-case SUM of those calls, not just one of them, or the browser will abort a
+ * request the backend is still genuinely (and successfully) processing.
+ *
+ * Budget: 3 x 10-minute Ollama calls (worst case, upload) + 5-minute buffer for physical
+ * storage, text extraction, and Qdrant vector indexing = 35 minutes. This is deliberately
+ * generous: `regenerateSummary`/`chatWithDocument` only make a single call each and will
+ * virtually always resolve far sooner, so the extra headroom here only matters when a model
+ * is genuinely still working, never when something is actually stuck.
+ *
+ * Must stay <= the reverse proxy and gateway timeouts further out in the request path
+ * (see `proxy_read_timeout`/`proxy_send_timeout` in nginx/nginx.conf, and
+ * `server.timeout`/`keepAliveTimeout` in src/main/server/server.ts) or the browser will see a
+ * connection reset from an intermediary before this abort controller itself ever fires.
  */
-export const LLM_TIMEOUT_MS = 600000; // 10 minutes
+export const LLM_TIMEOUT_MS = 2100000; // 35 minutes
 
 /**
  * Supported backend architecture driver classifications.
