@@ -120,7 +120,7 @@ export class ShellBarView extends Component<void> {
         id: 'camunda-bpmn',
         iconKey: 'GitBranch',
         tile: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 border-teal-100 dark:border-teal-900/50',
-        title: 'Camunda BPMN 2.0 Workflow',
+        title: 'BPMN 2.0 Workflow Model',
         subtitle: 'Document Ingestion, Dual AI & Qdrant RAG Process',
         action: () => appStore.openBpmnModal()
       },

@@ -78,7 +78,7 @@ const LINKS: SystemLinkEntry[] = [
     iconKey: 'Layers',
     tile: 'bg-violet-50 dark:bg-violet-950/50 text-violet-600 border-violet-100 dark:border-violet-900/50',
     title: 'Qdrant Dashboard',
-    subtitle: 'Browse the library_embeddings collection, points, and HNSW index stats',
+    subtitle: 'Browse the personal_library_embeddings collection, points, and HNSW index stats',
     url: (host) => `http://${host}:16333/dashboard`
   },
   {

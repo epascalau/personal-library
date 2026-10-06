@@ -91,7 +91,7 @@ export function generateMermaidMindmap(): string {
         Sentence-Boundary Preservation
         Heading Context Preservation
       Qdrant Vector DB
-        library_embeddings Collection
+        personal_library_embeddings Collection
         Dense Cosine Metric
         HNSW Vector Indexing
       Conversational Chat
@@ -203,7 +203,7 @@ export function generatePlantUmlMindmap(): string {
 **[#7c3aed] 4. Vector RAG & Conversational Chat
 *** Semantic Text Chunking (paragraph-aligned, ~400 characters per chunk)
 *** Dense Vector Embeddings Generation
-*** Qdrant Vector DB Integration (library_embeddings collection)
+*** Qdrant Vector DB Integration (personal_library_embeddings collection)
 *** Sub-10ms Cosine Distance HNSW Indexing
 *** Natural Language Conversational Q&A Assistant
 *** Interactive Grounded Citation Drawer with Confidence Scores
@@ -543,7 +543,7 @@ export function generateMindmapSvg(): string {
     <g transform="translate(280, 85)" filter="url(#node-shadow)">
       <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Qdrant Vector Database</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• library_embeddings collection</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• personal_library_embeddings collection</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Dense Cosine metric &amp; HNSW sub-10ms index</text>
     </g>
 
@@ -850,7 +850,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         lead: 'Sub-10ms neural search and grounded conversational Q&A.',
         bullets: [
           'Semantic chunking: paragraph-aligned chunks of roughly 400 characters, no fixed overlap window.',
-          'Qdrant vector collection library_embeddings with Cosine distance metric & HNSW.',
+          'Qdrant vector collection personal_library_embeddings with Cosine distance metric & HNSW.',
           'Conversational assistant with multi-turn context memory and prompt guardrails.',
           'Interactive citation drawer with exact quote highlights and confidence scores.'
         ]

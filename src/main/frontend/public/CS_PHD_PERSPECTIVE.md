@@ -21,7 +21,7 @@ While conventional engineering tracks emphasize narrow mechanical execution, pla
 | Dimension | Traditional CS PhD / Academic Lens | Strategic / Generative Leadership Lens | Concrete Implementation in Personal Library |
 | :--- | :--- | :--- | :--- |
 | **Primary Unit of Value** | Algorithmic rigor, convergence guarantees, proofs, loss functions | System affordances, real-world utility, rapid business validation | Production-grade SAP UI5 Web Components floorplans serving immediate researcher utility |
-| **Operational Bottleneck** | Computational complexity, theoretical limits, latency | Objective function definition, workflow decomposition | Decomposing ingestion into Camunda BPMN 2.0 executable tasks with human audit gates |
+| **Operational Bottleneck** | Computational complexity, theoretical limits, latency | Objective function definition, workflow decomposition | Decomposing ingestion into BPMN 2.0 service tasks with human audit gates (modeled as documentation; executed as sequential Spring services) |
 | **Cognitive Mode** | **Convergent**: Narrowing down to verifiable, optimal solutions | **Divergent**: Exploring lateral possibilities, edge cases, novel formulations | Dual-model inference (Llama 3.3 for analytical method synthesis + Mistral Large for executive takeaways) |
 | **Role of the Human** | Handcrafted implementer, manual debugger | Intent director, creative curator, ethical governor | Specifying architecture contracts while AI agents synthesize multi-file implementations |
 | **Tool Paradigm** | Low-level frameworks (PyTorch, Triton, CUDA) | Composable cognitive modules (grounding engines, multi-modal reasoners) | Qdrant HNSW vector store, Spring AI Ollama adapters, Keycloak OIDC, Express gateway |
@@ -44,7 +44,7 @@ The curriculum structures modern AI tooling into a cohesive cognitive architectu
 
 * **Grounding Layer (Qdrant & Vector Retrieval):** Anchors reasoning in curated, verified document chunks to constrain generative variance and eliminate hallucinations, displaying verifiable citations in the UI.
 * **Reasoning & Synthesis Layer (Spring AI, Llama 3.3 & Mistral Large):** Facilitates multi-model analytical synthesis, lateral hypothesis generation, and cross-domain scenario modeling.
-* **Prototyping & Pipeline Deployment (Camunda BPMN 2.0 & Gateway REST):** Translates high-level natural language intent into persistent, parameterized, reproducible agentic pipelines with retry boundaries and librarian review gates.
+* **Prototyping & Pipeline Deployment (BPMN 2.0 modeling & Gateway REST):** Translates high-level natural language intent into a documented, parameterized, reproducible pipeline design — retry boundaries and librarian review gates are expressed in the BPMN model; the running system implements the happy path in Spring services.
 
 ---
 

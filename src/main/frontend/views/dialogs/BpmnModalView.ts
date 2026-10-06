@@ -5,7 +5,8 @@
  * Camunda BPMN 2.0 Process Definition & Visual Flow Inspector modal.
  *
  * Displays the complete BPMN 2.0 XML model along with an architectural stage flow diagram,
- * Camunda 7 / Camunda 8 execution mappings, and one-click export for Camunda Modeler.
+ * Camunda 7 / Camunda 8 execution mappings (shown as a how-to guide — neither engine is
+ * embedded in this project), and one-click export for Camunda Modeler.
  */
 
 import { html, raw, RawHtml } from '../../core/html';
@@ -93,7 +94,8 @@ export class BpmnModalView extends DialogView {
    * Fetches the BPMN 2.0 XML definition from the server API endpoint.
    *
    * WHAT: Dispatches HTTP request to `/api/v1/bpmn/document-ingestion.bpmn` and caches text.
-   * WHY: Guarantees the frontend displays the exact XML served to Camunda engines.
+   * WHY: Guarantees the frontend displays the exact XML stored in the repository, so the
+   *      rendered diagram and the downloadable file can never drift apart.
    */
   private async loadBpmnXml(): Promise<void> {
     this.loading = true;
@@ -153,7 +155,7 @@ export class BpmnModalView extends DialogView {
   /**
    * Renders the header title and metadata badges.
    *
-   * WHAT: Emits modal title, subtitle, and Camunda 7 / Camunda 8 architecture tags.
+   * WHAT: Emits modal title, subtitle, and Camunda 7 / Camunda 8 compatibility tags.
    * WHY: Frames the dialog with enterprise architectural context and standards compliance.
    *
    * @returns RawHtml header block.
@@ -305,7 +307,7 @@ export class BpmnModalView extends DialogView {
                     href="/api/v1/bpmn/document-ingestion.bpmn?download=true"
                     download="document-ingestion-rag.bpmn"
                     class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-                    title="Download executable BPMN 2.0 XML for Camunda Modeler"
+                    title="Download the BPMN 2.0 XML for Camunda Modeler"
                   >
                     ${icon('Download', { className: 'w-3 h-3' })}
                     BPMN Model
@@ -488,7 +490,7 @@ export class BpmnModalView extends DialogView {
               <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
                 <li>• Formats: PDF, DOCX, Markdown, LaTeX, Plain Text with MIME validation</li>
                 <li>• Drag-and-drop file upload with client-side BibTeX extraction preview</li>
-                <li>• Camunda BPMN 2.0 7-task process with human validation gateway loop</li>
+                <li>• BPMN 2.0 model of the 7-task process with human validation gateway loop (documentation only)</li>
                 <li>• SHA-256 fingerprinting for de-duplication and versioned disk archiving</li>
               </ul>
             </div>
@@ -532,7 +534,7 @@ export class BpmnModalView extends DialogView {
               <p class="text-gray-500 dark:text-gray-400 text-[11px] mb-2">Semantic search, dense vector embeddings and multi-turn grounded conversation.</p>
               <ul class="space-y-1 text-gray-600 dark:text-gray-300 text-[11px]">
                 <li>• Semantic chunking: 500-token chunks with 50-token contextual overlap</li>
-                <li>• Qdrant library_embeddings collection with Cosine distance metric &amp; HNSW</li>
+                <li>• Qdrant personal_library_embeddings collection with Cosine distance metric &amp; HNSW</li>
                 <li>• Multi-turn conversational document chat assistant with context memory</li>
                 <li>• Grounded citation drawer with exact excerpt quotes and confidence scores</li>
               </ul>
@@ -712,13 +714,16 @@ export class BpmnModalView extends DialogView {
           ${icon('Info', { className: 'w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5' })}
           <div class="space-y-1">
             <h3 class="font-bold text-sm text-gray-900 dark:text-white">
-              Executable Camunda BPMN 2.0 Process Definition
+              BPMN 2.0 Process Model &middot; Design Documentation
             </h3>
             <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-              This process models the end-to-end ingestion lifecycle executed by Spring AI in the Personal Library.
-              It features <strong>4 swimlanes</strong> (UI Client, Spring AI Orchestrator, Ollama AI Models, Qdrant Vector Store),
-              <strong>parallel asynchronous branches</strong> for dual-model summarization, a <strong>human review loop</strong> for BibTeX validation,
-              and <strong>atomic persistence</strong> into MongoDB and Keycloak.
+This diagram models the end-to-end ingestion lifecycle. It features <strong>4 swimlanes</strong>
+              (SAP UI5 Client &amp; REST Ingestion, Spring AI Orchestration Tier, Ollama AI Models, Qdrant Vector Database),
+              branches for dual-model summarization, a <strong>human review loop</strong> for BibTeX validation, and persistence into MongoDB.
+              <br /><strong class="text-amber-600 dark:text-amber-400">Note:</strong> this is a <strong>static design artifact</strong> &mdash; no BPMN engine runs in
+              this application. The real pipeline executes as sequential Spring <code>@Service</code> calls, and the modeled retry
+              boundaries, parallel gateways and review gates are <em>intent</em>, not implemented behaviour. The guide below shows how you
+              would make it executable under Camunda 7 or 8.
             </p>
           </div>
         </div>
@@ -862,7 +867,7 @@ export class BpmnModalView extends DialogView {
               </p>
               <div class="pt-2 border-t border-purple-100 dark:border-purple-900/40 text-[10px] font-mono text-gray-500 dark:text-gray-400">
                 Delegate: ${'${vectorRagDelegate}'}
-                <br />Collection: library_embeddings
+                <br />Collection: personal_library_embeddings
               </div>
             </div>
           </div>
@@ -950,7 +955,9 @@ export class BpmnModalView extends DialogView {
   }
 
   /**
-   * Renders architecture and deployment instructions for Camunda 7 (Spring Boot) and Camunda 8 (Zeebe).
+   * Renders *optional* architecture and deployment instructions for Camunda 7 (Spring Boot)
+   * and Camunda 8 (Zeebe). This is reference material for taking the model to a real engine;
+   * neither engine is a dependency of this project.
    *
    * WHAT: Generates code examples demonstrating how to bind Java delegates or Zeebe workers to the BPMN process.
    * WHY: Provides practical implementation guidance for production enterprise integration.
@@ -960,6 +967,20 @@ export class BpmnModalView extends DialogView {
   private renderDeploymentView(): RawHtml {
     return html`
       <div class="space-y-6 text-xs text-gray-800 dark:text-gray-200">
+        <!-- Not-installed disclaimer -->
+        <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-900/60 rounded-xl p-4 flex items-start gap-3">
+          ${icon('AlertTriangle', { className: 'w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5' })}
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm text-gray-900 dark:text-white">Reference guide &mdash; not installed in this project</h3>
+            <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Personal Library ships <strong>no workflow engine</strong>. There is no <code>camunda-bpm-spring-boot-starter</code>
+              or Zeebe client on the classpath, and no <code>JavaDelegate</code> or <code>@JobWorker</code> bean exists in the codebase.
+              Ingestion runs as sequential Spring <code>@Service</code> calls. The snippets below show what you would add to make the
+              bundled BPMN model actually executable.
+            </p>
+          </div>
+        </div>
+
         <!-- Camunda 7 -->
         <div class="bg-white dark:bg-[#1c232b] rounded-xl border border-gray-200 dark:border-[#2e3b4a] p-5 space-y-3 shadow-xs">
           <div class="flex items-center justify-between border-b border-gray-100 dark:border-[#2e3b4a] pb-2">

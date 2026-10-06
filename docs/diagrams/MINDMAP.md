@@ -33,7 +33,7 @@ Personal Library & AI Research Engine
 ├── 4. Vector RAG & Conversational Chat
 │   ├── Semantic Text Chunking (paragraph-aligned, ~400 characters per chunk, no fixed overlap window)
 │   ├── Dense Vector Embeddings Generation
-│   ├── Qdrant Vector DB Integration (library_embeddings collection)
+│   ├── Qdrant Vector DB Integration (personal_library_embeddings collection)
 │   ├── Sub-10ms Cosine Distance HNSW Indexing
 │   ├── Natural Language Conversational Q&A Assistant
 │   ├── Interactive Grounded Citation Drawer with Confidence Scores

@@ -1171,7 +1171,7 @@ app.get(['/api/v1/health', '/api/v1/status'], (_req: Request, res: Response) => 
     vectorStore: {
       engine: 'Qdrant Vector Database',
       status: 'RUNNING',
-      collection: 'library_embeddings',
+      collection: 'personal_library_embeddings',
       indexedDocuments: documentsDatabase.length,
       totalChunks: documentsDatabase.reduce((acc, d) => acc + (d.chunks?.length || 0), 0)
     },
@@ -1891,7 +1891,7 @@ app.get('/api/v1/openapi.yaml', (_req: Request, res: Response) => {
 });
 
 /**
- * Serves the Camunda BPMN 2.0 process definition model for Document Ingestion and RAG.
+ * Serves the BPMN 2.0 process definition model for Document Ingestion and RAG.
  *
  * WHAT: Reads `src/main/resources/bpmn/document_ingestion_rag.bpmn` and streams it as `application/xml`
  * with optional download attachment disposition.
@@ -1911,7 +1911,7 @@ app.get(['/api/v1/bpmn/document-ingestion.bpmn', '/document-ingestion-rag.bpmn',
 });
 
 /**
- * Serves high-resolution PNG image of the Camunda BPMN 2.0 Process Diagram.
+ * Serves high-resolution PNG image of the BPMN 2.0 Process Diagram.
  *
  * WHAT: Streams `docs/diagrams/document_ingestion_rag.png` with `image/png` content-type.
  * WHY: Enables direct embedding in external documentation, wiki pages, presentations, and one-click download.
@@ -1929,7 +1929,7 @@ app.get(['/api/v1/diagrams/bpmn.png', '/document_ingestion_rag.png'], (_req: Req
 });
 
 /**
- * Serves enterprise multi-page PDF specification of the Camunda BPMN 2.0 Process Diagram.
+ * Serves enterprise multi-page PDF specification of the BPMN 2.0 Process Diagram.
  *
  * WHAT: Streams `docs/diagrams/document_ingestion_rag.pdf` with `application/pdf` content-type.
  * WHY: Provides architects with an archivable specification document containing diagrams, task tables, and delegate mappings.
@@ -1947,7 +1947,7 @@ app.get(['/api/v1/diagrams/bpmn.pdf', '/document_ingestion_rag.pdf'], (_req: Req
 });
 
 /**
- * Serves scalable vector SVG graphic of the Camunda BPMN 2.0 Process Diagram.
+ * Serves scalable vector SVG graphic of the BPMN 2.0 Process Diagram.
  *
  * WHAT: Streams `docs/diagrams/document_ingestion_rag.svg` with `image/svg+xml` content-type.
  * WHY: Enables crisp, vector diagram rendering in web views and diagramming tools.

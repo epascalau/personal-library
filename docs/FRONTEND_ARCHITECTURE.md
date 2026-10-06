@@ -195,7 +195,7 @@ All commands below run from the repository root with `npm run <script>`.
 | `BackendSettingsModalView` | ShellBar settings gear | Switch between the 3 `BACKEND_PRESETS` or enter a custom base URL; shows live health-check status. |
 | `DeleteConfirmDialogView` | Object Page "Delete" | Destructive-action confirmation (purges MongoDB + Qdrant + physical file). |
 | `OpenApiModalView` | Footer "API Spec" link | Fetches and renders `openapi.yaml` inline for quick contract inspection without leaving the app. |
-| `BpmnModalView` | Footer "Workflow" link | Renders the Camunda BPMN ingestion diagram (`document_ingestion_rag.bpmn`) for visual process documentation. |
+| `BpmnModalView` | Footer "Workflow" link | Renders the BPMN 2.0 ingestion model (`src/main/resources/bpmn/document_ingestion_rag.bpmn`) as visual process documentation. The file carries `camunda:` modeling attributes for Camunda Modeler compatibility, but no engine executes it. |
 
 ---
 

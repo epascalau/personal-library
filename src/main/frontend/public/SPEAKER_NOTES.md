@@ -14,7 +14,7 @@
 |  00:00 - 04:00 | Welcome, Announced Abstract & 1-Hour Session Agenda                           |
 |  04:00 - 10:00 | Section 1: Live Application Demonstration & Grounded Verification             |
 |  10:00 - 18:00 | Section 2: Why This App? The Software Engineering Inversion & Cognitive Stack|
-|  18:00 - 27:00 | Section 3: Enterprise Architecture, Camunda BPMN & Polyglot Persistence       |
+|  18:00 - 27:00 | Section 3: Enterprise Architecture, BPMN 2.0 Modeling & Polyglot Persistence  |
 |  27:00 - 38:00 | Section 4: RAG from Scratch & The Wizard of Oz Concrete Walkthrough          |
 |  38:00 - 45:00 | Section 5: Statistics & The Two Tables (CS PhD vs Leadership, Mongo vs Qdrant)|
 |  45:00 - 60:00 | Section 6: Open Floor Q&A & Technical Discussion with the Audience           |
@@ -52,7 +52,7 @@
 > *"Here is our flight plan for the next hour:*
 > 1. *We start right away with a **Live Demo** so you see the running application, the SAP UI5 Web Components-based UI, and what grounded retrieval actually looks like in practice.*
 > 2. *Next, we address **Why This App?**: the CS PhD perspective on why prompt-level hacks fall short, and how the value bottleneck has inverted from coding syntax to cognitive orchestration.*
-> 3. *Then, the **Enterprise Architecture**: our decoupled polyglot stack—Spring Boot 4.1.1, Qdrant, MongoDB 7.0, and Camunda BPMN 2.0 workflows.*
+> 3. *Then, the **Enterprise Architecture**: our decoupled polyglot stack—Spring Boot 4.1.1, Qdrant, MongoDB 7.0, and a BPMN 2.0 model documenting the ingestion pipeline.*
 > 4. *In section 4, we explain **RAG from Scratch**: the 'Tiny Desk' analogy, tokens as Lego bricks, embeddings as GPS coordinates in the Map of Meaning, and a step-by-step walkthrough using Chapter 1 of 'The Wonderful Wizard of Oz'.*
 > 5. *We will analyze **Two Comparative Tables**: Academic CS vs. Strategic Leadership, followed by MongoDB vs. Qdrant and our commercial development ROI ledger.*
 > 6. *Finally, the remaining 15 minutes are reserved for an **Open Floor Q&A** with you."*
@@ -128,7 +128,7 @@
 > 
 > 1. **The Grounding Layer:** We don't ask the model to remember facts. We use Qdrant to compute dense 768-dimensional vector representations, perform approximate nearest-neighbor searches in sub-3 milliseconds, and feed verified text into the context window.
 > 2. **The Reasoning & Synthesis Layer:** Different models have different cognitive personalities. We use Llama 3.3 for analytical, methodological dissection, and Mistral Large for high-level executive synthesis. They run concurrently without cross-contamination.
-> 3. **The Orchestration & Governance Layer:** How do you handle GPU timeouts, rate limits, or network glitches? You don't use ad-hoc try-catch blocks. You use an industrial workflow engine like Camunda BPMN 2.0 with asynchronous retry boundaries and human-in-the-loop audit gates."*
+> 3. **The Orchestration & Governance Layer:** How do you handle GPU timeouts, rate limits, or network glitches? In production you reach for an industrial workflow engine—Camunda, Temporal, Airflow—with asynchronous retry boundaries and human-in-the-loop audit gates. In *this* teaching build we stop one step short: we **model** that layer in BPMN 2.0 so you can see exactly what it would govern, while the code itself still handles failure with plain try-catch and graceful degradation. Closing that gap is the single biggest step from prototype to production."*
 
 ---
 
@@ -147,19 +147,21 @@
 
 ---
 
-### Slide 8: Section 3 — Camunda BPMN 2.0 Ingestion Workflow
+### Slide 8: Section 3 — The BPMN 2.0 Ingestion Model
 * **Elapsed Time:** `21:30 - 24:30` (3 minutes)
 * **Visual Anchor:** High-resolution embedded BPMN 2.0 diagram showing 4 horizontal swimlanes.
-* **Core Takeaway:** Asynchronous reliability: handle failure gracefully with compensation and retry policies.
+* **Core Takeaway:** A BPMN model is a precise, shared vocabulary for *designing* reliability—even before (or without) an engine that enforces it.
 
 #### Verbatim Presenter Script:
-> *"This BPMN 2.0 diagram represents our executable document ingestion lifecycle.
+> *"This BPMN 2.0 diagram documents our document ingestion lifecycle. Let me be precise about what it is and isn't: it's a **design artifact**, authored in Camunda Modeler and shipped in the repo as `document_ingestion_rag.bpmn`. There is **no workflow engine running in this stack**. What actually executes is a sequence of Spring `@Service` calls.
 > 
-> Look at the 4 horizontal swimlanes: Client User, Gateway, Spring Engine, and AI Subsystems.
+> So why ship it? Because BPMN is the lingua franca between architects, business analysts and auditors—and because it makes the *intended* reliability contract explicit and reviewable.
 > 
-> When a PDF arrives, the engine splits into a parallel fork. While text chunking and vector embedding proceed along one branch, dual LLM summarization proceeds along the other.
+> Look at the 4 swimlanes: SAP UI5 Client & REST Ingestion, Spring AI Orchestration Tier, Ollama AI Models, and the Qdrant Vector Database.
 > 
-> Notice the boundary timer events: if Ollama's local GPU is saturated and inference exceeds 60 seconds, the engine triggers an automatic `R3/PT10S` policy—retry up to 3 times with 10-second backoffs. If vector similarity falls below our confidence threshold of 0.70, the workflow routes to a human librarian review task rather than silently failing."*
+> The model shows text chunking and vector embedding alongside dual LLM summarization. In the code today, those run **sequentially**, not in parallel—which is exactly the kind of divergence a model like this helps you spot.
+> 
+> And notice the boundary timer events carrying `R3/PT10S`—retry 3 times with 10-second backoffs—plus a human librarian review gate. None of that is implemented. It's a specification of what we'd wire up the moment this left the classroom, and it's the clearest statement of our roadmap we could put on a single page."*
 
 ---
 
@@ -217,7 +219,7 @@
 #### Verbatim Presenter Script:
 > *"Let's trace a concrete query through this architecture using Chapter 11 of 'The Wonderful Wizard of Oz'.
 > 
-> * **Step 1:** The raw story is extracted from PDF and chunked into overlapping passages of 500 tokens.
+> * **Step 1:** The raw story is extracted from PDF and chunked on paragraph boundaries into passages of roughly 400 characters.
 > * **Step 2:** Each passage is passed to our embedding model to generate a 768-D vector coordinate.
 > * **Step 3:** The vector is indexed in Qdrant's HNSW graph, while the full BSON document is saved in MongoDB.
 > * **Step 4:** The user asks: *'Why must visitors wear green spectacles in the Emerald City?'*
@@ -255,7 +257,7 @@
 > Why not put everything into a single database? Because their access patterns are orthogonal. MongoDB 7.0 excels at B-Tree indexing, transactional integrity, schema evolution, and full document persistence. Qdrant excels at high-dimensional vector graphs and sub-3 millisecond nearest-neighbor lookups. Using both gives us zero compromises on either durability or search latency.
 > 
 > Now, look at the financial ledger on the right:
-> * A traditional senior software team would take 6 to 8 weeks to build this decoupled stack: SAP UI5, Spring Boot, Qdrant, Ollama, and Camunda. At enterprise rates, that represents **$12,000 to $16,500**.
+> * A traditional senior software team would take 6 to 8 weeks to build this decoupled stack: SAP UI5, Spring Boot, Qdrant, Ollama, and the supporting BPMN/architecture documentation. At enterprise rates, that represents **$12,000 to $16,500**.
 > * With AI copilot auto-completion, that drops to 2 to 3 weeks and ~$6,500.
 > * Built via autonomous cognitive orchestration, the all-in compute token cost was **$118.31**.
 > 
@@ -277,7 +279,7 @@
 > * Want to challenge our choice of Qdrant vs. pgvector?
 > * Want us to test an edge-case query or PDF live in the application?
 > * Want to debate whether human code-writing is truly being replaced or merely elevated?
-> * Or questions about local privacy, Spring AI, or Camunda workflow retries?
+> * Or questions about local privacy, Spring AI, or how you'd take the BPMN model from documentation to an executing engine?
 > 
 > Who would like to kick us off with the first question?"*
 
@@ -285,7 +287,7 @@
 1. *"While you formulate your questions, one common topic architects ask is: 'Why not just use pgvector inside Postgres instead of spinning up Qdrant?'"*  
    *Answer:* pgvector is great for small collections under 100k vectors. Once you scale to millions of high-dimensional points with dynamic payload filtering, dedicated HNSW engines like Qdrant offer significantly lower latency jitter and isolated memory allocations that won't starve transactional queries.
 2. *"Another frequent question is: 'How do you choose between chunking sizes—say 256 tokens vs. 1,000 tokens?'"*  
-   *Answer:* It's the precision vs. context trade-off. 256 tokens gives razor-sharp cosine similarity matches but can cut sentences in half. 1,000 tokens preserves narrative context but dilutes vector density. We found 500 tokens with 50-token overlap to be the optimal sweet spot for academic PDFs.
+   *Answer:* It's the precision vs. context trade-off. Small chunks give razor-sharp cosine similarity matches but can cut sentences in half; large chunks preserve narrative context but dilute vector density. This project takes a deliberately simple position: flush at roughly **400 characters**, always on a paragraph boundary, with **no overlap**. That avoids mid-sentence truncation without a tokenizer on the Java side — and adding overlap is the most obvious recall improvement we'd make next.
 
 ---
 
@@ -294,6 +296,6 @@
 | Question | Short Technical Answer |
 | :--- | :--- |
 | **Why not just use Gemini or GPT-4 API?** | The session's primary objective is privacy-preserving, enterprise-governed **local AI**. Data never leaves the corporate boundary. Zero per-token cloud billing. |
-| **What happens if Ollama crashes during summarization?** | Camunda BPMN 2.0 catches the boundary error event and applies the `R3/PT10S` policy: retries up to 3 times before routing to a dead-letter queue or human librarian review. |
+| **What happens if Ollama crashes during summarization?** | Today: the call is caught in `AiSummarizationService`, and that model's summary degrades to an inline placeholder notice while the rest of the upload succeeds — no retry, no queue. The BPMN model documents the `R3/PT10S` retry and librarian-review policy we'd implement in production, but it is not wired to an engine. |
 | **How is the detached-DOM EventBus implemented?** | Using `document.createComment('eventbus')` as a detached DOM node with native `addEventListener` and `dispatchEvent`. It incurs zero DOM render thrashing and zero network overhead. |
 | **What embedding model is used?** | `nomic-embed-text` running locally through Ollama, outputting 768-dimensional normalized float vectors. |

@@ -200,7 +200,7 @@ export function generateSystemArchitectureSvg(): string {
   <rect x="65" y="780" width="460" height="125" rx="8" fill="url(#card-amber)" stroke="#f59e0b" stroke-width="1.5" filter="url(#glow)" />
   <text x="80" y="805" font-size="13" font-weight="700" fill="#ffffff">Qdrant Vector Database</text>
   <text x="80" y="825" font-size="11" fill="#fde68a">Dense Semantic Search &amp; Cosine Retrieval</text>
-  <text x="80" y="847" font-size="10" font-family="monospace" fill="#fef3c7">• Collection: library_embeddings (HTTP 16333 / gRPC 16334)</text>
+  <text x="80" y="847" font-size="10" font-family="monospace" fill="#fef3c7">• Collection: personal_library_embeddings (HTTP 16333 / gRPC 16334)</text>
   <text x="80" y="865" font-size="10" font-family="monospace" fill="#fef3c7">• Paragraph Chunking (~350 characters/chunk)</text>
   <text x="80" y="883" font-size="10" font-family="monospace" fill="#fef3c7">• Top-K Retrieval with Excerpt Citations</text>
 
@@ -299,7 +299,7 @@ export function generateRagFlowSvg(): string {
   <rect x="730" y="295" width="400" height="65" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1" />
   <text x="745" y="315" font-size="11" font-weight="700" fill="#a7f3d0">Branch C: Qdrant Vector Upsert</text>
   <text x="745" y="333" font-size="10" fill="#d1fae5">• Vector embedding calculation &amp; payload indexing</text>
-  <text x="745" y="348" font-size="9" font-family="monospace" fill="#6ee7b7">Collection: library_embeddings (GUID document scoped)</text>
+  <text x="745" y="348" font-size="9" font-family="monospace" fill="#6ee7b7">Collection: personal_library_embeddings (GUID document scoped)</text>
 
   <!-- Arrow 3 -> Storage -->
   <path d="M 1150 240 L 1210 240" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#flow-arrow)" />

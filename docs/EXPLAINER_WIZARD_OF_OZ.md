@@ -23,7 +23,7 @@ Every concept is structured in **two complementary tiers**:
    * [1.2 Concrete Inspection: Tokenizing the Kansas Prairie](#12-concrete-inspection-tokenizing-the-kansas-prairie)
    * [1.3 Mathematical Rigor: Byte-Pair Encoding (BPE) & Positional Embeddings](#13-mathematical-rigor-byte-pair-encoding-bpe--positional-embeddings)
 2. [Phase 2: Embeddings & Vector Space (Words as Coordinates in Thought-Space)](#2-phase-2-embeddings--vector-space-words-as-coordinates-in-thought-space)
-   * [2.1 Plain English: The 384-Dimensional Meaning Compass](#21-plain-english-the-384-dimensional-meaning-compass)
+   * [2.1 Plain English: The 768-Dimensional Meaning Compass](#21-plain-english-the-768-dimensional-meaning-compass)
    * [2.2 Concrete Inspection: The Live Qdrant Vector Payload](#22-concrete-inspection-the-live-qdrant-vector-payload)
    * [2.3 Mathematical Rigor: Cosine Metric, Inner Product & Euclidean Norms](#23-mathematical-rigor-cosine-metric-inner-product--euclidean-norms)
 3. [Phase 3: How Qdrant Works (Finding Needles with Hierarchical Navigable Small World / HNSW Graphs)](#3-phase-3-how-qdrant-works-finding-needles-with-hierarchical-navigable-small-world--hnsw-graphs)
@@ -81,21 +81,39 @@ In our system, when a researcher uploads a document or runs a query, the text pi
 | $t_{12}$ | `"ies"` | 52–55 | `892` | Plural Morpheme |
 
 #### Project Code Reference
-In `src/main/frontend/services/backend/mockBackendAdapter.ts`, the tokenizer estimates token counts and splits text into chunks:
-```typescript
-// Token estimation and sliding-window segmentation
-export function estimateTokens(text: string): number {
-  // Average English word is ~4 characters, yielding ~1.3 tokens per word
-  return Math.ceil(text.trim().split(/\s+/).length * 1.33);
-}
+Tokenization happens inside the embedding model itself. What *our* code controls is **chunking** — how the document is cut up before each piece is embedded. That lives in `VectorRagService.indexDocumentChunks()` (`src/main/java/com/personallibrary/service/VectorRagService.java`), and it is **paragraph-aligned, not a sliding window**:
 
-export function chunkDocument(text: string, maxTokens = 500, overlap = 50): TextChunk[] {
-  const words = text.split(/\s+/);
-  const wordsPerChunk = Math.floor(maxTokens / 1.33);
-  const overlapWords = Math.floor(overlap / 1.33);
-  // ... constructs sliding window chunks preserving context
+```java
+String[] paragraphs = text.split("\\n\\s*\\n");   // split on blank lines
+StringBuilder current = new StringBuilder();
+int index = 0;
+
+for (String para : paragraphs) {
+    // Flush when adding this paragraph would push us past ~400 characters,
+    // but only if we have already accumulated something meaningful (> 50 chars).
+    if ((current.length() + para.length() > 400) && current.length() > 50) {
+        String chunkText = current.toString().trim();
+        String chunkId   = docGuid + "-c" + index;
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("documentGuid", docGuid);   // scopes retrieval to one document
+        metadata.put("chunkIndex", index);
+
+        springAiDocs.add(new Document(chunkId, chunkText, metadata));
+        current = new StringBuilder(para);
+        index++;
+    } else {
+        if (current.length() > 0) current.append("\n\n");
+        current.append(para);
+    }
 }
 ```
+
+Three things worth noticing, because they differ from the textbook description:
+
+1. **The unit is characters, not tokens.** The threshold is ~400 *characters* (roughly 100 tokens) — a deliberately simple heuristic that avoids needing a tokenizer on the Java side.
+2. **There is no overlap.** Classic RAG pipelines overlap chunks (e.g. 50 tokens) so a sentence straddling a boundary still appears whole somewhere. This project does not, which is a real recall trade-off and a good first thing to improve.
+3. **Paragraph boundaries are respected.** Because the split happens on blank lines, a chunk never cuts a paragraph in half — which is often worth more than overlap for well-structured prose like a book chapter.
 
 ---
 
@@ -127,7 +145,7 @@ where $i \in \{0, \dots, \frac{d_{\text{model}}}{2} - 1\}$ indexes the vector di
 
 ## 2. Phase 2: Embeddings & Vector Space (Words as Coordinates in Thought-Space)
 
-### 2.1 Plain English: The 384-Dimensional Meaning Compass
+### 2.1 Plain English: The 768-Dimensional Meaning Compass
 
 How does an algorithm know that `"cyclone"` and `"whirlwind"` are nearly identical in meaning, even though their letters are completely different?
 
@@ -137,12 +155,12 @@ Imagine a map of the world. On this map:
 * London and Paris are close together.
 * London and Tokyo are far apart.
 
-An AI model creates a "Map of Human Concepts", but instead of having just 2 dimensions (North/South, East/West), it has **384 to 1536 dimensions**.
+An AI model creates a "Map of Human Concepts", but instead of having just 2 dimensions (North/South, East/West), it has hundreds or thousands of dimensions — commonly 384 to 1536 depending on the model. The model this project uses, `nomic-embed-text`, produces **768 dimensions**.
 * One dimension might track: *Is this related to family?* (Dorothy, Uncle Henry, Aunt Em score high; cookstove scores zero).
 * Another dimension might track: *Is this dangerous weather?* (cyclone, whirlwind score high; cupboard scores zero).
 * Another dimension might track: *Is this a building or shelter?* (house, cyclone cellar, garret, room score high).
 
-When the paragraph about Dorothy is turned into an embedding, it becomes a single point (a list of 384 numbers) in this vast concept space.
+When the paragraph about Dorothy is turned into an embedding, it becomes a single point (a list of 768 numbers) in this vast concept space.
 
 ```
        ▲ Dimension 2: Severe Weather
@@ -163,7 +181,7 @@ When the paragraph about Dorothy is turned into an embedding, it becomes a singl
 
 ### 2.2 Concrete Inspection: The Live Qdrant Vector Payload
 
-When Dorothy’s passage is ingested by our backend (`VectorRagService.java`), the system generates a 384-dimensional vector and creates a **Point** in Qdrant:
+When Dorothy’s passage is ingested by our backend (`VectorRagService.java`), the system generates a 768-dimensional vector and creates a **Point** in Qdrant:
 
 ```json
 {
@@ -200,7 +218,7 @@ When Dorothy’s passage is ingested by our backend (`VectorRagService.java`), t
 
 Let text chunk $A$ (Dorothy's passage) and user query $B$ (*"Where do they hide during a Kansas tornado?"*) be represented by normalized dense vectors:
 
-$$\mathbf{u} = f_{\text{embed}}(A) \in \mathbb{R}^d, \quad \mathbf{v} = f_{\text{embed}}(B) \in \mathbb{R}^d, \quad d = 384$$
+$$\mathbf{u} = f_{\text{embed}}(A) \in \mathbb{R}^d, \quad \mathbf{v} = f_{\text{embed}}(B) \in \mathbb{R}^d, \quad d = 768$$
 
 #### Cosine Similarity Formula
 The semantic affinity between $\mathbf{u}$ and $\mathbf{v}$ is the cosine of the angle $\theta$ between them in $d$-dimensional space (Reimers & Gurevych, 2019):
@@ -239,33 +257,28 @@ That is exactly how **Qdrant** uses **HNSW (Hierarchical Navigable Small World)*
 
 ### 3.2 Concrete Inspection: Spring Boot Qdrant Integration & Schema
 
-Our Spring Boot 4 backend (`VectorRagService.java`) configures the Qdrant collection and searches it:
+Our Spring Boot 4 backend (`VectorRagService.java`) does **not** talk to Qdrant through the raw `QdrantClient`. It uses Spring AI's `VectorStore` abstraction, and the collection itself is auto-provisioned from `application.yml` (`spring.ai.vectorstore.qdrant.collection-name: personal_library_embeddings`, `initialize-schema: true`), with the vector width inferred from the embedding model (`nomic-embed-text` → 768 dimensions, Cosine distance).
 
 ```java
-// Spring Boot Qdrant Collection Definition
-public void initializeCollection() {
-    qdrantClient.createCollectionAsync(
-        "library_embeddings",
-        VectorParams.newBuilder()
-            .setSize(384)
-            .setDistance(Distance.Cosine)
-            .build()
-    ).get();
-}
+// Retrieval: Spring AI VectorStore similarity search
+List<Document> similarDocs = vectorStore.similaritySearch(
+        SearchRequest.builder()
+                .query(query)
+                .topK(4)                   // retrieve the 4 nearest chunks
+                .similarityThreshold(0.5)  // discard anything below 0.5 cosine similarity
+                .build()
+);
 
-// Query Execution with Cosine Search
-public List<ScoredPoint> searchKansasPassage(float[] queryVector, int topK) {
-    return qdrantClient.searchAsync(
-        SearchPoints.newBuilder()
-            .setCollectionName("library_embeddings")
-            .addAllVector(Floats.asList(queryVector))
-            .setLimit(topK)
-            .setWithPayload(WithPayloadSelector.newBuilder().setEnable(true).build())
-            .setScoreThreshold(0.75f) // Minimum 75% semantic similarity
-            .build()
-    ).get();
+// Results are then narrowed to the document under discussion by payload metadata
+for (Document doc : similarDocs) {
+    String docGuid = (String) doc.getMetadata().get("documentGuid");
+    if (docGuid == null || docGuid.equals(docEntity.getGuid())) {
+        contextPassages.add(doc.getText());
+    }
 }
 ```
+
+> **Honest caveat:** the citation `score` surfaced in the UI is currently a **hardcoded `0.88`**, not the true cosine distance returned by Qdrant. Spring AI's `Document` does not expose the raw score on this code path, so the value is a placeholder. Treat the percentages you see in the chat UI as illustrative, not measured.
 
 ---
 
@@ -411,11 +424,11 @@ Here is how the entire system pulls these components together in real time when 
                          │
                          ▼
         1. Tokenize & Compute Query Embedding
-           vq = f_embed("Where does Dorothy...") in R^384
+           vq = f_embed("Where does Dorothy...") in R^768
                          │
                          ▼
         2. Qdrant HNSW Graph Fast Retrieval
-           Scans library_embeddings collection -> Cosine Match: 91.8%
+           Scans personal_library_embeddings collection -> Cosine Match: 91.8%
            Pulls Chapter 1 passage chunk
                          │
                          ▼

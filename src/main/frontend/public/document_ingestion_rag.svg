@@ -142,7 +142,7 @@
   <text x="845" y="726" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">Paragraph Chunking</text>
   <text x="845" y="740" font-size="10" font-weight="500" fill="#475569" text-anchor="middle">&amp; Qdrant Vector Upsert</text>
   <rect x="770" y="745" width="150" height="12" rx="3" fill="#f5f3ff" />
-  <text x="845" y="754" font-size="8" font-family="monospace" font-weight="600" fill="#6d28d9" text-anchor="middle">collection: library_embeddings</text>
+  <text x="845" y="754" font-size="8" font-family="monospace" font-weight="600" fill="#6d28d9" text-anchor="middle">collection: personal_library_embeddings</text>
 
   <!-- Parallel Join Gateway (Lane 2) -->
   <polygon points="985,340 1010,315 1035,340 1010,365" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5" />

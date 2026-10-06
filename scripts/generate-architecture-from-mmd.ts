@@ -216,7 +216,7 @@ export function generateArchitectureSvg(): string {
   <g filter="url(#card-shadow)">
     <rect x="1195" y="590" width="355" height="115" rx="6" fill="#581c87" stroke="#a855f7" stroke-width="1.2" />
     <text x="1372" y="620" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Qdrant Vector Database</text>
-    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: library_embeddings (HTTP 16333/gRPC 16334)</text>
+    <text x="1372" y="642" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Collection: personal_library_embeddings (HTTP 16333/gRPC 16334)</text>
     <text x="1372" y="660" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Dense Cosine Similarity Search</text>
     <text x="1372" y="678" font-size="10.5" fill="#e9d5ff" text-anchor="middle">• Top-K Grounded Citation Retrieval</text>
   </g>
@@ -351,7 +351,7 @@ export function generateArchitecturePdf(pngBuffer: Buffer, outputPath: string): 
       '• Fully Local Inference\n' +
       '  No cloud API keys; all generation runs via the local Ollama daemon.\n\n' +
       '• Qdrant Vector DB\n' +
-      '  Dense cosine similarity retrieval (library_embeddings).\n\n' +
+      '  Dense cosine similarity retrieval (personal_library_embeddings).\n\n' +
       '• Semantic Chunking\n' +
       '  ~350 char boundaries with paragraph context.',
       36 + (colWidth + colGap) * 2 + 10, startY + 40, { width: colWidth - 20, lineGap: 3 }

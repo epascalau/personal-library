@@ -12,7 +12,7 @@ Enterprise document management and AI research assistants feature diverse commun
 - Long-running dual-model LLM inferences (10s–30s generation latencies).
 - Conversational RAG queries with vector similarity retrieval.
 - Cross-component UI reactivity (filter changes, theme toggling, toasts, audit rollbacks).
-- Asynchronous workflow lifecycle tracking modeled in Camunda BPMN 2.0.
+- Ingestion lifecycle **modeled** in BPMN 2.0 (documentation artifact; no engine executes it).
 
 Engineers often default to full-duplex persistent WebSockets (`ws://` / `wss://`) for AI applications under the assumption that streaming or push notifications require an open TCP socket. We evaluated whether persistent WebSockets or stateless HTTP/REST with an in-memory detached-DOM event bus best meets system requirements.
 
@@ -92,9 +92,9 @@ export function createEventBus<TEvents extends EventsDefinition>(busName = 'app-
 
 ---
 
-## 5. Camunda BPMN 2.0 Ingestion Workflow Alignment
+## 5. BPMN 2.0 Ingestion Model Alignment
 
-In the **Camunda BPMN 2.0 Ingestion Workflow** (`src/main/resources/bpmn/document_ingestion_rag.bpmn`), you will find the following task:
+In the **BPMN 2.0 ingestion model** (`src/main/resources/bpmn/document_ingestion_rag.bpmn`) — a static documentation artifact, not an executed process — you will find the following task:
 
 ```xml
 <!-- Send Task: Broadcast WebSocket / EventBus Notification -->

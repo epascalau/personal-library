@@ -51,7 +51,7 @@ public class AuthController {
                     "username", "emilian.pascalau",
                     "email", "emilian.pascalau@gmail.com",
                     "name", "Emilian Pascalau",
-                    "roles", List.of("LIBRARY_ADMIN", "RESEARCHER"),
+                    "roles", List.of("LIBRARY_ADMIN", "CHIEF_RESEARCHER"),
                     "realm", "personal-library-realm",
                     "authenticatedAt", Instant.now().toString()
             ));
@@ -93,7 +93,7 @@ public class AuthController {
                         "username", username.split("@")[0],
                         "email", username,
                         "name", username.split("@")[0].replace(".", " "),
-                        "roles", List.of("LIBRARY_ADMIN", "RESEARCHER"),
+                        "roles", List.of("LIBRARY_ADMIN", "CHIEF_RESEARCHER"),
                         "realm", credentials.getOrDefault("realm", "personal-library-realm")
                 )
         ));

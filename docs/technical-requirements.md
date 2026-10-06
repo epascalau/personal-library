@@ -12,7 +12,7 @@ This Software Requirements Specification (SRS) defines the functional, non-funct
 ### 1.2 System Scope
 The platform provides an end-to-end, decoupled enterprise topology featuring:
 - **Multi-Format Ingestion**: Ingesting `.pdf`, `.docx`, `.doc`, `.txt`, `.md`, `.pptx`, `.ppt`, `.xls`, and `.xlsx` files up to 50 MB.
-- **Workflow Orchestration**: Camunda BPMN 2.0 workflow orchestration (`camunda-ingestion-flow.bpmn`) governing asynchronous multi-stage ingestion with retry boundaries (`R3/PT10S`).
+- **Workflow Documentation**: A BPMN 2.0 model (`src/main/resources/bpmn/document_ingestion_rag.bpmn`) documents the multi-stage ingestion pipeline, including modeled retry boundaries (`R3/PT10S`). It is a **static design artifact** — no BPMN/Camunda engine is embedded; the pipeline executes as sequential Spring `@Service` calls.
 - **Domain-Specific BibTeX Extraction**: Abstract Syntax Tree (AST) lexer/tokenizer extracting 14 standard LaTeX BibTeX publication fields with dynamic schema generation.
 - **Dual-Model Parallel AI Summarization**: Concurrent, comparative summarization via open-weights models (**Meta Llama 3.3 70B Instruct** and **Mistral Large 2411**) deployed on Ollama and Spring AI.
 - **Conversational RAG with Verifiable Grounding**: 768-dimensional dense vector embeddings using local **Nomic Embed Text** (`nomic-embed-text`) with **Google `text-embedding-004`** cloud fallback, stored in **Qdrant** with Cosine similarity and interactive citation drawers.
@@ -26,8 +26,8 @@ The platform provides an end-to-end, decoupled enterprise topology featuring:
 ### FR-1: Document Ingestion & Multi-Format Parsing
 - **FR-1.1 (File Formats)**: The system shall support uploading files in `.pdf`, `.docx`, `.doc`, `.txt`, `.md`, `.pptx`, `.ppt`, `.xls`, and `.xlsx` formats with file sizes up to 50 MB.
 - **FR-1.2 (Text Extraction)**: Upon upload, the backend text extraction pipeline shall extract raw text, document structure, page breaks, and character counts using `pdf-parse` and dedicated format parsers.
-- **FR-1.3 (Boundary-Aware Chunking)**: Ingested text shall be split into paragraph-aligned, sliding-window sub-word chunks (default: ~400–500 tokens with 50-token overlap) to preserve semantic coherence across sentence boundaries.
-- **FR-1.4 (BPMN 2.0 Ingestion Workflow)**: Ingestion tasks shall be orchestrated via Camunda BPMN 2.0 (`docs/diagrams/camunda-ingestion-flow.bpmn`), ensuring asynchronous state persistence, retry policies (`R3/PT10S`), and compensating transaction handling.
+- **FR-1.3 (Boundary-Aware Chunking)**: Ingested text shall be split on paragraph boundaries and accumulated into chunks that flush once they would exceed **~400 characters**, subject to a 50-character minimum. Chunks are **paragraph-aligned and non-overlapping**; coherence is preserved by never cutting mid-paragraph rather than by a sliding overlap window.
+- **FR-1.4 (BPMN 2.0 Ingestion Model)**: The ingestion pipeline shall be documented as a BPMN 2.0 model (`src/main/resources/bpmn/document_ingestion_rag.bpmn`) describing stage sequencing, retry intent (`R3/PT10S`), and review gates, and shall be viewable in-app. *Implementation note:* these semantics are **modeled, not executed** — the running code performs the stages sequentially in `DocumentService` / `VectorRagService` without an engine.
 
 ### FR-2: Automated BibTeX Bibliographic Metadata Extraction
 - **FR-2.1 (Schema Extraction)**: The system shall parse and infer 14 standard LaTeX BibTeX publication fields: Entry Type (`@article`, `@book`, `@inproceedings`, `@techreport`, `@misc`), `title`, `author`, `journal`, `booktitle`, `year`, `volume`, `number`, `pages`, `publisher`, `institution`, `organization`, `school`, `doi`, `isbn`, and `issn`.
@@ -46,7 +46,7 @@ The platform provides an end-to-end, decoupled enterprise topology featuring:
 - **FR-4.1 (Interactive Q&A)**: Users shall be able to converse interactively with any ingested document via a dedicated RAG conversational drawer.
 - **FR-4.2 (Dense Vector Embeddings)**:
   - Local sovereign model: **Nomic Embed Text** (`nomic-embed-text`) generating 768-dimensional dense vectors with an 8,192-token context window and asymmetric prefixes (`search_document:` / `search_query:`).
-  - Cloud reference baseline: **Google `text-embedding-004`** via `@google/genai` (768 dimensions with Matryoshka Representation Learning).
+  - Cloud reference baseline (**comparative only — not a dependency of this project**): **Google `text-embedding-004`** (768 dimensions with Matryoshka Representation Learning). The Gemini/cloud path was removed; no `@google/genai` package is installed.
 - **FR-4.3 (Qdrant Vector Retrieval)**: Vectors shall be matched in Qdrant using Cosine Similarity, scoped strictly by `documentGuid` to prevent cross-document context leaks.
 - **FR-4.4 (Verifiable Citations)**: Responses must provide interactive grounding citations displaying:
   - Source chunk identifier (`guid-c0`) and page offset.

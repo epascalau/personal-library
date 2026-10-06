@@ -317,9 +317,9 @@ personal-library/
 3. **Extraction**:
    - PDF documents parsed via Apache PDFBox / Tika to extract raw text and structural metadata.
    - BibTeX files parsed using regex/AST into `BibTeXMetadata`.
-4. **Chunking**: Text partitioned into overlapping chunks (e.g., 512 tokens with 64-token overlap).
+4. **Chunking**: Text split on blank lines and accumulated into paragraph-aligned, **non-overlapping** chunks, flushed once a chunk would exceed ~400 characters (50-character minimum).
 5. **Vector Embedding**: Chunks dispatched to Ollama `nomic-embed-text` generating 768-dimensional dense vectors.
-6. **Vector Indexing**: Points written to Qdrant collection `library_embeddings` with metadata payload (`documentGuid`, `chunkIndex`, `text`, `version`).
+6. **Vector Indexing**: Points written to Qdrant collection `personal_library_embeddings` with metadata payload (`documentGuid`, `chunkIndex`, `text`, `version`).
 7. **Database Storage**: `DocumentEntity` persisted to MongoDB collection `documents`.
 
 #### 2. Dual AI Summarization (`AiSummarizationService.java`)

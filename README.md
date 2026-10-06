@@ -65,15 +65,15 @@ For engineers, architects, and researchers studying this codebase, a comprehensi
 
 | # | Topic | Key Concepts Demonstrated | Code Locations |
 |---|---|---|---|
-| **1** | [SAP Fiori UI5 Architecture](docs/LEARNING_TOPICS.md#1-enterprise-ui-architecture-with-sap-fiori--ui5-web-components) | Framework-free W3C Web Components (`@ui5/webcomponents` v2), List Report & Object Page floorplans, dynamic Light/Dark theming | `src/main/frontend/views/`, `styles.css` |
+| **1** | [SAP Fiori UI5 Architecture](docs/LEARNING_TOPICS.md#1-enterprise-ui-user-interface-architecture-with-sap-fiori--ui5-w3c-web-components) | Framework-free W3C Web Components (`@ui5/webcomponents` v2), List Report & Object Page floorplans, dynamic Light/Dark theming | `src/main/frontend/views/`, `styles.css` |
 | **2** | [Reactive State Management](docs/LEARNING_TOPICS.md#2-reactive-state-management--decoupled-frontend-patterns) | Observable `Store<T>` micro-framework, fine-grained subscriptions, component lifecycle (`track`, `unmount`), typed `EventBus`, client-side i18n engine | `src/main/frontend/core/`, `stores/`, `i18n/` |
 | **3** | [Pluggable Backend Gateway](docs/LEARNING_TOPICS.md#3-pluggable-backend-gateway--driver-adapter-pattern) | Gateway Facade & Driver Adapter pattern, production REST vs. standalone mock driver, zero-downtime hot-swapping at runtime | `src/main/frontend/services/backend/` |
-| **4** | [Multi-Model LLM Orchestration](docs/LEARNING_TOPICS.md#4-multi-model-llm-orchestration--comparative-benchmarking) | Specialized dual personas (Llama 3.3 70B analytical vs. Mistral Large 2411 executive) running fully local via Ollama, race-condition-safe parallel execution | `src/main/java/.../AiSummarizationService.java`, `server.ts` |
-| **5** | [Vector RAG Architecture](docs/LEARNING_TOPICS.md#5-retrieval-augmented-generation-rag--vector-database-architecture) | Sliding-window semantic chunking (500 tokens / 50 overlap), Qdrant HNSW cosine indexing, grounded retrieval, anti-hallucination citation drawer | `src/main/java/.../VectorRagService.java`, `ObjectPageView.ts` |
-| **6** | [Camunda BPMN 2.0 Workflows](docs/LEARNING_TOPICS.md#6-camunda-bpmn-20-workflow-orchestration) | Long-running asynchronous orchestration, service tasks, retry boundaries (`R3/PT10S`), human-in-the-loop review gateway, in-app BPMN viewer | `document-ingestion-rag.bpmn`, `BpmnDialog.ts` |
-| **7** | [Domain Parsing (LaTeX / BibTeX)](docs/LEARNING_TOPICS.md#7-domain-specific-parsing--metadata-engineering-latex--bibtex) | AST lexing/tokenization, 14 standard publication attributes, dynamic schema-driven form generation, bidirectional LaTeX BNF formatting | `src/main/frontend/utils/bibtexParser.ts` |
-| **8** | [Versioning & Immutable Rollback](docs/LEARNING_TOPICS.md#8-document-versioning-lineage--immutable-rollback-architecture) | Stable GUID continuity, immutable snapshot archiving (`DocumentVersionSnapshot`), non-destructive append-only rollback, historical asset download | `DocumentService.java`, `mockBackendAdapter.ts`, `ObjectPageView.ts` |
-| **9** | [Microservices Topology & Security](docs/LEARNING_TOPICS.md#9-production-grade-microservices-topology--security) | Multi-container Docker Compose topology, Keycloak OIDC/OAuth2 JWT bearer validation, granular RBAC, GNU AGPLv3 network copyleft | `docker-compose.yml`, `SecurityConfig.java` |
+| **4** | [Multi-Model LLM Orchestration](docs/LEARNING_TOPICS.md#4-multi-model-large-language-model-llm-orchestration--comparative-benchmarking) | Specialized dual personas (Llama 3.3 70B analytical vs. Mistral Large 2411 executive) running fully local via Ollama, race-condition-safe parallel execution | `src/main/java/.../AiSummarizationService.java`, `server.ts` |
+| **5** | [Vector RAG Architecture](docs/LEARNING_TOPICS.md#5-retrieval-augmented-generation-rag--vector-database-architecture) | Paragraph-aligned chunking (~400 chars, non-overlapping), Qdrant HNSW cosine indexing, `topK=4` / `similarityThreshold=0.5` grounded retrieval, citation drawer | `src/main/java/.../VectorRagService.java`, `ObjectPageView.ts` |
+| **6** | [BPMN 2.0 as Architecture Documentation](docs/LEARNING_TOPICS.md#6-business-process-model-and-notation-bpmn-20-as-executable-architecture-documentation) | Reading BPMN 2.0 XML, lanes, service tasks and modeled retry boundaries (`R3/PT10S`) as a **static** design artifact — no workflow engine is embedded — plus the in-app BPMN viewer | `src/main/resources/bpmn/document_ingestion_rag.bpmn`, `BpmnModalView.ts` |
+| **7** | [LLM-Based BibTeX Metadata Extraction](docs/LEARNING_TOPICS.md#7-domain-specific-metadata-engineering-llm-based-bibtex-extraction) | Prompt-driven extraction to JSON, response sanitization, deterministic fallback metadata, 19 typed `BibTeXMetadata` fields, schema-driven form generation | `src/main/java/.../BibTeXExtractionService.java`, `BibTeXMetadata.java` |
+| **8** | [Versioning & Immutable Rollback](docs/LEARNING_TOPICS.md#8-document-versioning-lineage--immutable-rollback-architecture) | Stable GUID continuity, immutable snapshot archiving (`DocumentVersionSnapshot`), non-destructive append-only rollback, historical asset download | `DocumentService.java`, `MockBackendAdapter.ts`, `ObjectPageView.ts` |
+| **9** | [Microservices Topology & Security](docs/LEARNING_TOPICS.md#9-production-grade-microservices-topology-keycloak-oidc-openid-connect--security) | Multi-container Docker Compose topology, Keycloak OIDC/OAuth2 JWT bearer validation, realm RBAC roles (**modelled but not yet enforced**), GNU AGPLv3 network copyleft | `docker-compose.yml`, `SecurityConfig.java` |
 | **10** | [Architecture-as-Code Tooling](docs/LEARNING_TOPICS.md#10-architecture-as-code--automated-visual-documentation-tooling) | Programmatic diagram generation (SVG, 4K PNG via Resvg, archival PDFs via PDFKit, Draw.io XML), dual-stack Java/TypeScript UML, OpenAPI 3.0 | `scripts/generate-*.ts`, `docs/diagrams/` |
 
 ---
@@ -86,7 +86,7 @@ To assist developers, researchers, and students, all acronyms used throughout th
 |---|---|---|
 | **RAG** | **Retrieval-Augmented Generation** | An AI architecture that combines information retrieval (querying a vector database for relevant text chunks) with generative language modeling, eliminating model hallucinations by grounding answers in verbatim document sources. |
 | **LLM** | **Large Language Model** | Deep learning neural networks trained on extensive text data (e.g., Llama 3.3 70B, Mistral Large 2411) capable of natural language understanding, synthesis, and summarization. |
-| **BPMN** | **Business Process Model and Notation (BPMN 2.0)** | An ISO/IEC 19510 standard graphical notation for modeling end-to-end enterprise workflows in an executable XML format. Used by Camunda 7/8 Zeebe engines to orchestrate document ingestion pipelines. |
+| **BPMN** | **Business Process Model and Notation (BPMN 2.0)** | An ISO/IEC 19510 standard graphical notation for modeling end-to-end enterprise workflows in XML. This project ships a BPMN file as **design documentation only** — it is viewable in Camunda Modeler and in the in-app viewer, but **no BPMN engine runs here**; ingestion is orchestrated by ordinary Spring `@Service` calls. |
 | **HNSW** | **Hierarchical Navigable Small World** | A state-of-the-art graph algorithm for Approximate Nearest Neighbor (ANN) vector search used in Qdrant, providing logarithmic $\mathcal{O}(\log N)$ retrieval speed across high-dimensional embedding spaces. |
 | **AST** | **Abstract Syntax Tree** | A hierarchical tree structure representing the abstract syntactic structure of source code or markup. Used in this codebase to parse, validate, and serialize LaTeX BibTeX entries. |
 | **BPE** | **Byte-Pair Encoding** | A subword tokenization algorithm that iteratively merges the most frequent pairs of adjacent bytes/characters to represent open-vocabulary human language using a compact token dictionary. |
@@ -466,7 +466,7 @@ Mongo Express provides a lightweight, browser-based GUI for browsing the `person
 
 ### 4. Qdrant Vector Database Inspection
 
-Qdrant stores dense vector embeddings and text chunks in the `library_embeddings` collection for RAG semantic search.
+Qdrant stores dense vector embeddings and text chunks in the `personal_library_embeddings` collection for RAG semantic search.
 
 * **Qdrant Connection Ports:**
   * **HTTP REST API:** `http://localhost:16333`
@@ -477,18 +477,18 @@ Qdrant stores dense vector embeddings and text chunks in the `library_embeddings
   # 1. View all Qdrant collections
   curl -s http://localhost:16333/collections | jq .
 
-  # 2. View 'library_embeddings' configuration (vector size, distance metric, HNSW parameters, points count)
-  curl -s http://localhost:16333/collections/library_embeddings | jq .
+  # 2. View 'personal_library_embeddings' configuration (vector size, distance metric, HNSW parameters, points count)
+  curl -s http://localhost:16333/collections/personal_library_embeddings | jq .
 
   # 3. Scroll through indexed document chunks and payloads (text excerpts, document GUIDs)
-  curl -s -X POST http://localhost:16333/collections/library_embeddings/points/scroll \
+  curl -s -X POST http://localhost:16333/collections/personal_library_embeddings/points/scroll \
     -H 'Content-Type: application/json' \
     -d '{"limit": 5, "with_payload": true, "with_vector": false}' | jq .
   ```
 
 * **Inspect Qdrant collection directly inside the container:**
   ```bash
-  docker exec -it personal-library-qdrant curl -s http://localhost:6333/collections/library_embeddings
+  docker exec -it personal-library-qdrant curl -s http://localhost:6333/collections/personal_library_embeddings
   ```
 
 ---

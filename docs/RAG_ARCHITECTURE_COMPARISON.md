@@ -70,7 +70,7 @@ In AI literature (*Gao et al., 2024: "Retrieval-Augmented Generation for Large L
 
 ### Where Does Personal Library Stand?
 The **Personal Library** application implements a **mature Advanced-Lean RAG architecture**:
-* **Exceptional Production Strengths**: Native Qdrant vector database integration via Spring AI, sliding-window paragraph chunking, strict document GUID scoping, dual-persona LLM synthesis (Llama 3.3 + Mistral Large), cloud fallback via Gemini Flash, interactive UI citation drawers with verbatim highlights, and BPMN 2.0 ingestion orchestration.
+* **Exceptional Production Strengths**: Native Qdrant vector database integration via Spring AI, paragraph-aligned chunking, strict document GUID scoping, dual-persona LLM synthesis (Llama + Mistral, run sequentially), graceful degradation to an inline placeholder when Ollama is unreachable, interactive UI citation drawers with verbatim highlights, and a BPMN 2.0 model documenting the ingestion pipeline.
 * **Evolutionary Gaps Compared to Modular Reference**: Single-modality vector search (dense-only without sparse BM25 fusion), lack of a secondary cross-encoder re-ranking stage, absence of query expansion/HyDE, and heuristic citation scoring rather than automated LLM-as-a-judge reflection (Ragas triad).
 
 ---
@@ -79,14 +79,14 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
 
 | Pipeline Component | Canonical Modular Reference RAG | Personal Library Implementation | Architectural Assessment & Status |
 |---|---|---|---|
-| **Document Ingestion** | Asynchronous message queues with OCR layout analysis (Apache Tika, PyMuPDF, Unstructured). | Camunda BPMN 2.0 workflow with `pdf-parse` text stream extraction. | **Production-Grade**: BPMN orchestration gives strong auditability and retry policies. |
+| **Document Ingestion** | Asynchronous message queues with OCR layout analysis (Apache Tika, PyMuPDF, Unstructured). | Synchronous Spring service pipeline with `pdf-parse` / PDFBox text stream extraction, documented by a BPMN 2.0 model. | **Below Reference**: ingestion is synchronous and in-request; there is no queue, no engine, and no automatic retry — the BPMN file documents the intended policy only. |
 | **Metadata Extraction** | Heuristic regex or generic title inference. | Dedicated AST lexer/tokenizer extracting 14 standard LaTeX BibTeX publication fields. | **Exceeds Reference**: Domain-specific academic BibTeX engineering with dynamic schema generation. |
-| **Chunking Strategy** | Hierarchical "Small-to-Big" (sentence vectors linked to parent paragraphs) or Semantic Chunking. | Paragraph-boundary sliding window (~400 characters, paragraph-aligned in Java; 500 tokens in mock). | **Standard Advanced**: Avoids mid-sentence truncation; ready for hierarchical parent-child indexing. |
+| **Chunking Strategy** | Hierarchical "Small-to-Big" (sentence vectors linked to parent paragraphs) or Semantic Chunking. | Paragraph-aligned, **non-overlapping** chunks flushed at ~400 characters (50-character minimum); the mock adapter uses static fixture chunks rather than a real splitter. | **Simpler than Reference**: avoids mid-sentence truncation, but the absence of overlap costs recall on boundary-straddling sentences. |
 | **Vector Store** | HNSW or IVF indexed vector database (Qdrant, Milvus, Pinecone). | Qdrant Vector Database (v1.11.0) with Cosine distance metric and HNSW indexing. | **Matches Reference**: Enterprise vector database running in dedicated container (Port 6333/6334). |
 | **Search Modality** | **Hybrid Search**: Dense Vector (Cosine) + Sparse Lexical (BM25 / Splade) via Reciprocal Rank Fusion. | **Dense Vector Search**: Qdrant cosine similarity search scoped by `documentGuid`. | **Gap / Opportunity**: Lacks BM25 sparse keyword index for exact acronym/formula matches. |
 | **Query Processing** | Query expansion, rewriting, sub-query decomposition, or HyDE (Hypothetical Document Embeddings). | Raw user question vectorization directly embedded into semantic search. | **Gap / Opportunity**: Single-turn query passing without conversational history query reformulation. |
 | **Post-Retrieval Re-Ranking** | Two-stage retrieval with Cross-Encoder (e.g. `bge-reranker-large`, Cohere Rerank). | Direct Top-$K$ selection ($k=4$) ordered by bi-encoder vector similarity score. | **Gap / Opportunity**: Candidate pool of 20 narrowed by Cross-Encoder would boost precision by ~8-15%. |
-| **LLM Inference** | Single generalist model via API or self-hosted endpoint. | **Dual-Model Local Orchestration**: Llama 3.3 (70B) + Mistral Large (2411) via Ollama with Gemini Flash fallback. | **Exceeds Reference**: Specialized academic vs. executive personas running concurrently with cloud resilience. |
+| **LLM Inference** | Single generalist model via API or self-hosted endpoint. | **Dual-Model Local Orchestration**: two Ollama models (UI labels read "Llama 3.3 70B" / "Mistral Large"; the tags actually pulled are `llama3.2` and `mistral`), invoked **sequentially**, with no cloud fallback. | **Differs from Reference**: specialized academic vs. executive personas, fully local; resilience comes from graceful degradation, not a cloud failover. |
 | **Attribution & Citations** | Text footnotes or inline reference numbers. | **Interactive Citation Drawer**: Highlighted verbatim source passages, page/char offsets, similarity scores. | **Exceeds Reference**: UI connects claims to source document text with instant inspection drawer. |
 | **Hallucination Evaluation** | Automated Ragas / TruLens triad metrics (Faithfulness, Context Relevance, Answer Relevance). | Prompt-enforced grounding instructions + static heuristic confidence scores. | **Gap / Opportunity**: No automated secondary verification loop checking token hallucination. |
 
@@ -97,7 +97,7 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
 ### Stage 1: Document Parsing & Text Ingestion
 * **Reference Pattern**: Ingestion handles complex PDFs with multi-column tables, scanned image OCR, and mathematical formulas using multi-modal layout detection.
 * **Current App Implementation**:
-  In `server.ts` (`extractTextFromPdfBuffer`), the application utilizes `pdf-parse` to extract sequential text streams. In Spring Boot (`VectorRagService.java`), ingestion is orchestrated through Camunda BPMN 2.0 with retry boundaries (`R3/PT10S`).
+  In `server.ts` (`extractTextFromPdfBuffer`), the application utilizes `pdf-parse` to extract sequential text streams. In Spring Boot, ingestion runs synchronously through `DocumentService` → `BibTeXExtractionService` → `AiSummarizationService` → `VectorRagService.indexDocumentChunks()`. The accompanying BPMN 2.0 model depicts retry boundaries (`R3/PT10S`), but these are **not implemented in code**.
 * **Comparison**: Our approach is highly reliable for research papers, books, and text-heavy PDFs. However, complex vector tables or scanned image pages without OCR text layers would require adding Tesseract or PDF layout analysis.
 
 ---
@@ -122,8 +122,8 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
 
 ### Stage 3: Embedding & Vector Indexing (Qdrant)
 * **Reference Pattern**: Uses dense vector embeddings (384 to 1536 dimensions) indexed via HNSW graphs in a specialized vector engine, partitioned with tenant and metadata payload filters.
-* **Embedding Model Topologies & `text-embedding-004`**:
-  The system supports a dual-tier embedding topology spanning local edge-native models and enterprise cloud models:
+* **Embedding Model Topologies (comparative reference)**:
+  This project embeds **exclusively locally** via Ollama. The table below places the model actually in use alongside two well-known alternatives so the trade-offs are visible — **Google `text-embedding-004` is not wired into this codebase** (the Gemini/cloud path was removed; there is no `@google/genai` dependency) and is listed purely as a cloud baseline:
 
   | Embedding Dimension / Metric | **Google `text-embedding-004`** (Cloud Bridge) | **Nomic `nomic-embed-text`** (Local Ollama) | **Sentence-Transformers `all-MiniLM-L6-v2`** (Spring AI / CPU) |
   | :--- | :--- | :--- | :--- |
@@ -131,17 +131,17 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
   | **Context Window** | **8,192 tokens** | **8,192 tokens** | **256 – 512 tokens** |
   | **Architecture** | Transformer Encoder with Matryoshka Representation Learning (MRL) | Bidirectional BERT with Rotary Position Embeddings (RoPE) | 6-layer Siamese BERT encoder |
   | **Task-Specific Prefixing** | `RETRIEVAL_DOCUMENT`, `RETRIEVAL_QUERY`, `SEMANTIC_SIMILARITY` | `search_document: `, `search_query: ` | Symmetric pairwise encoding |
-  | **Deployment Target** | Serverless Google Cloud API via `@google/genai` | Containerized Ollama instance (Port 11434) | Embedded Spring Boot runtime (In-memory/CPU) |
+  | **Deployment Target** | Serverless Google Cloud API (**not used in this project**) | Containerized Ollama instance (Port 11434) | Embedded Spring Boot runtime (In-memory/CPU) |
   | **Operational Cost** | \$0.00002 / 1k chars (tracked in Financial Ledger ROI) | $0.00 (Self-hosted on local hardware) | $0.00 (Self-hosted on local JVM) |
   | **MTEB Benchmark Rank** | Top-tier (>55.0 retrieval score) | High open-source (>52.0 retrieval score) | Lightweight baseline (~41.9 retrieval score) |
 
-  #### Why `text-embedding-004` Matters:
+  #### Why `text-embedding-004` Is Worth Studying (even though this project does not use it):
   1. **Matryoshka Representation Learning (MRL)**: Unlike conventional models where all 768 dimensions must be stored, `text-embedding-004` is trained such that the first $d \in \{128, 256, 512\}$ dimensions maintain near-optimal representational fidelity. This allows high-throughput Qdrant vector indexing with up to 66% vector storage memory reduction.
   2. **Task-Specific Asymmetry**: For document chunks, the model applies document-passage embeddings; for user search questions, it applies query-specific prefix weights, improving recall over symmetric bi-encoders.
   3. **Cost Accounting Baseline**: As detailed in `docs/unified_financial_ledger_roi_key_takeaways.md`, `text-embedding-004` provides the deterministic token cost baseline for calculating the return on investment of local vs. cloud enterprise RAG pipelines.
 
 * **Current App Implementation**:
-  Uses Qdrant 1.11.0 in `docker-compose.yml`. Spring AI initializes `library_embeddings` with `VectorParams(size=384, distance=Cosine)`. Every point stores:
+  Uses Qdrant 1.11.0 in `docker-compose.yml`. Spring AI auto-provisions `personal_library_embeddings` (`application.yml` → `spring.ai.vectorstore.qdrant`) with `VectorParams(size=768, distance=Cosine)` — 768 being the native output dimensionality of `nomic-embed-text`. Every point stores:
   ```json
   {
     "id": "guid-c0",
@@ -217,7 +217,7 @@ The **Personal Library** application implements a **mature Advanced-Lean RAG arc
   2. **Groundedness / Faithfulness**: Is the answer derived solely from the retrieved context?
   3. **Answer Relevance**: Does the generated answer address the user query?
 * **Current App Implementation**:
-  Returns heuristic similarity scores (e.g. 88%–95%) derived from vector similarity and keyword overlap, without an automated post-generation reflection model.
+  Surfaces a citation `score` in the UI that is currently a **hardcoded `0.88`** placeholder (`1.0` for the excerpt fallback), not a measured cosine distance — Spring AI's `Document` does not expose the raw score on this path. There is no automated post-generation reflection model.
 * **Comparison**: Adding automated Ragas scoring in CI/CD or background evaluation tasks would provide automated regression testing for research retrieval accuracy.
 
 ---
@@ -299,7 +299,7 @@ Chat History:
 ${history.slice(-3).map(m => `${m.role}: ${m.text}`).join('\n')}
 Follow-up: "${question}"
 Standalone Query:`;
-  return (await safeGeminiGenerate(prompt)) || question;
+  return (await ollamaGenerate(prompt)) || question; // local-only; no cloud provider in this project
 }
 ```
 

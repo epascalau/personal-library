@@ -483,10 +483,10 @@ class AppStore extends Store<AppState> {
   }
 
   /**
-   * Opens the interactive Camunda BPMN 2.0 process model viewer modal.
+   * Opens the interactive BPMN 2.0 process model viewer modal.
    *
    * WHAT: Sets `bpmnModalOpen: true` in application state.
-   * WHY: Provides process engineers and architects with direct access to the Camunda BPMN 2.0 workflow,
+   * WHY: Provides process engineers and architects with direct access to the BPMN 2.0 ingestion model,
    * task delegates, diagram visualizer, and export download.
    */
   openBpmnModal(): void {
@@ -494,7 +494,7 @@ class AppStore extends Store<AppState> {
   }
 
   /**
-   * Closes the Camunda BPMN modal.
+   * Closes the BPMN modal.
    *
    * WHAT: Sets `bpmnModalOpen: false` in application state.
    * WHY: Dismisses the workflow inspection dialogue and restores user interface focus.

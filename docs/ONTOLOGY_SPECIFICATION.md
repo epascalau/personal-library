@@ -152,7 +152,7 @@ prov:Entity
 
 prov:Activity
   └── :BPMNWorkflowProcess
-        ├── :processId ("camunda-ingestion-flow")
+        ├── :processId ("Process_DocumentIngestionRAG")
         ├── :retryPolicy ("R3/PT10S")
         └── :swimlanes (4: Librarian, Ingestion Engine, AI Workers, Storage)
 
@@ -165,7 +165,7 @@ prov:Agent
 * **Core Axioms:**
   * `:hasHistoricalSnapshot` (`:DocumentAsset` $\to$ `:AuditSnapshot`): 1:N version history chain.
   * `:previousVersionLineage` (`:DocumentAsset` $\to$ `:DocumentAsset`): Directed acyclic version evolution graph.
-  * `:orchestratedBy` (`:DocumentAsset` $\to$ `:BPMNWorkflowProcess`): Lifecycle management via Camunda 2.0.
+  * `:orchestratedBy` (`:DocumentAsset` $\to$ `:BPMNWorkflowProcess`): Associates a document with the BPMN 2.0 ingestion model that *describes* its lifecycle (documentation-level relation; no engine executes it).
   * `:governedBy` (`:DocumentAsset` $\to$ `:SecurityPrincipal`): Access control enforcement.
   * **Non-Destructive Rollback Axiom:** Rollback to version $N$ clones snapshot $N$ into newly advanced version $M = \max(V) + 1$, maintaining an unbroken audit trail.
 
@@ -189,7 +189,7 @@ prov:Agent
 | `:citesEvidence` | `:AssistantResponse` | `:GroundedCitation` | Attaches evidence citations to synthesized responses. |
 | `:hasHistoricalSnapshot`| `:DocumentAsset` | `:AuditSnapshot` | Links document to immutable prior version states. |
 | `:previousVersionLineage`| `:DocumentAsset` | `:DocumentAsset` | Self-referential pointer tracking version history. |
-| `:orchestratedBy` | `:DocumentAsset` | `:BPMNWorkflowProcess` | Assigns document ingestion to Camunda workflow. |
+| `:orchestratedBy` | `:DocumentAsset` | `:BPMNWorkflowProcess` | Associates document ingestion with the BPMN 2.0 model that documents it. |
 | `:governedBy` | `:DocumentAsset` | `:SecurityPrincipal` | Subject to Keycloak RBAC security policies. |
 
 ---
