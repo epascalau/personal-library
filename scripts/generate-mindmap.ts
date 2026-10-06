@@ -39,13 +39,13 @@ export function generateMermaidMindmap(): string {
         Progress Tracking
         Client-Side BibTeX Parser
       Static BPMN 2.0 Export
-        Process_DocumentIngestionRAG.bpmn
+        document-ingestion-rag.bpmn
         External Camunda Modeler Compatibility
         Human Review Task Loop
         Parallel Dual AI Workers
         Qdrant Vector Embedding Task
       Physical Storage
-        SHA-256 Checksum Validation
+        Version-Isolated File Paths
         Versioned Asset Archiving
         Asset Streaming & MIME Detection
     BibTeX & LaTeX Engine
@@ -87,8 +87,8 @@ export function generateMermaidMindmap(): string {
         Model Performance Metrics
     Vector RAG & Search
       Semantic Chunking
-        500 Token Chunks
-        50 Token Overlap Window
+        Paragraph-Aligned ~400 Char Chunks
+        Sentence-Boundary Preservation
         Heading Context Preservation
       Qdrant Vector DB
         library_embeddings Collection
@@ -106,12 +106,12 @@ export function generateMermaidMindmap(): string {
     Version Control & Lineage
       Version Management
         In-Place File Overwriting
-        Semantic Version Numbering
+        Incrementing Version Numbering
         Lineage Chain Tracking
       Audit & Lineage
         Historical Document Snapshots
         Detailed Mutation Audit Trail
-        SHA-256 Fingerprint Comparison
+        Non-Destructive Rollback
         Rollback & Version Retrieval
     Enterprise UI5 Frontend
       SAP Fiori Design
@@ -149,7 +149,7 @@ export function generateMermaidMindmap(): string {
         Strongest Copyleft Protection
     Architecture & Tooling
       API Specifications
-        OpenAPI 3.1 & Swagger UI
+        OpenAPI 3.0.3 & Swagger UI
         Spring Web REST Controllers
       Visual Diagrams
         C4 Architecture Diagrams
@@ -179,7 +179,7 @@ export function generatePlantUmlMindmap(): string {
 *** Drag-and-Drop Upload Modal with Real-time Progress
 *** Static BPMN 2.0 Export (external Camunda Modeler compatibility, no embedded engine)
 *** Human Review & Correction Gateway Loop
-*** SHA-256 Content Fingerprinting & De-duplication
+*** Version-Isolated Physical Storage with De-duplication by Path
 *** Physical Asset Storage with Versioned Archiving
 
 **[#d97706] 2. BibTeX & LaTeX Engine
@@ -201,7 +201,7 @@ export function generatePlantUmlMindmap(): string {
 *** Cached Immutable Summary History per Document Version
 
 **[#7c3aed] 4. Vector RAG & Conversational Chat
-*** Semantic Text Chunking (500 tokens, 50-token contextual overlap)
+*** Semantic Text Chunking (paragraph-aligned, ~400 characters per chunk)
 *** Dense Vector Embeddings Generation
 *** Qdrant Vector DB Integration (library_embeddings collection)
 *** Sub-10ms Cosine Distance HNSW Indexing
@@ -213,9 +213,9 @@ left side
 
 **[#e11d48] 5. Version Control & Lineage
 *** Non-Destructive In-Place Version Overwriting
-*** Version Lineage Chain (versionNumber, previousVersionGuid)
+*** Version Lineage Chain (versionNumber, embedded versionHistory snapshots)
 *** Complete Mutation Audit Trail (Timestamp, User, Changes)
-*** Semantic Version Comparison & Diff Viewing
+*** Non-Destructive Rollback Creates a New Latest Version
 *** Historical Document Asset Download & Rollback
 
 **[#0d9488] 6. Enterprise UI5 Frontend
@@ -235,7 +235,7 @@ left side
 *** GNU AGPL-3.0-or-later Strongest Network Copyleft
 
 **[#4f46e5] 8. Architecture & Tooling Ecosystem
-*** Interactive OpenAPI 3.1 Swagger REST Specifications
+*** Interactive OpenAPI 3.0.3 Swagger REST Specifications
 *** Complete C4 Architecture & Component Diagrams
 *** Technology-Specific UML Class Diagrams (Java & TypeScript)
 *** Multi-Format Visual Exports (SVG, 4K PNG, Archival PDF, Draw.io)
@@ -408,7 +408,7 @@ export function generateMindmapSvg(): string {
     <g transform="translate(10, 170)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Static BPMN 2.0 Export</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Process_DocumentIngestionRAG.bpmn, no embedded engine</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• document-ingestion-rag.bpmn, no embedded engine</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Served for external Camunda Modeler compatibility</text>
     </g>
 
@@ -416,8 +416,8 @@ export function generateMindmapSvg(): string {
     <path d="M 200 52 L 200 155 L 330 155 L 330 170" fill="none" stroke="#10b981" stroke-width="1.5" />
     <g transform="translate(280, 170)" filter="url(#node-shadow)">
       <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
-      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">SHA-256 Fingerprinting &amp; Storage</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• De-duplication &amp; hash integrity check</text>
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Version-Isolated Physical Storage</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• One directory per document version (no overwrite)</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Local/Cloud versioned physical disk archive</text>
     </g>
   </g>
@@ -534,7 +534,7 @@ export function generateMindmapSvg(): string {
     <g transform="translate(10, 85)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Semantic Text Chunking</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• 500 token chunks with 50-token overlap</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• ~400-char paragraph-aligned chunks</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Header preservation &amp; document GUID tag</text>
     </g>
 
@@ -591,7 +591,7 @@ export function generateMindmapSvg(): string {
     <g transform="translate(280, 85)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#fecdd3">Version Lineage Chain</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• previousVersionGuid pointer tracking</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Embedded versionHistory snapshot archiving</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Non-destructive historical preservation</text>
     </g>
 
@@ -725,7 +725,7 @@ export function generateMindmapSvg(): string {
     <path d="M 275 52 L 275 70 L 135 70 L 135 85" fill="none" stroke="#6366f1" stroke-width="1.5" />
     <g transform="translate(10, 85)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#6366f1" stroke-width="1" />
-      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">OpenAPI 3.1 &amp; Swagger Spec</text>
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">OpenAPI 3.0.3 &amp; Swagger Spec</text>
       <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Interactive REST endpoint documentation</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Downloadable JSON schema &amp; test harness</text>
     </g>
@@ -818,7 +818,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         bullets: [
           'Binary formats: PDF, DOCX, Markdown, LaTeX, Plain Text with MIME validation.',
           'Static BPMN 2.0 export served for external Camunda Modeler compatibility; human review loop runs in-app.',
-          'SHA-256 fingerprinting for atomic de-duplication and integrity verification.',
+          'Version-isolated physical storage path per upload, preventing any prior version\'s bytes from being overwritten.',
           'Physical versioned file system with secure streaming endpoint delivery.'
         ]
       },
@@ -849,7 +849,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         color: '#7c3aed',
         lead: 'Sub-10ms neural search and grounded conversational Q&A.',
         bullets: [
-          'Semantic chunking: 500-token chunks with 50-token contextual overlap windows.',
+          'Semantic chunking: paragraph-aligned chunks of roughly 400 characters, no fixed overlap window.',
           'Qdrant vector collection library_embeddings with Cosine distance metric & HNSW.',
           'Conversational assistant with multi-turn context memory and prompt guardrails.',
           'Interactive citation drawer with exact quote highlights and confidence scores.'
@@ -861,7 +861,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         lead: 'Non-destructive in-place versioning and audit preservation.',
         bullets: [
           'Multipart version overwriting that preserves the root document GUID.',
-          'Version lineage pointer chain (versionNumber, previousVersionGuid, rootGuid).',
+          'Version lineage via incrementing versionNumber and embedded versionHistory snapshots (no separate rootGuid field).',
           'Complete mutation audit history: timestamps, editing user, and modified fields.',
           'Historical document rollback and raw binary download for any prior version.'
         ]
@@ -893,7 +893,7 @@ export async function generateMindmapPdf(pngBuffer: Buffer, outputPath: string):
         color: '#4f46e5',
         lead: 'Standards-compliant documentation and exporter tooling.',
         bullets: [
-          'OpenAPI 3.1 REST API specification and interactive Swagger schema viewer.',
+          'OpenAPI 3.0.3 REST API specification and interactive Swagger schema viewer.',
           'Complete C4 Architecture diagrams and Java / TypeScript UML class diagrams.',
           'Automated multi-format exporter: SVG, Ultra-HD PNG, Archival PDF, Draw.io, Mermaid.',
           'Self-contained repository ZIP exporter with full source code, scripts, and models.'

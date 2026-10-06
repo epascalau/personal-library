@@ -156,7 +156,7 @@
     <g transform="translate(10, 170)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Static BPMN 2.0 Export</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Process_DocumentIngestionRAG.bpmn, no embedded engine</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• document-ingestion-rag.bpmn, no embedded engine</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Served for external Camunda Modeler compatibility</text>
     </g>
 
@@ -164,8 +164,8 @@
     <path d="M 200 52 L 200 155 L 330 155 L 330 170" fill="none" stroke="#10b981" stroke-width="1.5" />
     <g transform="translate(280, 170)" filter="url(#node-shadow)">
       <rect width="270" height="55" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1" />
-      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">SHA-256 Fingerprinting &amp; Storage</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• De-duplication &amp; hash integrity check</text>
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#a7f3d0">Version-Isolated Physical Storage</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• One directory per document version (no overwrite)</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Local/Cloud versioned physical disk archive</text>
     </g>
   </g>
@@ -282,7 +282,7 @@
     <g transform="translate(10, 85)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#e9d5ff">Semantic Text Chunking</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• 500 token chunks with 50-token overlap</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• ~400-char paragraph-aligned chunks</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Header preservation &amp; document GUID tag</text>
     </g>
 
@@ -339,7 +339,7 @@
     <g transform="translate(280, 85)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
       <text x="12" y="22" font-size="11" font-weight="700" fill="#fecdd3">Version Lineage Chain</text>
-      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• previousVersionGuid pointer tracking</text>
+      <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Embedded versionHistory snapshot archiving</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Non-destructive historical preservation</text>
     </g>
 
@@ -473,7 +473,7 @@
     <path d="M 275 52 L 275 70 L 135 70 L 135 85" fill="none" stroke="#6366f1" stroke-width="1.5" />
     <g transform="translate(10, 85)" filter="url(#node-shadow)">
       <rect width="260" height="55" rx="6" fill="#1e293b" stroke="#6366f1" stroke-width="1" />
-      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">OpenAPI 3.1 &amp; Swagger Spec</text>
+      <text x="12" y="22" font-size="11" font-weight="700" fill="#c7d2fe">OpenAPI 3.0.3 &amp; Swagger Spec</text>
       <text x="12" y="38" font-size="9.5" fill="#94a3b8">• Interactive REST endpoint documentation</text>
       <text x="12" y="49" font-size="9.5" fill="#94a3b8">• Downloadable JSON schema &amp; test harness</text>
     </g>

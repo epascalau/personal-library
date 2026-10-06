@@ -6,7 +6,7 @@
 *** Drag-and-Drop Upload Modal with Real-time Progress
 *** Static BPMN 2.0 Export (external Camunda Modeler compatibility, no embedded engine)
 *** Human Review & Correction Gateway Loop
-*** SHA-256 Content Fingerprinting & De-duplication
+*** Version-Isolated Physical Storage with De-duplication by Path
 *** Physical Asset Storage with Versioned Archiving
 
 **[#d97706] 2. BibTeX & LaTeX Engine
@@ -28,7 +28,7 @@
 *** Cached Immutable Summary History per Document Version
 
 **[#7c3aed] 4. Vector RAG & Conversational Chat
-*** Semantic Text Chunking (500 tokens, 50-token contextual overlap)
+*** Semantic Text Chunking (paragraph-aligned, ~400 characters per chunk)
 *** Dense Vector Embeddings Generation
 *** Qdrant Vector DB Integration (library_embeddings collection)
 *** Sub-10ms Cosine Distance HNSW Indexing
@@ -40,9 +40,9 @@ left side
 
 **[#e11d48] 5. Version Control & Lineage
 *** Non-Destructive In-Place Version Overwriting
-*** Version Lineage Chain (versionNumber, previousVersionGuid)
+*** Version Lineage Chain (versionNumber, embedded versionHistory snapshots)
 *** Complete Mutation Audit Trail (Timestamp, User, Changes)
-*** Semantic Version Comparison & Diff Viewing
+*** Non-Destructive Rollback Creates a New Latest Version
 *** Historical Document Asset Download & Rollback
 
 **[#0d9488] 6. Enterprise UI5 Frontend
@@ -62,7 +62,7 @@ left side
 *** GNU AGPL-3.0-or-later Strongest Network Copyleft
 
 **[#4f46e5] 8. Architecture & Tooling Ecosystem
-*** Interactive OpenAPI 3.1 Swagger REST Specifications
+*** Interactive OpenAPI 3.0.3 Swagger REST Specifications
 *** Complete C4 Architecture & Component Diagrams
 *** Technology-Specific UML Class Diagrams (Java & TypeScript)
 *** Multi-Format Visual Exports (SVG, 4K PNG, Archival PDF, Draw.io)

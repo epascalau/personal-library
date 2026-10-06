@@ -11,9 +11,9 @@ Personal Library & AI Research Engine
 ├── 1. Ingestion & Document Pipeline
 │   ├── Multi-Format Ingestion (PDF, DOCX, Markdown, LaTeX, Plain Text)
 │   ├── Drag-and-Drop Upload Modal with Real-time Progress & Preview
-│   ├── Static BPMN 2.0 Export (Process_DocumentIngestionRAG.bpmn, for external Camunda Modeler compatibility — no embedded engine)
+│   ├── Static BPMN 2.0 Export (document-ingestion-rag.bpmn, for external Camunda Modeler compatibility — no embedded engine)
 │   ├── Human Review & Correction Gateway Loop
-│   ├── SHA-256 Content Fingerprinting & De-duplication
+│   ├── Version-Isolated Physical Storage per Upload (no in-place overwrite)
 │   └── Physical Asset Storage with Versioned Archiving
 ├── 2. BibTeX & LaTeX Metadata Engine
 │   ├── AST Lexer & Regex Tokenizer for BibTeX Entries
@@ -31,7 +31,7 @@ Personal Library & AI Research Engine
 │   ├── Side-by-Side Synchronized Benchmark Comparator UI
 │   └── Cached Immutable Summary History per Document Version
 ├── 4. Vector RAG & Conversational Chat
-│   ├── Semantic Text Chunking (500 tokens, 50-token contextual overlap)
+│   ├── Semantic Text Chunking (paragraph-aligned, ~400 characters per chunk, no fixed overlap window)
 │   ├── Dense Vector Embeddings Generation
 │   ├── Qdrant Vector DB Integration (library_embeddings collection)
 │   ├── Sub-10ms Cosine Distance HNSW Indexing
@@ -40,9 +40,9 @@ Personal Library & AI Research Engine
 │   └── Strict Source Verification & Anti-Hallucination Controls
 ├── 5. Version Control & Lineage Tracking
 │   ├── Non-Destructive In-Place Version Overwriting
-│   ├── Version Lineage Chain (versionNumber, previousVersionGuid, rootGuid)
+│   ├── Version Lineage Chain (incrementing versionNumber, embedded versionHistory snapshots)
 │   ├── Complete Mutation Audit Trail (Timestamp, User, Changes)
-│   ├── Semantic Version Comparison & Diff Viewing
+│   ├── Non-Destructive Rollback (restores content as a new latest version)
 │   └── Historical Document Asset Download & Rollback
 ├── 6. Enterprise UI5 Frontend Experience
 │   ├── SAP UI5 Web Components & Horizon Dark Dual Theming
@@ -60,7 +60,7 @@ Personal Library & AI Research Engine
 │   ├── Strict Path Traversal & Sanitization Protections
 │   └── GNU AGPL-3.0-or-later Strongest Network Copyleft
 └── 8. Architecture, API & Tooling Ecosystem
-    ├── Interactive OpenAPI 3.1 Swagger REST Specifications
+    ├── Interactive OpenAPI 3.0.3 Swagger REST Specifications
     ├── Complete C4 Architecture & Component Diagrams
     ├── Technology-Specific UML Class Diagrams (Java & TypeScript)
     ├── Multi-Format Visual Exports (SVG, 4K PNG, Archival PDF, Draw.io)
