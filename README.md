@@ -247,13 +247,20 @@ the container image (Vite bundle + Spring Boot JAR), redeploys, and verifies tha
 the stack actually answers.
 
 ```bash
-npm run rebuild          # routine clean rebuild and redeploy
-npm run rebuild:deep     # also drop node_modules and generated artifacts, build without layer cache
-npm run clean:all        # clean everything, do not rebuild
-npm run rebuild:reset    # factory reset, including all data and models
+npm run rebuild                # routine clean rebuild and redeploy
+npm run rebuild:deep           # also drop node_modules and GENERATED docs, build without layer cache
+npm run clean:generated-docs   # wipe only generated docs (docs/typescript, docs/javadoc, docs/diagrams); no rebuild
+npm run ops:factory-reset      # DESTRUCTIVE: wipes all data, models and generated docs — ops/CI use only
 
 ./scripts/rebuild.sh --help   # all options
 ```
+
+**Doc safety.** `docs/` mixes generated output (`docs/typescript`, `docs/javadoc`,
+`docs/diagrams` — reproducible via `npm run docs`/`diagrams`) with hand-authored
+source content (architecture specs, presentations, `openapi.yaml`, the BPMN
+file, ...). `--deep` and `clean:generated-docs` only ever delete the three
+generated subdirectories above; hand-authored docs are never touched, because
+no npm task can recreate them.
 
 **Data safety.** Persistent volumes are *preserved by default*. Deleting data is
 always an explicit opt-in, and the script asks for confirmation first:
@@ -264,6 +271,7 @@ always an explicit opt-in, and the script asks for confirmation first:
 | `--purge-data` | Drops MongoDB, Qdrant and uploaded files. **Models are kept.** |
 | `--purge-models` | Drops the Ollama model cache (forces a ~7 GB re-download). |
 | `--purge-all` | `--deep` + `--purge-data` + `--purge-models` — a true factory reset. |
+| `--force` | Required alongside a purge flag when run non-interactively (CI/scripted); there is no silent auto-skip of the confirmation prompt. |
 
 `--purge-data` deliberately keeps the model cache, because re-pulling several
 gigabytes through a corporate TLS proxy is slow and failure prone.
