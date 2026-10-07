@@ -322,23 +322,102 @@
 /* Table                                                               */
 /* ------------------------------------------------------------------ */
 
+/*
+ * The table is themed through genuine UI5 theme parameters (--sapList_*,
+ * --sapContent_*). Those are re-published by the theme bundle whenever the
+ * theme switches, so the dark variant needs no bespoke overrides here: the
+ * component recolours itself. Only typography and the cell content that lives
+ * in the light DOM is styled by the application.
+ */
 :host(.plib-table) {
-  --ui5_table_row_height: 2.75rem;
   border-radius: 0.75rem;
   overflow: hidden;
+  border: var(--sapList_BorderWidth, 1px) solid var(--sapList_BorderColor, #d9d9d9);
 }
 
 :host(.plib-table-header-cell),
 :host(.plib-table-cell) {
-  font-size: 0.75rem;
+  font-size: var(--sapFontSmallSize, 0.75rem);
 }
 
 :host(.plib-table-header-cell) {
   font-weight: 600;
-  color: var(--sap-text-secondary, #475569);
+  color: var(--sapContent_LabelColor, #556b82);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.plib-table-nodata {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+
+/* Light-DOM content rendered inside the table cells. */
+.plib-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.plib-cell-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plib-cell-title,
+.plib-cell-filename,
+.plib-cell-text,
+.plib-cell-size,
+.plib-cell-date,
+.plib-cell-meta,
+.plib-cell-format {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.plib-cell-title {
+  font-weight: 600;
+  color: var(--sapTextColor, #1d2d3e);
+}
+
+.plib-cell-filename {
+  font-family: var(--sapContent_MonospaceFontFamily, monospace);
+  font-weight: 500;
+  color: var(--sapTextColor, #1d2d3e);
+}
+
+.plib-cell-meta {
+  font-family: var(--sapContent_MonospaceFontFamily, monospace);
   font-size: 0.6875rem;
+  color: var(--sapContent_LabelColor, #556b82);
+}
+
+.plib-cell-text,
+.plib-cell-date {
+  color: var(--sapTextColor, #1d2d3e);
+}
+
+.plib-cell-date {
+  font-size: 0.6875rem;
+  color: var(--sapContent_LabelColor, #556b82);
+}
+
+.plib-cell-format {
+  text-transform: uppercase;
+  font-family: var(--sapContent_MonospaceFontFamily, monospace);
+  font-size: 0.6875rem;
+  color: var(--sapContent_LabelColor, #556b82);
+}
+
+.plib-cell-size,
+.plib-cell-mono {
+  font-family: var(--sapContent_MonospaceFontFamily, monospace);
+  color: var(--sapTextColor, #1d2d3e);
 }
 
 /* ------------------------------------------------------------------ */
@@ -447,17 +526,6 @@
   background-color: var(--sap-input-bg, #161c22);
   border-color: var(--sap-input-border, #354353);
   color: var(--sap-text-primary, #f0f4f8);
-}
-
-:host-context([data-sap-theme='sap_horizon_dark']) .ui5-table-row {
-  background-color: var(--sap-surface, #1c232b);
-  border-color: var(--sap-border, #2e3b4a);
-  color: var(--sap-text-primary, #f0f4f8);
-}
-
-:host-context([data-sap-theme='sap_horizon_dark']) .ui5-table-header-row {
-  background-color: var(--sap-surface-secondary, #232c37);
-  border-color: var(--sap-border, #2e3b4a);
 }
 
 :host-context([data-sap-theme='sap_horizon_dark']).plib-dialog .ui5-popup-root,

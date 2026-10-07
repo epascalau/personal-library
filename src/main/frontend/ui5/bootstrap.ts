@@ -44,6 +44,7 @@ import '@ui5/webcomponents/dist/TableCell.js';
 import '@ui5/webcomponents/dist/TableHeaderCell.js';
 import '@ui5/webcomponents/dist/TableHeaderRow.js';
 import '@ui5/webcomponents/dist/TableRow.js';
+import '@ui5/webcomponents/dist/TableRowAction.js';
 import '@ui5/webcomponents/dist/Tag.js';
 import '@ui5/webcomponents/dist/Text.js';
 import '@ui5/webcomponents/dist/TextArea.js';
@@ -58,6 +59,7 @@ import '@ui5/webcomponents-fiori/dist/ShellBarItem.js';
 import '@ui5/webcomponents-fiori/dist/ShellBarSpacer.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoEntries.js';
+import '@ui5/webcomponents-fiori/dist/illustrations/NoFilterResults.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/UnableToLoad.js';
 
 // Icon registry (side-effect imports + the `icon()` helper)

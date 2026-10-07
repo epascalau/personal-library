@@ -37,9 +37,16 @@ interface TextFilterSpec {
 interface SortableColumn {
   key: string;
   label: string;
-  /** Tailwind classes for the `<th>`, matching the original per-column padding. */
-  thClass: string;
+  /** Passed to `ui5-table-header-cell` — proportional when omitted. */
+  width?: string;
+  minWidth?: string;
   alignEnd?: boolean;
+  /**
+   * `ui5-table` drops lower-importance columns into the popin area first when
+   * the viewport narrows, which is what replaces the old `overflow-x-auto`
+   * horizontal scrollbar.
+   */
+  importance?: number;
 }
 
 const FORMAT_OPTIONS: Array<{ value: string; label: string }> = [
@@ -433,15 +440,18 @@ export class ListReportView extends Component {
           </div>
         </div>
 
-        <div class="overflow-x-auto" data-scroll-key="list-table">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              ${this.tableHead()}
-            </thead>
-            <tbody class="bg-white dark:bg-[#1c232b]">
-              ${this.tableBody()}
-            </tbody>
-          </table>
+        <div data-scroll-key="list-table">
+          <ui5-table
+            class="plib-table"
+            overflow-mode="Popin"
+            row-action-count="1"
+            ${appStore.state.loadingDocs ? raw('loading') : ''}
+            loading-delay="0"
+          >
+            ${this.tableHead()}
+            ${this.noDataSlot()}
+            ${this.tableBody()}
+          </ui5-table>
         </div>
 
         ${this.paginationBar()}
@@ -452,79 +462,68 @@ export class ListReportView extends Component {
   /**
    * Generates the table header row with sortable column headers.
    *
-   * WHAT: Maps Column definitions across file name, title, author, edition, format, size, and date into `<th>` elements.
+   * WHAT: Maps column definitions across file name, title, author, edition, format, size and date into `<ui5-table-header-cell>` elements.
    * WHY: Centralizes table header definitions and labels following SAP Fiori List Report layout standards.
    *
-   * @returns RawHtml representing the table header `<tr>`.
+   * @returns RawHtml representing the `<ui5-table-header-row>`.
    */
   private tableHead(): RawHtml {
     const t = i18nStore.state.t;
     const columns: SortableColumn[] = [
-      { key: 'fileName', label: t.listReport.colFileName, thClass: 'py-3 px-4' },
-      { key: 'title', label: t.listReport.colTitleDetails, thClass: 'py-3 px-4' },
-      { key: 'author', label: t.listReport.colAuthor, thClass: 'py-3 px-4' },
-      { key: 'edition', label: t.listReport.edition, thClass: 'py-3 px-3' },
-      { key: 'format', label: t.listReport.colFormat, thClass: 'py-3 px-3' },
+      { key: 'fileName', label: t.listReport.colFileName, minWidth: '11rem' },
+      { key: 'title', label: t.listReport.colTitleDetails, minWidth: '14rem', importance: 10 },
+      { key: 'author', label: t.listReport.colAuthor, minWidth: '9rem' },
+      { key: 'edition', label: t.listReport.edition, minWidth: '7rem', importance: -1 },
+      { key: 'format', label: t.listReport.colFormat, width: '6rem', importance: -2 },
       {
         key: 'fileSize',
         label: t.objectPage.fileSize,
-        thClass: 'py-3 px-3 text-right',
-        alignEnd: true
+        width: '7rem',
+        alignEnd: true,
+        importance: -3
       },
-      { key: 'uploadDate', label: t.listReport.colUploadDate, thClass: 'py-3 px-4' }
+      { key: 'uploadDate', label: t.listReport.colUploadDate, width: '9rem', importance: -1 }
     ];
 
     return html`
-      <tr
-        class="bg-[#f8fafc] border-b border-gray-200 text-gray-700 uppercase tracking-wider text-[11px] select-none font-semibold"
-      >
+      <ui5-table-header-row slot="headerRow" sticky>
         ${raw(columns.map((column) => this.sortableHeader(column)).join(''))}
-        <th class="py-3 px-4 text-center w-20">${t.listReport.colActions}</th>
-      </tr>
+      </ui5-table-header-row>
     `;
   }
 
   /**
    * Renders a sortable column header element with click targets and visual indicators.
    *
-   * WHAT: Generates a `<th>` tag with data-sort attribute and sort chevron icon.
+   * WHAT: Generates a `<ui5-table-header-cell>` carrying the data-sort key, the column's
+   * responsive width/importance hints and the native sort indicator.
    * WHY: Allows users to click column headers to toggle ascending/descending order across all query attributes.
    *
    * @param column Column definition object.
    * @returns Header HTML string.
    */
   private sortableHeader(column: SortableColumn): string {
-    return html`
-      <th
-        data-sort="${column.key}"
-        class="${cx(column.thClass, 'cursor-pointer hover:bg-gray-100 transition group')}"
-      >
-        <span class="${cx('flex items-center', column.alignEnd && 'justify-end')}">
-          ${column.label}${this.sortIndicator(column.key)}
-        </span>
-      </th>
-    `.toString();
-  }
-
-  /**
-   * Renders sort order glyph indicators (up/down/unsorted) next to header titles.
-   *
-   * WHAT: Renders ArrowUp, ArrowDown, or dual ArrowUpDown depending on active sort column and direction.
-   * WHY: Provides clear visual cues to users regarding current sort column and direction.
-   *
-   * @param columnKey Target column key identifier.
-   * @returns RawHtml sort icon glyph.
-   */
-  private sortIndicator(columnKey: string): RawHtml {
     const { sortBy, sortOrder } = appStore.state;
-    if (sortBy !== columnKey) {
-      return icon('ArrowUpDown', {
-        className: 'w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 inline ml-1'
-      });
-    }
-    return icon(sortOrder === 'asc' ? 'ArrowUp' : 'ArrowDown', {
-      className: 'w-3.5 h-3.5 text-[#0070f2] inline ml-1 font-bold'
-    });
+    // `sortIndicator` is a built-in TableHeaderCell property, so the arrow
+    // glyphs the view used to draw by hand are now rendered (and announced to
+    // screen readers) by the component itself.
+    const indicator =
+      sortBy === column.key ? (sortOrder === 'asc' ? 'Ascending' : 'Descending') : 'None';
+
+    return html`
+      <ui5-table-header-cell
+        data-sort="${column.key}"
+        class="plib-table-header-cell"
+        horizontal-align="${column.alignEnd ? 'End' : 'Start'}"
+        sort-indicator="${indicator}"
+        importance="${String(column.importance ?? 0)}"
+        ${column.width ? raw(`width="${column.width}"`) : ''}
+        ${column.minWidth ? raw(`min-width="${column.minWidth}"`) : ''}
+        popin-text="${column.label}"
+      >
+        ${column.label}
+      </ui5-table-header-cell>
+    `.toString();
   }
 
   /**
@@ -538,28 +537,37 @@ export class ListReportView extends Component {
   private tableBody(): RawHtml {
     const { loadingDocs, fetchError, documents } = appStore.state;
 
-    if (loadingDocs) {
-      return html`
-        <tr>
-          <td colspan="8" class="py-12 text-center text-gray-500">
-            <div class="flex flex-col items-center justify-center gap-2">
-              <ui5-busy-indicator class="plib-busy" active size="M" delay="0"></ui5-busy-indicator>
-              <span class="text-xs">Loading documents from MongoDB &amp; Qdrant...</span>
-            </div>
-          </td>
-        </tr>
-      `;
-    }
-
-    if (fetchError) {
-      return this.errorRow(fetchError);
-    }
-
-    if (documents.length === 0) {
-      return this.emptyRow();
+    // `ui5-table` renders its own busy overlay from the `loading` property and
+    // its own placeholder from the `noData` slot, so the view no longer emits
+    // spinner or empty rows with hand-counted `colspan` values.
+    if (loadingDocs || fetchError || documents.length === 0) {
+      return raw('');
     }
 
     return raw(documents.map((doc) => this.documentRow(doc)).join(''));
+  }
+
+  /**
+   * Fills the table's `noData` slot for the error and empty-result states.
+   *
+   * WHAT: Returns the backend-error panel, the "no matches" guidance, or nothing
+   * while rows are present or loading.
+   * WHY: `ui5-table` owns the placeholder area, so these states no longer need
+   * to masquerade as table rows spanning a hardcoded column count — which also
+   * means adding or reordering columns can no longer break them.
+   */
+  private noDataSlot(): RawHtml {
+    const { loadingDocs, fetchError, documents } = appStore.state;
+    if (loadingDocs) {
+      return raw('');
+    }
+    if (fetchError) {
+      return this.errorRow(fetchError);
+    }
+    if (documents.length === 0) {
+      return this.emptyRow();
+    }
+    return raw('');
   }
 
   /**
@@ -573,42 +581,21 @@ export class ListReportView extends Component {
    */
   private errorRow(message: string): RawHtml {
     return html`
-      <tr>
-        <td colspan="8" class="py-12 px-4 text-center">
-          <div
-            class="max-w-md mx-auto p-6 bg-amber-50/70 border border-amber-200 rounded-xl flex flex-col items-center gap-3"
+      <div slot="noData" class="plib-table-nodata">
+        <ui5-illustrated-message name="UnableToLoad" design="Scene">
+          <ui5-title slot="title" level="H4">Backend Communication Issue</ui5-title>
+          <ui5-text slot="subtitle" class="plib-cell-mono">${message}</ui5-text>
+          <ui5-button class="plib-button" design="Emphasized" icon="refresh" data-action="retry"
+            >Retry Connection</ui5-button
           >
-            <div
-              class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700"
-            >
-              ${icon('AlertTriangle', { className: 'w-5 h-5' })}
-            </div>
-            <div class="text-center">
-              <h4 class="font-bold text-gray-900 text-sm">Backend Communication Issue</h4>
-              <p class="text-xs text-amber-800 mt-1 font-mono">${message}</p>
-              <p class="text-[11px] text-gray-500 mt-2">
-                The backend service did not complete the request in time or may still be
-                initializing.
-              </p>
-            </div>
-            <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
-              <ui5-button
-                class="plib-button"
-                design="Emphasized"
-                icon="refresh"
-                data-action="retry"
-                >Retry Connection</ui5-button
-              >
-              <ui5-button class="plib-button" icon="it-host" data-action="switch-offline"
-                >Switch to Offline Engine</ui5-button
-              >
-              <ui5-button class="plib-button" data-action="open-backend-settings"
-                >Backend Settings</ui5-button
-              >
-            </div>
-          </div>
-        </td>
-      </tr>
+          <ui5-button class="plib-button" icon="it-host" data-action="switch-offline"
+            >Switch to Offline Engine</ui5-button
+          >
+          <ui5-button class="plib-button" data-action="open-backend-settings"
+            >Backend Settings</ui5-button
+          >
+        </ui5-illustrated-message>
+      </div>
     `;
   }
 
@@ -621,34 +608,43 @@ export class ListReportView extends Component {
    * @returns RawHtml empty state row markup.
    */
   private emptyRow(): RawHtml {
+    const hasFilters = this.activeFilterCount > 0;
     return html`
-      <tr>
-        <td colspan="8" class="py-12 text-center text-gray-500">
-          <div class="flex flex-col items-center justify-center gap-2">
-            ${icon('FileText', { className: 'w-8 h-8 text-gray-300' })}
-            <span class="font-medium text-gray-700"
-              >No documents match the current filter criteria</span
-            >
-            <p class="text-xs text-gray-400">
-              Try adjusting your filters or upload a new document to the library.
-            </p>
-            <button
-              type="button"
-              data-action="reset-filters"
-              class="mt-2 text-xs text-[#0070f2] font-semibold hover:underline cursor-pointer"
-            >
-              Reset All Filters
-            </button>
-          </div>
-        </td>
-      </tr>
+      <div slot="noData" class="plib-table-nodata">
+        <ui5-illustrated-message
+          name="${hasFilters ? 'NoFilterResults' : 'NoEntries'}"
+          design="Scene"
+        >
+          <ui5-title slot="title" level="H4">
+            ${hasFilters
+              ? 'No documents match the current filter criteria'
+              : 'The library is empty'}
+          </ui5-title>
+          <ui5-text slot="subtitle">
+            ${hasFilters
+              ? 'Try adjusting your filters or upload a new document to the library.'
+              : 'Upload a document to start building the library.'}
+          </ui5-text>
+          ${hasFilters
+            ? html`<ui5-button class="plib-button" data-action="reset-filters"
+                >Reset All Filters</ui5-button
+              >`
+            : html`<ui5-button
+                class="plib-button"
+                design="Emphasized"
+                icon="upload"
+                data-action="open-upload"
+                >${i18nStore.state.t.listReport.uploadButton}</ui5-button
+              >`}
+        </ui5-illustrated-message>
+      </div>
     `;
   }
 
   /**
    * Renders a single data row displaying document metadata and action buttons.
    *
-   * WHAT: Generates a table row `<tr>` formatted with document badges, bibliographic title, author,
+   * WHAT: Generates a `<ui5-table-row>` formatted with document badges, bibliographic title, author,
    * edition, format extension, byte size, ingestion date, and delete action button.
    * WHY: Implements the interactive List Report floorplan row with full clickability for Object Page navigation.
    *
@@ -656,61 +652,48 @@ export class ListReportView extends Component {
    * @returns Table row HTML string.
    */
   private documentRow(doc: DocumentRecord): string {
+    const t = i18nStore.state.t;
     return html`
-      <tr
-        data-guid="${doc.guid}"
-        class="hover:bg-[#f1f5f9]/70 dark:hover:bg-[#26313e] cursor-pointer transition-colors group"
-      >
-        <td class="py-3 px-4">
-          <div class="flex items-center gap-2 font-mono text-[11px] text-gray-800">
+      <ui5-table-row row-key="${doc.guid}" data-guid="${doc.guid}" interactive>
+        <ui5-table-row-action
+          slot="actions"
+          icon="delete"
+          text="${t.common.delete}"
+          data-action="delete"
+        ></ui5-table-row-action>
+
+        <ui5-table-cell class="plib-table-cell">
+          <div class="plib-cell plib-cell-inline">
             ${formatBadge(doc.format)}
-            <span
-              class="truncate max-w-[180px] font-medium group-hover:text-[#0070f2] transition-colors"
-              >${doc.fileName}</span
-            >
+            <span class="plib-cell-filename">${doc.fileName}</span>
           </div>
-        </td>
+        </ui5-table-cell>
 
-        <td class="py-3 px-4">
-          <div
-            class="font-semibold text-gray-900 group-hover:text-[#0070f2] transition-colors line-clamp-1 max-w-[240px]"
-          >
-            ${doc.bibtex.title || 'Untitled Document'}
+        <ui5-table-cell class="plib-table-cell">
+          <div class="plib-cell">
+            <span class="plib-cell-title">${doc.bibtex.title || 'Untitled Document'}</span>
+            <span class="plib-cell-meta">@${doc.bibtex.entryType}: ${doc.bibtex.bibKey}</span>
           </div>
-          <div class="text-[11px] text-gray-400 font-mono">
-            @${doc.bibtex.entryType}: ${doc.bibtex.bibKey}
-          </div>
-        </td>
+        </ui5-table-cell>
 
-        <td class="py-3 px-4 text-gray-600 line-clamp-1 max-w-[160px]">
-          ${doc.bibtex.author || '—'}
-        </td>
+        <ui5-table-cell class="plib-table-cell">
+          <span class="plib-cell-text">${doc.bibtex.author || '—'}</span>
+        </ui5-table-cell>
 
-        <td class="py-3 px-3 text-gray-600 dark:text-gray-300">
-          ${renderEditionYear(doc.bibtex.edition, doc.bibtex.year)}
-        </td>
+        <ui5-table-cell class="plib-table-cell">${renderEditionYear(doc.bibtex.edition, doc.bibtex.year)}</ui5-table-cell>
 
-        <td class="py-3 px-3 text-gray-600 uppercase font-mono text-[11px]">${doc.format}</td>
+        <ui5-table-cell class="plib-table-cell">
+          <span class="plib-cell-format">${doc.format}</span>
+        </ui5-table-cell>
 
-        <td class="py-3 px-3 text-right text-gray-600 font-mono whitespace-nowrap">
-          ${doc.fileSizeFormatted}
-        </td>
+        <ui5-table-cell class="plib-table-cell">
+          <span class="plib-cell-size">${doc.fileSizeFormatted}</span>
+        </ui5-table-cell>
 
-        <td class="py-3 px-4 text-gray-500 whitespace-nowrap text-[11px]">
-          ${formatUploadDate(doc.uploadDate)}
-        </td>
-
-        <td class="py-3 px-4 text-center" data-cell="actions">
-          <ui5-button
-            class="plib-button plib-button--icon"
-            design="Transparent"
-            icon="delete"
-            data-action="delete"
-            tooltip="Delete Document"
-            accessible-name="Delete Document"
-          ></ui5-button>
-        </td>
-      </tr>
+        <ui5-table-cell class="plib-table-cell">
+          <span class="plib-cell-date">${formatUploadDate(doc.uploadDate)}</span>
+        </ui5-table-cell>
+      </ui5-table-row>
     `.toString();
   }
 
@@ -1028,7 +1011,8 @@ export class ListReportView extends Component {
    * opening the Object Page when clicking the delete icon.
    */
   private bindTableEvents(): void {
-    this.on('[data-action="open-upload"]', 'click', () => appStore.openUpload());
+    // Rendered both in the toolbar and in the empty-state placeholder.
+    this.onAll('[data-action="open-upload"]', 'click', () => appStore.openUpload());
 
     this.on('[data-action="retry"]', 'click', () => void appStore.fetchDocuments());
     this.on('[data-action="switch-offline"]', 'click', () => backendStore.switchPreset('mock'));
@@ -1036,22 +1020,27 @@ export class ListReportView extends Component {
       appStore.openBackendSettings()
     );
 
-    this.onAll('th[data-sort]', 'click', (event) => {
-      const th = event.currentTarget as HTMLElement;
-      appStore.setSort(th.dataset.sort as string);
+    this.onAll('ui5-table-header-cell[data-sort]', 'click', (event) => {
+      const cell = event.currentTarget as HTMLElement;
+      appStore.setSort(cell.dataset.sort as string);
     });
 
-    this.onAll('tbody tr[data-guid]', 'click', (event) => {
-      const row = event.currentTarget as HTMLElement;
-      void appStore.loadSingleDocument(row.dataset.guid as string);
+    // `row-click` fires once per interactive row, including keyboard
+    // activation, which the old `<tr>` click handler never supported. It also
+    // already excludes the row-action area, so the separate stopPropagation
+    // guard the actions cell needed is gone.
+    this.on('ui5-table.plib-table', 'row-click', (event) => {
+      const { row } = (event as CustomEvent<{ row: HTMLElement }>).detail;
+      const guid = row?.getAttribute('row-key');
+      if (guid) {
+        void appStore.loadSingleDocument(guid);
+      }
     });
 
-    // Keeps the row click from navigating when the delete action is used.
-    this.onAll('td[data-cell="actions"]', 'click', (event) => event.stopPropagation());
-
-    this.onAll('ui5-button[data-action="delete"]', 'click', (event) => {
-      const row = (event.currentTarget as HTMLElement).closest<HTMLElement>('tr[data-guid]');
-      const doc = appStore.state.documents.find((item) => item.guid === row?.dataset.guid);
+    this.on('ui5-table.plib-table', 'row-action-click', (event) => {
+      const { row } = (event as CustomEvent<{ row: HTMLElement; action: HTMLElement }>).detail;
+      const guid = row?.getAttribute('row-key');
+      const doc = appStore.state.documents.find((item) => item.guid === guid);
       if (doc) {
         appStore.requestDelete(doc);
       }
