@@ -183,6 +183,34 @@ elif ! $PURGE_DATA; then
 fi
 
 step "Deleting build artifacts"
+
+# `docker compose build` compiles as root inside the container. If target/ (or
+# dist/) was ever produced by a root-owned process that wrote back to the host,
+# the files end up owned by root:root and a plain host-side `rm -rf` fails with
+# "Permission denied" — aborting the whole reset. Rather than demanding `sudo`
+# (which the rest of this script never needs), delete such leftovers the same
+# way they were created: from a throwaway root container. Docker is already a
+# verified preflight dependency, so this introduces no new requirement.
+remove_artifact() {
+  local artifact="$1"
+  if rm -rf -- "${PROJECT_ROOT:?}/$artifact" 2>/dev/null; then
+    ok "Removed $artifact"
+    return 0
+  fi
+  note "Host-side delete of $artifact was denied; retrying as root in a container."
+  # Only the parent is mounted and only this basename is removed, so a bad
+  # value cannot escape the project root.
+  if docker run --rm \
+       -v "${PROJECT_ROOT:?}:/work" \
+       -w /work \
+       alpine:3.20 \
+       rm -rf -- "./$artifact" >/dev/null 2>&1; then
+    ok "Removed $artifact (via container, was root-owned)"
+    return 0
+  fi
+  fail "Could not remove '$artifact' even as root. Remove it manually and re-run."
+}
+
 artifacts=(dist target server.js)
 # Only ever delete the specific generated-doc subdirectories, never docs/
 # itself — docs/ also holds hand-authored specs, presentations, openapi.yaml,
@@ -190,8 +218,7 @@ artifacts=(dist target server.js)
 $DEEP && artifacts+=("${GENERATED_DOC_DIRS[@]}" node_modules)
 for artifact in "${artifacts[@]}"; do
   if [[ -e "$artifact" ]]; then
-    rm -rf -- "${PROJECT_ROOT:?}/$artifact"
-    ok "Removed $artifact"
+    remove_artifact "$artifact"
   else
     note "Skipped $artifact (absent)"
   fi

@@ -158,6 +158,8 @@ A single script drives the full clean-rebuild-redeploy-verify cycle. All flags a
 ### 6.1 Resolving a root-owned `target/` (local Maven builds)
 Because `docker compose build` runs Maven **inside the container as root** while `target/` is not bind-mounted back to the host in the default Compose setup, a subsequent host-side `mvn clean`/`mvn compile` can fail with `Operation not permitted` if a local `target/` directory was ever created by a root process on this host. See [BACKEND_ARCHITECTURE.md §9.2](BACKEND_ARCHITECTURE.md) for the verified `javac`-based workaround used during backend development to sidestep this without requiring `sudo chown`.
 
+`rebuild.sh` itself is **immune** to this. Its artifact-deletion step first attempts an ordinary host-side `rm -rf`; if that is denied, it retries the delete from a throwaway `alpine:3.20` root container with the project root bind-mounted. Only the named artifact (`dist`, `target`, `server.js`, …) is removed, and the script fails loudly if even the root-container attempt does not succeed. This keeps `sudo` out of the reset path entirely — Docker is already a verified preflight dependency, so no new requirement is introduced.
+
 ---
 
 ## 7. Documentation Build Tasks (`npm run docs`, `npm run diagrams`)
@@ -208,7 +210,8 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 
 | Symptom | Cause | Fix |
 | :--- | :--- | :--- |
-| `mvn clean`/`mvn compile` fails with `Operation not permitted` | `target/` is root-owned from a prior container build | See §6.1 / [BACKEND_ARCHITECTURE.md §9.2](BACKEND_ARCHITECTURE.md) |
+| `mvn clean`/`mvn compile` fails with `Operation not permitted` | `target/` is root-owned from a prior container build | See §6.1 / [BACKEND_ARCHITECTURE.md §9.2](BACKEND_ARCHITECTURE.md). `./scripts/rebuild.sh` handles this automatically. |
+| `rebuild.sh` aborts at step 3 with `rm: cannot remove 'target/...': Permission denied` | Root-owned build output from a container build | Fixed — the script now retries the delete in a root container (§6.1). If you still see this, the container fallback itself failed; check `docker info`. |
 | `docker compose up` stack never reports healthy | Ollama still pulling `OLLAMA_PRELOAD_MODELS` on first boot (~7 GB) | Wait — `start_period: 20s` plus `retries: 10` is generous but a cold pull on a slow link can still exceed it; check `docker compose logs ollama`. |
 | TLS/cert errors pulling npm/Maven/OS packages during `docker compose build` | `./certs/` is empty or certs aren't in `.crt`/`.pem` format | Drop the corporate root/intermediate CA bundle into `./certs/` — see §2 and [README.md](../README.md) enterprise certificate section. |
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |
