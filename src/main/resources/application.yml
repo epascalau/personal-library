@@ -32,8 +32,9 @@ spring:
   # - embedding.options.model (nomic-embed-text): 768-dim embeddings with 8k context window,
   #   yielding superior semantic cluster density over traditional 384-dim sentence transformers.
   # - vectorstore.qdrant.port (6334): Connects via gRPC for high-performance binary protocol transfer.
-  # - initialize-schema (true in local, false in docker): Automatically creates the collection on
-  #   local launch; disabled in docker to prevent startup race conditions across scaled replicas.
+  # - initialize-schema (true): Automatically creates the collection if it is absent.
+  #   Enabled in both profiles — nothing else provisions it, and the compose stack runs
+  #   a single backend replica, so there is no concurrent-DDL race to avoid.
   ai:
     ollama:
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}

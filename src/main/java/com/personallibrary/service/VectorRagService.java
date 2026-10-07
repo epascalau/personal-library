@@ -16,6 +16,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,8 +63,22 @@ public class VectorRagService {
      * @param text    Full text body of the document.
      * @return List of persisted {@link DocumentChunk} items.
      */
-    public List<DocumentChunk> indexDocumentChunks(String docGuid, String text) {
-        List<DocumentChunk> chunks = new ArrayList<>();
+    /**
+     * WHAT: Derives a Qdrant-acceptable point ID from a human-readable chunk ID.
+     * WHY: Qdrant only accepts an unsigned integer or a UUID as a point ID. The readable
+     * chunk ID ("{docGuid}-c{index}") is a UUID with a suffix, which the client rejects with
+     * "UUID string too large" — previously swallowed as a warning, silently leaving Qdrant
+     * empty while uploads still returned 200. Name-based (v3) UUIDs are deterministic, so
+     * re-indexing a chunk overwrites its point instead of duplicating it.
+     *
+     * @param chunkId Readable chunk identifier.
+     * @return Deterministic UUID string accepted by Qdrant.
+     */
+    private static String toPointId(String chunkId) {
+        return UUID.nameUUIDFromBytes(chunkId.getBytes(StandardCharsets.UTF_8)).toString();
+    }
+
+    public List<DocumentChunk> indexDocumentChunks(String docGuid, String text) {        List<DocumentChunk> chunks = new ArrayList<>();
         List<Document> springAiDocs = new ArrayList<>();
 
         String[] paragraphs = text.split("\\n\\s*\\n");
@@ -86,7 +101,7 @@ public class VectorRagService {
                 metadata.put("documentGuid", docGuid);
                 metadata.put("chunkIndex", index);
 
-                springAiDocs.add(new Document(chunkId, chunkText, metadata));
+                springAiDocs.add(new Document(toPointId(chunkId), chunkText, metadata));
                 current = new StringBuilder(para);
                 index++;
             } else {
@@ -109,7 +124,7 @@ public class VectorRagService {
             metadata.put("documentGuid", docGuid);
             metadata.put("chunkIndex", index);
 
-            springAiDocs.add(new Document(chunkId, chunkText, metadata));
+            springAiDocs.add(new Document(toPointId(chunkId), chunkText, metadata));
         }
 
         try {
@@ -143,21 +158,28 @@ public class VectorRagService {
         List<String> contextPassages = new ArrayList<>();
 
         try {
-            // Similarity search scoped to this document GUID
+            // Scope the search to this document inside the vector store itself. Filtering
+            // after topK would discard hits that already displaced this document's chunks,
+            // so a query could return few or no passages purely because another, larger
+            // document dominated the global top-K.
             List<Document> similarDocs = vectorStore.similaritySearch(
                     SearchRequest.builder()
                             .query(query)
                             .topK(4)
                             .similarityThreshold(0.5)
+                            .filterExpression("documentGuid == '" + docEntity.getGuid() + "'")
                             .build()
             );
 
             for (Document doc : similarDocs) {
                 String docGuid = (String) doc.getMetadata().get("documentGuid");
                 if (docGuid == null || docGuid.equals(docEntity.getGuid())) {
-                    Integer chunkIndex = (Integer) doc.getMetadata().getOrDefault("chunkIndex", 0);
+                    // Qdrant returns payload integers as Long, so a direct (Integer) cast
+                    // throws ClassCastException and drops the whole result set.
+                    Object rawIndex = doc.getMetadata().getOrDefault("chunkIndex", 0);
+                    int chunkIndex = (rawIndex instanceof Number n) ? n.intValue() : 0;
                     citations.add(ChatResponse.CitationDto.builder()
-                            .chunkIndex(chunkIndex != null ? chunkIndex : 0)
+                            .chunkIndex(chunkIndex)
                             .score(0.88)
                             .snippet(doc.getText().substring(0, Math.min(doc.getText().length(), 200)))
                             .build());

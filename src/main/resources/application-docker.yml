@@ -18,9 +18,14 @@ spring:
       qdrant:
         host: qdrant
         port: 6334
-        # Schema initialization is disabled in Docker to prevent DDL collisions during
-        # concurrent multi-instance orchestration; collection is provisioned beforehand.
-        initialize-schema: false
+        # Must stay true: nothing else provisions the collection. This compose
+        # stack runs exactly one backend replica, so the multi-instance DDL race
+        # this was once set to false for cannot occur. With it disabled, every
+        # index call failed with "Collection `personal_library_embeddings`
+        # doesn't exist!", which VectorRagService catches and logs as a warning —
+        # uploads still returned 200 while Qdrant stayed empty, so documents were
+        # visible in the UI but contributed nothing to retrieval.
+        initialize-schema: true
 
 app:
   storage:
