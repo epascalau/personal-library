@@ -340,6 +340,39 @@
   font-size: var(--sapFontSmallSize, 0.75rem);
 }
 
+/*
+ * Cell padding must be declared against the light-DOM element, not through
+ * `:host(...)`.
+ *
+ * The table cells are authored in this application's own markup, so they live
+ * in the light DOM. The document stylesheet therefore applies to them directly,
+ * and the Tailwind preflight reset (`*, ::before, ::after { padding: 0 }`) wins
+ * over every `:host(...)` rule coming from the component's shadow tree —
+ * declarations from the outer tree always beat `:host` declarations from the
+ * inner one, whatever their specificity. That reset was silently flattening
+ * UI5's own default cell padding to zero, which is why adjacent column values
+ * ran into each other.
+ *
+ * A plain class selector sits in the same (outer) tree as the reset and beats
+ * it on specificity, so the padding survives.
+ */
+ui5-table-cell.plib-table-cell,
+ui5-table-header-cell.plib-table-header-cell {
+  padding-inline: 1rem;
+}
+
+ui5-table-cell.plib-table-cell {
+  padding-block: 0.5rem;
+}
+
+/*
+ * In the popin area the cells stack label over value in a single full-width
+ * column, so the trailing inset only pushes the text off-centre.
+ */
+ui5-table-cell.plib-table-cell[_popin] {
+  padding-inline-end: 0;
+}
+
 :host(.plib-table-header-cell) {
   font-weight: 600;
   color: var(--sapContent_LabelColor, #556b82);
