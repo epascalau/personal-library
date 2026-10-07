@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatController (com.personallibrary.controller) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.controller.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.controller.html">com.personallibrary.controller</a> &gt;
+      <strong>ChatController</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.controller</div>
+        <h2>class ChatController</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@RestController</span>  <span class="annotation">@RequestMapping(&quot;/api/v1&quot;)</span>  <span class="annotation">@RequiredArgsConstructor</span>  <span class="annotation">@Tag(name = &quot;AI Services&quot;, description = &quot;Convenience RAG chat endpoint&quot;)</span> </div>
+        <div class="signature">
+          public class <strong>ChatController</strong>
+          
+          
+        </div>
+        <p>Top-level convenience REST controller exposing `/chat` as a flat alternative to the document-scoped `/documents/{guid}/chat` RAG endpoint.  WHAT: Accepts a document identifier inline in the request body (as `documentGuid` or `guid`) instead of as a path variable, then delegates to the same {@link VectorRagService} RAG pipeline. WHY: Documented in the project&#39;s OpenAPI 3.0 contract (openapi.yaml) as a convenience endpoint for API consumers that prefer a single flat chat resource over nested per-document paths.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-10-06</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private DocumentService</td>
+                <td class="name-col"><code>documentService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private VectorRagService</td>
+                <td class="name-col"><code>vectorRagService</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;ChatResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">chat</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Convenience RAG chat endpoint identifying the target document inline in the request body.  WHAT: Resolves the target document via `documentGuid`/`guid`, then queries Qdrant for semantic citations and generates a grounded answer via Llama 3.3, identically to {@code DocumentController.chatWithDocument}. WHY: Mirrors the per-document chat endpoint&#39;s RAG grounding and citation behavior for clients that prefer not to nest the document identifier in the URL path.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public resolveGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">f</a></strong>(guid == null || guid.isBlank()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public badReques</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getEntityByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public questio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">n</a></strong>(Object request.getQuestion()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chatHistor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">y</a></strong>(Object request.getChatHistory()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">k</a></strong>(Object vectorRagService.chatWithDocument(doc, Object chatRequest)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">chat</div>
+            <div><span class="annotation">@PostMapping(&quot;/chat&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Document RAG assistant query (convenience endpoint; accepts documentGuid or guid in body)&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;ChatResponse&gt; <strong>chat</strong>(Object param)
+            </div>
+            <p>Convenience RAG chat endpoint identifying the target document inline in the request body.  WHAT: Resolves the target document via `documentGuid`/`guid`, then queries Qdrant for semantic citations and generates a grounded answer via Llama 3.3, identically to {@code DocumentController.chatWithDocument}. WHY: Mirrors the per-document chat endpoint&#39;s RAG grounding and citation behavior for clients that prefer not to nest the document identifier in the URL path.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>request</code> - {@link ChatConvenienceRequest} carrying the target document GUID, question, and history.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link ChatResponse} with answer and grounded citations.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public resolveGui <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(guid == null || guid.isBlank()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public badReques <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getEntityByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public questio <strong>n</strong>(Object request.getQuestion()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public chatHistor <strong>y</strong>(Object request.getChatHistory()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object vectorRagService.chatWithDocument(doc, Object chatRequest)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

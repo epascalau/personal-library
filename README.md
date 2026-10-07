@@ -289,6 +289,32 @@ To add your own starter documents, drop files into `./initial_data/` and re-run
 | `SEED_REMOTE_PDF_NAME` | `the-wonderful-wizard-of-oz.pdf` | File name recorded for the remote document |
 | `SEED_MAX_TIME` | `900` | Per-document upload timeout in seconds |
 
+#### Network Configuration (corporate environments)
+
+Containers do **not** use the host's `/etc/resolv.conf` — they inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server your network blocks, Ollama model pulls and the seeder's PDF download both fail while the host resolves fine. The failure is quiet: the stack still reports healthy **with no models installed**, and documents then ingest without embeddings, so they appear in the UI but return nothing from RAG.
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `LIBRARY_DNS` | *(unset)* | DNS resolver for the `ollama` and `library-seeder` containers. Set it to the `nameserver` from the host's `/etc/resolv.conf`. |
+| `ENTERPRISE_HTTP_PROXY` | *(unset)* | Outbound HTTP proxy for Ollama model pulls |
+| `ENTERPRISE_HTTPS_PROXY` | *(unset)* | Outbound HTTPS proxy for Ollama model pulls |
+| `ENTERPRISE_NO_PROXY` | `localhost,127.0.0.1,qdrant,mongodb,keycloak` | Hosts bypassing the proxy — **keep the service names**, or internal traffic breaks |
+
+```bash
+grep nameserver /etc/resolv.conf     # e.g. 10.0.0.53
+echo "LIBRARY_DNS=10.0.0.53" >> .env
+```
+
+Always confirm models are present before judging RAG quality:
+
+```bash
+docker exec personal-library-ollama ollama list   # expect 3 models
+```
+
+> 📘 For every configuration knob, its default, and the exact file or class that
+> consumes it, see **[DEVOPS_GUIDE.md §4.5](docs/DEVOPS_GUIDE.md)**. For what a
+> factory reset destroys and how each piece is restored, see **§4.6**.
+
 Access Points:
 * **Web Application (via nginx, recommended):** `http://localhost:8088`
 * **Web Application (direct, dev/bypass):** `http://localhost:13000`
@@ -363,8 +389,25 @@ npm run ops:factory-reset      # DESTRUCTIVE: wipes all data, models and generat
 `docs/diagrams` — reproducible via `npm run docs`/`diagrams`) with hand-authored
 source content (architecture specs, presentations, `openapi.yaml`, the BPMN
 file, ...). `--deep` and `clean:generated-docs` only ever delete the three
-generated subdirectories above; hand-authored docs are never touched, because
-no npm task can recreate them.
+generated subdirectories above; hand-authored docs are never touched.
+
+One subtlety: `docs/diagrams/` is **not** purely generated. Five hand-authored
+sources live there and no generator can recreate them — `MINDMAP.md`,
+`architecture_diagrams.mmd` (an *input* to `generate-architecture-from-mmd.ts`),
+`rag_data_flow.drawio`, `system_architecture.drawio`, and
+`system_architecture.puml`. `rebuild.sh` stashes and restores them around the
+directory delete via its `PRESERVED_DIAGRAM_SOURCES` list. **Add any new
+hand-authored file in that directory to that list**, or a `--deep` run will
+destroy it.
+
+After a `--deep` run the script reinstalls `node_modules` and regenerates all
+three documentation trees automatically, so `git status` stays clean. The one
+exception is `clean:generated-docs` (`--deep --clean-only`), which exits before
+those phases by design; it prints the recovery command:
+
+```bash
+npm ci && npm run docs && npm run diagrams
+```
 
 **Data safety.** Persistent volumes are *preserved by default*. Deleting data is
 always an explicit opt-in, and the script asks for confirmation first:

@@ -144,8 +144,8 @@
               <tr>
                 <td class="type-col">public Path</td>
                 <td class="desc-col">
-                  <strong><a href="#method-6">storeFile</a></strong>(MultipartFile file, String guid)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Stores a physical uploaded file to the local disk under a unique GUID directory.  WHAT: Cleans original filename, creates subdirectory named by document GUID, and writes stream with REPLACE_EXISTING. WHY: Subdividing files into GUID-isolated folders prevents filename collision and preserves version isolation across documents sharing identical original filenames.  /</div>
+                  <strong><a href="#method-6">storeFile</a></strong>(MultipartFile file, String guid, int version)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Stores a physical uploaded file to the local disk under a unique GUID directory, isolated by version.  WHAT: Cleans original filename, creates a per-version subdirectory (guid/v{version}/), and writes stream with REPLACE_EXISTING. WHY: Version-isolated subdirectories ensure each historical revision&#39;s physical bytes remain independently addressable on disk, so overwriting the active version never destroys the asset a prior version snapshot or rollback needs to stream back to the client.  /</div>
                 </td>
               </tr>
             
@@ -192,7 +192,7 @@
               <tr>
                 <td class="type-col">public inf</td>
                 <td class="desc-col">
-                  <strong><a href="#method-12">o</a></strong>(&quot;Stored file {} for GUID {} at {}&quot;, Object cleanFileName, Object guid, Object destination)
+                  <strong><a href="#method-12">o</a></strong>(&quot;Stored file {} for GUID {} version {} at {}&quot;, Object cleanFileName, Object guid, Object version, Object destination)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -200,23 +200,15 @@
               <tr>
                 <td class="type-col">public String</td>
                 <td class="desc-col">
-                  <strong><a href="#method-13">extractTextContent</a></strong>(Path filePath)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Extracts full plain text content from a file using Apache Tika.  WHAT: Invokes Apache Tika parser to extract text across PDF, DOCX, TXT, and office documents with fallback string on failure. WHY: Apache Tika provides content-detection and metadata extraction across hundreds of file types, delivering uniform plain text to downstream vector embedding and summarization pipelines.  /</div>
+                  <strong><a href="#method-13">detectContentType</a></strong>(Path filePath)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Detects the MIME content type of a physical file on disk using Apache Tika.  WHAT: Invokes Apache Tika&#39;s magic-byte and extension-based content detection. WHY: Allows download endpoints to stream the exact original content type (PDF, DOCX, plain text, etc.) instead of hardcoding or guessing a single MIME type for every document format supported by the library.  /</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public toFil</td>
+                <td class="type-col">public detec</td>
                 <td class="desc-col">
-                  <strong><a href="#method-14">e</a></strong>()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public parseToStrin</td>
-                <td class="desc-col">
-                  <strong><a href="#method-15">g</a></strong>(Object file)
+                  <strong><a href="#method-14">t</a></strong>(Object filePath.toFile()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -224,7 +216,7 @@
               <tr>
                 <td class="type-col">public catc</td>
                 <td class="desc-col">
-                  <strong><a href="#method-16">h</a></strong>(Exception e)
+                  <strong><a href="#method-15">h</a></strong>(Exception e)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -232,13 +224,21 @@
               <tr>
                 <td class="type-col">public war</td>
                 <td class="desc-col">
-                  <strong><a href="#method-17">n</a></strong>(&quot;Apache Tika could not parse text from {}: {}&quot;, Object filePath, Object e.getMessage()
+                  <strong><a href="#method-16">n</a></strong>(&quot;Apache Tika could not detect content type for {}: {}&quot;, Object filePath, Object e.getMessage()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public getFileNam</td>
+                <td class="type-col">public String</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">extractTextContent</a></strong>(Path filePath)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Extracts full plain text content from a file using Apache Tika.  WHAT: Invokes Apache Tika parser to extract text across PDF, DOCX, TXT, and office documents with fallback string on failure. WHY: Apache Tika provides content-detection and metadata extraction across hundreds of file types, delivering uniform plain text to downstream vector embedding and summarization pipelines.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public toFil</td>
                 <td class="desc-col">
                   <strong><a href="#method-18">e</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
@@ -246,9 +246,41 @@
               </tr>
             
               <tr>
+                <td class="type-col">public parseToStrin</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">g</a></strong>(Object file)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public war</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">n</a></strong>(&quot;Apache Tika could not parse text from {}: {}&quot;, Object filePath, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getFileNam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">e</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
                 <td class="type-col">public void</td>
                 <td class="desc-col">
-                  <strong><a href="#method-19">deletePhysicalAsset</a></strong>(String guid)
+                  <strong><a href="#method-23">deletePhysicalAsset</a></strong>(String guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Purges physical files and directory for a specified document GUID.  WHAT: Recursively walks the GUID directory in bottom-up reverse order and deletes each file and subfolder. WHY: Bottom-up deletion ensures child files are deleted before parent directories, guaranteeing clean removal without left-over orphaned disk assets.  /</div>
                 </td>
               </tr>
@@ -256,7 +288,7 @@
               <tr>
                 <td class="type-col">public resolv</td>
                 <td class="desc-col">
-                  <strong><a href="#method-20">e</a></strong>(Object guid)
+                  <strong><a href="#method-24">e</a></strong>(Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -264,7 +296,7 @@
               <tr>
                 <td class="type-col">public i</td>
                 <td class="desc-col">
-                  <strong><a href="#method-21">f</a></strong>(Object Files.exists(targetDir)
+                  <strong><a href="#method-25">f</a></strong>(Object Files.exists(targetDir)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -272,7 +304,7 @@
               <tr>
                 <td class="type-col">public wal</td>
                 <td class="desc-col">
-                  <strong><a href="#method-22">k</a></strong>(Object targetDir)
+                  <strong><a href="#method-26">k</a></strong>(Object targetDir)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -280,7 +312,7 @@
               <tr>
                 <td class="type-col">public sorte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-23">d</a></strong>(Object (a, Object b)
+                  <strong><a href="#method-27">d</a></strong>(Object (a, Object b)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -288,7 +320,7 @@
               <tr>
                 <td class="type-col">public forEac</td>
                 <td class="desc-col">
-                  <strong><a href="#method-24">h</a></strong>(p -&gt; { try { Files.delete(p)
+                  <strong><a href="#method-28">h</a></strong>(p -&gt; { try { Files.delete(p)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -296,7 +328,7 @@
               <tr>
                 <td class="type-col">public catc</td>
                 <td class="desc-col">
-                  <strong><a href="#method-25">h</a></strong>(IOException e)
+                  <strong><a href="#method-29">h</a></strong>(IOException e)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -304,7 +336,7 @@
               <tr>
                 <td class="type-col">public erro</td>
                 <td class="desc-col">
-                  <strong><a href="#method-26">r</a></strong>(&quot;Failed to delete path {}&quot;, Object p, Object e)
+                  <strong><a href="#method-30">r</a></strong>(&quot;Failed to delete path {}&quot;, Object p, Object e)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -312,7 +344,7 @@
               <tr>
                 <td class="type-col">public inf</td>
                 <td class="desc-col">
-                  <strong><a href="#method-27">o</a></strong>(&quot;Deleted physical storage directory for GUID: {}&quot;, Object guid)
+                  <strong><a href="#method-31">o</a></strong>(&quot;Deleted physical storage directory for GUID: {}&quot;, Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -320,7 +352,7 @@
               <tr>
                 <td class="type-col">public catc</td>
                 <td class="desc-col">
-                  <strong><a href="#method-28">h</a></strong>(IOException e)
+                  <strong><a href="#method-32">h</a></strong>(IOException e)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -328,7 +360,7 @@
               <tr>
                 <td class="type-col">public erro</td>
                 <td class="desc-col">
-                  <strong><a href="#method-29">r</a></strong>(&quot;Error purging storage for GUID: {}&quot;, Object guid, Object e)
+                  <strong><a href="#method-33">r</a></strong>(&quot;Error purging storage for GUID: {}&quot;, Object guid, Object e)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -438,14 +470,14 @@
             <div class="detail-title">storeFile</div>
             
             <div class="signature">
-              public Path <strong>storeFile</strong>(MultipartFile file, String guid)
+              public Path <strong>storeFile</strong>(MultipartFile file, String guid, int version)
             </div>
-            <p>Stores a physical uploaded file to the local disk under a unique GUID directory.  WHAT: Cleans original filename, creates subdirectory named by document GUID, and writes stream with REPLACE_EXISTING. WHY: Subdividing files into GUID-isolated folders prevents filename collision and preserves version isolation across documents sharing identical original filenames.  /</p>
+            <p>Stores a physical uploaded file to the local disk under a unique GUID directory, isolated by version.  WHAT: Cleans original filename, creates a per-version subdirectory (guid/v{version}/), and writes stream with REPLACE_EXISTING. WHY: Version-isolated subdirectories ensure each historical revision&#39;s physical bytes remain independently addressable on disk, so overwriting the active version never destroys the asset a prior version snapshot or rollback needs to stream back to the client.  /</p>
 
             
               <dl class="param-list">
                 <dt>Parameters:</dt>
-                <dd><code>file</code> - Uploaded multipart file.</dd><dd><code>guid</code> - Unique document identifier.</dd>
+                <dd><code>file</code> - Uploaded multipart file.</dd><dd><code>guid</code> - Unique document identifier.</dd><dd><code>version</code> - Version sequence number this asset represents.</dd>
               </dl>
             
 
@@ -543,7 +575,7 @@
             <div class="detail-title">o</div>
             
             <div class="signature">
-              public inf <strong>o</strong>(&quot;Stored file {} for GUID {} at {}&quot;, Object cleanFileName, Object guid, Object destination)
+              public inf <strong>o</strong>(&quot;Stored file {} for GUID {} version {} at {}&quot;, Object cleanFileName, Object guid, Object version, Object destination)
             </div>
             <p>No description provided.</p>
 
@@ -555,6 +587,76 @@
           </div>
         
           <div class="detail-block" id="method-13">
+            <div class="detail-title">detectContentType</div>
+            
+            <div class="signature">
+              public String <strong>detectContentType</strong>(Path filePath)
+            </div>
+            <p>Detects the MIME content type of a physical file on disk using Apache Tika.  WHAT: Invokes Apache Tika&#39;s magic-byte and extension-based content detection. WHY: Allows download endpoints to stream the exact original content type (PDF, DOCX, plain text, etc.) instead of hardcoding or guessing a single MIME type for every document format supported by the library.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>filePath</code> - Path to the physical file on disk.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Detected MIME content type, or &quot;application/octet-stream&quot; on detection failure.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public detec <strong>t</strong>(Object filePath.toFile()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">n</div>
+            
+            <div class="signature">
+              public war <strong>n</strong>(&quot;Apache Tika could not detect content type for {}: {}&quot;, Object filePath, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
             <div class="detail-title">extractTextContent</div>
             
             <div class="signature">
@@ -579,7 +681,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-14">
+          <div class="detail-block" id="method-18">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -594,7 +696,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-15">
+          <div class="detail-block" id="method-19">
             <div class="detail-title">g</div>
             
             <div class="signature">
@@ -609,7 +711,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-16">
+          <div class="detail-block" id="method-20">
             <div class="detail-title">h</div>
             
             <div class="signature">
@@ -624,7 +726,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-17">
+          <div class="detail-block" id="method-21">
             <div class="detail-title">n</div>
             
             <div class="signature">
@@ -639,7 +741,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-18">
+          <div class="detail-block" id="method-22">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -654,7 +756,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-19">
+          <div class="detail-block" id="method-23">
             <div class="detail-title">deletePhysicalAsset</div>
             
             <div class="signature">
@@ -674,7 +776,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-20">
+          <div class="detail-block" id="method-24">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -689,7 +791,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-21">
+          <div class="detail-block" id="method-25">
             <div class="detail-title">f</div>
             
             <div class="signature">
@@ -704,7 +806,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-22">
+          <div class="detail-block" id="method-26">
             <div class="detail-title">k</div>
             
             <div class="signature">
@@ -719,7 +821,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-23">
+          <div class="detail-block" id="method-27">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -734,7 +836,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-24">
+          <div class="detail-block" id="method-28">
             <div class="detail-title">h</div>
             
             <div class="signature">
@@ -749,7 +851,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-25">
+          <div class="detail-block" id="method-29">
             <div class="detail-title">h</div>
             
             <div class="signature">
@@ -764,7 +866,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-26">
+          <div class="detail-block" id="method-30">
             <div class="detail-title">r</div>
             
             <div class="signature">
@@ -779,7 +881,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-27">
+          <div class="detail-block" id="method-31">
             <div class="detail-title">o</div>
             
             <div class="signature">
@@ -794,7 +896,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-28">
+          <div class="detail-block" id="method-32">
             <div class="detail-title">h</div>
             
             <div class="signature">
@@ -809,7 +911,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-29">
+          <div class="detail-block" id="method-33">
             <div class="detail-title">r</div>
             
             <div class="signature">

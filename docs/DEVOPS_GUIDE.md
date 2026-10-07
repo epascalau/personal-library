@@ -66,10 +66,16 @@ This single-container-two-process design was chosen over two separate images/con
 | `mongodb` | `mongo:7.0` | `37017→27017` | — | Document metadata + version history persistence. Host-published on `37017`, not MongoDB's own `27017` default, to avoid colliding with a MongoDB instance already running locally; internal service-to-service traffic still uses the real `27017`. |
 | `mongo-express` | `mongo-express:1.0.2` | `8091→8081` | `mongodb` (healthy) | Lightweight browser GUI for `personal_library` (collections, documents, ad-hoc queries) — an alternative to `mongosh` one-liners. `ME_CONFIG_BASICAUTH=false` since it sits behind the same trust boundary as the other dev-time admin ports; connects internally using the `mongodb` service's `root`/`librarypass` credentials. |
 | `storage-browser` | `halverneus/static-file-server:v1.8.10` | `8092→8080` | — | Read-only directory listing of the `library_storage` volume, exposing the physical uploaded files as `{guid}/v{version}/{fileName}`. Complements `mongo-express` (metadata) and the Qdrant dashboard (embeddings) by making the third persistence tier — the bytes on disk — inspectable too, which is what demonstrates that version-isolated subdirectories keep rollback non-destructive. Mounted `:ro` so the viewer can never mutate an asset a version snapshot depends on. **No healthcheck**: the image is built `FROM scratch` (one static Go binary, no shell/wget/curl), so no in-container probe can run. |
-| `qdrant` | `qdrant/qdrant:v1.11.0` | `16333→6333` (REST), `16334→6334` (gRPC) | — | Vector search; Spring AI connects over gRPC (6334, internal) for binary embedding transfer; TLS disabled since traffic never leaves the internal `library-net` bridge network (edge TLS belongs at nginx). Host-published on `16333`/`16334`, not Qdrant's own `6333`/`6334` defaults, to avoid colliding with a Qdrant instance already running locally. |
+| `qdrant` | `qdrant/qdrant:v1.18.0` | `16333→6333` (REST), `16334→6334` (gRPC) | — | Vector search; Spring AI connects over gRPC (6334, internal) for binary embedding transfer; TLS disabled since traffic never leaves the internal `library-net` bridge network (edge TLS belongs at nginx). Host-published on `16333`/`16334`, not Qdrant's own `6333`/`6334` defaults, to avoid colliding with a Qdrant instance already running locally. |
 | `ollama` | `ollama/ollama:latest` | `21434→11434` | — | Local LLM + embedding inference. Custom `entrypoint: ollama-entrypoint.sh` (not the stock image entrypoint) trusts `./certs` **before** `ollama serve` starts, so the very first model pull can succeed through a corporate TLS-intercepting proxy. `OLLAMA_PRELOAD_MODELS` controls which models are pulled on first boot (default `nomic-embed-text llama3.2 mistral`). Host-published on `21434`, not Ollama's own `11434` default, to avoid colliding with an Ollama daemon already running locally; internal service-to-service traffic still uses the real `11434`. |
 | `keycloak` | `quay.io/keycloak/keycloak:24.0.5` | `8180→8080` | — | OIDC identity provider; `start-dev --import-realm` auto-imports `./config/keycloak-realm.json` on first boot. |
 | `library-seeder` | `curlimages/curl:8.11.1` | — | `personal-library-app` (healthy) | **One-shot task container, not a service** (`restart: "no"`). Runs `scripts/seed-initial-documents.sh` once the app is healthy, ingesting every file in `./initial_data` plus a remote public-domain PDF, then exits — see §4.3. |
+
+### 4.1 Persistent Volumes
+`mongodb_data`, `qdrant_data`, `ollama_models` (~7 GB), `library_storage` (uploaded physical files, browsable read-only at `http://localhost:8092` — see `storage-browser` in §4) — all **named, external-lifetime** volumes that survive `docker compose down` and ordinary rebuilds. Only `scripts/rebuild.sh --purge-data`/`--purge-models` removes them (§6).
+
+### 4.2 Why `qdrant: condition: service_started` (not `service_healthy`)
+Unlike every other dependency, `qdrant` has no `healthcheck:` block in Compose — `personal-library-app` only waits for the container process to **start**, not for a verified-healthy response. The Spring AI Qdrant client itself handles retry/backoff on first connection, and `VectorRagService`'s RAG chat path gracefully degrades to the document's plain-text excerpt if a Qdrant query fails (see [BACKEND_ARCHITECTURE.md §5.2](BACKEND_ARCHITECTURE.md)) — so the extra startup-ordering guarantee was judged unnecessary for this one dependency.
 
 ### 4.3 `library-seeder`: Initial Document Ingestion
 
@@ -113,12 +119,6 @@ Environment knobs: `SEED_ENABLED` (`true`), `SEED_REMOTE_PDF_URL`,
 `SEED_REMOTE_PDF_NAME`, `SEED_MAX_TIME`, `SEED_API_BASE`, `SEED_LOCAL_DIR`,
 `SEED_CERTS_DIR`. Re-run on demand with `docker compose up library-seeder`.
 
-### 4.1 Persistent Volumes
-`mongodb_data`, `qdrant_data`, `ollama_models` (~7 GB), `library_storage` (uploaded physical files, browsable read-only at `http://localhost:8092` — see `storage-browser` in §4) — all **named, external-lifetime** volumes that survive `docker compose down` and ordinary rebuilds. Only `scripts/rebuild.sh --purge-data`/`--purge-models` removes them (§6).
-
-### 4.2 Why `qdrant: condition: service_started` (not `service_healthy`)
-Unlike every other dependency, `qdrant` has no `healthcheck:` block in Compose — `personal-library-app` only waits for the container process to **start**, not for a verified-healthy response. The Spring AI Qdrant client itself handles retry/backoff on first connection, and `VectorRagService`'s RAG chat path gracefully degrades to the document's plain-text excerpt if a Qdrant query fails (see [BACKEND_ARCHITECTURE.md §5.2](BACKEND_ARCHITECTURE.md)) — so the extra startup-ordering guarantee was judged unnecessary for this one dependency.
-
 ### 4.4 `LIBRARY_DNS`: Outbound DNS for `ollama` and `library-seeder`
 Two services need to reach the public internet: `ollama` (pulls models from `registry.ollama.ai`) and `library-seeder` (downloads the remote PDF).
 
@@ -147,6 +147,88 @@ Always confirm models before trusting a RAG result:
 docker exec personal-library-ollama ollama list   # expect 3 models
 ```
 
+### 4.5 Complete Environment Variable Reference
+
+Every host-level knob the Compose file reads, its default, and **the code that consumes it**. Anything not listed here is hardcoded in `docker-compose.yml` and is not meant to be overridden per environment.
+
+Set these in a `.env` file beside `docker-compose.yml` (Compose loads it automatically) or export them in your shell.
+
+| Variable | Default | Consumed by | Purpose |
+| :--- | :--- | :--- | :--- |
+| `OLLAMA_PRELOAD_MODELS` | `nomic-embed-text llama3.2 mistral` | [`ollama-entrypoint.sh`](../ollama-entrypoint.sh) | Space-separated models pulled on first boot. **All three are required**: `nomic-embed-text` for embeddings, the other two for the dual summaries. |
+| `OLLAMA_LLAMA_MODEL` | `llama3.2` | [`AiSummarizationService`](../src/main/java/com/personallibrary/service/AiSummarizationService.java), [`OllamaConfig`](../src/main/java/com/personallibrary/config/OllamaConfig.java) | Chat/citation-grounding model. Must also appear in `OLLAMA_PRELOAD_MODELS`. |
+| `OLLAMA_MISTRAL_MODEL` | `mistral` | [`AiSummarizationService`](../src/main/java/com/personallibrary/service/AiSummarizationService.java), [`OllamaConfig`](../src/main/java/com/personallibrary/config/OllamaConfig.java) | Executive-synthesis model. Must also appear in `OLLAMA_PRELOAD_MODELS`. |
+| `LIBRARY_DNS` | *(unset — no override)* | `ollama` + `library-seeder` services | Container DNS resolver. Required when the Docker daemon's resolver is blocked — see §4.4. |
+| `ENTERPRISE_HTTP_PROXY` | *(unset)* | `ollama` service → `HTTP_PROXY` | Outbound HTTP proxy for model pulls. |
+| `ENTERPRISE_HTTPS_PROXY` | *(unset)* | `ollama` service → `HTTPS_PROXY` | Outbound HTTPS proxy for model pulls. Pair with a CA in `./certs` if the proxy intercepts TLS (§2). |
+| `ENTERPRISE_NO_PROXY` | `localhost,127.0.0.1,qdrant,mongodb,keycloak` | `ollama` service → `NO_PROXY` | Hosts that must bypass the proxy. **Keep the service names** — routing internal traffic through a proxy breaks the stack. |
+| `SEED_ENABLED` | `true` | [`seed-initial-documents.sh`](../scripts/seed-initial-documents.sh) | Set `false` to skip initial document ingestion entirely (§4.3). |
+| `SEED_REMOTE_PDF_URL` | Wizard of Oz CDN URL | [`seed-initial-documents.sh`](../scripts/seed-initial-documents.sh) | Remote document to fetch and ingest. |
+| `SEED_REMOTE_PDF_NAME` | `the-wonderful-wizard-of-oz.pdf` | [`seed-initial-documents.sh`](../scripts/seed-initial-documents.sh) | File name used for upload **and** for the idempotency check. |
+| `SEED_MAX_TIME` | `900` | [`seed-initial-documents.sh`](../scripts/seed-initial-documents.sh) | Per-document timeout (seconds). First ingestion is LLM-bound on CPU-only inference. |
+
+Fixed container-internal values — change these in `docker-compose.yml` itself, not via `.env`: `SEED_API_BASE`, `SEED_LOCAL_DIR`, `SEED_CERTS_DIR`, `ENTERPRISE_CA_DIR`, `OLLAMA_ORIGINS`.
+
+#### Spring Boot application properties
+
+The backend's own configuration lives in [`application.yml`](../src/main/resources/application.yml) (defaults) and [`application-docker.yml`](../src/main/resources/application-docker.yml) (the `docker` profile overrides, activated by `SPRING_PROFILES_ACTIVE=docker` in Compose).
+
+| Property | Value | Consumed by | Why it matters |
+| :--- | :--- | :--- | :--- |
+| `spring.ai.vectorstore.qdrant.collection-name` | `personal_library_embeddings` | [`VectorRagService`](../src/main/java/com/personallibrary/service/VectorRagService.java) | Qdrant collection holding all chunk embeddings. |
+| `spring.ai.vectorstore.qdrant.initialize-schema` | `true` (**both** profiles) | Spring AI Qdrant starter | **Must stay `true`** — nothing else provisions the collection. Setting it `false` makes every index call fail with "Collection doesn't exist!", which is caught and logged as a warning, so uploads still return 200 while Qdrant stays empty. |
+| `spring.ai.vectorstore.qdrant.port` | `6334` | Spring AI Qdrant starter | gRPC, not the `6333` REST port. |
+| `app.models.llama` | `${OLLAMA_LLAMA_MODEL:llama3.2}` | [`AiSummarizationService`](../src/main/java/com/personallibrary/service/AiSummarizationService.java) | Binds `OLLAMA_LLAMA_MODEL` into the dual-summary service. |
+| `app.models.mistral` | `${OLLAMA_MISTRAL_MODEL:mistral}` | [`AiSummarizationService`](../src/main/java/com/personallibrary/service/AiSummarizationService.java) | Binds `OLLAMA_MISTRAL_MODEL` into the dual-summary service. |
+| `app.storage.upload-dir` | `${STORAGE_DIR:./storage/documents}`, overridden to `/app/storage/documents` in the `docker` profile | [`StorageService`](../src/main/java/com/personallibrary/service/StorageService.java) | Backed by the `library_storage` volume (§4.1). `STORAGE_DIR` only affects a **non-Docker** local run; the `docker` profile hardcodes the container path. |
+| `spring.mongodb.uri` | `mongodb://…@mongodb:27017/personal_library` (`docker` profile) | Spring Data MongoDB | Spring Boot 4 renamed this prefix from `spring.data.mongodb`. |
+| `spring.ai.ollama.base-url` | `http://ollama:11434` (`docker` profile) | Spring AI Ollama starter | Internal port `11434`, **not** the host-published `21434`. |
+
+---
+
+### 4.6 Recreating Everything After a Factory Reset
+
+`npm run ops:factory-reset` (`rebuild.sh --purge-all`) is the most destructive operation in the repo. It implies `--deep`, `--purge-data`, and `--purge-models`, so it removes:
+
+| Removed | Restored by | Automatic? |
+| :--- | :--- | :--- |
+| Containers, network, application image | Phase 4–5 of the same script | ✅ |
+| `dist/`, `target/`, `server.js` | The container build | ✅ |
+| `node_modules/` | `npm ci` in phase 3 | ✅ |
+| `docs/typescript/`, `docs/javadoc/`, `docs/diagrams/` *(207 tracked files)* | `npm run docs` + `npm run diagrams` in phase 3b | ✅ |
+| MongoDB documents, Qdrant vectors, uploaded files | `library-seeder` re-ingests the two starter documents (§4.3) | ✅ |
+| Ollama models (~7 GB) | Re-pulled on next `ollama` start | ✅ *(needs working DNS — §4.4)* |
+
+**Never removed**, and therefore the things that genuinely must live in version control:
+
+* All hand-authored `docs/*.md`, `docs/presentations/`, `openapi.yaml`, the BPMN file.
+* The five hand-authored sources inside the otherwise-generated `docs/diagrams/`: `MINDMAP.md`, `architecture_diagrams.mmd` (an **input** to `generate-architecture-from-mmd.ts`), `rag_data_flow.drawio`, `system_architecture.drawio`, `system_architecture.puml`. `rebuild.sh` stashes and restores these around the directory delete — see `PRESERVED_DIAGRAM_SOURCES` in [`rebuild.sh`](../scripts/rebuild.sh). **Add to that list when you add a hand-authored file there.**
+* `./certs/` CA material (git-ignored by `certs/*.crt`) — re-supply it manually on a new machine.
+* `./initial_data/` — tracked, so the local seed document survives.
+* Your `.env`, if you created one (git-ignored).
+
+Full recreation from a clean checkout:
+
+```bash
+cp .env.example .env          # then edit: LIBRARY_DNS, ENTERPRISE_* if needed
+# drop any corporate CA into ./certs/
+npm ci                        # host toolchain
+npm run ops:factory-reset     # or: docker compose up -d --build
+```
+
+Verify the result — a healthy stack is **not** sufficient evidence that RAG works:
+
+```bash
+docker exec personal-library-ollama ollama list          # expect 3 models
+curl -s localhost:18080/api/v1/documents | head -c 200   # expect totalCount: 2
+curl -s localhost:16333/collections/personal_library_embeddings \
+  | grep -o '"points_count":[0-9]*'                      # expect > 0
+```
+
+That last check is the important one. Every failure in the ingestion path is caught and logged at `warn` level, so an empty Qdrant collection still presents as a perfectly healthy stack with documents visible in the UI. See the troubleshooting rows in §9.
+
+> **Caveat:** `npm run clean:generated-docs` (`--deep --clean-only`) deletes `node_modules` and the generated docs but exits *before* the phases that rebuild them. The script now prints the recovery command; run `npm ci && npm run docs && npm run diagrams` afterwards.
+
 ---
 
 ## 5. `nginx/nginx.conf`: Routing Table
@@ -171,7 +253,7 @@ A single script drives the full clean-rebuild-redeploy-verify cycle. All flags a
 | Flag | Effect |
 | :--- | :--- |
 | *(none)* | Routine clean rebuild: removes `dist/`, `target/`, `server.js`, and the project's existing containers/image; rebuilds; redeploys; verifies. Named volumes (Mongo/Qdrant/uploaded files/Ollama models) are **preserved**. |
-| `--deep` | Additionally removes `node_modules/` **and generated documentation** (`docs/typescript`, `docs/javadoc`, `docs/diagrams` — all reproducible via `npm run docs` / `npm run diagrams`, see §7), forcing a full dependency reinstall and doc regeneration. **Never** touches hand-authored docs (architecture specs, presentations, `openapi.yaml`, the BPMN file, etc.) — there is no npm task that can recreate those if deleted. |
+| `--deep` | Additionally removes `node_modules/` **and generated documentation** (`docs/typescript`, `docs/javadoc`, `docs/diagrams` — see §7), then **reinstalls dependencies and regenerates all three trees automatically** (phases 3 and 3b), so the working tree is left clean. Hand-authored docs are never touched; the five hand-authored sources inside `docs/diagrams/` are stashed and restored around the delete — see `PRESERVED_DIAGRAM_SOURCES` and §4.6. |
 | `--purge-data` | Removes the MongoDB, Qdrant, and uploaded-file **volumes**. Destroys all stored documents and vectors. Ollama models are explicitly kept (re-pulling ~7 GB through a corporate TLS proxy is slow and failure-prone). |
 | `--purge-models` | Additionally removes the Ollama model cache volume (forces a fresh ~7 GB pull on next start). |
 | `--purge-all` | Shorthand for `--deep --purge-data --purge-models` — a genuine **factory reset**: all stored documents, vectors, and models destroyed. Use deliberately, never by habit. |
@@ -179,7 +261,7 @@ A single script drives the full clean-rebuild-redeploy-verify cycle. All flags a
 | `--no-cache` | Builds the Docker image without the layer cache (fully reproducible build). |
 | `--pull` | Refreshes third-party base/service images (`mongo`, `mongo-express`, `qdrant`, `ollama`, `keycloak`, `nginx`, `swagger-editor`) before building. |
 | `--clean-only` | Stops after the cleaning phase — no build, no deploy. This is exactly what `npm run clean:generated-docs` invokes (`./scripts/rebuild.sh --deep --clean-only`), reusing the same safe generated-vs-hand-authored doc distinction instead of a separate ad hoc `rm`. |
-| `--skip-verify` | Skips the post-deploy verification phase (checks `http://localhost:13000/`, `http://localhost:18080/api/v1/documents`, `http://localhost:18080/actuator/health`). |
+| `--skip-verify` | Skips the post-deploy verification phase (see §6.2). |
 
 **Always removed** regardless of flags: `dist/`, `target/`, `server.js`, and the project's own containers/image. **Always kept** unless explicitly purged: MongoDB data, Qdrant vectors, uploaded files, Ollama models. **Never removed**: hand-authored `docs/` content.
 
@@ -187,6 +269,30 @@ A single script drives the full clean-rebuild-redeploy-verify cycle. All flags a
 Because `docker compose build` runs Maven **inside the container as root** while `target/` is not bind-mounted back to the host in the default Compose setup, a subsequent host-side `mvn clean`/`mvn compile` can fail with `Operation not permitted` if a local `target/` directory was ever created by a root process on this host. See [BACKEND_ARCHITECTURE.md §9.2](BACKEND_ARCHITECTURE.md) for the verified `javac`-based workaround used during backend development to sidestep this without requiring `sudo chown`.
 
 `rebuild.sh` itself is **immune** to this. Its artifact-deletion step first attempts an ordinary host-side `rm -rf`; if that is denied, it retries the delete from a throwaway `alpine:3.20` root container with the project root bind-mounted. Only the named artifact (`dist`, `target`, `server.js`, …) is removed, and the script fails loudly if even the root-container attempt does not succeed. This keeps `sudo` out of the reset path entirely — Docker is already a verified preflight dependency, so no new requirement is introduced.
+
+### 6.2 Post-deploy verification: why "healthy" is not enough
+
+Deployment waits on real container health checks (`docker compose up -d --wait`) rather than a fixed sleep. Verification then checks, in order: the frontend, the Spring Boot `/actuator/health` endpoint, the documents API, the installed Ollama models, and **the Qdrant vector count**.
+
+That last check exists because container health has repeatedly been a misleading signal in this project. Indexing and retrieval failures in `VectorRagService` are caught and logged at `warn` while the HTTP layer still returns **200**. A stack can therefore report fully healthy while:
+
+* Ollama holds **zero models** (a blocked DNS resolver made every pull fail — see §4.4), or
+* Qdrant holds **zero vectors** (a missing collection, or point IDs Qdrant rejects).
+
+In both cases documents upload successfully and appear in the UI, but RAG answers are ungrounded — the model falls back to its own training data, which is precisely the failure mode this application exists to prevent. The two checks that cannot be faked:
+
+```bash
+docker exec personal-library-ollama ollama list                 # expect 3 models
+curl -s localhost:16333/collections/personal_library_embeddings # expect points_count > 0
+```
+
+A `points_count` of `0` is only legitimate immediately after `--purge-data`, before seeding or the first upload finishes.
+
+### 6.3 One-shot services and `--wait`
+
+`docker compose up --wait` fails when **any** waited container exits — including a one-shot job that finished successfully with exit code `0`. `library-seeder` is exactly such a job: it uploads the starter documents and terminates.
+
+`rebuild.sh` therefore excludes the services listed in its `ONESHOT_SERVICES` array from the waited set and starts the seeder separately **after** the stack is confirmed healthy, treating a seeding failure as non-fatal (no network must not fail an otherwise good deployment). Plain `docker compose up` is unaffected and still seeds as documented in §7.1. **Add any future run-to-completion service to `ONESHOT_SERVICES`**, or it will report every successful deployment as a failure.
 
 ---
 
@@ -211,7 +317,21 @@ These are genuinely DevOps-adjacent (they produce the very documentation artifac
 7. `generate-ontology-diagrams.ts` — domain ontology/concept-relationship diagrams.
 8. `generate-rag-diagrams.ts` — RAG pipeline/data-flow diagrams (feeds the RAG docs, see [RAG_ARCHITECTURE_COMPARISON.md](RAG_ARCHITECTURE_COMPARISON.md)).
 
-Each script independently emits PNG, SVG, and PDF renditions per diagram (confirmed during the diagram-audit segment of this project's history) — so `docs/diagrams/` is **entirely generated/reproducible** and is exactly what `--deep`/`clean:generated-docs` is safe to delete.
+Each script independently emits PNG, SVG, and PDF renditions per diagram.
+
+**`docs/diagrams/` is *not* entirely generated, despite the name.** Five files there are hand-authored and no generator recreates them:
+
+| File | Role |
+| :--- | :--- |
+| `architecture_diagrams.mmd` | **Input** consumed by `generate-architecture-from-mmd.ts` (sub-script 4) |
+| `system_architecture.puml` | Hand-tuned PlantUML source |
+| `system_architecture.drawio` | Hand-tuned draw.io source |
+| `rag_data_flow.drawio` | Hand-tuned draw.io source |
+| `MINDMAP.md` | Hand-authored narrative companion to the generated mindmap |
+
+Note that *other* `.mmd`/`.puml` files in the same directory (`mindmap.mmd`, `entity_relationship_diagram.puml`, …) **are** generated, so extension alone cannot distinguish them. `rebuild.sh` therefore carries an explicit `PRESERVED_DIAGRAM_SOURCES` list and stashes those five around the directory delete. **Keep that list in sync** when adding a hand-authored file here — see §4.6.
+
+Everything else under `docs/diagrams/` is reproducible and safe for `--deep`/`clean:generated-docs` to remove.
 
 ### 7.1 Orphaned / Manual-Only Scripts
 Two TypeScript scripts exist under `scripts/` with **no corresponding `package.json` entry** — they must be invoked directly via `tsx`:
@@ -247,6 +367,9 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |
 | Library is empty after `docker compose up --build` | `library-seeder` skipped or failed — it is deliberately non-fatal | `docker compose logs library-seeder`. Common causes: `SEED_ENABLED=false`, no network for the CDN download, or a TLS error needing a cert in `./certs/` (§4.3). Re-run with `docker compose up library-seeder`. |
 | `library-seeder` logs `WARN ... HTTP 500` on upload | The ingestion pipeline itself failed — usually Ollama models still loading | Wait for `docker exec -it personal-library-ollama ollama list` to show all three models, then `docker compose up library-seeder` again (already-ingested documents are skipped). |
+| `rebuild.sh` reports `Deployment failed` but `docker compose ps` shows everything running | `docker compose up --wait` fails when any waited container **exits**, even successfully (exit `0`). A one-shot service was included in the waited set. | Add the service to `ONESHOT_SERVICES` in `rebuild.sh` — see §6.3. |
+| `personal-library-mongodb is unhealthy` during `docker compose up --build`, then recovers | The `mongosh` probe is a full Node.js runtime and times out while the Maven/Vite builds saturate the CPU. Enough consecutive timeouts mark it unhealthy, and every `depends_on: service_healthy` consumer then aborts. | Fixed — `mongodb` and `mongo-express` now carry generous `start_period` values (failures inside `start_period` do not count toward `retries`). A genuinely dead service still fails. |
+| Verification prints `Qdrant collection ... is missing` | `initialize-schema` is not `true`, so nothing ever creates the collection and every index call fails silently behind a `warn` | Ensure `initialize-schema: true` in **both** `application.yml` and `application-docker.yml` (§4.5), then restart the app. |
 
 ---
 

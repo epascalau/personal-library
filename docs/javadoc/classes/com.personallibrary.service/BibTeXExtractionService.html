@@ -63,8 +63,8 @@
               </tr>
             
               <tr>
-                <td class="type-col">private ObjectMapper</td>
-                <td class="name-col"><code>objectMapper</code></td>
+                <td class="type-col">private JsonMapper</td>
+                <td class="name-col"><code>jsonMapper</code></td>
                 <td class="desc-col">-</td>
               </tr>
             
@@ -91,7 +91,7 @@
                 <td class="type-col">public BibTeXExtractionServic</td>
                 <td class="desc-col">
                   <strong><a href="#method-0">e</a></strong>(Object param)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Constructs the extraction service with the primary AI chat client.  WHAT: Injects the Llama ChatClient and Jackson ObjectMapper for parsing LLM JSON responses. WHY: Employs Llama 3.3&#39;s analytical comprehension to extract bibliographic fields from messy document text.  /</div>
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Constructs the extraction service with the primary AI chat client.  WHAT: Injects the Llama ChatClient and Spring Boot&#39;s auto-configured Jackson 3 {@link JsonMapper} (replacing the Jackson 2 {@code ObjectMapper} used prior to the Spring Boot 4 migration) for parsing LLM JSON responses. WHY: Employs Llama 3.3&#39;s analytical comprehension to extract bibliographic fields from messy document text.  /</div>
                 </td>
               </tr>
             
@@ -675,12 +675,12 @@
             <div class="signature">
               public BibTeXExtractionServic <strong>e</strong>(Object param)
             </div>
-            <p>Constructs the extraction service with the primary AI chat client.  WHAT: Injects the Llama ChatClient and Jackson ObjectMapper for parsing LLM JSON responses. WHY: Employs Llama 3.3&#39;s analytical comprehension to extract bibliographic fields from messy document text.  /</p>
+            <p>Constructs the extraction service with the primary AI chat client.  WHAT: Injects the Llama ChatClient and Spring Boot&#39;s auto-configured Jackson 3 {@link JsonMapper} (replacing the Jackson 2 {@code ObjectMapper} used prior to the Spring Boot 4 migration) for parsing LLM JSON responses. WHY: Employs Llama 3.3&#39;s analytical comprehension to extract bibliographic fields from messy document text.  /</p>
 
             
               <dl class="param-list">
                 <dt>Parameters:</dt>
-                <dd><code>chatClient</code> - Llama AI chat client.</dd><dd><code>objectMapper</code> - Jackson JSON object mapper.</dd>
+                <dd><code>chatClient</code> - Llama AI chat client.</dd><dd><code>jsonMapper</code> - Jackson 3 JSON mapper.</dd>
               </dl>
             
 

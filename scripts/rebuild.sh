@@ -44,6 +44,20 @@ FORCE=false           # required alongside a purge flag in non-interactive shell
 # NEVER deleted by this script.
 readonly GENERATED_DOC_DIRS=(docs/typescript docs/javadoc docs/diagrams)
 
+# docs/typescript and docs/javadoc are 100% generated. docs/diagrams is NOT: it
+# mixes generated renditions with the hand-authored sources below, which no
+# generator can recreate (architecture_diagrams.mmd is an *input* to
+# generate-architecture-from-mmd.ts; the rest have no generator at all).
+# Deleting the directory wholesale silently destroyed them, so they are skipped.
+# Keep this list in sync when adding a hand-authored file under docs/diagrams/.
+readonly PRESERVED_DIAGRAM_SOURCES=(
+  docs/diagrams/MINDMAP.md
+  docs/diagrams/architecture_diagrams.mmd
+  docs/diagrams/rag_data_flow.drawio
+  docs/diagrams/system_architecture.drawio
+  docs/diagrams/system_architecture.puml
+)
+
 readonly UI_URL="http://localhost:13000/"
 readonly API_URL="http://localhost:18080/api/v1/documents"
 readonly HEALTH_URL="http://localhost:18080/actuator/health"
@@ -216,6 +230,20 @@ artifacts=(dist target server.js)
 # itself — docs/ also holds hand-authored specs, presentations, openapi.yaml,
 # and the BPMN file that no npm task can recreate.
 $DEEP && artifacts+=("${GENERATED_DOC_DIRS[@]}" node_modules)
+
+# Stash the hand-authored sources that live inside docs/diagrams/ so the
+# directory delete below cannot destroy them, then put them back afterwards.
+preserve_stash=""
+if $DEEP; then
+  preserve_stash="$(mktemp -d)"
+  for src in "${PRESERVED_DIAGRAM_SOURCES[@]}"; do
+    if [[ -f "$src" ]]; then
+      mkdir -p "$preserve_stash/$(dirname "$src")"
+      cp -p -- "$src" "$preserve_stash/$src"
+    fi
+  done
+fi
+
 for artifact in "${artifacts[@]}"; do
   if [[ -e "$artifact" ]]; then
     remove_artifact "$artifact"
@@ -223,7 +251,18 @@ for artifact in "${artifacts[@]}"; do
     note "Skipped $artifact (absent)"
   fi
 done
+
 if $DEEP; then
+  restored=0
+  for src in "${PRESERVED_DIAGRAM_SOURCES[@]}"; do
+    if [[ -f "$preserve_stash/$src" ]]; then
+      mkdir -p "$(dirname "$src")"
+      cp -p -- "$preserve_stash/$src" "$src"
+      restored=$((restored + 1))
+    fi
+  done
+  rm -rf -- "$preserve_stash"
+  (( restored > 0 )) && ok "Preserved $restored hand-authored diagram source(s) in docs/diagrams/."
   note "Hand-authored docs/ content preserved (specs, presentations, openapi.yaml, BPMN, ...)."
 fi
 
@@ -237,6 +276,15 @@ fi
 if $CLEAN_ONLY; then
   printf '\n%s✓ Clean complete in %ds. Build and deploy skipped (--clean-only).%s\n' \
     "$C_GREEN$C_BOLD" "$((SECONDS - START_TS))" "$C_RESET"
+  if $DEEP; then
+    # --deep removed node_modules and the committed generated-doc trees, and
+    # --clean-only exits before the phases that would rebuild them. Say so
+    # explicitly: otherwise the next `git status` shows ~200 deleted files with
+    # no obvious cause.
+    warn "--deep also removed node_modules and the generated documentation."
+    info "Restore them with:"
+    info "    npm ci && npm run docs && npm run diagrams"
+  fi
   exit 0
 fi
 
@@ -262,6 +310,25 @@ else
   warn "npm not found on the host; relying on the in-container build."
 fi
 
+# --- Phase 3b: regenerate the documentation --deep just deleted -------------
+# Without this, a --deep run leaves ~200 tracked files missing from git and the
+# next `git status` is a wall of spurious deletions. These dirs are committed
+# artifacts, so the reset is only truly reversible once they are rebuilt.
+if $DEEP && [[ -d node_modules ]]; then
+  step "Regenerating API documentation and diagrams"
+  if npm run --silent docs >/dev/null 2>&1; then
+    ok "Regenerated docs/typescript and docs/javadoc."
+  else
+    warn "npm run docs failed; regenerate manually before committing."
+  fi
+  if npm run --silent diagrams >/dev/null 2>&1; then
+    ok "Regenerated docs/diagrams."
+  else
+    warn "npm run diagrams failed; regenerate manually before committing."
+  fi
+  info "Review with 'git status docs/' — regenerated output may legitimately differ."
+fi
+
 # --- Phase 4: build ---------------------------------------------------------
 step "Building the container image (frontend bundle + Spring Boot JAR)"
 build_cmd=(docker compose build)
@@ -272,16 +339,42 @@ ok "Image built."
 
 # --- Phase 5: deploy --------------------------------------------------------
 step "Deploying the stack"
+# `--wait` blocks until every service with a healthcheck reports healthy, so a
+# failure here means a service genuinely did not come up.
+#
+# Caveat: `--wait` also fails when *any* waited container exits — including a
+# one-shot job that completed successfully with exit code 0. `library-seeder`
+# is exactly such a job (it uploads the starter documents and terminates), so
+# waiting on it turns every successful deployment into a reported failure.
+# It is therefore excluded from the waited set and started separately below.
+# Plain `docker compose up` is unaffected and still seeds as documented.
+readonly ONESHOT_SERVICES=("library-seeder")
+wait_services=()
+while IFS= read -r svc; do
+  for oneshot in "${ONESHOT_SERVICES[@]}"; do
+    [[ "$svc" == "$oneshot" ]] && continue 2
+  done
+  wait_services+=("$svc")
+done < <(docker compose config --services)
+
 up_cmd=(docker compose up -d --wait)
 $PULL && up_cmd+=(--pull always)
-# --wait blocks until every service with a healthcheck reports healthy, so a
-# failure here means a service genuinely did not come up.
+up_cmd+=("${wait_services[@]}")
 if ! "${up_cmd[@]}"; then
   warn "Services did not all become healthy. Recent application logs:"
   docker compose logs --tail=40 personal-library-app || true
   fail "Deployment failed."
 fi
 ok "All services report healthy."
+
+# Starter-document seeding runs after the stack is confirmed healthy. It is
+# intentionally non-fatal: a failed seed (no network, CDN unreachable) must not
+# fail an otherwise good deployment.
+if ! docker compose up -d --no-deps library-seeder >/dev/null 2>&1; then
+  warn "Could not start library-seeder; starter documents may be missing."
+else
+  note "Starter-document seeding started (see: docker compose logs library-seeder)."
+fi
 docker compose ps --format 'table {{.Service}}\t{{.Status}}'
 
 # --- Phase 6: verify --------------------------------------------------------
@@ -313,6 +406,30 @@ else
   else
     warn "No Ollama models present yet; they may still be downloading."
     note "Follow progress: docker compose logs -f ollama | grep ollama-entrypoint"
+  fi
+
+  # A healthy stack is NOT evidence of a working one. Indexing failures in
+  # VectorRagService are caught and logged at WARN while uploads still return
+  # 200, so documents can appear in the UI with zero embeddings behind them —
+  # RAG then silently answers from the model's own training data instead of the
+  # library. The only honest check is asking Qdrant how many vectors it holds.
+  vector_status="$(curl -s --max-time 20 \
+    "http://localhost:${QDRANT_HOST_PORT:-16333}/collections/personal_library_embeddings" 2>/dev/null || true)"
+  if [[ -z "$vector_status" ]]; then
+    warn "Qdrant did not respond; vector search is unavailable."
+  elif grep -q '"status":"ok"' <<<"$vector_status"; then
+    points="$(sed -n 's/.*"points_count":\([0-9]*\).*/\1/p' <<<"$vector_status")"
+    if [[ "${points:-0}" -gt 0 ]]; then
+      ok "Qdrant vectors indexed: ${points} point(s)."
+    else
+      note "Qdrant collection exists but holds 0 vectors (expected on a fresh"
+      note "  purge until seeding/upload completes; otherwise indexing is failing:"
+      note "  docker compose logs personal-library-app | grep -i 'vector\\|qdrant'"
+    fi
+  else
+    warn "Qdrant collection 'personal_library_embeddings' is missing."
+    note "It is created at startup by 'initialize-schema: true'. Without it, every"
+    note "  index call fails and RAG answers are ungrounded."
   fi
 
   $verify_failed && fail "Deployment verification failed; see the warnings above."

@@ -14,7 +14,7 @@ This document is the authoritative technical reference for the **Personal Librar
 | AI Orchestration | Spring AI | 2.0.1 | Ollama chat/embedding client + Qdrant vector store client, both auto-configured from `application.yml`. |
 | Language runtime | Java | 21 | LTS; required by `pom.xml` `<java.version>`. |
 | Persistence (documents) | MongoDB | 7.0 | `spring-boot-starter-data-mongodb`; property prefix is `spring.mongodb.*` in Spring Boot 4 (not the deprecated `spring.data.mongodb.*`). |
-| Persistence (vectors) | Qdrant | v1.11.0 | Connected over gRPC (port 6334) for binary embedding transfer. |
+| Persistence (vectors) | Qdrant | v1.18.0 | Connected over gRPC (port 6334) for binary embedding transfer. |
 | LLM inference | Ollama | `llama3.2`/`llama3.3`, `mistral`, `nomic-embed-text` | Local, no cloud egress; see §5. |
 | Authentication | Keycloak | 24.0.5 | OAuth2/OIDC Resource Server (`spring-boot-starter-oauth2-resource-server`) validating Bearer JWTs. |
 | Document text extraction | Apache Tika | 2.9.2 | `tika-core` + `tika-parsers-standard-package`; parses PDF/DOCX/DOC/XLS/PPT/TXT/MD. |
@@ -227,7 +227,7 @@ All commands run from the repository root. The system `mvn` binary is used direc
 | Profile | Activated by | Key differences from base `application.yml` |
 | :--- | :--- | :--- |
 | *(default)* | No `SPRING_PROFILES_ACTIVE` set (local `mvn`/IDE run) | All service hosts default to `localhost`; Qdrant `initialize-schema: true` (auto-creates the collection on startup — safe for a single local instance). |
-| `docker` | `SPRING_PROFILES_ACTIVE=docker` (set in `docker-compose.yml`) | `application-docker.yml` overrides hostnames to the Compose service names (`mongodb`, `qdrant`, `ollama`, `keycloak`); `initialize-schema: false` to avoid a startup race condition if this service were ever horizontally scaled to multiple replicas sharing one Qdrant instance. |
+| `docker` | `SPRING_PROFILES_ACTIVE=docker` (set in `docker-compose.yml`) | `application-docker.yml` overrides hostnames to the Compose service names (`mongodb`, `qdrant`, `ollama`, `keycloak`); Qdrant `initialize-schema: true`, as in the default profile. It was once `false` to avoid a startup race if this service were ever scaled to multiple replicas, but nothing else provisioned the collection, so **every** index call failed with "Collection `personal_library_embeddings` doesn't exist!" — caught and logged at `warn`, leaving uploads returning 200 while Qdrant stayed empty. The stack runs a single replica, so the race it guarded against cannot occur. See [DEVOPS_GUIDE.md §4.5](DEVOPS_GUIDE.md). |
 
 ### 9.2 Resolving a locally root-owned `target/`
 If `target/` was last written by a container-run Maven build (bind-mounted into the container, built as root), a host-side `mvn compile`/`package` will fail with `Operation not permitted`. Verified workaround used during backend development in this repo: generate the dependency classpath with `mvn -o dependency:build-classpath -Dmdep.outputFile=/tmp/cp.txt`, then compile directly with `javac -cp "$(cat /tmp/cp.txt)" -processorpath <lombok-jar> -d /tmp/scratch-out @<(find src/main/java -name '*.java')` — this sidesteps Maven's own `target/` output directory entirely for a quick correctness check, though a real `mvn package` (for an actual deployable JAR) still requires fixing the directory ownership first (e.g., via `docker compose build`, which runs its own isolated build inside the container and writes the final JAR into the image layer, not back onto the host bind mount).

@@ -41,6 +41,14 @@
             <tr>
               <td class="name-col">
                 <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.controller/ApiExceptionHandler.html">ApiExceptionHandler</a>
+              </td>
+              <td class="desc-col">Centralized REST exception translation, mapping internal service-layer exceptions to the HTTP status codes documented in the project&#39;s OpenAPI 3.0 contract (openapi.yaml).  WHAT: Converts {@link NoSuchElementException} (document, version, or snapshot not found) into HTTP 404, and {@link IllegalArgumentException} (invalid client-supplied state, e.g. rolling back to the already-active version) into HTTP 400, each with a small JSON error body. WHY: Without this advice, Spring&#39;s default error handling surfaces these as HTTP 500 Internal Server Error, which both leaks stack traces and contradicts the documented `404`/`400` response codes for endpoints like `GET /documents/{guid}`, `GET /documents/{guid}/versions/{version}/download`, and `POST /documents/{guid}/rollback/{version}`.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
                 <a href="../classes/com.personallibrary.controller/AuthController.html">AuthController</a>
               </td>
               <td class="desc-col">Controller handling Keycloak OpenID Connect authentication session probing, userinfo resolution, and token exchange.  /</td>
@@ -49,9 +57,25 @@
             <tr>
               <td class="name-col">
                 <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.controller/ChatController.html">ChatController</a>
+              </td>
+              <td class="desc-col">Top-level convenience REST controller exposing `/chat` as a flat alternative to the document-scoped `/documents/{guid}/chat` RAG endpoint.  WHAT: Accepts a document identifier inline in the request body (as `documentGuid` or `guid`) instead of as a path variable, then delegates to the same {@link VectorRagService} RAG pipeline. WHY: Documented in the project&#39;s OpenAPI 3.0 contract (openapi.yaml) as a convenience endpoint for API consumers that prefer a single flat chat resource over nested per-document paths.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
                 <a href="../classes/com.personallibrary.controller/DocumentController.html">DocumentController</a>
               </td>
               <td class="desc-col">REST Controller exposing document management endpoints for the SAP Fiori floorplans: List Report querying with multi-attribute filtering, Object Page details, file uploads with automated BibTeX extraction and dual summarization, in-place version overwriting, and RAG conversational search.  /</td>
+            </tr>
+          
+            <tr>
+              <td class="name-col">
+                <span class="tag-badge" style="font-size: 0.75rem; margin-right: 0.5rem;">class</span>
+                <a href="../classes/com.personallibrary.controller/HealthController.html">HealthController</a>
+              </td>
+              <td class="desc-col">Controller reporting aggregate health status of the Java Spring Boot backend, mirroring the shape returned by the Node.js Integrated Gateway&#39;s `/api/v1/health` endpoint.  /</td>
             </tr>
           
         </tbody>

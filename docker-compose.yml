@@ -13,7 +13,9 @@ services:
       - "18080:18080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATA_MONGODB_URI=mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
+      # Spring Boot 4 renamed this prefix: "spring.data.mongodb" is a hard deprecation
+      # that is SILENTLY ignored, so the old SPRING_DATA_MONGODB_URI name had no effect.
+      - SPRING_MONGODB_URI=mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6334
       - OLLAMA_BASE_URL=http://ollama:11434
@@ -143,10 +145,19 @@ services:
     volumes:
       - mongodb_data:/data/db
     healthcheck:
+      # `mongosh` is a full Node.js runtime, so this probe is far heavier than a
+      # TCP check. While `docker compose up --build` is saturating the CPU with
+      # the Maven and Vite builds, it can exceed a short timeout repeatedly and
+      # trip `retries` before Mongo is genuinely slow or broken — which then
+      # cascades, because every `depends_on: service_healthy` consumer aborts.
+      # `start_period` exists precisely for this: failures inside it do not count
+      # toward `retries`, so a slow start is tolerated while a genuinely dead
+      # Mongo still fails the deployment.
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
+      start_period: 60s
     networks:
       - library-net
 
@@ -178,11 +189,15 @@ services:
       mongodb:
         condition: service_healthy
     healthcheck:
+      # Generous start_period for the same reason as mongodb above: this viewer
+      # starts last, when the build is still loading the host, and a handful of
+      # timed-out probes must not mark an ancillary debugging tool "unhealthy"
+      # and so fail `docker compose up --wait` for the entire stack.
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8081/ > /dev/null 2>&1 || exit 1"]
       interval: 15s
-      timeout: 5s
+      timeout: 10s
       retries: 5
-      start_period: 15s
+      start_period: 90s
     networks:
       - library-net
 

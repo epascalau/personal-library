@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HealthController (com.personallibrary.controller) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.controller.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.controller.html">com.personallibrary.controller</a> &gt;
+      <strong>HealthController</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.controller</div>
+        <h2>class HealthController</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Slf4j</span>  <span class="annotation">@RestController</span>  <span class="annotation">@RequestMapping(&quot;/api/v1&quot;)</span>  <span class="annotation">@RequiredArgsConstructor</span>  <span class="annotation">@Tag(name = &quot;Health&quot;, description = &quot;Aggregate backend, AI model, vector store, and identity provider health status&quot;)</span> </div>
+        <div class="signature">
+          public class <strong>HealthController</strong>
+          
+          
+        </div>
+        <p>Controller reporting aggregate health status of the Java Spring Boot backend, mirroring the shape returned by the Node.js Integrated Gateway&#39;s `/api/v1/health` endpoint.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-10-06</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private DocumentRepository</td>
+                <td class="name-col"><code>documentRepository</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private Optional&lt;BuildProperties&gt;</td>
+                <td class="name-col"><code>buildProperties</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>ollamaBaseUrl</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>llamaModelName</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>mistralModelName</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>serverPort</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>qdrantCollectionName</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>modelStatus</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>modelState</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>false</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private return</td>
+                <td class="name-col"><code>0</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public ofSecond</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">s</a></strong>(Object 3)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public Object&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">health</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Reports detailed health status of application, AI models, vector database, and MongoDB.  WHAT: Probes the local Ollama daemon&#39;s `/api/tags` endpoint for reachability, counts indexed documents via MongoDB, and assembles uptime, model, vector store, and build metadata into a single JSON payload matching the Node.js Integrated Gateway&#39;s `/api/v1/health` contract. WHY: The frontend&#39;s `RestBackendAdapter` probes `/health` on whichever backend target is selected (Integrated Gateway or Direct Java Spring Boot); without this endpoint, the Java backend returned a 404 on every 30-second poll, forcing a slower fallback probe and generating log/network noise.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public probeOllam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-2">a</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public safeCoun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">t</a></strong>(Object &quot;status&quot;, Object &quot;UP&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">t</a></strong>(Object &quot;timestamp&quot;, Object Instant.now()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-6">t</a></strong>(Object &quot;name&quot;, &quot;Personal Library Spring Boot Backend&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">t</a></strong>(Object &quot;port&quot;, Object serverPort)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">t</a></strong>(Object &quot;version&quot;, Object buildProperties.map(BuildProperties::getVersion)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-9">t</a></strong>(Object &quot;status&quot;, Object &quot;RUNNING&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-10">t</a></strong>(Object &quot;server&quot;, Object server)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-11">t</a></strong>(Object &quot;id&quot;, Object llamaModelName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-12">t</a></strong>(Object &quot;name&quot;, &quot;Ollama Llama 3.3 (70B Instruct)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-13">t</a></strong>(Object &quot;status&quot;, Object modelStatus)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-14">t</a></strong>(Object &quot;framework&quot;, &quot;Spring AI / Local Ollama Engine&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-15">t</a></strong>(Object &quot;state&quot;, Object modelState)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-16">t</a></strong>(Object &quot;id&quot;, Object mistralModelName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-17">t</a></strong>(Object &quot;name&quot;, &quot;Ollama Mistral Large (2411)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-18">t</a></strong>(Object &quot;status&quot;, Object modelStatus)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-19">t</a></strong>(Object &quot;framework&quot;, &quot;Spring AI / Local Ollama Engine&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-20">t</a></strong>(Object &quot;state&quot;, Object modelState)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-21">t</a></strong>(Object &quot;llama3_3&quot;, Object llama)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">t</a></strong>(Object &quot;mistralLarge&quot;, Object mistral)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">t</a></strong>(Object &quot;models&quot;, Object models)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">t</a></strong>(Object &quot;engine&quot;, &quot;Qdrant Vector Database&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">t</a></strong>(Object &quot;status&quot;, Object &quot;RUNNING&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">t</a></strong>(Object &quot;collection&quot;, Object qdrantCollectionName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">t</a></strong>(Object &quot;indexedDocuments&quot;, Object indexedDocuments)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">t</a></strong>(Object &quot;vectorStore&quot;, Object vectorStore)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">k</a></strong>(Object body)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private boolean</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">probeOllama</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Performs a short-timeout GET request against the local Ollama daemon&#39;s model listing endpoint.  WHAT: Sends `GET {ollamaBaseUrl}/api/tags` with a 3-second timeout and checks for HTTP 200. WHY: Confirms the Ollama container is actually reachable from the Java backend&#39;s network namespace, rather than assuming availability from configuration alone.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public newBuilde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-31">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public newBuilde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-32">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ur</td>
+                <td class="desc-col">
+                  <strong><a href="#method-33">i</a></strong>(URI.create(ollamaBaseUrl + &quot;/api/tags&quot;)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public timeou</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">t</a></strong>(Object PROBE_TIMEOUT)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public GE</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">T</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-36">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public sen</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">d</a></strong>(Object request, Object HttpResponse.BodyHandlers.discarding()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public statusCod</td>
+                <td class="desc-col">
+                  <strong><a href="#method-38">e</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-39">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public debu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-40">g</a></strong>(&quot;Ollama health probe failed: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private long</td>
+                <td class="desc-col">
+                  <strong><a href="#method-41">safeCount</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Counts persisted documents, tolerating transient MongoDB connectivity issues.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public coun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-42">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public catc</td>
+                <td class="desc-col">
+                  <strong><a href="#method-43">h</a></strong>(Exception e)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public debu</td>
+                <td class="desc-col">
+                  <strong><a href="#method-44">g</a></strong>(&quot;Document count query failed during health check: {}&quot;, Object e.getMessage()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public ofSecond <strong>s</strong>(Object 3)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">health</div>
+            <div><span class="annotation">@GetMapping({&quot;/health&quot;, &quot;/status&quot;})</span>  <span class="annotation">@Operation(summary = &quot;Aggregate backend health&quot;, description = &quot;Reports Ollama, MongoDB, and Qdrant vector store readiness&quot;)</span> </div>
+            <div class="signature">
+              public Object&gt;&gt; <strong>health</strong>()
+            </div>
+            <p>Reports detailed health status of application, AI models, vector database, and MongoDB.  WHAT: Probes the local Ollama daemon&#39;s `/api/tags` endpoint for reachability, counts indexed documents via MongoDB, and assembles uptime, model, vector store, and build metadata into a single JSON payload matching the Node.js Integrated Gateway&#39;s `/api/v1/health` contract. WHY: The frontend&#39;s `RestBackendAdapter` probes `/health` on whichever backend target is selected (Integrated Gateway or Direct Java Spring Boot); without this endpoint, the Java backend returned a 404 on every 30-second poll, forcing a slower fallback probe and generating log/network noise.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>JSON health payload with `status: &quot;UP&quot;` when reachable, mirroring the gateway&#39;s schema.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
+            <div class="detail-title">a</div>
+            
+            <div class="signature">
+              public probeOllam <strong>a</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public safeCoun <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;status&quot;, Object &quot;UP&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;timestamp&quot;, Object Instant.now()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;name&quot;, &quot;Personal Library Spring Boot Backend&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;port&quot;, Object serverPort)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;version&quot;, Object buildProperties.map(BuildProperties::getVersion)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;status&quot;, Object &quot;RUNNING&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-10">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;server&quot;, Object server)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-11">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;id&quot;, Object llamaModelName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-12">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;name&quot;, &quot;Ollama Llama 3.3 (70B Instruct)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-13">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;status&quot;, Object modelStatus)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-14">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;framework&quot;, &quot;Spring AI / Local Ollama Engine&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-15">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;state&quot;, Object modelState)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-16">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;id&quot;, Object mistralModelName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-17">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;name&quot;, &quot;Ollama Mistral Large (2411)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-18">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;status&quot;, Object modelStatus)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-19">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;framework&quot;, &quot;Spring AI / Local Ollama Engine&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-20">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;state&quot;, Object modelState)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;llama3_3&quot;, Object llama)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;mistralLarge&quot;, Object mistral)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;models&quot;, Object models)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;engine&quot;, &quot;Qdrant Vector Database&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;status&quot;, Object &quot;RUNNING&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;collection&quot;, Object qdrantCollectionName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;indexedDocuments&quot;, Object indexedDocuments)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public pu <strong>t</strong>(Object &quot;vectorStore&quot;, Object vectorStore)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object body)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">probeOllama</div>
+            
+            <div class="signature">
+              private boolean <strong>probeOllama</strong>()
+            </div>
+            <p>Performs a short-timeout GET request against the local Ollama daemon&#39;s model listing endpoint.  WHAT: Sends `GET {ollamaBaseUrl}/api/tags` with a 3-second timeout and checks for HTTP 200. WHY: Confirms the Ollama container is actually reachable from the Java backend&#39;s network namespace, rather than assuming availability from configuration alone.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>true if Ollama responded successfully; false otherwise.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-31">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public newBuilde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-32">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public newBuilde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-33">
+            <div class="detail-title">i</div>
+            
+            <div class="signature">
+              public ur <strong>i</strong>(URI.create(ollamaBaseUrl + &quot;/api/tags&quot;)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-34">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public timeou <strong>t</strong>(Object PROBE_TIMEOUT)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-35">
+            <div class="detail-title">T</div>
+            
+            <div class="signature">
+              public GE <strong>T</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-36">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-37">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public sen <strong>d</strong>(Object request, Object HttpResponse.BodyHandlers.discarding()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-38">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public statusCod <strong>e</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-39">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-40">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public debu <strong>g</strong>(&quot;Ollama health probe failed: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-41">
+            <div class="detail-title">safeCount</div>
+            
+            <div class="signature">
+              private long <strong>safeCount</strong>()
+            </div>
+            <p>Counts persisted documents, tolerating transient MongoDB connectivity issues.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Document count, or 0 if the count query fails.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-42">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public coun <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-43">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public catc <strong>h</strong>(Exception e)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-44">
+            <div class="detail-title">g</div>
+            
+            <div class="signature">
+              public debu <strong>g</strong>(&quot;Document count query failed during health check: {}&quot;, Object e.getMessage()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

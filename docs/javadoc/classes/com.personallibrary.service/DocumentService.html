@@ -98,6 +98,12 @@
                 <td class="desc-col">-</td>
               </tr>
             
+              <tr>
+                <td class="type-col">private int</td>
+                <td class="name-col"><code>newVersionNumber</code></td>
+                <td class="desc-col">-</td>
+              </tr>
+            
           </tbody>
         </table>
       
@@ -152,7 +158,7 @@
               <tr>
                 <td class="type-col">public storeFil</td>
                 <td class="desc-col">
-                  <strong><a href="#method-4">e</a></strong>(Object file, Object guid)
+                  <strong><a href="#method-4">e</a></strong>(Object file, Object guid, Object 1)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -377,7 +383,7 @@
                 <td class="type-col">public DocumentResponse</td>
                 <td class="desc-col">
                   <strong><a href="#method-32">overwriteDocument</a></strong>(String existingGuid, MultipartFile newFile, BibTeXMetadata updatedBibtex)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Overwrites an existing document&#39;s file content and metadata in-place while retaining its persistent GUID. Advances the internal version sequence number.  WHAT: Replaces physical asset on disk, extracts new text content, updates BibTeX metadata, re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments versionNumber. WHY: Retaining the existing document GUID preserves deep links, bookmark URLs, and Object Page routes while accurately reflecting updated revisions and version history.  /</div>
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Overwrites an existing document&#39;s file content and metadata in-place while retaining its persistent GUID. Advances the internal version sequence number and archives the prior state as an immutable snapshot.  WHAT: Archives the current state into {@code versionHistory}, replaces physical asset on disk (in a version-isolated subdirectory so the prior asset&#39;s bytes are never touched), extracts new text content, updates BibTeX metadata, re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments versionNumber. WHY: Retaining the existing document GUID preserves deep links, bookmark URLs, and Object Page routes while accurately reflecting updated revisions. Archiving a full snapshot before mutating the entity is what makes {@link #getVersionHistory(String)}, {@link #getHistoricalDownloadAsset(String, int)}, and {@link #rollbackToVersion(String, int)} possible.  /</div>
                 </td>
               </tr>
             
@@ -390,23 +396,23 @@
               </tr>
             
               <tr>
+                <td class="type-col">public getVersionNumbe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getVersionHistor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">y</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
                 <td class="type-col">public getOriginalFilenam</td>
-                <td class="desc-col">
-                  <strong><a href="#method-34">e</a></strong>()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public getFileExtensio</td>
-                <td class="desc-col">
-                  <strong><a href="#method-35">n</a></strong>(Object fileName)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public getSiz</td>
                 <td class="desc-col">
                   <strong><a href="#method-36">e</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
@@ -414,9 +420,25 @@
               </tr>
             
               <tr>
+                <td class="type-col">public getFileExtensio</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">n</a></strong>(Object fileName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getSiz</td>
+                <td class="desc-col">
+                  <strong><a href="#method-38">e</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
                 <td class="type-col">public i</td>
                 <td class="desc-col">
-                  <strong><a href="#method-37">f</a></strong>(newFile != null)
+                  <strong><a href="#method-39">f</a></strong>(newFile != null)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -424,7 +446,7 @@
               <tr>
                 <td class="type-col">public storeFil</td>
                 <td class="desc-col">
-                  <strong><a href="#method-38">e</a></strong>(Object newFile, Object existingGuid)
+                  <strong><a href="#method-40">e</a></strong>(Object newFile, Object existingGuid, Object newVersionNumber)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -432,7 +454,7 @@
               <tr>
                 <td class="type-col">public toStrin</td>
                 <td class="desc-col">
-                  <strong><a href="#method-39">g</a></strong>()
+                  <strong><a href="#method-41">g</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -440,7 +462,7 @@
               <tr>
                 <td class="type-col">public extractTextConten</td>
                 <td class="desc-col">
-                  <strong><a href="#method-40">t</a></strong>(Object storedPath)
+                  <strong><a href="#method-42">t</a></strong>(Object storedPath)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -448,7 +470,7 @@
               <tr>
                 <td class="type-col">public getPhysicalFilePat</td>
                 <td class="desc-col">
-                  <strong><a href="#method-41">h</a></strong>()
+                  <strong><a href="#method-43">h</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -456,7 +478,7 @@
               <tr>
                 <td class="type-col">public getFullConten</td>
                 <td class="desc-col">
-                  <strong><a href="#method-42">t</a></strong>()
+                  <strong><a href="#method-44">t</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -464,7 +486,7 @@
               <tr>
                 <td class="type-col">public getBibte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-43">x</a></strong>()
+                  <strong><a href="#method-45">x</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -472,7 +494,7 @@
               <tr>
                 <td class="type-col">public indexDocumentChunk</td>
                 <td class="desc-col">
-                  <strong><a href="#method-44">s</a></strong>(Object existingGuid, Object textContent)
+                  <strong><a href="#method-46">s</a></strong>(Object existingGuid, Object textContent)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -480,7 +502,7 @@
               <tr>
                 <td class="type-col">public generateDualSummarie</td>
                 <td class="desc-col">
-                  <strong><a href="#method-45">s</a></strong>(Object finalBibtex.getTitle()
+                  <strong><a href="#method-47">s</a></strong>(Object finalBibtex.getTitle()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -488,7 +510,7 @@
               <tr>
                 <td class="type-col">public setFileNam</td>
                 <td class="desc-col">
-                  <strong><a href="#method-46">e</a></strong>(Object fileName)
+                  <strong><a href="#method-48">e</a></strong>(Object fileName)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -496,7 +518,7 @@
               <tr>
                 <td class="type-col">public setFileSiz</td>
                 <td class="desc-col">
-                  <strong><a href="#method-47">e</a></strong>(Object fileSize)
+                  <strong><a href="#method-49">e</a></strong>(Object fileSize)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -504,7 +526,7 @@
               <tr>
                 <td class="type-col">public setFileSizeFormatte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-48">d</a></strong>(Object DocumentEntity.formatBytes(fileSize)
+                  <strong><a href="#method-50">d</a></strong>(Object DocumentEntity.formatBytes(fileSize)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -512,7 +534,7 @@
               <tr>
                 <td class="type-col">public setForma</td>
                 <td class="desc-col">
-                  <strong><a href="#method-49">t</a></strong>(Object format)
+                  <strong><a href="#method-51">t</a></strong>(Object format)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -520,7 +542,7 @@
               <tr>
                 <td class="type-col">public setPhysicalFilePat</td>
                 <td class="desc-col">
-                  <strong><a href="#method-50">h</a></strong>(Object filePath)
+                  <strong><a href="#method-52">h</a></strong>(Object filePath)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -528,7 +550,7 @@
               <tr>
                 <td class="type-col">public setEditDat</td>
                 <td class="desc-col">
-                  <strong><a href="#method-51">e</a></strong>(Object Instant.now()
+                  <strong><a href="#method-53">e</a></strong>(Object Instant.now()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -536,7 +558,7 @@
               <tr>
                 <td class="type-col">public setVersionNumbe</td>
                 <td class="desc-col">
-                  <strong><a href="#method-52">r</a></strong>(Object (existing.getVersionNumber()
+                  <strong><a href="#method-54">r</a></strong>(Object newVersionNumber)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -544,7 +566,7 @@
               <tr>
                 <td class="type-col">public setBibte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-53">x</a></strong>(Object finalBibtex)
+                  <strong><a href="#method-55">x</a></strong>(Object finalBibtex)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -552,7 +574,7 @@
               <tr>
                 <td class="type-col">public setBibtexRa</td>
                 <td class="desc-col">
-                  <strong><a href="#method-54">w</a></strong>(Object finalBibtex.toRawBibTeX()
+                  <strong><a href="#method-56">w</a></strong>(Object finalBibtex.toRawBibTeX()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -560,7 +582,7 @@
               <tr>
                 <td class="type-col">public setSummarie</td>
                 <td class="desc-col">
-                  <strong><a href="#method-55">s</a></strong>(Object summaries)
+                  <strong><a href="#method-57">s</a></strong>(Object summaries)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -568,7 +590,7 @@
               <tr>
                 <td class="type-col">public setContentExcerp</td>
                 <td class="desc-col">
-                  <strong><a href="#method-56">t</a></strong>(Object textContent.substring(0, Object Math.min(textContent.length()
+                  <strong><a href="#method-58">t</a></strong>(Object textContent.substring(0, Object Math.min(textContent.length()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -576,7 +598,7 @@
               <tr>
                 <td class="type-col">public setFullConten</td>
                 <td class="desc-col">
-                  <strong><a href="#method-57">t</a></strong>(Object textContent)
+                  <strong><a href="#method-59">t</a></strong>(Object textContent)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -584,7 +606,7 @@
               <tr>
                 <td class="type-col">public setChunk</td>
                 <td class="desc-col">
-                  <strong><a href="#method-58">s</a></strong>(Object chunks)
+                  <strong><a href="#method-60">s</a></strong>(Object chunks)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -592,7 +614,7 @@
               <tr>
                 <td class="type-col">public sav</td>
                 <td class="desc-col">
-                  <strong><a href="#method-59">e</a></strong>(Object existing)
+                  <strong><a href="#method-61">e</a></strong>(Object existing)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -600,7 +622,7 @@
               <tr>
                 <td class="type-col">public inf</td>
                 <td class="desc-col">
-                  <strong><a href="#method-60">o</a></strong>(&quot;Document content overwritten in-place for GUID: {} (v{})
+                  <strong><a href="#method-62">o</a></strong>(&quot;Document content overwritten in-place for GUID: {} (v{})
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -608,53 +630,37 @@
               <tr>
                 <td class="type-col">public fromEntit</td>
                 <td class="desc-col">
-                  <strong><a href="#method-61">y</a></strong>(Object saved)
+                  <strong><a href="#method-63">y</a></strong>(Object saved)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public DocumentResponse</td>
+                <td class="type-col">public List&lt;DocumentVersionSnapshot&gt;</td>
                 <td class="desc-col">
-                  <strong><a href="#method-62">getDocumentByGuid</a></strong>(String guid)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves a single document by its GUID and transforms to response DTO.  WHAT: Finds document entity by GUID in MongoDB and converts to DocumentResponse DTO. WHY: Enforces read-only DTO boundaries for client layers, throwing standard NoSuchElementException if absent.  /</div>
+                  <strong><a href="#method-64">getVersionHistory</a></strong>(String guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves the archived historical version snapshot list for a document.  WHAT: Returns the immutable list of {@link DocumentVersionSnapshot} archived prior to each overwrite or rollback. WHY: Powers the Object Page&#39;s version history panel, letting researchers inspect or restore prior revisions without losing the currently active one.  /</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public findByGui</td>
+                <td class="type-col">public return</td>
                 <td class="desc-col">
-                  <strong><a href="#method-63">d</a></strong>(Object guid)
+                  <strong><a href="#method-65">getEntityByGuid</a></strong>(Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public orElseThro</td>
+                <td class="type-col">public DownloadAsset</td>
                 <td class="desc-col">
-                  <strong><a href="#method-64">w</a></strong>(Object ()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                  <strong><a href="#method-66">getDownloadAsset</a></strong>(String guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Resolves the physical asset for the currently active version of a document.  WHAT: Looks up the document&#39;s current physical file path and original file name. WHY: Backs the primary &quot;Download&quot; action on the Object Page, decoupled from HTTP streaming concerns.  /</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public fromEntit</td>
-                <td class="desc-col">
-                  <strong><a href="#method-65">y</a></strong>(Object entity)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public DocumentEntity</td>
-                <td class="desc-col">
-                  <strong><a href="#method-66">getEntityByGuid</a></strong>(String guid)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves the raw persistent entity by its GUID.  WHAT: Directly queries documentRepository for the DocumentEntity matching GUID. WHY: Required by internal services (e.g. storage downloads, summarization triggers) that need internal fields like physicalFilePath.  /</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public findByGui</td>
+                <td class="type-col">public getEntityByGui</td>
                 <td class="desc-col">
                   <strong><a href="#method-67">d</a></strong>(Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
@@ -662,18 +668,18 @@
               </tr>
             
               <tr>
-                <td class="type-col">public orElseThro</td>
+                <td class="type-col">public new</td>
                 <td class="desc-col">
-                  <strong><a href="#method-68">w</a></strong>(Object ()
+                  <strong><a href="#method-68">DownloadAsset</a></strong>(Object entity.getPhysicalFilePath()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public void</td>
+                <td class="type-col">public DownloadAsset</td>
                 <td class="desc-col">
-                  <strong><a href="#method-69">deleteDocument</a></strong>(String guid)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Permanently purges a document, its physical disk assets, and vector embeddings.  WHAT: Deletes disk storage files via storageService, then deletes MongoDB entity record via documentRepository. WHY: Prevents orphan disk files and stale metadata in the database when documents are deleted by users.  /</div>
+                  <strong><a href="#method-69">getHistoricalDownloadAsset</a></strong>(String guid, int targetVersion)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Resolves the physical asset for a specific historical (or current) version of a document.  WHAT: Returns the active version&#39;s asset directly if it matches the requested version number; otherwise searches {@code versionHistory} for a matching archived snapshot&#39;s preserved physical file path. WHY: Allows researchers to download any prior revision&#39;s exact original bytes, not just the latest one.  /</div>
                 </td>
               </tr>
             
@@ -686,17 +692,265 @@
               </tr>
             
               <tr>
-                <td class="type-col">public deletePhysicalAsse</td>
+                <td class="type-col">public getVersionNumbe</td>
                 <td class="desc-col">
-                  <strong><a href="#method-71">t</a></strong>(Object guid)
+                  <strong><a href="#method-71">r</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public delet</td>
+                <td class="type-col">public i</td>
                 <td class="desc-col">
-                  <strong><a href="#method-72">e</a></strong>(Object entity)
+                  <strong><a href="#method-72">f</a></strong>(currentVersion == targetVersion)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-73">DownloadAsset</a></strong>(Object entity.getPhysicalFilePath()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getVersionHistor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-74">y</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public filte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-75">r</a></strong>(v -&gt; Objects.equals(v.getVersionNumber()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public findFirs</td>
+                <td class="desc-col">
+                  <strong><a href="#method-76">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public orElseThro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-77">w</a></strong>(Object ()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-78">DownloadAsset</a></strong>(Object snapshot.getPhysicalFilePath()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public DocumentResponse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-79">rollbackToVersion</a></strong>(String guid, int targetVersion)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Rolls back the document&#39;s active state to a previously archived historical version snapshot.  WHAT: Restores metadata, BibTeX, summaries, text content, and physical file reference from the specified snapshot, re-indexes Qdrant vector chunks for the restored content, archives the current (about-to-be replaced) state as a new snapshot, and advances the version sequence counter. WHY: Provides guaranteed non-destructive rollbacks: nothing is ever deleted, the restored state simply becomes the new latest version while every prior revision (including the one just replaced) remains in {@code versionHistory} for full audit integrity.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getEntityByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-80">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getVersionNumbe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-81">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-82">f</a></strong>(currentVersion == targetVersion)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-83">IllegalArgumentException</a></strong>(&quot;Document is already at version &quot; + targetVersion)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getVersionHistor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-84">y</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public filte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-85">r</a></strong>(v -&gt; Objects.equals(v.getVersionNumber()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public findFirs</td>
+                <td class="desc-col">
+                  <strong><a href="#method-86">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public orElseThro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-87">w</a></strong>(Object ()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getVersionHistor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-88">y</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public indexDocumentChunk</td>
+                <td class="desc-col">
+                  <strong><a href="#method-89">s</a></strong>(Object guid, Object target.getFullContent()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setFileNam</td>
+                <td class="desc-col">
+                  <strong><a href="#method-90">e</a></strong>(Object target.getFileName()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setFileSiz</td>
+                <td class="desc-col">
+                  <strong><a href="#method-91">e</a></strong>(Object target.getFileSize()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setFileSizeFormatte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-92">d</a></strong>(Object target.getFileSizeFormatted()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setForma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-93">t</a></strong>(Object target.getFormat()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setPhysicalFilePat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-94">h</a></strong>(Object target.getPhysicalFilePath()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setEditDat</td>
+                <td class="desc-col">
+                  <strong><a href="#method-95">e</a></strong>(Object Instant.now()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setVersionNumbe</td>
+                <td class="desc-col">
+                  <strong><a href="#method-96">r</a></strong>(Object newVersionNumber)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setBibte</td>
+                <td class="desc-col">
+                  <strong><a href="#method-97">x</a></strong>(Object target.getBibtex()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setBibtexRa</td>
+                <td class="desc-col">
+                  <strong><a href="#method-98">w</a></strong>(Object target.getBibtexRaw()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setSummarie</td>
+                <td class="desc-col">
+                  <strong><a href="#method-99">s</a></strong>(Object target.getSummaries()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setContentExcerp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-100">t</a></strong>(Object target.getContentExcerpt()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setFullConten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-101">t</a></strong>(Object target.getFullContent()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public setChunk</td>
+                <td class="desc-col">
+                  <strong><a href="#method-102">s</a></strong>(Object chunks)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public sav</td>
+                <td class="desc-col">
+                  <strong><a href="#method-103">e</a></strong>(Object existing)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -704,119 +958,151 @@
               <tr>
                 <td class="type-col">public inf</td>
                 <td class="desc-col">
-                  <strong><a href="#method-73">o</a></strong>(&quot;Document and physical assets purged for GUID: {}&quot;, Object guid)
+                  <strong><a href="#method-104">o</a></strong>(&quot;Document rolled back for GUID: {} to snapshot v{} (new active version v{})
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public PaginatedResponse&lt;DocumentResponse&gt;</td>
+                <td class="type-col">public fromEntit</td>
                 <td class="desc-col">
-                  <strong><a href="#method-74">searchDocuments</a></strong>(String fileName, String title, String author, String edition, String format, String content, int page, int pageSize, String sortBy, String sortOrder)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Executes dynamic multi-attribute queries supporting single or combined filters across fileName, title, author, edition, format, and content for the List Report floorplan.  WHAT: Maps client sort keys to MongoDB field paths, assembles Pageable requests, calls dynamic query fragment, and maps entities to PaginatedResponse of DocumentResponse DTOs. WHY: Delivers high-performance server-side filtering, sorting, and pagination tailored specifically to the SAP Fiori List Report grid specifications.  /</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public equalsIgnoreCas</td>
-                <td class="desc-col">
-                  <strong><a href="#method-75">e</a></strong>(Object sortOrder)
+                  <strong><a href="#method-105">y</a></strong>(Object saved)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public mapSortFiel</td>
+                <td class="type-col">private DocumentVersionSnapshot</td>
                 <td class="desc-col">
-                  <strong><a href="#method-76">d</a></strong>(Object sortBy)
+                  <strong><a href="#method-106">buildSnapshot</a></strong>(DocumentEntity entity, String note)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Builds an immutable snapshot capturing a document entity&#39;s current state, for archival into {@code versionHistory} prior to an overwrite or rollback mutation.  WHAT: Copies every user-facing and physical-asset field from the live entity into a {@link DocumentVersionSnapshot}. WHY: Centralizes snapshot construction so {@link #overwriteDocument} and {@link #rollbackToVersion} cannot drift from each other on which fields get preserved.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-107">r</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public o</td>
+                <td class="type-col">public snapshotGui</td>
                 <td class="desc-col">
-                  <strong><a href="#method-77">f</a></strong>(Object Math.max(0, page - 1)
+                  <strong><a href="#method-108">d</a></strong>(&quot;snapshot-&quot; + entity.getGuid()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public searchDocument</td>
+                <td class="type-col">public versionNumbe</td>
                 <td class="desc-col">
-                  <strong><a href="#method-78">s</a></strong>(Object fileName, Object title, Object author, Object edition, Object format, Object content, Object pageable)
+                  <strong><a href="#method-109">r</a></strong>(Object entity.getVersionNumber()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public getConten</td>
+                <td class="type-col">public fileNam</td>
                 <td class="desc-col">
-                  <strong><a href="#method-79">t</a></strong>()
+                  <strong><a href="#method-110">e</a></strong>(Object entity.getFileName()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public ma</td>
+                <td class="type-col">public fileSiz</td>
                 <td class="desc-col">
-                  <strong><a href="#method-80">p</a></strong>(Object DocumentResponse::fromEntity)
+                  <strong><a href="#method-111">e</a></strong>(Object entity.getFileSize()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public toLis</td>
+                <td class="type-col">public fileSizeFormatte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-81">t</a></strong>()
+                  <strong><a href="#method-112">d</a></strong>(Object entity.getFileSizeFormatted()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public &lt;DocumentResponse&gt;builde</td>
+                <td class="type-col">public forma</td>
                 <td class="desc-col">
-                  <strong><a href="#method-82">r</a></strong>()
+                  <strong><a href="#method-113">t</a></strong>(Object entity.getFormat()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public item</td>
+                <td class="type-col">public physicalFilePat</td>
                 <td class="desc-col">
-                  <strong><a href="#method-83">s</a></strong>(Object dtos)
+                  <strong><a href="#method-114">h</a></strong>(Object entity.getPhysicalFilePath()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public totalCoun</td>
+                <td class="type-col">public savedA</td>
                 <td class="desc-col">
-                  <strong><a href="#method-84">t</a></strong>(Object entityPage.getTotalElements()
+                  <strong><a href="#method-115">t</a></strong>(Object entity.getEditDate()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public pag</td>
+                <td class="type-col">public bibte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-85">e</a></strong>(Object page)
+                  <strong><a href="#method-116">x</a></strong>(Object entity.getBibtex()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public pageSiz</td>
+                <td class="type-col">public bibtexRa</td>
                 <td class="desc-col">
-                  <strong><a href="#method-86">e</a></strong>(Object pageSize)
+                  <strong><a href="#method-117">w</a></strong>(Object entity.getBibtexRaw()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public totalPage</td>
+                <td class="type-col">public summarie</td>
                 <td class="desc-col">
-                  <strong><a href="#method-87">s</a></strong>(Object entityPage.getTotalPages()
+                  <strong><a href="#method-118">s</a></strong>(Object entity.getSummaries()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public contentExcerp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-119">t</a></strong>(Object entity.getContentExcerpt()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fullConten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-120">t</a></strong>(Object entity.getFullContent()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public chunksCoun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-121">t</a></strong>(Object entity.getChunks()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public not</td>
+                <td class="desc-col">
+                  <strong><a href="#method-122">e</a></strong>(Object note)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -824,7 +1110,223 @@
               <tr>
                 <td class="type-col">public buil</td>
                 <td class="desc-col">
-                  <strong><a href="#method-88">d</a></strong>()
+                  <strong><a href="#method-123">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public DocumentResponse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-124">getDocumentByGuid</a></strong>(String guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves a single document by its GUID and transforms to response DTO.  WHAT: Finds document entity by GUID in MongoDB and converts to DocumentResponse DTO. WHY: Enforces read-only DTO boundaries for client layers, throwing standard NoSuchElementException if absent.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public findByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-125">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public orElseThro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-126">w</a></strong>(Object ()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public fromEntit</td>
+                <td class="desc-col">
+                  <strong><a href="#method-127">y</a></strong>(Object entity)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public DocumentEntity</td>
+                <td class="desc-col">
+                  <strong><a href="#method-128">getEntityByGuid</a></strong>(String guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves the raw persistent entity by its GUID.  WHAT: Directly queries documentRepository for the DocumentEntity matching GUID. WHY: Required by internal services (e.g. storage downloads, summarization triggers) that need internal fields like physicalFilePath.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public findByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-129">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public orElseThro</td>
+                <td class="desc-col">
+                  <strong><a href="#method-130">w</a></strong>(Object ()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public void</td>
+                <td class="desc-col">
+                  <strong><a href="#method-131">deleteDocument</a></strong>(String guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Permanently purges a document, its physical disk assets, and vector embeddings.  WHAT: Deletes disk storage files via storageService, then deletes MongoDB entity record via documentRepository. WHY: Prevents orphan disk files and stale metadata in the database when documents are deleted by users.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getEntityByGui</td>
+                <td class="desc-col">
+                  <strong><a href="#method-132">d</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public deletePhysicalAsse</td>
+                <td class="desc-col">
+                  <strong><a href="#method-133">t</a></strong>(Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public delet</td>
+                <td class="desc-col">
+                  <strong><a href="#method-134">e</a></strong>(Object entity)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public inf</td>
+                <td class="desc-col">
+                  <strong><a href="#method-135">o</a></strong>(&quot;Document and physical assets purged for GUID: {}&quot;, Object guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public PaginatedResponse&lt;DocumentResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-136">searchDocuments</a></strong>(String fileName, String title, String author, String edition, String format, String content, int page, int pageSize, String sortBy, String sortOrder)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Executes dynamic multi-attribute queries supporting single or combined filters across fileName, title, author, edition, format, and content for the List Report floorplan.  WHAT: Maps client sort keys to MongoDB field paths, assembles Pageable requests, calls dynamic query fragment, and maps entities to PaginatedResponse of DocumentResponse DTOs. WHY: Delivers high-performance server-side filtering, sorting, and pagination tailored specifically to the SAP Fiori List Report grid specifications.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public equalsIgnoreCas</td>
+                <td class="desc-col">
+                  <strong><a href="#method-137">e</a></strong>(Object sortOrder)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public mapSortFiel</td>
+                <td class="desc-col">
+                  <strong><a href="#method-138">d</a></strong>(Object sortBy)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-139">f</a></strong>(Object Math.max(0, page - 1)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public searchDocument</td>
+                <td class="desc-col">
+                  <strong><a href="#method-140">s</a></strong>(Object fileName, Object title, Object author, Object edition, Object format, Object content, Object pageable)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public getConten</td>
+                <td class="desc-col">
+                  <strong><a href="#method-141">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ma</td>
+                <td class="desc-col">
+                  <strong><a href="#method-142">p</a></strong>(Object DocumentResponse::fromEntity)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public toLis</td>
+                <td class="desc-col">
+                  <strong><a href="#method-143">t</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public &lt;DocumentResponse&gt;builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-144">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public item</td>
+                <td class="desc-col">
+                  <strong><a href="#method-145">s</a></strong>(Object dtos)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public totalCoun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-146">t</a></strong>(Object entityPage.getTotalElements()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pag</td>
+                <td class="desc-col">
+                  <strong><a href="#method-147">e</a></strong>(Object page)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public pageSiz</td>
+                <td class="desc-col">
+                  <strong><a href="#method-148">e</a></strong>(Object pageSize)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public totalPage</td>
+                <td class="desc-col">
+                  <strong><a href="#method-149">s</a></strong>(Object entityPage.getTotalPages()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-150">d</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -832,7 +1334,7 @@
               <tr>
                 <td class="type-col">private String</td>
                 <td class="desc-col">
-                  <strong><a href="#method-89">getFileExtension</a></strong>(String fileName)
+                  <strong><a href="#method-151">getFileExtension</a></strong>(String fileName)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Extracts lowercase file extension from filename.  WHAT: Splits filename by the last dot and returns the trailing string lowercased. WHY: Normalizes file formats (e.g. &quot;PDF&quot;, &quot;pdf&quot;) for uniform categorization and UI icon rendering.  /</div>
                 </td>
               </tr>
@@ -840,7 +1342,7 @@
               <tr>
                 <td class="type-col">public i</td>
                 <td class="desc-col">
-                  <strong><a href="#method-90">f</a></strong>(fileName == null || !fileName.contains(&quot;.&quot;)
+                  <strong><a href="#method-152">f</a></strong>(fileName == null || !fileName.contains(&quot;.&quot;)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -848,7 +1350,7 @@
               <tr>
                 <td class="type-col">public substrin</td>
                 <td class="desc-col">
-                  <strong><a href="#method-91">g</a></strong>(Object fileName.lastIndexOf(&#39;.&#39;)
+                  <strong><a href="#method-153">g</a></strong>(Object fileName.lastIndexOf(&#39;.&#39;)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -856,7 +1358,7 @@
               <tr>
                 <td class="type-col">private String</td>
                 <td class="desc-col">
-                  <strong><a href="#method-92">mapSortField</a></strong>(String clientField)
+                  <strong><a href="#method-154">mapSortField</a></strong>(String clientField)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Translates frontend column identifiers into MongoDB document property paths.  WHAT: Maps UI column property keys (&quot;title&quot;, &quot;author&quot;, &quot;edition&quot;) to nested MongoDB paths (&quot;bibtex.title&quot;, etc.). WHY: Shields frontend components from internal document database nesting conventions while enabling seamless sort delegation.  /</div>
                 </td>
               </tr>
@@ -864,7 +1366,7 @@
               <tr>
                 <td class="type-col">public i</td>
                 <td class="desc-col">
-                  <strong><a href="#method-93">f</a></strong>(clientField == null)
+                  <strong><a href="#method-155">f</a></strong>(clientField == null)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -872,7 +1374,7 @@
               <tr>
                 <td class="type-col">public return</td>
                 <td class="desc-col">
-                  <strong><a href="#method-94">switch</a></strong>(Object clientField)
+                  <strong><a href="#method-156">switch</a></strong>(Object clientField)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -962,7 +1464,7 @@
             <div class="detail-title">e</div>
             
             <div class="signature">
-              public storeFil <strong>e</strong>(Object file, Object guid)
+              public storeFil <strong>e</strong>(Object file, Object guid, Object 1)
             </div>
             <p>No description provided.</p>
 
@@ -1384,7 +1886,7 @@
             <div class="signature">
               public DocumentResponse <strong>overwriteDocument</strong>(String existingGuid, MultipartFile newFile, BibTeXMetadata updatedBibtex)
             </div>
-            <p>Overwrites an existing document&#39;s file content and metadata in-place while retaining its persistent GUID. Advances the internal version sequence number.  WHAT: Replaces physical asset on disk, extracts new text content, updates BibTeX metadata, re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments versionNumber. WHY: Retaining the existing document GUID preserves deep links, bookmark URLs, and Object Page routes while accurately reflecting updated revisions and version history.  /</p>
+            <p>Overwrites an existing document&#39;s file content and metadata in-place while retaining its persistent GUID. Advances the internal version sequence number and archives the prior state as an immutable snapshot.  WHAT: Archives the current state into {@code versionHistory}, replaces physical asset on disk (in a version-isolated subdirectory so the prior asset&#39;s bytes are never touched), extracts new text content, updates BibTeX metadata, re-indexes semantic chunks in Qdrant, regenerates dual summaries, and increments versionNumber. WHY: Retaining the existing document GUID preserves deep links, bookmark URLs, and Object Page routes while accurately reflecting updated revisions. Archiving a full snapshot before mutating the entity is what makes {@link #getVersionHistory(String)}, {@link #getHistoricalDownloadAsset(String, int)}, and {@link #rollbackToVersion(String, int)} possible.  /</p>
 
             
               <dl class="param-list">
@@ -1424,10 +1926,10 @@
           </div>
         
           <div class="detail-block" id="method-34">
-            <div class="detail-title">e</div>
+            <div class="detail-title">r</div>
             
             <div class="signature">
-              public getOriginalFilenam <strong>e</strong>()
+              public getVersionNumbe <strong>r</strong>()
             </div>
             <p>No description provided.</p>
 
@@ -1439,10 +1941,10 @@
           </div>
         
           <div class="detail-block" id="method-35">
-            <div class="detail-title">n</div>
+            <div class="detail-title">y</div>
             
             <div class="signature">
-              public getFileExtensio <strong>n</strong>(Object fileName)
+              public getVersionHistor <strong>y</strong>()
             </div>
             <p>No description provided.</p>
 
@@ -1457,7 +1959,7 @@
             <div class="detail-title">e</div>
             
             <div class="signature">
-              public getSiz <strong>e</strong>()
+              public getOriginalFilenam <strong>e</strong>()
             </div>
             <p>No description provided.</p>
 
@@ -1469,10 +1971,10 @@
           </div>
         
           <div class="detail-block" id="method-37">
-            <div class="detail-title">f</div>
+            <div class="detail-title">n</div>
             
             <div class="signature">
-              public i <strong>f</strong>(newFile != null)
+              public getFileExtensio <strong>n</strong>(Object fileName)
             </div>
             <p>No description provided.</p>
 
@@ -1487,7 +1989,7 @@
             <div class="detail-title">e</div>
             
             <div class="signature">
-              public storeFil <strong>e</strong>(Object newFile, Object existingGuid)
+              public getSiz <strong>e</strong>()
             </div>
             <p>No description provided.</p>
 
@@ -1499,6 +2001,36 @@
           </div>
         
           <div class="detail-block" id="method-39">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(newFile != null)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-40">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public storeFil <strong>e</strong>(Object newFile, Object existingGuid, Object newVersionNumber)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-41">
             <div class="detail-title">g</div>
             
             <div class="signature">
@@ -1513,7 +2045,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-40">
+          <div class="detail-block" id="method-42">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -1528,7 +2060,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-41">
+          <div class="detail-block" id="method-43">
             <div class="detail-title">h</div>
             
             <div class="signature">
@@ -1543,7 +2075,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-42">
+          <div class="detail-block" id="method-44">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -1558,7 +2090,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-43">
+          <div class="detail-block" id="method-45">
             <div class="detail-title">x</div>
             
             <div class="signature">
@@ -1573,7 +2105,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-44">
+          <div class="detail-block" id="method-46">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -1588,7 +2120,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-45">
+          <div class="detail-block" id="method-47">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -1603,7 +2135,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-46">
+          <div class="detail-block" id="method-48">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -1618,7 +2150,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-47">
+          <div class="detail-block" id="method-49">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -1633,7 +2165,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-48">
+          <div class="detail-block" id="method-50">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -1648,7 +2180,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-49">
+          <div class="detail-block" id="method-51">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -1663,7 +2195,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-50">
+          <div class="detail-block" id="method-52">
             <div class="detail-title">h</div>
             
             <div class="signature">
@@ -1678,7 +2210,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-51">
+          <div class="detail-block" id="method-53">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -1693,11 +2225,11 @@
             
           </div>
         
-          <div class="detail-block" id="method-52">
+          <div class="detail-block" id="method-54">
             <div class="detail-title">r</div>
             
             <div class="signature">
-              public setVersionNumbe <strong>r</strong>(Object (existing.getVersionNumber()
+              public setVersionNumbe <strong>r</strong>(Object newVersionNumber)
             </div>
             <p>No description provided.</p>
 
@@ -1708,7 +2240,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-53">
+          <div class="detail-block" id="method-55">
             <div class="detail-title">x</div>
             
             <div class="signature">
@@ -1723,7 +2255,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-54">
+          <div class="detail-block" id="method-56">
             <div class="detail-title">w</div>
             
             <div class="signature">
@@ -1738,7 +2270,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-55">
+          <div class="detail-block" id="method-57">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -1753,7 +2285,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-56">
+          <div class="detail-block" id="method-58">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -1768,7 +2300,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-57">
+          <div class="detail-block" id="method-59">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -1783,7 +2315,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-58">
+          <div class="detail-block" id="method-60">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -1798,7 +2330,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-59">
+          <div class="detail-block" id="method-61">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -1813,7 +2345,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-60">
+          <div class="detail-block" id="method-62">
             <div class="detail-title">o</div>
             
             <div class="signature">
@@ -1828,7 +2360,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-61">
+          <div class="detail-block" id="method-63">
             <div class="detail-title">y</div>
             
             <div class="signature">
@@ -1843,7 +2375,957 @@
             
           </div>
         
-          <div class="detail-block" id="method-62">
+          <div class="detail-block" id="method-64">
+            <div class="detail-title">getVersionHistory</div>
+            
+            <div class="signature">
+              public List&lt;DocumentVersionSnapshot&gt; <strong>getVersionHistory</strong>(String guid)
+            </div>
+            <p>Retrieves the archived historical version snapshot list for a document.  WHAT: Returns the immutable list of {@link DocumentVersionSnapshot} archived prior to each overwrite or rollback. WHY: Powers the Object Page&#39;s version history panel, letting researchers inspect or restore prior revisions without losing the currently active one.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>List of historical version snapshots, newest first; empty if never overwritten.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-65">
+            <div class="detail-title">getEntityByGuid</div>
+            
+            <div class="signature">
+              public return <strong>getEntityByGuid</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-66">
+            <div class="detail-title">getDownloadAsset</div>
+            
+            <div class="signature">
+              public DownloadAsset <strong>getDownloadAsset</strong>(String guid)
+            </div>
+            <p>Resolves the physical asset for the currently active version of a document.  WHAT: Looks up the document&#39;s current physical file path and original file name. WHY: Backs the primary &quot;Download&quot; action on the Object Page, decoupled from HTTP streaming concerns.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link DownloadAsset} pointing at the active version&#39;s physical file.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-67">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getEntityByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-68">
+            <div class="detail-title">DownloadAsset</div>
+            
+            <div class="signature">
+              public new <strong>DownloadAsset</strong>(Object entity.getPhysicalFilePath()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-69">
+            <div class="detail-title">getHistoricalDownloadAsset</div>
+            
+            <div class="signature">
+              public DownloadAsset <strong>getHistoricalDownloadAsset</strong>(String guid, int targetVersion)
+            </div>
+            <p>Resolves the physical asset for a specific historical (or current) version of a document.  WHAT: Returns the active version&#39;s asset directly if it matches the requested version number; otherwise searches {@code versionHistory} for a matching archived snapshot&#39;s preserved physical file path. WHY: Allows researchers to download any prior revision&#39;s exact original bytes, not just the latest one.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd><dd><code>targetVersion</code> - Version sequence number to resolve.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link DownloadAsset} pointing at the requested version&#39;s physical file.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-70">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getEntityByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-71">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public getVersionNumbe <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-72">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(currentVersion == targetVersion)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-73">
+            <div class="detail-title">DownloadAsset</div>
+            
+            <div class="signature">
+              public new <strong>DownloadAsset</strong>(Object entity.getPhysicalFilePath()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-74">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public getVersionHistor <strong>y</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-75">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public filte <strong>r</strong>(v -&gt; Objects.equals(v.getVersionNumber()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-76">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public findFirs <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-77">
+            <div class="detail-title">w</div>
+            
+            <div class="signature">
+              public orElseThro <strong>w</strong>(Object ()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-78">
+            <div class="detail-title">DownloadAsset</div>
+            
+            <div class="signature">
+              public new <strong>DownloadAsset</strong>(Object snapshot.getPhysicalFilePath()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-79">
+            <div class="detail-title">rollbackToVersion</div>
+            
+            <div class="signature">
+              public DocumentResponse <strong>rollbackToVersion</strong>(String guid, int targetVersion)
+            </div>
+            <p>Rolls back the document&#39;s active state to a previously archived historical version snapshot.  WHAT: Restores metadata, BibTeX, summaries, text content, and physical file reference from the specified snapshot, re-indexes Qdrant vector chunks for the restored content, archives the current (about-to-be replaced) state as a new snapshot, and advances the version sequence counter. WHY: Provides guaranteed non-destructive rollbacks: nothing is ever deleted, the restored state simply becomes the new latest version while every prior revision (including the one just replaced) remains in {@code versionHistory} for full audit integrity.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Document GUID to roll back.</dd><dd><code>targetVersion</code> - Historical version sequence number to restore.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Updated {@link DocumentResponse} reflecting the restored (new) active version.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-80">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public getEntityByGui <strong>d</strong>(Object guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-81">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public getVersionNumbe <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-82">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(currentVersion == targetVersion)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-83">
+            <div class="detail-title">IllegalArgumentException</div>
+            
+            <div class="signature">
+              public new <strong>IllegalArgumentException</strong>(&quot;Document is already at version &quot; + targetVersion)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-84">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public getVersionHistor <strong>y</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-85">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public filte <strong>r</strong>(v -&gt; Objects.equals(v.getVersionNumber()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-86">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public findFirs <strong>t</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-87">
+            <div class="detail-title">w</div>
+            
+            <div class="signature">
+              public orElseThro <strong>w</strong>(Object ()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-88">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public getVersionHistor <strong>y</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-89">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public indexDocumentChunk <strong>s</strong>(Object guid, Object target.getFullContent()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-90">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public setFileNam <strong>e</strong>(Object target.getFileName()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-91">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public setFileSiz <strong>e</strong>(Object target.getFileSize()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-92">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public setFileSizeFormatte <strong>d</strong>(Object target.getFileSizeFormatted()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-93">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public setForma <strong>t</strong>(Object target.getFormat()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-94">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public setPhysicalFilePat <strong>h</strong>(Object target.getPhysicalFilePath()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-95">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public setEditDat <strong>e</strong>(Object Instant.now()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-96">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public setVersionNumbe <strong>r</strong>(Object newVersionNumber)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-97">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public setBibte <strong>x</strong>(Object target.getBibtex()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-98">
+            <div class="detail-title">w</div>
+            
+            <div class="signature">
+              public setBibtexRa <strong>w</strong>(Object target.getBibtexRaw()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-99">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public setSummarie <strong>s</strong>(Object target.getSummaries()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-100">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public setContentExcerp <strong>t</strong>(Object target.getContentExcerpt()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-101">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public setFullConten <strong>t</strong>(Object target.getFullContent()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-102">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public setChunk <strong>s</strong>(Object chunks)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-103">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public sav <strong>e</strong>(Object existing)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-104">
+            <div class="detail-title">o</div>
+            
+            <div class="signature">
+              public inf <strong>o</strong>(&quot;Document rolled back for GUID: {} to snapshot v{} (new active version v{})
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-105">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public fromEntit <strong>y</strong>(Object saved)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-106">
+            <div class="detail-title">buildSnapshot</div>
+            
+            <div class="signature">
+              private DocumentVersionSnapshot <strong>buildSnapshot</strong>(DocumentEntity entity, String note)
+            </div>
+            <p>Builds an immutable snapshot capturing a document entity&#39;s current state, for archival into {@code versionHistory} prior to an overwrite or rollback mutation.  WHAT: Copies every user-facing and physical-asset field from the live entity into a {@link DocumentVersionSnapshot}. WHY: Centralizes snapshot construction so {@link #overwriteDocument} and {@link #rollbackToVersion} cannot drift from each other on which fields get preserved.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>entity</code> - Live document entity to capture.</dd><dd><code>note</code> - Human-readable audit note describing why this snapshot was archived.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Immutable {@link DocumentVersionSnapshot}.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-107">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-108">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public snapshotGui <strong>d</strong>(&quot;snapshot-&quot; + entity.getGuid()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-109">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public versionNumbe <strong>r</strong>(Object entity.getVersionNumber()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-110">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public fileNam <strong>e</strong>(Object entity.getFileName()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-111">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public fileSiz <strong>e</strong>(Object entity.getFileSize()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-112">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public fileSizeFormatte <strong>d</strong>(Object entity.getFileSizeFormatted()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-113">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public forma <strong>t</strong>(Object entity.getFormat()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-114">
+            <div class="detail-title">h</div>
+            
+            <div class="signature">
+              public physicalFilePat <strong>h</strong>(Object entity.getPhysicalFilePath()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-115">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public savedA <strong>t</strong>(Object entity.getEditDate()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-116">
+            <div class="detail-title">x</div>
+            
+            <div class="signature">
+              public bibte <strong>x</strong>(Object entity.getBibtex()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-117">
+            <div class="detail-title">w</div>
+            
+            <div class="signature">
+              public bibtexRa <strong>w</strong>(Object entity.getBibtexRaw()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-118">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public summarie <strong>s</strong>(Object entity.getSummaries()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-119">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public contentExcerp <strong>t</strong>(Object entity.getContentExcerpt()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-120">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public fullConten <strong>t</strong>(Object entity.getFullContent()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-121">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public chunksCoun <strong>t</strong>(Object entity.getChunks()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-122">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public not <strong>e</strong>(Object note)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-123">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-124">
             <div class="detail-title">getDocumentByGuid</div>
             
             <div class="signature">
@@ -1868,7 +3350,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-63">
+          <div class="detail-block" id="method-125">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -1883,7 +3365,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-64">
+          <div class="detail-block" id="method-126">
             <div class="detail-title">w</div>
             
             <div class="signature">
@@ -1898,7 +3380,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-65">
+          <div class="detail-block" id="method-127">
             <div class="detail-title">y</div>
             
             <div class="signature">
@@ -1913,7 +3395,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-66">
+          <div class="detail-block" id="method-128">
             <div class="detail-title">getEntityByGuid</div>
             
             <div class="signature">
@@ -1938,7 +3420,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-67">
+          <div class="detail-block" id="method-129">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -1953,7 +3435,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-68">
+          <div class="detail-block" id="method-130">
             <div class="detail-title">w</div>
             
             <div class="signature">
@@ -1968,7 +3450,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-69">
+          <div class="detail-block" id="method-131">
             <div class="detail-title">deleteDocument</div>
             
             <div class="signature">
@@ -1988,7 +3470,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-70">
+          <div class="detail-block" id="method-132">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -2003,7 +3485,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-71">
+          <div class="detail-block" id="method-133">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -2018,7 +3500,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-72">
+          <div class="detail-block" id="method-134">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -2033,7 +3515,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-73">
+          <div class="detail-block" id="method-135">
             <div class="detail-title">o</div>
             
             <div class="signature">
@@ -2048,7 +3530,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-74">
+          <div class="detail-block" id="method-136">
             <div class="detail-title">searchDocuments</div>
             
             <div class="signature">
@@ -2073,7 +3555,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-75">
+          <div class="detail-block" id="method-137">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -2088,7 +3570,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-76">
+          <div class="detail-block" id="method-138">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -2103,7 +3585,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-77">
+          <div class="detail-block" id="method-139">
             <div class="detail-title">f</div>
             
             <div class="signature">
@@ -2118,7 +3600,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-78">
+          <div class="detail-block" id="method-140">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -2133,7 +3615,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-79">
+          <div class="detail-block" id="method-141">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -2148,7 +3630,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-80">
+          <div class="detail-block" id="method-142">
             <div class="detail-title">p</div>
             
             <div class="signature">
@@ -2163,7 +3645,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-81">
+          <div class="detail-block" id="method-143">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -2178,7 +3660,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-82">
+          <div class="detail-block" id="method-144">
             <div class="detail-title">r</div>
             
             <div class="signature">
@@ -2193,7 +3675,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-83">
+          <div class="detail-block" id="method-145">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -2208,7 +3690,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-84">
+          <div class="detail-block" id="method-146">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -2223,7 +3705,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-85">
+          <div class="detail-block" id="method-147">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -2238,7 +3720,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-86">
+          <div class="detail-block" id="method-148">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -2253,7 +3735,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-87">
+          <div class="detail-block" id="method-149">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -2268,7 +3750,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-88">
+          <div class="detail-block" id="method-150">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -2283,7 +3765,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-89">
+          <div class="detail-block" id="method-151">
             <div class="detail-title">getFileExtension</div>
             
             <div class="signature">
@@ -2308,7 +3790,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-90">
+          <div class="detail-block" id="method-152">
             <div class="detail-title">f</div>
             
             <div class="signature">
@@ -2323,7 +3805,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-91">
+          <div class="detail-block" id="method-153">
             <div class="detail-title">g</div>
             
             <div class="signature">
@@ -2338,7 +3820,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-92">
+          <div class="detail-block" id="method-154">
             <div class="detail-title">mapSortField</div>
             
             <div class="signature">
@@ -2363,7 +3845,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-93">
+          <div class="detail-block" id="method-155">
             <div class="detail-title">f</div>
             
             <div class="signature">
@@ -2378,7 +3860,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-94">
+          <div class="detail-block" id="method-156">
             <div class="detail-title">switch</div>
             
             <div class="signature">

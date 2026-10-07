@@ -20,7 +20,7 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/services_backend_types.BackendAdapter.html" class="tsd-signature-type tsd-kind-interface">BackendAdapter</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L20">services/backend/RestBackendAdapter.ts:20</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L21">services/backend/RestBackendAdapter.ts:21</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -65,9 +65,9 @@ Provides unified CRUD, vector search, RAG conversation, and dual summarization m
 <div class="tsd-signature tsd-anchor-link" id="constructorrestbackendadapter"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">RestBackendAdapter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">config</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/services_backend_types.BackendConfig.html" class="tsd-signature-type tsd-kind-interface">BackendConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">RestBackendAdapter</a><a href="#constructorrestbackendadapter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Initializes the REST adapter with endpoint configuration and timeout defaults.</p>
-<p>WHAT: Merges user config with default 120-second timeout and strips trailing slashes from baseUrl.
+<p>WHAT: Merges user config with a default <code>LLM_TIMEOUT_MS</code> timeout and strips trailing slashes from baseUrl.
 WHY: Normalizing baseUrl avoids double-slash errors (<code>//documents</code>) when building resource paths,
-while a default 120s timeout accommodates long-running LLM and RAG vector operations.</p>
+while a generous default timeout accommodates long-running, CPU-bound local LLM and RAG vector operations.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -77,7 +77,7 @@ while a default 120s timeout accommodates long-running LLM and RAG vector operat
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">RestBackendAdapter</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L34">services/backend/RestBackendAdapter.ts:34</a></li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L35">services/backend/RestBackendAdapter.ts:35</a></li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -88,7 +88,7 @@ while a default 120s timeout accommodates long-running LLM and RAG vector operat
 </div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#config">config</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L23">services/backend/RestBackendAdapter.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L24">services/backend/RestBackendAdapter.ts:24</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="id"><code class="tsd-tag">Readonly</code><span>id</span><a href="#id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -96,7 +96,7 @@ while a default 120s timeout accommodates long-running LLM and RAG vector operat
 </div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#id">id</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L21">services/backend/RestBackendAdapter.ts:21</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L22">services/backend/RestBackendAdapter.ts:22</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="name"><code class="tsd-tag">Readonly</code><span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -104,7 +104,7 @@ while a default 120s timeout accommodates long-running LLM and RAG vector operat
 </div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#name">name</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L22">services/backend/RestBackendAdapter.ts:22</a></li></ul></aside></section></section></details>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L23">services/backend/RestBackendAdapter.ts:23</a></li></ul></aside></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -135,7 +135,7 @@ and invokes the LLM to generate an accurate, grounded answer with cited context 
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#chatwithdocument">chatWithDocument</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L366">services/backend/RestBackendAdapter.ts:366</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L378">services/backend/RestBackendAdapter.ts:378</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="deletedocument"><span>delete<wbr/>Document</span><a href="#deletedocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -156,7 +156,7 @@ WHY: Purges MongoDB entities, physical storage assets, and Qdrant vector index c
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#deletedocument">deleteDocument</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L321">services/backend/RestBackendAdapter.ts:321</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L331">services/backend/RestBackendAdapter.ts:331</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="extractmetadata"><span>extract<wbr/>Metadata</span><a href="#extractmetadata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -187,7 +187,7 @@ saving researcher time and reducing cataloging errors.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#extractmetadata">extractMetadata</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L396">services/backend/RestBackendAdapter.ts:396</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L409">services/backend/RestBackendAdapter.ts:409</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getdocument"><span>get<wbr/>Document</span><a href="#getdocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -208,7 +208,7 @@ WHY: Object Page views require complete document representation for RAG chat and
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getdocument">getDocument</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L220">services/backend/RestBackendAdapter.ts:220</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L224">services/backend/RestBackendAdapter.ts:224</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getdocuments"><span>get<wbr/>Documents</span><a href="#getdocuments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -230,7 +230,7 @@ indexes and custom regex queries to filter records without transferring entire c
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getdocuments">getDocuments</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L175">services/backend/RestBackendAdapter.ts:175</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L179">services/backend/RestBackendAdapter.ts:179</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getdownloadurl"><span>get<wbr/>Download<wbr/>Url</span><a href="#getdownloadurl" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -251,7 +251,7 @@ WHY: Allows native browser anchor tags and download managers to stream binary at
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getdownloadurl">getDownloadUrl</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L464">services/backend/RestBackendAdapter.ts:464</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L477">services/backend/RestBackendAdapter.ts:477</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="gethistoricaldownloadurl"><span>get<wbr/>Historical<wbr/>Download<wbr/>Url</span><a href="#gethistoricaldownloadurl" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -268,7 +268,7 @@ WHY: Allows native browser anchor tags and download managers to stream binary at
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#gethistoricaldownloadurl">getHistoricalDownloadUrl</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L495">services/backend/RestBackendAdapter.ts:495</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L508">services/backend/RestBackendAdapter.ts:508</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getopenapispec"><span>get<wbr/>Open<wbr/>Api<wbr/>Spec</span><a href="#getopenapispec" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -283,7 +283,7 @@ WHY: Powers the interactive OpenAPI schema viewer and developer documentation mo
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getopenapispec">getOpenApiSpec</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L507">services/backend/RestBackendAdapter.ts:507</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L520">services/backend/RestBackendAdapter.ts:520</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getversionhistory"><span>get<wbr/>Version<wbr/>History</span><a href="#getversionhistory" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -299,7 +299,7 @@ WHY: Powers the interactive OpenAPI schema viewer and developer documentation mo
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentVersionSnapshot.html" class="tsd-signature-type tsd-kind-interface">DocumentVersionSnapshot</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#getversionhistory">getVersionHistory</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L471">services/backend/RestBackendAdapter.ts:471</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L484">services/backend/RestBackendAdapter.ts:484</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="login"><span>login</span><a href="#login" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -326,7 +326,7 @@ WHY: Establishes security principal and roles for Role-Based Access Control (RBA
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#login">login</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L425">services/backend/RestBackendAdapter.ts:425</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L438">services/backend/RestBackendAdapter.ts:438</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="logout"><span>logout</span><a href="#logout" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -340,7 +340,7 @@ WHY: Informs Keycloak session manager to invalidate the server-side session toke
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#logout">logout</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L447">services/backend/RestBackendAdapter.ts:447</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L460">services/backend/RestBackendAdapter.ts:460</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="overwriteversion"><span>overwrite<wbr/>Version</span><a href="#overwriteversion" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -348,10 +348,13 @@ WHY: Informs Keycloak session manager to invalidate the server-side session toke
 <div class="tsd-signature tsd-anchor-link" id="overwriteversion-1"><span class="tsd-kind-call-signature">overwriteVersion</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">guid</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">bibtex</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">File</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileFormat</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileName</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileSize</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#overwriteversion-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Overwrites the physical content and metadata of an existing document while preserving its persistent GUID.</p>
-<p>WHAT: Issues a PUT to <code>/documents/{guid}</code> with <code>isNewVersion: true</code>.
+<p>WHAT: Issues a multipart/form-data PUT to <code>/documents/{guid}</code> carrying the optional replacement <code>File</code>
+under the <code>file</code> field and updated BibTeX metadata as a JSON string under the <code>bibtex</code> field, matching
+the Java backend's <code>@RequestParam(value = &quot;file&quot;, required = false)</code> / <code>@RequestParam(&quot;bibtex&quot;)</code> contract.
 WHY: Preserving the persistent GUID across version updates maintains citation stability,
 permalinks, and bookmark references while updating physical file contents, re-indexing vector embeddings,
-and regenerating summaries.</p>
+and regenerating summaries. As with initial upload, the Spring Boot endpoint only accepts
+<code>multipart/form-data</code>; a JSON body is rejected with HTTP 415 Unsupported Media Type.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -366,7 +369,7 @@ and regenerating summaries.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#overwriteversion">overwriteVersion</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L278">services/backend/RestBackendAdapter.ts:278</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L289">services/backend/RestBackendAdapter.ts:289</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="regeneratesummary"><span>regenerate<wbr/>Summary</span><a href="#regeneratesummary" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -391,7 +394,7 @@ or alternative models (Llama 3.3 vs Mistral Large) without re-uploading the docu
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#regeneratesummary">regenerateSummary</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L341">services/backend/RestBackendAdapter.ts:341</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L351">services/backend/RestBackendAdapter.ts:351</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="rollbackversion"><span>rollback<wbr/>Version</span><a href="#rollbackversion" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -408,7 +411,7 @@ or alternative models (Llama 3.3 vs Mistral Large) without re-uploading the docu
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#rollbackversion">rollbackVersion</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L483">services/backend/RestBackendAdapter.ts:483</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L496">services/backend/RestBackendAdapter.ts:496</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="testhealth"><span>test<wbr/>Health</span><a href="#testhealth" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -424,7 +427,7 @@ basic REST database query functionality is tested, giving researchers an accurat
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#testhealth">testHealth</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L520">services/backend/RestBackendAdapter.ts:520</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L533">services/backend/RestBackendAdapter.ts:533</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="uploaddocument"><span>upload<wbr/>Document</span><a href="#uploaddocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -432,11 +435,16 @@ basic REST database query functionality is tested, giving researchers an accurat
 <div class="tsd-signature tsd-anchor-link" id="uploaddocument-1"><span class="tsd-kind-call-signature">uploadDocument</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">bibtex</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/types.BibTeXMetadata.html" class="tsd-signature-type tsd-kind-interface">BibTeXMetadata</a><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">File</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileContent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileData</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileFormat</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">fileSize</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">mimeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/types.DocumentRecord.html" class="tsd-signature-type tsd-kind-interface">DocumentRecord</a><span class="tsd-signature-symbol">&gt;</span><a href="#uploaddocument-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Ingests a new document into the library with automated BibTeX extraction and dual-model AI summarization.</p>
-<p>WHAT: Issues a POST to <code>/documents</code> with file payload, base64 data, and metadata.
+<p>WHAT: Issues a multipart/form-data POST to <code>/documents</code> carrying the raw <code>File</code> under the <code>file</code>
+field and the BibTeX metadata as a JSON string under the <code>bibtex</code> field, matching the Java backend's
+<code>@RequestParam(&quot;file&quot;) MultipartFile file</code> / <code>@RequestParam(&quot;bibtex&quot;) String bibtexJson</code> contract.
 WHY: Ingestion is a computationally intensive pipeline involving file storage, text extraction,
 chunk vectorization into Qdrant, and dual LLM synthesis (Llama 3.3 and Mistral Large).
 A generous 180-second timeout prevents premature disconnection, while 0 retries ensures
-that documents are never accidentally ingested twice.</p>
+that documents are never accidentally ingested twice. Sending the physical <code>File</code> directly as
+multipart (rather than JSON-encoded base64) avoids ~33% payload bloat and matches what the
+Spring Boot endpoint actually accepts (<code>consumes = MULTIPART_FORM_DATA_VALUE</code>); a JSON body here
+is rejected with HTTP 415 Unsupported Media Type.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -448,7 +456,7 @@ that documents are never accidentally ingested twice.</p>
 <aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/services_backend_types.BackendAdapter.html">BackendAdapter</a>.<a href="../interfaces/services_backend_types.BackendAdapter.html#uploaddocument">uploadDocument</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/76e25dbda569fc9ebc53db9087066c6417c20578/src/main/frontend/services/backend/RestBackendAdapter.ts#L236">services/backend/RestBackendAdapter.ts:236</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/epascalau/personal-library/blob/a4e235b23587a7110b9c5317c405c36f5dd0ea26/src/main/frontend/services/backend/RestBackendAdapter.ts#L245">services/backend/RestBackendAdapter.ts:245</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

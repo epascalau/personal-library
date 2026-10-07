@@ -94,17 +94,73 @@
           <tbody>
             
               <tr>
+                <td class="type-col">public ofMinute</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">s</a></strong>(Object 10)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Read timeout applied to the underlying HTTP client used to call Ollama.  WHY: CPU-bound local Ollama inference can legitimately take several minutes per chat completion (observed ~2.5 minutes for a single Mistral summarization call), so the default REST client timeout must be raised well above typical cloud-API expectations to avoid prematurely aborting genuinely in-progress generations.  IMPORTANT — this is a PER-CALL timeout, not a per-request one: {@code uploadDocument()} chains up to THREE sequential Ollama calls within a single HTTP request (BibTeX extraction, then Llama summary, then Mistral summary — see {@code DocumentService.uploadDocument()} / {@code AiSummarizationService}), and {@code overwriteDocument()} chains two (Llama + Mistral). Every timeout further out in the request path (the frontend&#39;s fetch abort controller, the nginx reverse proxy, and the Node gateway&#39;s HTTP server) MUST budget for the full worst-case SUM of these sequential calls, not just one multiple of this constant. See {@code LLM_TIMEOUT_MS} in {@code types.ts} and {@code nginx/nginx.conf} for the corresponding end-to-end budget. /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ofSecond</td>
+                <td class="desc-col">
+                  <strong><a href="#method-1">s</a></strong>(Object 10)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
                 <td class="type-col">public OllamaApi</td>
                 <td class="desc-col">
-                  <strong><a href="#method-0">ollamaApi</a></strong>()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Initializes the low-level Ollama API client.  WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL. WHY: Centralizes HTTP communication and REST connectivity to the local or remote Ollama daemon, ensuring connection pooling and uniform base URL resolution across all downstream chat models.  /</div>
+                  <strong><a href="#method-2">ollamaApi</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Initializes the low-level Ollama API client.  WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL, using a {@link RestClient} whose request factory applies a generous read timeout. WHY: Centralizes HTTP communication and REST connectivity to the local or remote Ollama daemon, ensuring connection pooling, uniform base URL resolution, and sufficient read timeouts for slow, CPU-bound local inference across all downstream chat models.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public default</td>
+                <td class="desc-col">
+                  <strong><a href="#method-3">s</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public withConnectTimeou</td>
+                <td class="desc-col">
+                  <strong><a href="#method-4">t</a></strong>(Object OLLAMA_CONNECT_TIMEOUT)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public withReadTimeou</td>
+                <td class="desc-col">
+                  <strong><a href="#method-5">t</a></strong>(Object OLLAMA_READ_TIMEOUT)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
                 <td class="type-col">public builde</td>
                 <td class="desc-col">
-                  <strong><a href="#method-1">r</a></strong>()
+                  <strong><a href="#method-6">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public requestFactor</td>
+                <td class="desc-col">
+                  <strong><a href="#method-7">y</a></strong>(Object ClientHttpRequestFactoryBuilder.detect()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-8">r</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -112,71 +168,15 @@
               <tr>
                 <td class="type-col">public baseUr</td>
                 <td class="desc-col">
-                  <strong><a href="#method-2">l</a></strong>(Object ollamaBaseUrl)
+                  <strong><a href="#method-9">l</a></strong>(Object ollamaBaseUrl)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
             
               <tr>
-                <td class="type-col">public buil</td>
+                <td class="type-col">public restClientBuilde</td>
                 <td class="desc-col">
-                  <strong><a href="#method-3">d</a></strong>()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public OllamaChatModel</td>
-                <td class="desc-col">
-                  <strong><a href="#method-4">llamaChatModel</a></strong>(OllamaApi ollamaApi)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Primary ChatModel configured with Llama 3.3 model specifications.  WHAT: Instantiates an OllamaChatModel backed by Llama 3.3 with temperature set to 0.2. WHY: Lower temperature (0.2) promotes rigorous factual precision, strict citation grounding, and minimal hallucination when analyzing complex academic literature, codebases, and RAG contexts.  /</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public builde</td>
-                <td class="desc-col">
-                  <strong><a href="#method-5">r</a></strong>()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public ollamaAp</td>
-                <td class="desc-col">
-                  <strong><a href="#method-6">i</a></strong>(Object ollamaApi)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public defaultOption</td>
-                <td class="desc-col">
-                  <strong><a href="#method-7">s</a></strong>(Object OllamaOptions.builder()
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public mode</td>
-                <td class="desc-col">
-                  <strong><a href="#method-8">l</a></strong>(Object llamaModelName)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public temperatur</td>
-                <td class="desc-col">
-                  <strong><a href="#method-9">e</a></strong>(Object 0.2)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
-                </td>
-              </tr>
-            
-              <tr>
-                <td class="type-col">public buil</td>
-                <td class="desc-col">
-                  <strong><a href="#method-10">d</a></strong>()
+                  <strong><a href="#method-10">r</a></strong>(Object restClientBuilder)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -192,8 +192,8 @@
               <tr>
                 <td class="type-col">public OllamaChatModel</td>
                 <td class="desc-col">
-                  <strong><a href="#method-12">mistralChatModel</a></strong>(OllamaApi ollamaApi)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Secondary ChatModel configured with Mistral Large model specifications.  WHAT: Instantiates an OllamaChatModel backed by Mistral Large with temperature set to 0.3. WHY: A slightly higher temperature (0.3) enables fluent, expressive natural language synthesis optimal for high-level executive summaries, architectural takeaways, and concise abstractive overviews.  /</div>
+                  <strong><a href="#method-12">llamaChatModel</a></strong>(OllamaApi ollamaApi)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Primary ChatModel configured with Llama 3.3 model specifications.  WHAT: Instantiates an OllamaChatModel backed by Llama 3.3 with temperature set to 0.2. WHY: Lower temperature (0.2) promotes rigorous factual precision, strict citation grounding, and minimal hallucination when analyzing complex academic literature, codebases, and RAG contexts.  /</div>
                 </td>
               </tr>
             
@@ -214,9 +214,9 @@
               </tr>
             
               <tr>
-                <td class="type-col">public defaultOption</td>
+                <td class="type-col">public option</td>
                 <td class="desc-col">
-                  <strong><a href="#method-15">s</a></strong>(Object OllamaOptions.builder()
+                  <strong><a href="#method-15">s</a></strong>(Object OllamaChatOptions.builder()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -224,7 +224,7 @@
               <tr>
                 <td class="type-col">public mode</td>
                 <td class="desc-col">
-                  <strong><a href="#method-16">l</a></strong>(Object mistralModelName)
+                  <strong><a href="#method-16">l</a></strong>(Object llamaModelName)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -232,7 +232,7 @@
               <tr>
                 <td class="type-col">public temperatur</td>
                 <td class="desc-col">
-                  <strong><a href="#method-17">e</a></strong>(Object 0.3)
+                  <strong><a href="#method-17">e</a></strong>(Object 0.2)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -254,17 +254,65 @@
               </tr>
             
               <tr>
-                <td class="type-col">public ChatClient</td>
+                <td class="type-col">public OllamaChatModel</td>
                 <td class="desc-col">
-                  <strong><a href="#method-20">llamaChatClient</a></strong>(OllamaChatModel llamaChatModel)
-                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Fluent ChatClient wrapper for the primary Llama chat model.  WHAT: Constructs a high-level Spring AI ChatClient wrapping the primary LlamaChatModel. WHY: Provides a fluent, builder-based prompt composition API with prompt templates and system prompt injection capabilities for analytical processing and RAG answering.  /</div>
+                  <strong><a href="#method-20">mistralChatModel</a></strong>(OllamaApi ollamaApi)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Secondary ChatModel configured with Mistral Large model specifications.  WHAT: Instantiates an OllamaChatModel backed by Mistral Large with temperature set to 0.3. WHY: A slightly higher temperature (0.3) enables fluent, expressive natural language synthesis optimal for high-level executive summaries, architectural takeaways, and concise abstractive overviews.  /</div>
                 </td>
               </tr>
             
               <tr>
                 <td class="type-col">public builde</td>
                 <td class="desc-col">
-                  <strong><a href="#method-21">r</a></strong>(Object llamaChatModel)
+                  <strong><a href="#method-21">r</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ollamaAp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-22">i</a></strong>(Object ollamaApi)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public option</td>
+                <td class="desc-col">
+                  <strong><a href="#method-23">s</a></strong>(Object OllamaChatOptions.builder()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public mode</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">l</a></strong>(Object mistralModelName)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public temperatur</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">e</a></strong>(Object 0.3)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public buil</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">d</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -272,7 +320,23 @@
               <tr>
                 <td class="type-col">public ChatClient</td>
                 <td class="desc-col">
-                  <strong><a href="#method-22">mistralChatClient</a></strong>(OllamaChatModel mistralChatModel)
+                  <strong><a href="#method-28">llamaChatClient</a></strong>(OllamaChatModel llamaChatModel)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Fluent ChatClient wrapper for the primary Llama chat model.  WHAT: Constructs a high-level Spring AI ChatClient wrapping the primary LlamaChatModel. WHY: Provides a fluent, builder-based prompt composition API with prompt templates and system prompt injection capabilities for analytical processing and RAG answering.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public builde</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">r</a></strong>(Object llamaChatModel)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ChatClient</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">mistralChatClient</a></strong>(OllamaChatModel mistralChatModel)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Fluent ChatClient wrapper for the secondary Mistral chat model.  WHAT: Constructs a high-level Spring AI ChatClient wrapping the secondary MistralChatModel. WHY: Simplifies prompt assembly and response extraction for executive summarization pipelines using Spring AI&#39;s modern ChatClient abstractions.  /</div>
                 </td>
               </tr>
@@ -280,7 +344,7 @@
               <tr>
                 <td class="type-col">public builde</td>
                 <td class="desc-col">
-                  <strong><a href="#method-23">r</a></strong>(Object mistralChatModel)
+                  <strong><a href="#method-31">r</a></strong>(Object mistralChatModel)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -292,12 +356,42 @@
         <h3>Method Details</h3>
         
           <div class="detail-block" id="method-0">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public ofMinute <strong>s</strong>(Object 10)
+            </div>
+            <p>Read timeout applied to the underlying HTTP client used to call Ollama.  WHY: CPU-bound local Ollama inference can legitimately take several minutes per chat completion (observed ~2.5 minutes for a single Mistral summarization call), so the default REST client timeout must be raised well above typical cloud-API expectations to avoid prematurely aborting genuinely in-progress generations.  IMPORTANT — this is a PER-CALL timeout, not a per-request one: {@code uploadDocument()} chains up to THREE sequential Ollama calls within a single HTTP request (BibTeX extraction, then Llama summary, then Mistral summary — see {@code DocumentService.uploadDocument()} / {@code AiSummarizationService}), and {@code overwriteDocument()} chains two (Llama + Mistral). Every timeout further out in the request path (the frontend&#39;s fetch abort controller, the nginx reverse proxy, and the Node gateway&#39;s HTTP server) MUST budget for the full worst-case SUM of these sequential calls, not just one multiple of this constant. See {@code LLM_TIMEOUT_MS} in {@code types.ts} and {@code nginx/nginx.conf} for the corresponding end-to-end budget. /</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-1">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public ofSecond <strong>s</strong>(Object 10)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-2">
             <div class="detail-title">ollamaApi</div>
             <div><span class="annotation">@Bean</span> </div>
             <div class="signature">
               public OllamaApi <strong>ollamaApi</strong>()
             </div>
-            <p>Initializes the low-level Ollama API client.  WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL. WHY: Centralizes HTTP communication and REST connectivity to the local or remote Ollama daemon, ensuring connection pooling and uniform base URL resolution across all downstream chat models.  /</p>
+            <p>Initializes the low-level Ollama API client.  WHAT: Constructs an OllamaApi client instance pointing to the configured Ollama base URL, using a {@link RestClient} whose request factory applies a generous read timeout. WHY: Centralizes HTTP communication and REST connectivity to the local or remote Ollama daemon, ensuring connection pooling, uniform base URL resolution, and sufficient read timeouts for slow, CPU-bound local inference across all downstream chat models.  /</p>
 
             
 
@@ -311,7 +405,52 @@
             
           </div>
         
-          <div class="detail-block" id="method-1">
+          <div class="detail-block" id="method-3">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public default <strong>s</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-4">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public withConnectTimeou <strong>t</strong>(Object OLLAMA_CONNECT_TIMEOUT)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-5">
+            <div class="detail-title">t</div>
+            
+            <div class="signature">
+              public withReadTimeou <strong>t</strong>(Object OLLAMA_READ_TIMEOUT)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-6">
             <div class="detail-title">r</div>
             
             <div class="signature">
@@ -326,7 +465,37 @@
             
           </div>
         
-          <div class="detail-block" id="method-2">
+          <div class="detail-block" id="method-7">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public requestFactor <strong>y</strong>(Object ClientHttpRequestFactoryBuilder.detect()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-8">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-9">
             <div class="detail-title">l</div>
             
             <div class="signature">
@@ -341,126 +510,11 @@
             
           </div>
         
-          <div class="detail-block" id="method-3">
-            <div class="detail-title">d</div>
-            
-            <div class="signature">
-              public buil <strong>d</strong>()
-            </div>
-            <p>No description provided.</p>
-
-            
-
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-4">
-            <div class="detail-title">llamaChatModel</div>
-            <div><span class="annotation">@Bean(name = &quot;llamaChatModel&quot;)</span>  <span class="annotation">@Primary</span> </div>
-            <div class="signature">
-              public OllamaChatModel <strong>llamaChatModel</strong>(OllamaApi ollamaApi)
-            </div>
-            <p>Primary ChatModel configured with Llama 3.3 model specifications.  WHAT: Instantiates an OllamaChatModel backed by Llama 3.3 with temperature set to 0.2. WHY: Lower temperature (0.2) promotes rigorous factual precision, strict citation grounding, and minimal hallucination when analyzing complex academic literature, codebases, and RAG contexts.  /</p>
-
-            
-              <dl class="param-list">
-                <dt>Parameters:</dt>
-                <dd><code>ollamaApi</code> - Low-level Ollama API client.</dd>
-              </dl>
-            
-
-            
-              <dl class="param-list">
-                <dt>Returns:</dt>
-                <dd>{@link OllamaChatModel} configured for Llama inference.</dd>
-              </dl>
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-5">
+          <div class="detail-block" id="method-10">
             <div class="detail-title">r</div>
             
             <div class="signature">
-              public builde <strong>r</strong>()
-            </div>
-            <p>No description provided.</p>
-
-            
-
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-6">
-            <div class="detail-title">i</div>
-            
-            <div class="signature">
-              public ollamaAp <strong>i</strong>(Object ollamaApi)
-            </div>
-            <p>No description provided.</p>
-
-            
-
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-7">
-            <div class="detail-title">s</div>
-            
-            <div class="signature">
-              public defaultOption <strong>s</strong>(Object OllamaOptions.builder()
-            </div>
-            <p>No description provided.</p>
-
-            
-
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-8">
-            <div class="detail-title">l</div>
-            
-            <div class="signature">
-              public mode <strong>l</strong>(Object llamaModelName)
-            </div>
-            <p>No description provided.</p>
-
-            
-
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-9">
-            <div class="detail-title">e</div>
-            
-            <div class="signature">
-              public temperatur <strong>e</strong>(Object 0.2)
-            </div>
-            <p>No description provided.</p>
-
-            
-
-            
-
-            
-          </div>
-        
-          <div class="detail-block" id="method-10">
-            <div class="detail-title">d</div>
-            
-            <div class="signature">
-              public buil <strong>d</strong>()
+              public restClientBuilde <strong>r</strong>(Object restClientBuilder)
             </div>
             <p>No description provided.</p>
 
@@ -487,12 +541,12 @@
           </div>
         
           <div class="detail-block" id="method-12">
-            <div class="detail-title">mistralChatModel</div>
-            <div><span class="annotation">@Bean(name = &quot;mistralChatModel&quot;)</span> </div>
+            <div class="detail-title">llamaChatModel</div>
+            <div><span class="annotation">@Bean(name = &quot;llamaChatModel&quot;)</span>  <span class="annotation">@Primary</span> </div>
             <div class="signature">
-              public OllamaChatModel <strong>mistralChatModel</strong>(OllamaApi ollamaApi)
+              public OllamaChatModel <strong>llamaChatModel</strong>(OllamaApi ollamaApi)
             </div>
-            <p>Secondary ChatModel configured with Mistral Large model specifications.  WHAT: Instantiates an OllamaChatModel backed by Mistral Large with temperature set to 0.3. WHY: A slightly higher temperature (0.3) enables fluent, expressive natural language synthesis optimal for high-level executive summaries, architectural takeaways, and concise abstractive overviews.  /</p>
+            <p>Primary ChatModel configured with Llama 3.3 model specifications.  WHAT: Instantiates an OllamaChatModel backed by Llama 3.3 with temperature set to 0.2. WHY: Lower temperature (0.2) promotes rigorous factual precision, strict citation grounding, and minimal hallucination when analyzing complex academic literature, codebases, and RAG contexts.  /</p>
 
             
               <dl class="param-list">
@@ -504,7 +558,7 @@
             
               <dl class="param-list">
                 <dt>Returns:</dt>
-                <dd>{@link OllamaChatModel} configured for Mistral inference.</dd>
+                <dd>{@link OllamaChatModel} configured for Llama inference.</dd>
               </dl>
             
 
@@ -545,7 +599,7 @@
             <div class="detail-title">s</div>
             
             <div class="signature">
-              public defaultOption <strong>s</strong>(Object OllamaOptions.builder()
+              public option <strong>s</strong>(Object OllamaChatOptions.builder()
             </div>
             <p>No description provided.</p>
 
@@ -560,7 +614,7 @@
             <div class="detail-title">l</div>
             
             <div class="signature">
-              public mode <strong>l</strong>(Object mistralModelName)
+              public mode <strong>l</strong>(Object llamaModelName)
             </div>
             <p>No description provided.</p>
 
@@ -575,7 +629,7 @@
             <div class="detail-title">e</div>
             
             <div class="signature">
-              public temperatur <strong>e</strong>(Object 0.3)
+              public temperatur <strong>e</strong>(Object 0.2)
             </div>
             <p>No description provided.</p>
 
@@ -617,6 +671,136 @@
           </div>
         
           <div class="detail-block" id="method-20">
+            <div class="detail-title">mistralChatModel</div>
+            <div><span class="annotation">@Bean(name = &quot;mistralChatModel&quot;)</span> </div>
+            <div class="signature">
+              public OllamaChatModel <strong>mistralChatModel</strong>(OllamaApi ollamaApi)
+            </div>
+            <p>Secondary ChatModel configured with Mistral Large model specifications.  WHAT: Instantiates an OllamaChatModel backed by Mistral Large with temperature set to 0.3. WHY: A slightly higher temperature (0.3) enables fluent, expressive natural language synthesis optimal for high-level executive summaries, architectural takeaways, and concise abstractive overviews.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>ollamaApi</code> - Low-level Ollama API client.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>{@link OllamaChatModel} configured for Mistral inference.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-21">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public builde <strong>r</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-22">
+            <div class="detail-title">i</div>
+            
+            <div class="signature">
+              public ollamaAp <strong>i</strong>(Object ollamaApi)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-23">
+            <div class="detail-title">s</div>
+            
+            <div class="signature">
+              public option <strong>s</strong>(Object OllamaChatOptions.builder()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-24">
+            <div class="detail-title">l</div>
+            
+            <div class="signature">
+              public mode <strong>l</strong>(Object mistralModelName)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public temperatur <strong>e</strong>(Object 0.3)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public buil <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
             <div class="detail-title">llamaChatClient</div>
             <div><span class="annotation">@Bean(name = &quot;llamaChatClient&quot;)</span> </div>
             <div class="signature">
@@ -641,7 +825,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-21">
+          <div class="detail-block" id="method-29">
             <div class="detail-title">r</div>
             
             <div class="signature">
@@ -656,7 +840,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-22">
+          <div class="detail-block" id="method-30">
             <div class="detail-title">mistralChatClient</div>
             <div><span class="annotation">@Bean(name = &quot;mistralChatClient&quot;)</span> </div>
             <div class="signature">
@@ -681,7 +865,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-23">
+          <div class="detail-block" id="method-31">
             <div class="detail-title">r</div>
             
             <div class="signature">

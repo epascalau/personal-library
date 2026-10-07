@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatConvenienceRequest (com.personallibrary.dto) - Personal Library Javadoc</title>
+  <link rel="stylesheet" href="../../stylesheet.css">
+</head>
+<body>
+  <header>
+    <h1>Personal Library Java Backend API Reference</h1>
+    <div class="subtitle">Spring Boot 3 • Spring AI • Ollama • MongoDB • Qdrant Vector Engine</div>
+  </header>
+  <nav class="top-nav">
+    <a href="../../index.html">Overview</a>
+    <a href="../../packages/com.personallibrary.dto.html">Package</a>
+    <a href="#" class="active">Class</a>
+    <a href="../../tree.html">Tree</a>
+    <a href="../typescript/index.html" target="_blank">TypeScript API ↗</a>
+  </nav>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../../index.html">All Packages</a> &gt;
+      <a href="../../packages/com.personallibrary.dto.html">com.personallibrary.dto</a> &gt;
+      <strong>ChatConvenienceRequest</strong>
+    </div>
+
+    <div class="card">
+      <div class="class-header">
+        <div class="package-label">package com.personallibrary.dto</div>
+        <h2>class ChatConvenienceRequest</h2>
+        <div style="margin-bottom: 0.5rem;"><span class="annotation">@Data</span>  <span class="annotation">@Builder</span>  <span class="annotation">@NoArgsConstructor</span>  <span class="annotation">@AllArgsConstructor</span> </div>
+        <div class="signature">
+          public class <strong>ChatConvenienceRequest</strong>
+          
+          
+        </div>
+        <p>Data Transfer Object for the top-level `/chat` convenience RAG endpoint, which identifies the target document inline in the request body rather than via a path variable.  WHAT: Carries the same question/chatHistory payload as {@link ChatRequest}, plus either `documentGuid` or `guid` (both accepted for client flexibility) identifying which document to scope the conversational search to. WHY: Some API consumers prefer a single flat chat endpoint over a nested per-document resource path; this DTO lets `/chat` accept both common field name conventions without ambiguity.  /</p>
+        <div class="meta-tags">
+          <span class="tag-badge">Author: Enterprise Architecture Team</span>
+          <span class="tag-badge">Version: 1.0.0</span>
+          <span class="tag-badge">Since: 2026-10-06</span>
+        </div>
+      </div>
+
+      <!-- Field Summary -->
+      
+        <h3>Field Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Field</th>
+              <th class="desc-col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>documentGuid</code></td>
+                <td class="desc-col">Target document GUID (primary field name per the OpenAPI contract). /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>guid</code></td>
+                <td class="desc-col">Alternate target document GUID field name, accepted for client flexibility. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private String</td>
+                <td class="name-col"><code>question</code></td>
+                <td class="desc-col">User&#39;s natural language question regarding the document. /</td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private ChatMessageDto&gt;</td>
+                <td class="name-col"><code>chatHistory</code></td>
+                <td class="desc-col">Optional conversation turns for contextual multi-turn dialogue. /</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      <!-- Constructor Summary -->
+      
+
+      <!-- Method Summary -->
+      
+        <h3>Method Summary</h3>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th class="type-col">Modifier and Type</th>
+              <th class="name-col">Method and Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td class="type-col">public String</td>
+                <td class="desc-col">
+                  <strong><a href="#method-0">resolveGuid</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Resolves the effective target document GUID, preferring {@code documentGuid} over {@code guid}.  /</div>
+                </td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        <!-- Method Details -->
+        <h3>Method Details</h3>
+        
+          <div class="detail-block" id="method-0">
+            <div class="detail-title">resolveGuid</div>
+            
+            <div class="signature">
+              public String <strong>resolveGuid</strong>()
+            </div>
+            <p>Resolves the effective target document GUID, preferring {@code documentGuid} over {@code guid}.  /</p>
+
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>The non-null document GUID the client supplied, or {@code null} if neither was set.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+  <footer>Personal Library API Reference • Generated with Javadoc Generator for Spring Boot</footer>
+</body>
+</html>

@@ -87,8 +87,8 @@
               </tr>
             
               <tr>
-                <td class="type-col">private ObjectMapper</td>
-                <td class="name-col"><code>objectMapper</code></td>
+                <td class="type-col">private JsonMapper</td>
+                <td class="name-col"><code>jsonMapper</code></td>
                 <td class="desc-col">-</td>
               </tr>
             
@@ -316,9 +316,153 @@
               </tr>
             
               <tr>
+                <td class="type-col">public ResponseEntity&lt;Resource&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-24">downloadDocument</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Downloads the physical asset of the currently active document version.  WHAT: Streams the original uploaded file bytes from disk with its detected MIME content type and an attachment Content-Disposition header carrying the original file name.  WHY: Allows researchers to download the primary source file directly from the Object Page, matching exactly the bytes that were originally uploaded (as opposed to the extracted plain-text excerpt).  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public return</td>
+                <td class="desc-col">
+                  <strong><a href="#method-25">streamAsset</a></strong>(Object documentService.getDownloadAsset(guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;List&lt;DocumentVersionSnapshot&gt;&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-26">getVersionHistory</a></strong>(Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Retrieves the historical version snapshot list for a document.  WHAT: Returns every immutable snapshot archived prior to an overwrite or rollback, newest first.  WHY: Powers the Object Page&#39;s version history panel, letting researchers inspect or restore prior revisions without losing the currently active one.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-27">k</a></strong>(Object documentService.getVersionHistory(guid)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;Resource&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-28">downloadHistoricalVersion</a></strong>(Object param, Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Downloads the physical asset for a specific historical (or current) version.  WHAT: Resolves either the active version&#39;s file or an archived snapshot&#39;s preserved file, then streams it.  WHY: Lets researchers retrieve the exact original bytes of any prior revision, not only the latest one.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public return</td>
+                <td class="desc-col">
+                  <strong><a href="#method-29">streamAsset</a></strong>(Object documentService.getHistoricalDownloadAsset(guid, Object version)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public ResponseEntity&lt;DocumentResponse&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-30">rollbackVersion</a></strong>(Object param, Object param)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Rolls back the document to a designated historical version snapshot.  WHAT: Restores metadata, text content, summaries, and file reference from the specified snapshot, archives the current state as a new snapshot, and advances the version sequence counter.  WHY: Provides guaranteed non-destructive rollbacks while maintaining full audit integrity.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-31">k</a></strong>(Object documentService.rollbackToVersion(guid, Object version)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">private ResponseEntity&lt;Resource&gt;</td>
+                <td class="desc-col">
+                  <strong><a href="#method-32">streamAsset</a></strong>(DownloadAsset asset)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Streams a resolved physical asset to the client with its detected content type and attachment disposition.  WHAT: Wraps a {@link DownloadAsset} path in a {@link FileSystemResource} and sets the appropriate Content-Type (via Apache Tika detection) and Content-Disposition headers.  WHY: Shared by both the current-version and historical-version download endpoints to avoid duplicating HTTP streaming mechanics.  /</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-33">f</a></strong>(Object asset.physicalFilePath()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public i</td>
+                <td class="desc-col">
+                  <strong><a href="#method-34">f</a></strong>(Object !Files.exists(path)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public notFoun</td>
+                <td class="desc-col">
+                  <strong><a href="#method-35">d</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public new</td>
+                <td class="desc-col">
+                  <strong><a href="#method-36">FileSystemResource</a></strong>(Object path)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public detectContentTyp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-37">e</a></strong>(Object path)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public o</td>
+                <td class="desc-col">
+                  <strong><a href="#method-38">k</a></strong>()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public contentTyp</td>
+                <td class="desc-col">
+                  <strong><a href="#method-39">e</a></strong>(Object MediaType.parseMediaType(contentType)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public heade</td>
+                <td class="desc-col">
+                  <strong><a href="#method-40">r</a></strong>(Object HttpHeaders.CONTENT_DISPOSITION, &quot;attachment; filename=\&quot;&quot; + asset.fileName()
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="type-col">public bod</td>
+                <td class="desc-col">
+                  <strong><a href="#method-41">y</a></strong>(Object resource)
+                  <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
+                </td>
+              </tr>
+            
+              <tr>
                 <td class="type-col">public ResponseEntity&lt;SummaryRecord&gt;</td>
                 <td class="desc-col">
-                  <strong><a href="#method-24">regenerateSummary</a></strong>(Object param, Object param)
+                  <strong><a href="#method-42">regenerateSummary</a></strong>(Object param, Object param)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Triggers summary regeneration for a specific model (Llama 3.3 or Mistral Large).  WHAT: Sends document content to the requested Ollama model engine and updates the document&#39;s summary map.  WHY: Allows researchers to benchmark individual models independently or recompute summaries if model parameters, system prompts, or upstream context changes.  /</div>
                 </td>
               </tr>
@@ -326,7 +470,7 @@
               <tr>
                 <td class="type-col">public getEntityByGui</td>
                 <td class="desc-col">
-                  <strong><a href="#method-25">d</a></strong>(Object guid)
+                  <strong><a href="#method-43">d</a></strong>(Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -334,7 +478,7 @@
               <tr>
                 <td class="type-col">public generateSummaryForMode</td>
                 <td class="desc-col">
-                  <strong><a href="#method-26">l</a></strong>(Object request.getModel()
+                  <strong><a href="#method-44">l</a></strong>(Object request.getModel()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -342,7 +486,7 @@
               <tr>
                 <td class="type-col">public getBibte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-27">x</a></strong>()
+                  <strong><a href="#method-45">x</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -350,7 +494,7 @@
               <tr>
                 <td class="type-col">public getFullConten</td>
                 <td class="desc-col">
-                  <strong><a href="#method-28">t</a></strong>()
+                  <strong><a href="#method-46">t</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -358,7 +502,7 @@
               <tr>
                 <td class="type-col">public getBibte</td>
                 <td class="desc-col">
-                  <strong><a href="#method-29">x</a></strong>()
+                  <strong><a href="#method-47">x</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -366,7 +510,7 @@
               <tr>
                 <td class="type-col">public getSummarie</td>
                 <td class="desc-col">
-                  <strong><a href="#method-30">s</a></strong>()
+                  <strong><a href="#method-48">s</a></strong>()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -374,7 +518,7 @@
               <tr>
                 <td class="type-col">public setEditDat</td>
                 <td class="desc-col">
-                  <strong><a href="#method-31">e</a></strong>(Object java.time.Instant.now()
+                  <strong><a href="#method-49">e</a></strong>(Object java.time.Instant.now()
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -382,7 +526,7 @@
               <tr>
                 <td class="type-col">public getDocumentByGui</td>
                 <td class="desc-col">
-                  <strong><a href="#method-32">d</a></strong>(Object guid)
+                  <strong><a href="#method-50">d</a></strong>(Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -390,7 +534,7 @@
               <tr>
                 <td class="type-col">public o</td>
                 <td class="desc-col">
-                  <strong><a href="#method-33">k</a></strong>(Object newSummary)
+                  <strong><a href="#method-51">k</a></strong>(Object newSummary)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -398,7 +542,7 @@
               <tr>
                 <td class="type-col">public ResponseEntity&lt;ChatResponse&gt;</td>
                 <td class="desc-col">
-                  <strong><a href="#method-34">chatWithDocument</a></strong>(Object param, Object param)
+                  <strong><a href="#method-52">chatWithDocument</a></strong>(Object param, Object param)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">Interactive RAG conversational chat scoped to the active document.  WHAT: Queries Qdrant vector store for semantic citations matching the user&#39;s question, constructs a grounded contextual prompt, and generates an answer via Llama 3.3.  WHY: RAG grounding constrains the model&#39;s responses to verified excerpts from the active document, returning exact citation snippets and similarity scores to eliminate factual hallucination.  /</div>
                 </td>
               </tr>
@@ -406,7 +550,7 @@
               <tr>
                 <td class="type-col">public getEntityByGui</td>
                 <td class="desc-col">
-                  <strong><a href="#method-35">d</a></strong>(Object guid)
+                  <strong><a href="#method-53">d</a></strong>(Object guid)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -414,7 +558,7 @@
               <tr>
                 <td class="type-col">public chatWithDocumen</td>
                 <td class="desc-col">
-                  <strong><a href="#method-36">t</a></strong>(Object doc, Object request)
+                  <strong><a href="#method-54">t</a></strong>(Object doc, Object request)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -422,7 +566,7 @@
               <tr>
                 <td class="type-col">public o</td>
                 <td class="desc-col">
-                  <strong><a href="#method-37">k</a></strong>(Object response)
+                  <strong><a href="#method-55">k</a></strong>(Object response)
                   <div style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem;">-</div>
                 </td>
               </tr>
@@ -864,6 +1008,336 @@
           </div>
         
           <div class="detail-block" id="method-24">
+            <div class="detail-title">downloadDocument</div>
+            <div><span class="annotation">@GetMapping(&quot;/{guid}/download&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Download the physical asset of the currently active document version&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;Resource&gt; <strong>downloadDocument</strong>(Object param)
+            </div>
+            <p>Downloads the physical asset of the currently active document version.  WHAT: Streams the original uploaded file bytes from disk with its detected MIME content type and an attachment Content-Disposition header carrying the original file name.  WHY: Allows researchers to download the primary source file directly from the Object Page, matching exactly the bytes that were originally uploaded (as opposed to the extracted plain-text excerpt).  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Binary file stream.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Throws:</dt>
+                <dd><code>IOException</code> - If the physical asset cannot be read from disk.</dd>
+              </dl>
+            
+          </div>
+        
+          <div class="detail-block" id="method-25">
+            <div class="detail-title">streamAsset</div>
+            
+            <div class="signature">
+              public return <strong>streamAsset</strong>(Object documentService.getDownloadAsset(guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-26">
+            <div class="detail-title">getVersionHistory</div>
+            <div><span class="annotation">@GetMapping(&quot;/{guid}/versions&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Retrieve the historical version snapshot list for a document&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;List&lt;DocumentVersionSnapshot&gt;&gt; <strong>getVersionHistory</strong>(Object param)
+            </div>
+            <p>Retrieves the historical version snapshot list for a document.  WHAT: Returns every immutable snapshot archived prior to an overwrite or rollback, newest first.  WHY: Powers the Object Page&#39;s version history panel, letting researchers inspect or restore prior revisions without losing the currently active one.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>List of {@link DocumentVersionSnapshot}; empty if the document was never overwritten.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-27">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object documentService.getVersionHistory(guid)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-28">
+            <div class="detail-title">downloadHistoricalVersion</div>
+            <div><span class="annotation">@GetMapping(&quot;/{guid}/versions/{version}/download&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Download the physical asset for a specific historical version&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;Resource&gt; <strong>downloadHistoricalVersion</strong>(Object param, Object param)
+            </div>
+            <p>Downloads the physical asset for a specific historical (or current) version.  WHAT: Resolves either the active version&#39;s file or an archived snapshot&#39;s preserved file, then streams it.  WHY: Lets researchers retrieve the exact original bytes of any prior revision, not only the latest one.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Unique document identifier.</dd><dd><code>version</code> - Version sequence number to download.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Binary file stream.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Throws:</dt>
+                <dd><code>IOException</code> - If the physical asset cannot be read from disk.</dd>
+              </dl>
+            
+          </div>
+        
+          <div class="detail-block" id="method-29">
+            <div class="detail-title">streamAsset</div>
+            
+            <div class="signature">
+              public return <strong>streamAsset</strong>(Object documentService.getHistoricalDownloadAsset(guid, Object version)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-30">
+            <div class="detail-title">rollbackVersion</div>
+            <div><span class="annotation">@PostMapping(&quot;/{guid}/rollback/{version}&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Roll back the document to a designated historical version snapshot&quot;)</span> </div>
+            <div class="signature">
+              public ResponseEntity&lt;DocumentResponse&gt; <strong>rollbackVersion</strong>(Object param, Object param)
+            </div>
+            <p>Rolls back the document to a designated historical version snapshot.  WHAT: Restores metadata, text content, summaries, and file reference from the specified snapshot, archives the current state as a new snapshot, and advances the version sequence counter.  WHY: Provides guaranteed non-destructive rollbacks while maintaining full audit integrity.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>guid</code> - Document GUID.</dd><dd><code>version</code> - Historical version sequence number to restore.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Updated {@link DocumentResponse} reflecting the restored (new) active version.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-31">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>(Object documentService.rollbackToVersion(guid, Object version)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-32">
+            <div class="detail-title">streamAsset</div>
+            
+            <div class="signature">
+              private ResponseEntity&lt;Resource&gt; <strong>streamAsset</strong>(DownloadAsset asset)
+            </div>
+            <p>Streams a resolved physical asset to the client with its detected content type and attachment disposition.  WHAT: Wraps a {@link DownloadAsset} path in a {@link FileSystemResource} and sets the appropriate Content-Type (via Apache Tika detection) and Content-Disposition headers.  WHY: Shared by both the current-version and historical-version download endpoints to avoid duplicating HTTP streaming mechanics.  /</p>
+
+            
+              <dl class="param-list">
+                <dt>Parameters:</dt>
+                <dd><code>asset</code> - Resolved physical file path and original file name.</dd>
+              </dl>
+            
+
+            
+              <dl class="param-list">
+                <dt>Returns:</dt>
+                <dd>Binary file stream, or 404 if the physical asset is missing from disk.</dd>
+              </dl>
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-33">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public o <strong>f</strong>(Object asset.physicalFilePath()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-34">
+            <div class="detail-title">f</div>
+            
+            <div class="signature">
+              public i <strong>f</strong>(Object !Files.exists(path)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-35">
+            <div class="detail-title">d</div>
+            
+            <div class="signature">
+              public notFoun <strong>d</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-36">
+            <div class="detail-title">FileSystemResource</div>
+            
+            <div class="signature">
+              public new <strong>FileSystemResource</strong>(Object path)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-37">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public detectContentTyp <strong>e</strong>(Object path)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-38">
+            <div class="detail-title">k</div>
+            
+            <div class="signature">
+              public o <strong>k</strong>()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-39">
+            <div class="detail-title">e</div>
+            
+            <div class="signature">
+              public contentTyp <strong>e</strong>(Object MediaType.parseMediaType(contentType)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-40">
+            <div class="detail-title">r</div>
+            
+            <div class="signature">
+              public heade <strong>r</strong>(Object HttpHeaders.CONTENT_DISPOSITION, &quot;attachment; filename=\&quot;&quot; + asset.fileName()
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-41">
+            <div class="detail-title">y</div>
+            
+            <div class="signature">
+              public bod <strong>y</strong>(Object resource)
+            </div>
+            <p>No description provided.</p>
+
+            
+
+            
+
+            
+          </div>
+        
+          <div class="detail-block" id="method-42">
             <div class="detail-title">regenerateSummary</div>
             <div><span class="annotation">@PostMapping(&quot;/{guid}/summarize&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Trigger summary regeneration for a specific model (llama or mistral)&quot;)</span> </div>
             <div class="signature">
@@ -888,7 +1362,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-25">
+          <div class="detail-block" id="method-43">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -903,7 +1377,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-26">
+          <div class="detail-block" id="method-44">
             <div class="detail-title">l</div>
             
             <div class="signature">
@@ -918,7 +1392,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-27">
+          <div class="detail-block" id="method-45">
             <div class="detail-title">x</div>
             
             <div class="signature">
@@ -933,7 +1407,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-28">
+          <div class="detail-block" id="method-46">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -948,7 +1422,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-29">
+          <div class="detail-block" id="method-47">
             <div class="detail-title">x</div>
             
             <div class="signature">
@@ -963,7 +1437,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-30">
+          <div class="detail-block" id="method-48">
             <div class="detail-title">s</div>
             
             <div class="signature">
@@ -978,7 +1452,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-31">
+          <div class="detail-block" id="method-49">
             <div class="detail-title">e</div>
             
             <div class="signature">
@@ -993,7 +1467,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-32">
+          <div class="detail-block" id="method-50">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -1008,7 +1482,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-33">
+          <div class="detail-block" id="method-51">
             <div class="detail-title">k</div>
             
             <div class="signature">
@@ -1023,7 +1497,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-34">
+          <div class="detail-block" id="method-52">
             <div class="detail-title">chatWithDocument</div>
             <div><span class="annotation">@PostMapping(&quot;/{guid}/chat&quot;)</span>  <span class="annotation">@Operation(summary = &quot;Conversational chat with document assistant via Qdrant RAG and Llama 3.3&quot;)</span> </div>
             <div class="signature">
@@ -1048,7 +1522,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-35">
+          <div class="detail-block" id="method-53">
             <div class="detail-title">d</div>
             
             <div class="signature">
@@ -1063,7 +1537,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-36">
+          <div class="detail-block" id="method-54">
             <div class="detail-title">t</div>
             
             <div class="signature">
@@ -1078,7 +1552,7 @@
             
           </div>
         
-          <div class="detail-block" id="method-37">
+          <div class="detail-block" id="method-55">
             <div class="detail-title">k</div>
             
             <div class="signature">
