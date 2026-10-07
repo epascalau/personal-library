@@ -67,6 +67,7 @@ PURGE_MODELS=false    # drop the Ollama model cache as well
 NO_CACHE=false        # build the image without the Docker layer cache
 CLEAN_ONLY=false      # stop after the cleaning phase
 SKIP_VERIFY=false     # skip the post-deploy verification phase
+NO_WAIT_SEED=false    # return as soon as seeding starts, without waiting for it
 PULL=false            # refresh third-party base/service images
 FORCE=false           # required alongside a purge flag in non-interactive shells
 
@@ -133,6 +134,9 @@ Build & deploy
   --pull            Pull newer base and third-party service images.
   --clean-only      Clean, then stop (no build, no deploy).
   --skip-verify     Do not run the post-deploy verification.
+  --no-wait-seed    Do not wait for starter-document seeding to finish.
+                    Seeding still runs; the script just returns earlier, so
+                    the library may still be empty when the summary prints.
 
   -h, --help        Show this help.
 
@@ -159,6 +163,7 @@ while [[ $# -gt 0 ]]; do
     --pull)          PULL=true ;;
     --clean-only)    CLEAN_ONLY=true ;;
     --skip-verify)   SKIP_VERIFY=true ;;
+    --no-wait-seed)  NO_WAIT_SEED=true ;;
     -h|--help)       usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; echo >&2; usage >&2; exit 2 ;;
   esac
@@ -444,13 +449,93 @@ if ! "${up_cmd[@]}"; then
 fi
 ok "All services report healthy."
 
+# Ingestion is fully synchronous and CPU-bound: text extraction, embedding and
+# two LLM summarizations all run inside the upload request, so a document only
+# becomes visible once its entire pipeline finishes — minutes per file on CPU
+# inference. The stack reports healthy long before that, so without this wait
+# the script prints its success summary over an empty library, which looks
+# exactly like a failed seed. Block here, with visible progress, and say so.
+SEEDED_COUNT=0
+SEED_WAIT_TIMEOUT="${SEED_WAIT_TIMEOUT:-1800}"
+
+seed_doc_count() {
+  curl -s --max-time 10 "$API_URL" 2>/dev/null \
+    | sed -n 's/.*"totalCount":\([0-9]*\).*/\1/p' | head -1
+}
+
+wait_for_seeding() {
+  local sid state rc count elapsed=0 tty=false
+  # -aq, not -q: a seeder that already exited (nothing to do on a re-run, or
+  # SEED_ENABLED=false) is invisible to `ps -q`, which would look like a
+  # missing container and skip the wait with a misleading warning.
+  sid="$(dc ps -aq library-seeder 2>/dev/null | head -1 || true)"
+  if [[ -z "$sid" ]]; then
+    warn "library-seeder container not found; not waiting for seeding."
+    return 0
+  fi
+  [[ -t 1 ]] && tty=true
+
+  note "Seeding the starter documents. Each one runs extraction, embedding and"
+  note "  two LLM summarizations on CPU, so expect a few minutes per document."
+
+  while true; do
+    state="$(docker inspect -f '{{.State.Status}}' "$sid" 2>/dev/null || echo gone)"
+    count="$(seed_doc_count)"; count="${count:-0}"
+    SEEDED_COUNT="$count"
+
+    if [[ "$state" != "running" ]]; then
+      $tty && printf '\r\033[K'
+      rc="$(docker inspect -f '{{.State.ExitCode}}' "$sid" 2>/dev/null || echo 1)"
+      # The seeder is deliberately tolerant: an unreachable CDN logs a WARN and
+      # it still exits 0. Reporting only the exit code would therefore announce
+      # a complete library while a document is silently missing, so surface the
+      # seeder's own warnings here instead of trusting the status alone.
+      local seed_warnings
+      seed_warnings="$(dc logs --no-log-prefix library-seeder 2>/dev/null \
+        | grep -E '^\[seed\] (WARN|ERROR)' || true)"
+      if [[ "$rc" == "0" ]]; then
+        ok "Seeding finished in ${elapsed}s — ${count} document(s) in the library."
+      else
+        warn "Seeder exited with code ${rc} after ${elapsed}s (${count} document(s) ingested)."
+        note "  Details: npm run compose -- logs library-seeder"
+      fi
+      if [[ -n "$seed_warnings" ]]; then
+        warn "The seeder reported problems; some starter documents may be missing:"
+        while IFS= read -r line; do note "  ${line}"; done <<<"$seed_warnings"
+        note "  Re-run seeding with: npm run compose -- up -d --force-recreate library-seeder"
+      fi
+      return 0
+    fi
+
+    if (( elapsed >= SEED_WAIT_TIMEOUT )); then
+      $tty && printf '\r\033[K'
+      warn "Still seeding after ${elapsed}s; carrying on without waiting."
+      note "  Follow it with: npm run compose -- logs -f library-seeder"
+      return 0
+    fi
+
+    if $tty; then
+      printf '\r    %s…%s seeding: %s document(s) ready, %ds elapsed' \
+        "$C_DIM" "$C_RESET" "$count" "$elapsed"
+    elif (( elapsed > 0 && elapsed % 60 == 0 )); then
+      note "still seeding: ${count} document(s) ready, ${elapsed}s elapsed"
+    fi
+    sleep 5
+    elapsed=$((elapsed + 5))
+  done
+}
+
 # Starter-document seeding runs after the stack is confirmed healthy. It is
 # intentionally non-fatal: a failed seed (no network, CDN unreachable) must not
 # fail an otherwise good deployment.
 if ! dc up -d --no-deps library-seeder >/dev/null 2>&1; then
   warn "Could not start library-seeder; starter documents may be missing."
+elif $NO_WAIT_SEED; then
+  note "Starter-document seeding started in the background (--no-wait-seed)."
+  note "  The library may still be empty for a few minutes. Follow it with:"
+  note "  npm run compose -- logs -f library-seeder"
 else
-  note "Starter-document seeding started (see: docker compose logs library-seeder)."
+  wait_for_seeding
 fi
 dc ps --format 'table {{.Service}}\t{{.Status}}'
 
@@ -499,9 +584,10 @@ else
     if [[ "${points:-0}" -gt 0 ]]; then
       ok "Qdrant vectors indexed: ${points} point(s)."
     else
-      note "Qdrant collection exists but holds 0 vectors (expected on a fresh"
-      note "  purge until seeding/upload completes; otherwise indexing is failing:"
-      note "  docker compose logs personal-library-app | grep -i 'vector\\|qdrant'"
+      warn "Qdrant collection exists but holds 0 vectors."
+      note "  Seeding has already been waited for at this point, so this means"
+      note "  indexing is failing rather than still running. Check:"
+      note "  npm run compose -- logs personal-library-app | grep -i 'vector\\|qdrant'"
     fi
   else
     warn "Qdrant collection 'personal_library_embeddings' is missing."
@@ -514,6 +600,20 @@ fi
 
 printf '\n%s✓ Clean rebuild and deploy completed in %ds.%s\n' \
   "$C_GREEN$C_BOLD" "$((SECONDS - START_TS))" "$C_RESET"
+
+# The whole point of waiting for the seeder: this line is only reached once the
+# library actually has content, so "open the app" is advice the user can act on
+# immediately instead of landing on an empty list.
+if [[ "${SEEDED_COUNT:-0}" -gt 0 ]]; then
+  printf '\n    %s✓ The library is seeded with %s document(s) — open it now:%s\n' \
+    "$C_GREEN$C_BOLD" "$SEEDED_COUNT" "$C_RESET"
+  printf '      %s%s%s\n\n' "$C_BOLD" "$UI_URL" "$C_RESET"
+else
+  printf '\n    %s! The library is still empty.%s Seeding may not have finished;\n' \
+    "$C_YELLOW$C_BOLD" "$C_RESET"
+  printf '      watch it with: npm run compose -- logs -f library-seeder\n\n'
+fi
+
 printf '    UI          %s\n' "$UI_URL"
 printf '    Spring Boot %s\n' "http://localhost:${BACKEND_PORT}/api/v1"
-printf '    Logs        %s\n' "docker compose logs -f personal-library-app"
+printf '    Logs        %s\n' "npm run compose -- logs -f personal-library-app"

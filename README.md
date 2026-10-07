@@ -300,7 +300,17 @@ Behaviour worth knowing:
   TLS-intercepting proxy.
 
 To add your own starter documents, drop files into `./initial_data/` and re-run
-`docker compose up library-seeder`. Tuning knobs (all optional, set in [`config/settings.env`](config/settings.env)):
+`npm run compose -- up -d --force-recreate library-seeder`.
+
+> **Seeding is slow and synchronous.** Extraction, embedding and two LLM
+> summarizations run inside the upload request, so each document stays invisible
+> in the UI until its pipeline completes — a few minutes each on CPU inference,
+> while the stack already reports healthy. `npm run rebuild` waits for seeding,
+> shows progress, and only then prints *"The library is seeded — open it now"*.
+> After a plain `docker compose up` there is no such wait: if the list is empty,
+> watch `npm run compose -- logs -f library-seeder` before assuming a failure.
+
+Tuning knobs (all optional, set in [`config/settings.env`](config/settings.env)):
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |

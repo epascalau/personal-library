@@ -119,7 +119,43 @@ Design properties:
 
 Environment knobs: `SEED_ENABLED` (`true`), `SEED_REMOTE_PDF_URL`,
 `SEED_REMOTE_PDF_NAME`, `SEED_MAX_TIME`, `SEED_API_BASE`, `SEED_LOCAL_DIR`,
-`SEED_CERTS_DIR`. Re-run on demand with `docker compose up library-seeder`.
+`SEED_CERTS_DIR` — the first four live in [`config/settings.env`](../config/settings.env).
+Re-run on demand with `npm run compose -- up -d --force-recreate library-seeder`.
+
+#### Why `rebuild.sh` waits for it
+
+Ingestion is **fully synchronous and CPU-bound**: extraction, embedding and two
+LLM summarizations all happen inside the upload request, and the MongoDB record
+is only written when that finishes. A document is therefore invisible in the UI
+for minutes — measured at ~190 s for the Wizard of Oz PDF — while the stack has
+been reporting `healthy` the whole time.
+
+That gap is actively misleading: the rebuild used to print its success summary
+and URLs over an empty library, which is indistinguishable from a failed seed.
+`rebuild.sh` now blocks until the seeder exits, printing live progress, and only
+then tells you to open the app:
+
+```
+    ✓ Seeding finished in 190s — 2 document(s) in the library.
+    ✓ The library is seeded with 2 document(s) — open it now:
+      http://localhost:13000/
+```
+
+Use `--no-wait-seed` to return immediately instead (seeding still runs in the
+background); `SEED_WAIT_TIMEOUT` (default `1800`s) caps the wait either way.
+
+**The exit code is not sufficient on its own.** Because the seeder is non-fatal
+by design, an unreachable CDN logs a `WARN` and still exits `0` — so a missing
+document would otherwise be reported as a complete library. The wait therefore
+greps the seeder's own log for `WARN`/`ERROR` lines and surfaces them:
+
+```
+    ! The seeder reported problems; some starter documents may be missing:
+      [seed] WARN  Could not download 'the-wonderful-wizard-of-oz.pdf' ...
+```
+
+In practice that warning almost always means the DNS problem in §4.4 — the
+remote download is the one step that needs outbound name resolution.
 
 ### 4.4 `LIBRARY_DNS`: Outbound DNS for `ollama` and `library-seeder`
 Two services need to reach the public internet: `ollama` (pulls models from `registry.ollama.ai`) and `library-seeder` (downloads the remote PDF).
@@ -319,6 +355,7 @@ A single script drives the full clean-rebuild-redeploy-verify cycle. All flags a
 | `--pull` | Refreshes third-party base/service images (`mongo`, `mongo-express`, `qdrant`, `ollama`, `keycloak`, `nginx`, `swagger-editor`) before building. |
 | `--clean-only` | Stops after the cleaning phase — no build, no deploy. This is exactly what `npm run clean:generated-docs` invokes (`./scripts/rebuild.sh --deep --clean-only`), reusing the same safe generated-vs-hand-authored doc distinction instead of a separate ad hoc `rm`. |
 | `--skip-verify` | Skips the post-deploy verification phase (see §6.2). |
+| `--no-wait-seed` | Returns without waiting for starter-document seeding. Seeding still runs, but the library may be empty when the summary prints (§4.3). |
 
 **Always removed** regardless of flags: `dist/`, `target/`, `server.js`, and the project's own containers/image. **Always kept** unless explicitly purged: MongoDB data, Qdrant vectors, uploaded files, Ollama models. **Never removed**: hand-authored `docs/` content.
 
@@ -437,7 +474,7 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 | Documents appear in the UI but chat/RAG returns nothing relevant | Ingestion ran before `nomic-embed-text` was available, so `VectorRagService` logged `Vector store indexing skipped or failed (fallback to in-memory)` and Qdrant holds **zero** vectors. Almost always a symptom of the DNS row above. | Fix DNS, confirm all three models with `docker exec personal-library-ollama ollama list`, then re-upload the affected documents (delete them first — the seeder skips names already present). |
 | TLS/cert errors pulling npm/Maven/OS packages during `docker compose build` | `./certs/` is empty or certs aren't in `.crt`/`.pem` format | Drop the corporate root/intermediate CA bundle into `./certs/` — see §2 and [README.md](../README.md) enterprise certificate section. |
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |
-| Library is empty after `docker compose up --build` | `library-seeder` skipped or failed — it is deliberately non-fatal | `docker compose logs library-seeder`. Common causes: `SEED_ENABLED=false`, no network for the CDN download, or a TLS error needing a cert in `./certs/` (§4.3). Re-run with `docker compose up library-seeder`. |
+| Library is empty after `docker compose up --build` | Seeding is still running (it is synchronous and takes minutes per document — §4.3), or `library-seeder` skipped/failed, which is deliberately non-fatal. `npm run rebuild` waits and reports; plain `docker compose up` does not. | `docker compose logs library-seeder`. Common causes: `SEED_ENABLED=false`, no network for the CDN download, or a TLS error needing a cert in `./certs/` (§4.3). Re-run with `docker compose up library-seeder`. |
 | `library-seeder` logs `WARN ... HTTP 500` on upload | The ingestion pipeline itself failed — usually Ollama models still loading | Wait for `docker exec -it personal-library-ollama ollama list` to show all three models, then `docker compose up library-seeder` again (already-ingested documents are skipped). |
 | `rebuild.sh` reports `Deployment failed` but `docker compose ps` shows everything running | `docker compose up --wait` fails when any waited container **exits**, even successfully (exit `0`). A one-shot service was included in the waited set. | Add the service to `ONESHOT_SERVICES` in `rebuild.sh` — see §6.3. |
 | `personal-library-mongodb is unhealthy` during `docker compose up --build`, then recovers | The `mongosh` probe is a full Node.js runtime and times out while the Maven/Vite builds saturate the CPU. Enough consecutive timeouts mark it unhealthy, and every `depends_on: service_healthy` consumer then aborts. | Fixed — `mongodb` and `mongo-express` now carry generous `start_period` values (failures inside `start_period` do not count toward `retries`). A genuinely dead service still fails. |
