@@ -148,7 +148,7 @@ docker compose up -d --build
     Using the host resolver 10.255.255.254 for Ollama and the seeder this run.
 ```
 
-It stays silent when the daemon pins nothing, or pins a list that already includes the host resolver. An explicit `LIBRARY_DNS` (environment or `.env`) always wins. Persist it so plain `docker compose up` — which has no preflight — benefits too:
+It stays silent when the daemon pins nothing, or pins a list that already includes the host resolver. An explicit `LIBRARY_DNS` (environment or `config/settings.env`) always wins. Persist it so plain `docker compose up` — which has no preflight — benefits too:
 
 ```bash
 grep nameserver /etc/resolv.conf     # then set LIBRARY_DNS in config/settings.env
