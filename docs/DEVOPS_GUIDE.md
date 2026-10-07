@@ -71,6 +71,8 @@ This single-container-two-process design was chosen over two separate images/con
 | `keycloak` | `quay.io/keycloak/keycloak:24.0.5` | `8180→8080` | — | OIDC identity provider; `start-dev --import-realm` auto-imports `./config/keycloak-realm.json` on first boot. |
 | `library-seeder` | `curlimages/curl:8.11.1` | — | `personal-library-app` (healthy) | **One-shot task container, not a service** (`restart: "no"`). Runs `scripts/seed-initial-documents.sh` once the app is healthy, ingesting every file in `./initial_data` plus a remote public-domain PDF, then exits — see §4.3. |
 
+> **Every image tag and host port in this table is a variable.** The values shown are the defaults; all of them — plus the demo credentials — are set in one place, [`config/settings.env`](../config/settings.env). See §4.5 for how to change them and how precedence works.
+
 ### 4.1 Persistent Volumes
 `mongodb_data`, `qdrant_data`, `ollama_models` (~7 GB), `library_storage` (uploaded physical files, browsable read-only at `http://localhost:8092` — see `storage-browser` in §4) — all **named, external-lifetime** volumes that survive `docker compose down` and ordinary rebuilds. Only `scripts/rebuild.sh --purge-data`/`--purge-models` removes them (§6).
 
@@ -135,7 +137,7 @@ Set `LIBRARY_DNS` to the resolver from the host's `/etc/resolv.conf`; both servi
 
 ```bash
 grep nameserver /etc/resolv.conf          # e.g. 10.0.0.53
-export LIBRARY_DNS=10.0.0.53              # or put it in .env
+export LIBRARY_DNS=10.0.0.53              # or set it in config/settings.env
 docker compose up -d --build
 ```
 
@@ -149,7 +151,7 @@ docker compose up -d --build
 It stays silent when the daemon pins nothing, or pins a list that already includes the host resolver. An explicit `LIBRARY_DNS` (environment or `.env`) always wins. Persist it so plain `docker compose up` — which has no preflight — benefits too:
 
 ```bash
-echo "LIBRARY_DNS=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf)" >> .env
+grep nameserver /etc/resolv.conf     # then set LIBRARY_DNS in config/settings.env
 ```
 
 Fixing the daemon's own `dns` setting is the broader cure; `LIBRARY_DNS` is the per-project escape hatch.
@@ -162,9 +164,48 @@ docker exec personal-library-ollama ollama list   # expect 3 models
 
 ### 4.5 Complete Environment Variable Reference
 
-Every host-level knob the Compose file reads, its default, and **the code that consumes it**. Anything not listed here is hardcoded in `docker-compose.yml` and is not meant to be overridden per environment.
+**[`config/settings.env`](../config/settings.env) is the single place to change any of these.** Ports, image versions, demo credentials, model names, DNS/proxy and seeding options all live there, grouped and commented.
 
-Set these in a `.env` file beside `docker-compose.yml` (Compose loads it automatically) or export them in your shell.
+#### How a value is resolved
+
+Highest priority first:
+
+| # | Source | Use it for |
+| :--- | :--- | :--- |
+| 1 | Shell environment | One-off runs: `LIBRARY_DNS=10.0.0.53 npm run rebuild` |
+| 2 | Your personal dotenv in the project root | Machine-specific values and real secrets (gitignored) |
+| 3 | `config/settings.env` | Shared defaults, committed |
+| 4 | `${VAR:-default}` inside `docker-compose.yml` | Last-resort fallback |
+
+Levels 3 and 4 are kept **identical on purpose**, so a bare `docker compose up` — which reads neither an `--env-file` nor `config/settings.env` — still produces exactly the same stack. [`scripts/check-config.sh`](../scripts/check-config.sh) enforces that:
+
+```bash
+npm run config:check     # also runs automatically in rebuild.sh preflight
+```
+
+It fails if the two disagree, if a compose variable is missing from the central file, or if any variable lacks a `:-default`. Without it the central file could quietly become a lie — someone edits a value, runs plain `docker compose up`, and silently gets the stale inline default.
+
+#### Applying a change
+
+Compose only auto-loads a dotenv file from the project root; it never picks up `config/settings.env` on its own. Use the project's entrypoints, which pass the chain for you:
+
+```bash
+npm run rebuild               # and every other rebuild:/ops: script
+npm run compose -- up -d      # plain Compose with the env chain wired up
+npm run compose -- logs -f personal-library-app
+```
+
+#### Ports, images and credentials
+
+| Group | Variables | Notes |
+| :--- | :--- | :--- |
+| Host ports | `NGINX_HTTP_PORT` `APP_UI_PORT` `APP_BACKEND_PORT` `MONGO_PORT` `MONGO_EXPRESS_PORT` `STORAGE_BROWSER_PORT` `SWAGGER_EDITOR_PORT` `QDRANT_HTTP_PORT` `QDRANT_GRPC_PORT` `OLLAMA_PORT` `KEYCLOAK_PORT` | **Host side only.** Container-internal ports stay fixed, because `nginx.conf` and the inter-service URLs address services by name and internal port. The non-default host values avoid colliding with a MongoDB/Qdrant/Ollama/Keycloak already running locally. |
+| Image versions | `IMAGE_MONGO` `IMAGE_MONGO_EXPRESS` `IMAGE_NGINX` `IMAGE_QDRANT` `IMAGE_KEYCLOAK` `IMAGE_SWAGGER_EDITOR` `IMAGE_STORAGE_BROWSER` `IMAGE_SEEDER` `IMAGE_OLLAMA` | Keep `IMAGE_QDRANT`'s major/minor aligned with the Spring AI Qdrant client in `pom.xml`, or startup logs an incompatibility warning. `IMAGE_OLLAMA` is deliberately left at `:latest` — see the note in the file. |
+| Demo credentials | `MONGO_ROOT_USERNAME` `MONGO_ROOT_PASSWORD` `MONGO_DATABASE` `KEYCLOAK_ADMIN_USER` `KEYCLOAK_ADMIN_PASSWORD` `KEYCLOAK_REALM` `KEYCLOAK_CLIENT_ID` `KEYCLOAK_CLIENT_SECRET` | **Not secrets** — local throwaway values, committed so the stack starts with zero setup. `MONGO_ROOT_USERNAME`/`MONGO_ROOT_PASSWORD` each feed three services (mongodb, mongo-express, and the backend's `SPRING_MONGODB_URI`), which is exactly why they were centralized. For anything reachable by others, override them in your personal dotenv instead. |
+
+#### Operational knobs
+
+Each one below, its default, and **the code that consumes it**:
 
 | Variable | Default | Consumed by | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -180,7 +221,7 @@ Set these in a `.env` file beside `docker-compose.yml` (Compose loads it automat
 | `SEED_REMOTE_PDF_NAME` | `the-wonderful-wizard-of-oz.pdf` | [`seed-initial-documents.sh`](../scripts/seed-initial-documents.sh) | File name used for upload **and** for the idempotency check. |
 | `SEED_MAX_TIME` | `900` | [`seed-initial-documents.sh`](../scripts/seed-initial-documents.sh) | Per-document timeout (seconds). First ingestion is LLM-bound on CPU-only inference. |
 
-Fixed container-internal values — change these in `docker-compose.yml` itself, not via `.env`: `SEED_API_BASE`, `SEED_LOCAL_DIR`, `SEED_CERTS_DIR`, `ENTERPRISE_CA_DIR`, `OLLAMA_ORIGINS`.
+Fixed container-internal values — change these in `docker-compose.yml` itself, not in `config/settings.env`: `SEED_API_BASE`, `SEED_LOCAL_DIR`, `SEED_CERTS_DIR`, `ENTERPRISE_CA_DIR`, `OLLAMA_ORIGINS`, and every container-side port.
 
 #### Spring Boot application properties
 
@@ -218,16 +259,19 @@ The backend's own configuration lives in [`application.yml`](../src/main/resourc
 * The five hand-authored sources inside the otherwise-generated `docs/diagrams/`: `MINDMAP.md`, `architecture_diagrams.mmd` (an **input** to `generate-architecture-from-mmd.ts`), `rag_data_flow.drawio`, `system_architecture.drawio`, `system_architecture.puml`. `rebuild.sh` stashes and restores these around the directory delete — see `PRESERVED_DIAGRAM_SOURCES` in [`rebuild.sh`](../scripts/rebuild.sh). **Add to that list when you add a hand-authored file there.**
 * `./certs/` CA material (git-ignored by `certs/*.crt`) — re-supply it manually on a new machine.
 * `./initial_data/` — tracked, so the local seed document survives.
-* Your `.env`, if you created one (git-ignored).
+* [`config/settings.env`](../config/settings.env) — tracked, so every port, image version and credential comes back exactly as configured. This is what makes the stack reproducible rather than merely rebuildable.
+* Your personal dotenv in the project root, if you created one (git-ignored) — so machine-specific overrides and secrets are **not** restored by a fresh clone. Anything you cannot afford to retype belongs in `config/settings.env` instead.
 
 Full recreation from a clean checkout:
 
 ```bash
-cp .env.example .env          # then edit: LIBRARY_DNS, ENTERPRISE_* if needed
+# optional: set LIBRARY_DNS / ENTERPRISE_* in config/settings.env (§4.4, §4.5)
 # drop any corporate CA into ./certs/
 npm ci                        # host toolchain
-npm run ops:factory-reset     # or: docker compose up -d --build
+npm run ops:factory-reset     # or: npm run compose -- up -d --build
 ```
+
+No configuration step is required for a default local run — the committed `config/settings.env` and the matching inline defaults in `docker-compose.yml` are sufficient, and `rebuild.sh` auto-detects the broken-DNS case described in §4.4.
 
 Verify the result — a healthy stack is **not** sufficient evidence that RAG works:
 
@@ -358,6 +402,16 @@ Two TypeScript scripts exist under `scripts/` with **no corresponding `package.j
 If you expect an `npm run audit` or `npm run export` task, it does not exist — these are deliberately manual/ad hoc tools, not part of the regular build pipeline.
 
 `scripts/seed-initial-documents.sh` is also absent from `package.json`, but is **not** orphaned: it is the entrypoint of the `library-seeder` compose service (§4.3) and is bind-mounted into that container rather than executed on the host.
+
+### 7.2 Configuration Scripts
+
+| Script | npm task | Purpose |
+| :--- | :--- | :--- |
+| [`scripts/check-config.sh`](../scripts/check-config.sh) | `npm run config:check` | Verifies [`config/settings.env`](../config/settings.env) and the `${VAR:-default}` fallbacks in `docker-compose.yml` agree. Also run during `rebuild.sh` preflight, so drift fails a build rather than silently producing a stack that ignores the central file. |
+| [`scripts/compose.sh`](../scripts/compose.sh) | `npm run compose -- <args>` | `docker compose` with the env-file chain wired up. Compose only auto-loads a root dotenv file, so without this wrapper edits to `config/settings.env` appear to do nothing. |
+| [`scripts/lib/compose-env.sh`](../scripts/lib/compose-env.sh) | *(sourced)* | Builds that chain — committed defaults first, personal overrides last, since a later `--env-file` wins. Shared by `rebuild.sh` and `compose.sh` so every entrypoint resolves configuration identically. |
+
+`rebuild.sh` routes **all** of its Compose calls through a `dc()` wrapper built on the same helper. It deliberately does *not* source the env files into its own environment: exported values would rank above the `--env-file` chain in Compose's precedence and silently defeat the personal overrides. Its `setting()` helper instead reads the chain in the same order Compose does, which is how the final summary reports the ports that were actually deployed.
 
 ---
 

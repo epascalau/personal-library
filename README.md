@@ -249,6 +249,26 @@ the list with the `OLLAMA_PRELOAD_MODELS` environment variable (space separated)
 or pull extra models manually with
 `docker exec -it personal-library-ollama ollama pull <model>`.
 
+#### Configuration: One File for Everything
+
+All tunable settings — host ports, image versions, demo credentials, AI model names, DNS/proxy, and seeding — live in a single commented file:
+
+**[`config/settings.env`](config/settings.env)**
+
+Values resolve highest-priority-first: your shell → your personal dotenv in the project root (gitignored; the right home for secrets) → `config/settings.env` → the `${VAR:-default}` fallbacks in `docker-compose.yml`.
+
+The last two are kept deliberately identical, so a bare `docker compose up` still produces exactly the same stack. `npm run config:check` enforces that and fails if they drift (it also runs automatically during `rebuild.sh` preflight).
+
+Compose does not read `config/settings.env` on its own, so apply changes through the project's entrypoints:
+
+```bash
+npm run config:check          # verify the central file and compose agree
+npm run rebuild               # and every other rebuild:/ops: script
+npm run compose -- up -d      # plain Compose, env chain wired up
+```
+
+Credentials there (`librarypass`, `admin`) are **local demo values, not secrets** — committed so the stack starts with zero setup. Each previously appeared in three different services; centralizing them means changing a password in one place. For anything reachable by others, override them in your personal dotenv instead of editing the committed file.
+
 #### Automatic Initial Document Seeding
 
 So the stack is never handed over with an empty List Report, `docker compose up
@@ -280,7 +300,7 @@ Behaviour worth knowing:
   TLS-intercepting proxy.
 
 To add your own starter documents, drop files into `./initial_data/` and re-run
-`docker compose up library-seeder`. Tuning knobs (all optional, set in `.env`):
+`docker compose up library-seeder`. Tuning knobs (all optional, set in [`config/settings.env`](config/settings.env)):
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
@@ -293,7 +313,7 @@ To add your own starter documents, drop files into `./initial_data/` and re-run
 
 Containers do **not** use the host's `/etc/resolv.conf` — they inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server your network degrades or blocks, Ollama model pulls and the seeder's PDF download fail while the host resolves fine. The fault is often *intermittent*, so a multi-gigabyte model pull dies partway through even though a quick connectivity test passes.
 
-`./scripts/rebuild.sh` detects this automatically (it compares the daemon's pinned resolver against the host's) and overrides it for that run. Plain `docker compose up` has no such preflight, so persist the value in `.env`:
+`./scripts/rebuild.sh` detects this automatically (it compares the daemon's pinned resolver against the host's) and overrides it for that run. Plain `docker compose up` has no such preflight, so persist the value in [`config/settings.env`](config/settings.env):
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
@@ -304,7 +324,7 @@ Containers do **not** use the host's `/etc/resolv.conf` — they inherit the Doc
 
 ```bash
 grep nameserver /etc/resolv.conf     # e.g. 10.0.0.53
-echo "LIBRARY_DNS=10.0.0.53" >> .env
+# then in config/settings.env:  LIBRARY_DNS=10.0.0.53
 ```
 
 Always confirm models are present before judging RAG quality:

@@ -13,6 +13,8 @@
     "start": "node server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
+    "compose": "./scripts/compose.sh",
+    "config:check": "./scripts/check-config.sh",
     "rebuild": "./scripts/rebuild.sh",
     "rebuild:deep": "./scripts/rebuild.sh --deep --no-cache",
     "clean:generated-docs": "./scripts/rebuild.sh --deep --clean-only",

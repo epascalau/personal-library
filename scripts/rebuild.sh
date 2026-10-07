@@ -28,6 +28,38 @@ set -Eeuo pipefail
 readonly PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# All compose invocations go through this wrapper so the central settings file
+# and any personal overrides are always applied — a bare `docker compose` call
+# would ignore both.
+# shellcheck source=lib/compose-env.sh
+source "${PROJECT_ROOT}/scripts/lib/compose-env.sh"
+compose_env_args_into "$PROJECT_ROOT" COMPOSE_ENV_ARGS
+dc() { docker compose "${COMPOSE_ENV_ARGS[@]}" "$@"; }
+
+# Resolves one setting for the script's own output, mirroring Compose's
+# precedence exactly: shell environment, then the personal dotenv, then the
+# committed defaults, then the literal fallback.
+#
+# The files are deliberately NOT sourced wholesale. Exporting them would place
+# every value in the shell environment, where Compose ranks it ABOVE the
+# --env-file chain — silently defeating the personal overrides this is supposed
+# to honour.
+setting() {
+  local key="${1:?key required}" fallback="${2-}" value line
+  if [[ -n "${!key+x}" ]]; then
+    printf '%s' "${!key}"; return
+  fi
+  for f in "${PROJECT_ROOT}/.env" "${PROJECT_ROOT}/config/settings.env"; do
+    [[ -f "$f" ]] || continue
+    line="$(grep -E "^[[:space:]]*${key}=" "$f" | tail -n 1 || true)"
+    if [[ -n "$line" ]]; then
+      value="${line#*=}"
+      printf '%s' "$value"; return
+    fi
+  done
+  printf '%s' "$fallback"
+}
+
 # --- Options ----------------------------------------------------------------
 DEEP=false            # also drop node_modules and generated documentation
 PURGE_DATA=false      # drop mongodb / qdrant / uploaded-file volumes
@@ -58,9 +90,16 @@ readonly PRESERVED_DIAGRAM_SOURCES=(
   docs/diagrams/system_architecture.puml
 )
 
-readonly UI_URL="http://localhost:13000/"
-readonly API_URL="http://localhost:18080/api/v1/documents"
-readonly HEALTH_URL="http://localhost:18080/actuator/health"
+# Derived from the central configuration, so changing a port in
+# config/settings.env keeps these checks (and the closing summary) pointing at
+# the stack that was actually deployed.
+readonly UI_PORT="$(setting APP_UI_PORT 13000)"
+readonly BACKEND_PORT="$(setting APP_BACKEND_PORT 18080)"
+readonly QDRANT_PORT="$(setting QDRANT_HTTP_PORT 16333)"
+
+readonly UI_URL="http://localhost:${UI_PORT}/"
+readonly API_URL="http://localhost:${BACKEND_PORT}/api/v1/documents"
+readonly HEALTH_URL="http://localhost:${BACKEND_PORT}/actuator/health"
 
 usage() {
   cat <<'USAGE'
@@ -153,6 +192,14 @@ docker compose version >/dev/null 2>&1 || fail "the 'docker compose' plugin is r
 docker info >/dev/null 2>&1 || fail "the Docker daemon is not reachable. Is it running?"
 ok "Docker $(docker version --format '{{.Server.Version}}') and Compose $(docker compose version --short)"
 
+# config/settings.env is the single place to change any stack setting, but
+# docker-compose.yml also carries matching `${VAR:-default}` fallbacks so a bare
+# `docker compose up` still works. If those two ever disagree, editing the
+# central file would silently do nothing for anyone not using these scripts.
+if ! "${PROJECT_ROOT}/scripts/check-config.sh"; then
+  fail "Configuration drift detected. Reconcile config/settings.env with docker-compose.yml."
+fi
+
 # Containers inherit the Docker daemon's DNS resolver, not the host's. When
 # /etc/docker/daemon.json pins a public resolver the local network degrades or
 # blocks, model pulls fail with "server misbehaving" — yet the host resolves
@@ -167,7 +214,7 @@ ok "Docker $(docker version --format '{{.Server.Version}}') and Compose $(docker
 # the daemon's pinned resolver against the host's own. If the daemon sends
 # container DNS somewhere the host itself does not use, prefer the host's
 # resolver — it demonstrably works, since the rest of this build depends on it.
-if [[ -z "${LIBRARY_DNS:-}" ]] && ! grep -qs '^LIBRARY_DNS=' "${PROJECT_ROOT}/.env"; then
+if [[ -z "$(setting LIBRARY_DNS)" ]]; then
   host_dns="$(awk '/^nameserver/ {print $2; exit}' /etc/resolv.conf 2>/dev/null || true)"
   daemon_dns=""
   if [[ -r /etc/docker/daemon.json ]]; then
@@ -178,8 +225,8 @@ if [[ -z "${LIBRARY_DNS:-}" ]] && ! grep -qs '^LIBRARY_DNS=' "${PROJECT_ROOT}/.e
     export LIBRARY_DNS="$host_dns"
     warn "Docker pins container DNS to '${daemon_dns}', which the host itself does not use."
     note "Using the host resolver ${host_dns} for Ollama and the seeder this run."
-    note "Persist it so plain 'docker compose up' works too:"
-    note "  echo 'LIBRARY_DNS=${host_dns}' >> .env"
+    note "Persist it so plain 'docker compose up' works too — set this in"
+    note "  config/settings.env:  LIBRARY_DNS=${host_dns}"
   fi
 fi
 
@@ -201,7 +248,7 @@ fi
 # --- Phase 2: clean ---------------------------------------------------------
 step "Removing the running stack"
 # --remove-orphans also clears containers left behind by earlier compose files.
-compose_down=(docker compose down --remove-orphans)
+compose_down=(dc down --remove-orphans)
 if $PURGE_DATA && $PURGE_MODELS; then
   compose_down+=(--volumes)
 fi
@@ -297,7 +344,7 @@ if $DEEP; then
 fi
 
 # Drop the application image so the next build cannot silently reuse it.
-app_image="$(docker compose config --images 2>/dev/null | grep -- '-personal-library-app$' || true)"
+app_image="$(dc config --images 2>/dev/null | grep -- '-personal-library-app$' || true)"
 if [[ -n "$app_image" ]] && docker image inspect "$app_image" >/dev/null 2>&1; then
   docker image rm -f "$app_image" >/dev/null
   ok "Application image '$app_image' removed."
@@ -361,7 +408,7 @@ fi
 
 # --- Phase 4: build ---------------------------------------------------------
 step "Building the container image (frontend bundle + Spring Boot JAR)"
-build_cmd=(docker compose build)
+build_cmd=(dc build)
 $NO_CACHE && build_cmd+=(--no-cache)
 $PULL     && build_cmd+=(--pull)
 "${build_cmd[@]}" || fail "Image build failed."
@@ -385,14 +432,14 @@ while IFS= read -r svc; do
     [[ "$svc" == "$oneshot" ]] && continue 2
   done
   wait_services+=("$svc")
-done < <(docker compose config --services)
+done < <(dc config --services)
 
-up_cmd=(docker compose up -d --wait)
+up_cmd=(dc up -d --wait)
 $PULL && up_cmd+=(--pull always)
 up_cmd+=("${wait_services[@]}")
 if ! "${up_cmd[@]}"; then
   warn "Services did not all become healthy. Recent application logs:"
-  docker compose logs --tail=40 personal-library-app || true
+  dc logs --tail=40 personal-library-app || true
   fail "Deployment failed."
 fi
 ok "All services report healthy."
@@ -400,12 +447,12 @@ ok "All services report healthy."
 # Starter-document seeding runs after the stack is confirmed healthy. It is
 # intentionally non-fatal: a failed seed (no network, CDN unreachable) must not
 # fail an otherwise good deployment.
-if ! docker compose up -d --no-deps library-seeder >/dev/null 2>&1; then
+if ! dc up -d --no-deps library-seeder >/dev/null 2>&1; then
   warn "Could not start library-seeder; starter documents may be missing."
 else
   note "Starter-document seeding started (see: docker compose logs library-seeder)."
 fi
-docker compose ps --format 'table {{.Service}}\t{{.Status}}'
+dc ps --format 'table {{.Service}}\t{{.Status}}'
 
 # --- Phase 6: verify --------------------------------------------------------
 if $SKIP_VERIFY; then
@@ -430,7 +477,7 @@ else
   check_http "Documents API          " "$API_URL"    || verify_failed=true
 
   # The AI features are unusable without the language and embedding models.
-  models="$(docker compose exec -T ollama ollama list 2>/dev/null | tail -n +2 | awk '{print $1}' | paste -sd' ' - || true)"
+  models="$(dc exec -T ollama ollama list 2>/dev/null | tail -n +2 | awk '{print $1}' | paste -sd' ' - || true)"
   if [[ -n "$models" ]]; then
     ok "Ollama models ready: $models"
   else
@@ -444,7 +491,7 @@ else
   # RAG then silently answers from the model's own training data instead of the
   # library. The only honest check is asking Qdrant how many vectors it holds.
   vector_status="$(curl -s --max-time 20 \
-    "http://localhost:${QDRANT_HOST_PORT:-16333}/collections/personal_library_embeddings" 2>/dev/null || true)"
+    "http://localhost:${QDRANT_PORT}/collections/personal_library_embeddings" 2>/dev/null || true)"
   if [[ -z "$vector_status" ]]; then
     warn "Qdrant did not respond; vector search is unavailable."
   elif grep -q '"status":"ok"' <<<"$vector_status"; then
@@ -468,5 +515,5 @@ fi
 printf '\n%s✓ Clean rebuild and deploy completed in %ds.%s\n' \
   "$C_GREEN$C_BOLD" "$((SECONDS - START_TS))" "$C_RESET"
 printf '    UI          %s\n' "$UI_URL"
-printf '    Spring Boot %s\n' "http://localhost:18080/api/v1"
+printf '    Spring Boot %s\n' "http://localhost:${BACKEND_PORT}/api/v1"
 printf '    Logs        %s\n' "docker compose logs -f personal-library-app"

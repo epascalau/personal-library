@@ -9,22 +9,22 @@ services:
     container_name: personal-library-app
     restart: unless-stopped
     ports:
-      - "13000:13000"
-      - "18080:18080"
+      - "${APP_UI_PORT:-13000}:13000"
+      - "${APP_BACKEND_PORT:-18080}:18080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       # Spring Boot 4 renamed this prefix: "spring.data.mongodb" is a hard deprecation
       # that is SILENTLY ignored, so the old SPRING_DATA_MONGODB_URI name had no effect.
-      - SPRING_MONGODB_URI=mongodb://root:librarypass@mongodb:27017/personal_library?authSource=admin
+      - SPRING_MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-librarypass}@mongodb:27017/${MONGO_DATABASE:-personal_library}?authSource=admin
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6334
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_LLAMA_MODEL=${OLLAMA_LLAMA_MODEL:-llama3.2}
       - OLLAMA_MISTRAL_MODEL=${OLLAMA_MISTRAL_MODEL:-mistral}
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=personal-library-realm
-      - KEYCLOAK_CLIENT_ID=personal-library-client
-      - KEYCLOAK_CLIENT_SECRET=enterprise-library-secret
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-personal-library-realm}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-personal-library-client}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-enterprise-library-secret}
     volumes:
       - library_storage:/app/storage/documents
     healthcheck:
@@ -61,11 +61,11 @@ services:
   # and the preview always reflects the current file on disk without a rebuild.
   # ==============================================================================
   swagger-editor:
-    image: swaggerapi/swagger-editor:v5.8.10
+    image: ${IMAGE_SWAGGER_EDITOR:-swaggerapi/swagger-editor:v5.8.10}
     container_name: personal-library-swagger-editor
     restart: unless-stopped
     ports:
-      - "8090:80"
+      - "${SWAGGER_EDITOR_PORT:-8090}:80"
     volumes:
       # Mounted onto the editor's own static web root (NOT /tmp + SWAGGER_FILE,
       # which this nginx-based v5.x image does not actually wire up despite
@@ -103,11 +103,11 @@ services:
   # bound to port 80.
   # ==============================================================================
   nginx:
-    image: nginx:1.27-alpine
+    image: ${IMAGE_NGINX:-nginx:1.27-alpine}
     container_name: personal-library-nginx
     restart: unless-stopped
     ports:
-      - "8088:80"
+      - "${NGINX_HTTP_PORT:-8088}:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -133,15 +133,15 @@ services:
   # traffic (Spring Boot app, mongo-express) still uses the real default
   # 27017 against the `mongodb` service name, unaffected by this remap.
   mongodb:
-    image: mongo:7.0
+    image: ${IMAGE_MONGO:-mongo:7.0}
     container_name: personal-library-mongodb
     restart: unless-stopped
     ports:
-      - "37017:27017"
+      - "${MONGO_PORT:-37017}:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=librarypass
-      - MONGO_INITDB_DATABASE=personal_library
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-librarypass}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE:-personal_library}
     volumes:
       - mongodb_data:/data/db
     healthcheck:
@@ -173,16 +173,16 @@ services:
   # the UI's profile popover.
   # ==============================================================================
   mongo-express:
-    image: mongo-express:1.0.2
+    image: ${IMAGE_MONGO_EXPRESS:-mongo-express:1.0.2}
     container_name: personal-library-mongo-express
     restart: unless-stopped
     ports:
-      - "8091:8081"
+      - "${MONGO_EXPRESS_PORT:-8091}:8081"
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongodb
       - ME_CONFIG_MONGODB_PORT=27017
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=librarypass
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_ROOT_USERNAME:-root}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ROOT_PASSWORD:-librarypass}
       - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
       - ME_CONFIG_BASICAUTH=false
     depends_on:
@@ -221,11 +221,11 @@ services:
   # no shell, wget, or curl), so no in-container probe command can be executed.
   # ==============================================================================
   storage-browser:
-    image: halverneus/static-file-server:v1.8.10
+    image: ${IMAGE_STORAGE_BROWSER:-halverneus/static-file-server:v1.8.10}
     container_name: personal-library-storage-browser
     restart: unless-stopped
     ports:
-      - "8092:8080"
+      - "${STORAGE_BROWSER_PORT:-8092}:8080"
     environment:
       # Serve the mount point itself, with directory indexes enabled so each
       # GUID/version folder is navigable rather than returning 404 on a bare path.
@@ -264,12 +264,12 @@ services:
   #      preventing expensive re-embedding of the entire document catalog upon reboot.
   # ==============================================================================
   qdrant:
-    image: qdrant/qdrant:v1.18.0
+    image: ${IMAGE_QDRANT:-qdrant/qdrant:v1.18.0}
     container_name: personal-library-qdrant
     restart: unless-stopped
     ports:
-      - "16333:6333" # HTTP REST API
-      - "16334:6334" # gRPC Internal API
+      - "${QDRANT_HTTP_PORT:-16333}:6333" # HTTP REST API
+      - "${QDRANT_GRPC_PORT:-16334}:6334" # gRPC Internal API
     volumes:
       - qdrant_data:/qdrant/storage
     environment:
@@ -302,7 +302,7 @@ services:
   #      enabling model pulling through TLS-intercepting enterprise proxies (Zscaler, BlueCoat).
   # ==============================================================================
   ollama:
-    image: ollama/ollama:latest
+    image: ${IMAGE_OLLAMA:-ollama/ollama:latest}
     container_name: personal-library-ollama
     restart: unless-stopped
     # The stock image starts `ollama serve` directly, leaving no chance to trust
@@ -321,7 +321,7 @@ services:
     # locally. Internal container-to-container traffic (Spring Boot app)
     # still uses the real default 11434 against the `ollama` service name.
     ports:
-      - "21434:11434"
+      - "${OLLAMA_PORT:-21434}:11434"
     volumes:
       - ollama_models:/root/.ollama
       # Enterprise TLS certificates for the corporate proxy & registry fetching.
@@ -373,15 +373,15 @@ services:
   # Keycloak: OpenID Connect (OIDC) Identity Provider & Access Control
   # ==============================================================================
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.5
+    image: ${IMAGE_KEYCLOAK:-quay.io/keycloak/keycloak:24.0.5}
     container_name: personal-library-keycloak
     restart: unless-stopped
     command: start-dev --import-realm
     ports:
-      - "8180:8080"
+      - "${KEYCLOAK_PORT:-8180}:8080"
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
       - KC_HEALTH_ENABLED=true
     volumes:
       - ./config/keycloak-realm.json:/opt/keycloak/data/import/realm.json:ro
@@ -419,7 +419,7 @@ services:
   # the default restart policy would otherwise loop it forever after it exits.
   # ==============================================================================
   library-seeder:
-    image: curlimages/curl:8.11.1
+    image: ${IMAGE_SEEDER:-curlimages/curl:8.11.1}
     container_name: personal-library-seeder
     restart: "no"
     environment:
