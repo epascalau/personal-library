@@ -35,6 +35,14 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+# Bake a source snapshot into the image. The runtime stage deliberately carries
+# no project sources (only the built artifacts), so the /export.zip endpoint has
+# nothing to archive there — it previously failed with a 500. This stage is the
+# only one holding the full tree, so the archive is produced here and shipped as
+# a static asset. It excludes certs/, storage/ and dotenv secrets; see
+# scripts/export-zip.ts.
+RUN node ./node_modules/tsx/dist/cli.mjs scripts/export-zip.ts /tmp/project-source.zip
+
 FROM node:24.21.0-bookworm-slim AS node-runtime
 
 # Stage 2: Build the Java Spring Boot Backend (Maven + Java 21)
@@ -104,6 +112,9 @@ COPY src/main/server ./src/main/server
 COPY tsconfig.json ./
 COPY openapi.yaml ./
 COPY docker-entrypoint.sh ./
+
+# Source snapshot served by /export.zip (built in the frontend-builder stage).
+COPY --from=frontend-builder /tmp/project-source.zip ./project-source.zip
 RUN chmod +x docker-entrypoint.sh
 
 # Expose HTTP ports (UI/Gateway: 13000, Spring Boot: 18080)

@@ -2456,10 +2456,22 @@ app.get('/LICENSE', (_req: Request, res: Response) => {
  */
 const handleZipExport = async (_req: Request, res: Response) => {
   try {
-    const { generateProjectZipBuffer } = await import('../../../scripts/export-zip.ts');
-    const buffer = generateProjectZipBuffer();
     res.setHeader('Content-Disposition', 'attachment; filename="personal-library-enterprise.zip"');
     res.setHeader('Content-Type', 'application/zip');
+
+    // In the container the project sources are absent by design — only built
+    // artifacts ship — so the archive is baked in at image build time and
+    // simply streamed here. Generating it live would (and did) fail with a 500.
+    const prebuiltZip = path.resolve(projectRoot, 'project-source.zip');
+    if (fs.existsSync(prebuiltZip)) {
+      res.setHeader('Content-Length', fs.statSync(prebuiltZip).size.toString());
+      return res.sendFile(prebuiltZip);
+    }
+
+    // Local development: the working tree is right here, so build it on demand
+    // and always reflect the current state of the checkout.
+    const { generateProjectZipBuffer } = await import('../../../scripts/export-zip.ts');
+    const buffer = generateProjectZipBuffer();
     res.setHeader('Content-Length', buffer.length.toString());
     return res.send(buffer);
   } catch (err) {

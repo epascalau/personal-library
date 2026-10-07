@@ -390,7 +390,7 @@ A `points_count` of `0` is only legitimate immediately after `--purge-data`, bef
 
 `docker compose up --wait` fails when **any** waited container exits — including a one-shot job that finished successfully with exit code `0`. `library-seeder` is exactly such a job: it uploads the starter documents and terminates.
 
-`rebuild.sh` therefore excludes the services listed in its `ONESHOT_SERVICES` array from the waited set and starts the seeder separately **after** the stack is confirmed healthy, treating a seeding failure as non-fatal (no network must not fail an otherwise good deployment). Plain `docker compose up` is unaffected and still seeds as documented in §7.1. **Add any future run-to-completion service to `ONESHOT_SERVICES`**, or it will report every successful deployment as a failure.
+`rebuild.sh` therefore excludes the services listed in its `ONESHOT_SERVICES` array from the waited set and starts the seeder separately **after** the stack is confirmed healthy, treating a seeding failure as non-fatal (no network must not fail an otherwise good deployment). Plain `docker compose up` is unaffected and still seeds as documented in §4.3. **Add any future run-to-completion service to `ONESHOT_SERVICES`**, or it will report every successful deployment as a failure.
 
 ---
 
@@ -431,10 +431,23 @@ Note that *other* `.mmd`/`.puml` files in the same directory (`mindmap.mmd`, `en
 
 Everything else under `docs/diagrams/` is reproducible and safe for `--deep`/`clean:generated-docs` to remove.
 
-### 7.1 Orphaned / Manual-Only Scripts
-Two TypeScript scripts exist under `scripts/` with **no corresponding `package.json` entry** — they must be invoked directly via `tsx`:
+### 7.1 Manual-Only Scripts
+Two TypeScript scripts exist under `scripts/` with **no corresponding `package.json` entry** — invoke them directly via `tsx`. Only the first is genuinely orphaned; `export-zip.ts` additionally backs a UI feature (see below):
 - `tsx scripts/audit-codebase.ts` — cross-checks i18n locale-key parity, dead-import detection, and other repo-wide consistency checks (used during this project's documentation-audit work, never wired to CI).
-- `tsx scripts/export-zip.ts` — produces a distributable `.zip` snapshot of the repository, excluding build artifacts/`node_modules`/`.git`.
+- `tsx scripts/export-zip.ts [output.zip]` — produces a distributable `.zip` snapshot of the repository (~28 MB), excluding build artifacts, `node_modules`, `.git`, and the sensitive paths listed below. Writes to the OS temp directory when no path is given. Set `EXPORT_ZIP_ROOT` to archive a tree other than the repository root.
+
+This module is **also imported by the gateway** to serve the ShellBar's "Export project" action at `/export.zip` (aliases: `/api/v1/export/zip`, `/api/v1/export.zip`), so it is not purely manual.
+
+**How the archive is produced differs by environment, and has to:**
+
+| Environment | Source of the archive |
+| :--- | :--- |
+| Local `npm run dev` | Built on demand from the working tree, so it always reflects the current checkout. |
+| Container | Streamed from `/app/project-source.zip`, baked in during the `frontend-builder` stage. |
+
+The runtime image intentionally ships only build outputs — no `pom.xml`, no `src/main/frontend`, no `docs/` — so there is nothing there to archive on demand. The endpoint used to attempt it anyway and returned `500 ERR_MODULE_NOT_FOUND`; the snapshot is therefore produced in the one stage that holds the full tree ([`Dockerfile`](../Dockerfile)) and copied into the runtime image. **Consequence:** the container's archive is a snapshot of the source *as of the image build*, so rebuild the image after changing sources.
+
+**Excluded as sensitive** — the archive is meant to be shareable: `certs/` (the corporate CA used to pierce a TLS-intercepting proxy — internal infrastructure detail), `storage/` (whatever documents the operator uploaded), any `.crt`/`.pem`/`.key`/`.p12`/`.jks`/`.pfx`, and the operator's git-ignored dotenv. `.env.example` and `config/settings.env` are committed, non-secret templates and are deliberately kept.
 
 If you expect an `npm run audit` or `npm run export` task, it does not exist — these are deliberately manual/ad hoc tools, not part of the regular build pipeline.
 
@@ -475,6 +488,7 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 | TLS/cert errors pulling npm/Maven/OS packages during `docker compose build` | `./certs/` is empty or certs aren't in `.crt`/`.pem` format | Drop the corporate root/intermediate CA bundle into `./certs/` — see §2 and [README.md](../README.md) enterprise certificate section. |
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |
 | Library is empty after `docker compose up --build` | Seeding is still running (it is synchronous and takes minutes per document — §4.3), or `library-seeder` skipped/failed, which is deliberately non-fatal. `npm run rebuild` waits and reports; plain `docker compose up` does not. | `docker compose logs library-seeder`. Common causes: `SEED_ENABLED=false`, no network for the CDN download, or a TLS error needing a cert in `./certs/` (§4.3). Re-run with `docker compose up library-seeder`. |
+| "Export project" returns 500 / downloads nothing | In a container, `/app/project-source.zip` is missing — the image predates the snapshot being baked in, or was built from a stage that skipped it | `npm run compose -- logs personal-library-app \| grep -i zip`. Rebuild the image: `npm run rebuild`. The archive is a build-time snapshot (§7.1), so it also needs a rebuild to pick up source changes. |
 | `library-seeder` logs `WARN ... HTTP 500` on upload | The ingestion pipeline itself failed — usually Ollama models still loading | Wait for `docker exec -it personal-library-ollama ollama list` to show all three models, then `docker compose up library-seeder` again (already-ingested documents are skipped). |
 | `rebuild.sh` reports `Deployment failed` but `docker compose ps` shows everything running | `docker compose up --wait` fails when any waited container **exits**, even successfully (exit `0`). A one-shot service was included in the waited set. | Add the service to `ONESHOT_SERVICES` in `rebuild.sh` — see §6.3. |
 | `personal-library-mongodb is unhealthy` during `docker compose up --build`, then recovers | The `mongosh` probe is a full Node.js runtime and times out while the Maven/Vite builds saturate the CPU. Enough consecutive timeouts mark it unhealthy, and every `depends_on: service_healthy` consumer then aborts. | Fixed — `mongodb` and `mongo-express` now carry generous `start_period` values (failures inside `start_period` do not count toward `retries`). A genuinely dead service still fails. |
