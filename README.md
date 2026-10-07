@@ -238,6 +238,9 @@ docker compose logs -f ollama | grep ollama-entrypoint
 
 # 4. Confirm the models are installed
 docker exec -it personal-library-ollama ollama list
+
+# 5. Watch the one-shot initial document seeding (runs once the app is healthy)
+docker compose logs -f library-seeder
 ```
 
 The Ollama container pulls every model the backend needs on first start and
@@ -245,6 +248,46 @@ caches them in the `ollama_models` volume, so later starts are instant. Override
 the list with the `OLLAMA_PRELOAD_MODELS` environment variable (space separated)
 or pull extra models manually with
 `docker exec -it personal-library-ollama ollama pull <model>`.
+
+#### Automatic Initial Document Seeding
+
+So the stack is never handed over with an empty List Report, `docker compose up
+--build` also runs a short-lived `library-seeder` container. It waits until
+`personal-library-app` reports healthy, then ingests two starter documents:
+
+| Source | Document |
+| :--- | :--- |
+| `./initial_data/` (every bundled `.pdf`, `.docx`, `.doc`, `.txt`, `.md`) | *Natural Language Processing: A 15-Minute Primer* |
+| Public CDN download | *The Wonderful Wizard of Oz* — the document used by the RAG examples in the docs |
+
+**Why it uploads through the REST API instead of writing to the databases
+directly:** `POST /api/v1/documents` runs the full ingestion pipeline — Tika
+text extraction, BibTeX metadata extraction, chunking, 768-dimensional
+embeddings into Qdrant, and the dual Llama/Mistral summaries. Inserting rows
+straight into MongoDB and Qdrant would create documents that *appear* in the UI
+but return nothing from semantic retrieval, which is exactly the class of
+"looks right, isn't" failure this project tries to avoid.
+
+Behaviour worth knowing:
+* **Idempotent** — the seeder filters the list report by file name first, so
+  repeated `docker compose up` runs never create duplicates.
+* **Non-fatal** — an offline machine or an unavailable CDN logs a warning and
+  leaves the rest of the stack healthy; nothing blocks startup.
+* **Slow by design** — the first ingestion is LLM-bound and can take several
+  minutes per document on CPU-only inference (`SEED_MAX_TIME`, default 900s).
+* **Enterprise TLS** — any certificate in `./certs` is appended to the CA bundle
+  before the HTTPS download, matching how the Dockerfile trusts a corporate
+  TLS-intercepting proxy.
+
+To add your own starter documents, drop files into `./initial_data/` and re-run
+`docker compose up library-seeder`. Tuning knobs (all optional, set in `.env`):
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `SEED_ENABLED` | `true` | Set to `false` to skip seeding entirely |
+| `SEED_REMOTE_PDF_URL` | Wizard of Oz CDN URL | Override the remote document |
+| `SEED_REMOTE_PDF_NAME` | `the-wonderful-wizard-of-oz.pdf` | File name recorded for the remote document |
+| `SEED_MAX_TIME` | `900` | Per-document upload timeout in seconds |
 
 Access Points:
 * **Web Application (via nginx, recommended):** `http://localhost:8088`

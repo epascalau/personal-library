@@ -349,6 +349,57 @@ services:
     networks:
       - library-net
 
+  # ==============================================================================
+  # Library Seeder: One-Shot Initial Document Ingestion
+  # ==============================================================================
+  # WHAT: A short-lived sidecar that waits for the application to report healthy
+  # and then ingests two starter documents through the public REST API — every
+  # file bundled in ./initial_data, plus "The Wonderful Wizard of Oz" fetched
+  # from a public CDN. It exits as soon as both are processed.
+  # WHY: A freshly provisioned stack otherwise presents an empty List Report,
+  # which makes the RAG chat, dual summaries, and vector search impossible to
+  # evaluate without manual setup. Seeding through POST /api/v1/documents (not
+  # by writing to Mongo and Qdrant directly) is deliberate: it exercises the
+  # real pipeline — Tika extraction, BibTeX metadata, chunking, 768-D embeddings
+  # and the Llama/Mistral summaries — so the seeded records behave exactly like
+  # user-uploaded ones. A direct database insert would produce documents that
+  # appear in the UI but return nothing from semantic retrieval.
+  #
+  # The script is idempotent (it filters the list report by file name before
+  # uploading) so repeated `docker compose up` runs never duplicate records, and
+  # every failure path is non-fatal so an offline machine still gets a working
+  # stack. Set SEED_ENABLED=false to skip seeding entirely.
+  #
+  # `restart: "no"` is required: this is a task container, not a service, and
+  # the default restart policy would otherwise loop it forever after it exits.
+  # ==============================================================================
+  library-seeder:
+    image: curlimages/curl:8.11.1
+    container_name: personal-library-seeder
+    restart: "no"
+    environment:
+      - SEED_ENABLED=${SEED_ENABLED:-true}
+      - SEED_API_BASE=http://personal-library-app:18080/api/v1
+      - SEED_LOCAL_DIR=/seed/initial_data
+      - SEED_REMOTE_PDF_URL=${SEED_REMOTE_PDF_URL:-https://cdn.bookey.app/files/pdf/book/en/the-wonderful-wizard-of-oz.pdf}
+      - SEED_REMOTE_PDF_NAME=${SEED_REMOTE_PDF_NAME:-the-wonderful-wizard-of-oz.pdf}
+      - SEED_MAX_TIME=${SEED_MAX_TIME:-900}
+      - SEED_CERTS_DIR=/seed/certs
+    volumes:
+      - ./scripts/seed-initial-documents.sh:/seed/seed-initial-documents.sh:ro
+      - ./initial_data:/seed/initial_data:ro
+      # Same enterprise CA material the Dockerfile bakes into the app image, so
+      # the HTTPS download of the remote PDF also works behind a TLS-intercepting
+      # corporate proxy. Harmless (and ignored) when ./certs holds only .gitkeep.
+      - ./certs:/seed/certs:ro
+    entrypoint: ["/bin/sh"]
+    command: ["/seed/seed-initial-documents.sh"]
+    depends_on:
+      personal-library-app:
+        condition: service_healthy
+    networks:
+      - library-net
+
 volumes:
   mongodb_data:
     name: personal-library-mongodb-data

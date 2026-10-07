@@ -25,6 +25,7 @@ This document is the authoritative technical reference for how **Personal Librar
                       swagger-editor  :8090 ── (also reachable via nginx /swagger/)
                       mongo-express   :8091 ── (MongoDB web viewer)
                       storage-browser :8092 ── (read-only view of library_storage)
+                      library-seeder   (—)  ── one-shot: seeds initial_data + remote PDF, then exits
 ```
 
 **Key fact**: `personal-library-app` is a **single container image** running **two runtimes side by side** (Node/Express on 13000 *and* the Spring Boot JAR on 18080), started together by `docker-entrypoint.sh`. This is not two separate services — see §3.
@@ -68,6 +69,49 @@ This single-container-two-process design was chosen over two separate images/con
 | `qdrant` | `qdrant/qdrant:v1.11.0` | `16333→6333` (REST), `16334→6334` (gRPC) | — | Vector search; Spring AI connects over gRPC (6334, internal) for binary embedding transfer; TLS disabled since traffic never leaves the internal `library-net` bridge network (edge TLS belongs at nginx). Host-published on `16333`/`16334`, not Qdrant's own `6333`/`6334` defaults, to avoid colliding with a Qdrant instance already running locally. |
 | `ollama` | `ollama/ollama:latest` | `21434→11434` | — | Local LLM + embedding inference. Custom `entrypoint: ollama-entrypoint.sh` (not the stock image entrypoint) trusts `./certs` **before** `ollama serve` starts, so the very first model pull can succeed through a corporate TLS-intercepting proxy. `OLLAMA_PRELOAD_MODELS` controls which models are pulled on first boot (default `nomic-embed-text llama3.2 mistral`). Host-published on `21434`, not Ollama's own `11434` default, to avoid colliding with an Ollama daemon already running locally; internal service-to-service traffic still uses the real `11434`. |
 | `keycloak` | `quay.io/keycloak/keycloak:24.0.5` | `8180→8080` | — | OIDC identity provider; `start-dev --import-realm` auto-imports `./config/keycloak-realm.json` on first boot. |
+| `library-seeder` | `curlimages/curl:8.11.1` | — | `personal-library-app` (healthy) | **One-shot task container, not a service** (`restart: "no"`). Runs `scripts/seed-initial-documents.sh` once the app is healthy, ingesting every file in `./initial_data` plus a remote public-domain PDF, then exits — see §4.3. |
+
+### 4.3 `library-seeder`: Initial Document Ingestion
+
+A freshly provisioned stack would otherwise present an empty List Report, making
+RAG chat, dual summaries, and vector search impossible to evaluate without
+manual setup. This sidecar fixes that by seeding two documents:
+
+| Source | Document |
+| :--- | :--- |
+| `./initial_data/` (mounted `:ro`, every `.pdf`/`.docx`/`.doc`/`.txt`/`.md`) | *Natural Language Processing: A 15-Minute Primer* |
+| `SEED_REMOTE_PDF_URL` (public CDN) | *The Wonderful Wizard of Oz* |
+
+**Why it uploads via `POST /api/v1/documents` rather than inserting into
+MongoDB/Qdrant directly:** the REST path runs the real pipeline — Tika
+extraction, BibTeX metadata, chunking, 768-D embeddings, and the dual
+Llama/Mistral summaries. A direct database insert would produce records that
+render correctly in the UI but return **nothing** from semantic retrieval,
+i.e. precisely the "looks right, isn't" failure mode this project documents
+elsewhere (cf. the BPMN reality check in [BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md)).
+
+**Why a stock `curlimages/curl` image instead of the application image:** the
+seeder only needs HTTP and a POSIX shell. Reusing the app image would force a
+second (cache-hit but still resolved) build of a ~1 GB JRE+Node image for a task
+that exits in seconds, and would couple seeding to the application build graph.
+
+Design properties:
+* **Idempotent** — queries the list report with a `fileName` filter before each
+  upload, so repeated `docker compose up` never duplicates records.
+* **Non-fatal everywhere** — unreachable API, offline CDN, non-PDF payload, or a
+  failed upload all log a warning and `exit 0`; the stack stays healthy.
+* **Waits for the API, not just the container** — the Compose health condition
+  guarantees the process is up; the script additionally polls
+  `GET /documents?pageSize=1` (60 × 5 s) before the first multipart POST.
+* **Enterprise TLS aware** — appends every `./certs/*.crt|*.pem` to the stock CA
+  bundle at runtime and exports `CURL_CA_BUNDLE`, mirroring the Dockerfile's
+  trust strategy (§2) so the HTTPS download survives a TLS-intercepting proxy.
+* **Generous timeout** — `SEED_MAX_TIME` (default `900`s) per document, since
+  first ingestion is LLM-bound on CPU-only inference.
+
+Environment knobs: `SEED_ENABLED` (`true`), `SEED_REMOTE_PDF_URL`,
+`SEED_REMOTE_PDF_NAME`, `SEED_MAX_TIME`, `SEED_API_BASE`, `SEED_LOCAL_DIR`,
+`SEED_CERTS_DIR`. Re-run on demand with `docker compose up library-seeder`.
 
 ### 4.1 Persistent Volumes
 `mongodb_data`, `qdrant_data`, `ollama_models` (~7 GB), `library_storage` (uploaded physical files, browsable read-only at `http://localhost:8092` — see `storage-browser` in §4) — all **named, external-lifetime** volumes that survive `docker compose down` and ordinary rebuilds. Only `scripts/rebuild.sh --purge-data`/`--purge-models` removes them (§6).
@@ -140,11 +184,13 @@ These are genuinely DevOps-adjacent (they produce the very documentation artifac
 Each script independently emits PNG, SVG, and PDF renditions per diagram (confirmed during the diagram-audit segment of this project's history) — so `docs/diagrams/` is **entirely generated/reproducible** and is exactly what `--deep`/`clean:generated-docs` is safe to delete.
 
 ### 7.1 Orphaned / Manual-Only Scripts
-Two scripts exist under `scripts/` with **no corresponding `package.json` entry** — they must be invoked directly via `tsx`:
+Two TypeScript scripts exist under `scripts/` with **no corresponding `package.json` entry** — they must be invoked directly via `tsx`:
 - `tsx scripts/audit-codebase.ts` — cross-checks i18n locale-key parity, dead-import detection, and other repo-wide consistency checks (used during this project's documentation-audit work, never wired to CI).
 - `tsx scripts/export-zip.ts` — produces a distributable `.zip` snapshot of the repository, excluding build artifacts/`node_modules`/`.git`.
 
 If you expect an `npm run audit` or `npm run export` task, it does not exist — these are deliberately manual/ad hoc tools, not part of the regular build pipeline.
+
+`scripts/seed-initial-documents.sh` is also absent from `package.json`, but is **not** orphaned: it is the entrypoint of the `library-seeder` compose service (§4.3) and is bind-mounted into that container rather than executed on the host.
 
 ---
 
@@ -166,6 +212,8 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 | `docker compose up` stack never reports healthy | Ollama still pulling `OLLAMA_PRELOAD_MODELS` on first boot (~7 GB) | Wait — `start_period: 20s` plus `retries: 10` is generous but a cold pull on a slow link can still exceed it; check `docker compose logs ollama`. |
 | TLS/cert errors pulling npm/Maven/OS packages during `docker compose build` | `./certs/` is empty or certs aren't in `.crt`/`.pem` format | Drop the corporate root/intermediate CA bundle into `./certs/` — see §2 and [README.md](../README.md) enterprise certificate section. |
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |
+| Library is empty after `docker compose up --build` | `library-seeder` skipped or failed — it is deliberately non-fatal | `docker compose logs library-seeder`. Common causes: `SEED_ENABLED=false`, no network for the CDN download, or a TLS error needing a cert in `./certs/` (§4.3). Re-run with `docker compose up library-seeder`. |
+| `library-seeder` logs `WARN ... HTTP 500` on upload | The ingestion pipeline itself failed — usually Ollama models still loading | Wait for `docker exec -it personal-library-ollama ollama list` to show all three models, then `docker compose up library-seeder` again (already-ingested documents are skipped). |
 
 ---
 
