@@ -293,6 +293,14 @@ services:
     # The stock image starts `ollama serve` directly, leaving no chance to trust
     # a corporate root CA before the first registry call. See ollama-entrypoint.sh.
     entrypoint: ["/bin/sh", "/usr/local/bin/ollama-entrypoint.sh"]
+    # Pulling models reaches registry.ollama.ai, so this container needs working
+    # outbound DNS. Containers inherit the Docker daemon's resolver, which on
+    # some corporate hosts is a public one (e.g. 8.8.8.8 via daemon.json) that
+    # the network blocks — every pull then dies with "server misbehaving" and the
+    # stack silently comes up with no models at all. Set LIBRARY_DNS to the
+    # resolver from the host's /etc/resolv.conf to fix it without touching the
+    # Docker daemon config. Unset (the default) applies no override.
+    dns: ${LIBRARY_DNS:-}
     # Host-published on 21434, not Ollama's own 11434 default, so this
     # educational stack never collides with an Ollama daemon already running
     # locally. Internal container-to-container traffic (Spring Boot app)
@@ -394,6 +402,10 @@ services:
       - ./certs:/seed/certs:ro
     entrypoint: ["/bin/sh"]
     command: ["/seed/seed-initial-documents.sh"]
+    # Optional DNS override for the remote PDF download — same rationale as the
+    # `ollama` service above (containers inherit the Docker daemon's resolver,
+    # which may be a blocked public one). Unset by default; see LIBRARY_DNS.
+    dns: ${LIBRARY_DNS:-}
     depends_on:
       personal-library-app:
         condition: service_healthy

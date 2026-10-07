@@ -119,6 +119,34 @@ Environment knobs: `SEED_ENABLED` (`true`), `SEED_REMOTE_PDF_URL`,
 ### 4.2 Why `qdrant: condition: service_started` (not `service_healthy`)
 Unlike every other dependency, `qdrant` has no `healthcheck:` block in Compose — `personal-library-app` only waits for the container process to **start**, not for a verified-healthy response. The Spring AI Qdrant client itself handles retry/backoff on first connection, and `VectorRagService`'s RAG chat path gracefully degrades to the document's plain-text excerpt if a Qdrant query fails (see [BACKEND_ARCHITECTURE.md §5.2](BACKEND_ARCHITECTURE.md)) — so the extra startup-ordering guarantee was judged unnecessary for this one dependency.
 
+### 4.4 `LIBRARY_DNS`: Outbound DNS for `ollama` and `library-seeder`
+Two services need to reach the public internet: `ollama` (pulls models from `registry.ollama.ai`) and `library-seeder` (downloads the remote PDF).
+
+Containers do **not** use the host's `/etc/resolv.conf` — they inherit whatever resolver the Docker daemon hands out. If `/etc/docker/daemon.json` pins a public resolver that your network blocks, every outbound lookup fails inside containers while the host itself resolves perfectly:
+
+```jsonc
+// /etc/docker/daemon.json — a common cause
+{ "dns": ["8.8.8.8"] }
+```
+
+The failure is quiet and easy to misread. Ollama logs `lookup registry.ollama.ai on 127.0.0.11:53: server misbehaving` and the entrypoint only emits a `WARNING`, so **the stack still reports healthy with zero models installed**. Ingestion then succeeds but `VectorRagService` falls back to in-memory, leaving Qdrant empty — documents are visible in the UI yet invisible to RAG.
+
+Set `LIBRARY_DNS` to the resolver from the host's `/etc/resolv.conf`; both services pick it up and no Docker daemon change (or `sudo`) is needed:
+
+```bash
+grep nameserver /etc/resolv.conf          # e.g. 10.0.0.53
+export LIBRARY_DNS=10.0.0.53              # or put it in .env
+docker compose up -d --build
+```
+
+Leave it unset on networks with working container DNS — the default applies no override at all. Fixing the daemon's own `dns` setting is the broader cure; `LIBRARY_DNS` is the per-project escape hatch.
+
+Always confirm models before trusting a RAG result:
+
+```bash
+docker exec personal-library-ollama ollama list   # expect 3 models
+```
+
 ---
 
 ## 5. `nginx/nginx.conf`: Routing Table
@@ -213,6 +241,8 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 | `mvn clean`/`mvn compile` fails with `Operation not permitted` | `target/` is root-owned from a prior container build | See §6.1 / [BACKEND_ARCHITECTURE.md §9.2](BACKEND_ARCHITECTURE.md). `./scripts/rebuild.sh` handles this automatically. |
 | `rebuild.sh` aborts at step 3 with `rm: cannot remove 'target/...': Permission denied` | Root-owned build output from a container build | Fixed — the script now retries the delete in a root container (§6.1). If you still see this, the container fallback itself failed; check `docker info`. |
 | `docker compose up` stack never reports healthy | Ollama still pulling `OLLAMA_PRELOAD_MODELS` on first boot (~7 GB) | Wait — `start_period: 20s` plus `retries: 10` is generous but a cold pull on a slow link can still exceed it; check `docker compose logs ollama`. |
+| `ollama list` is empty and logs show `lookup registry.ollama.ai on 127.0.0.11:53: server misbehaving` | Containers inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server (e.g. `8.8.8.8`) that your network blocks, **every** model pull fails even though the host resolves fine. | Set `LIBRARY_DNS` to the resolver from the host's `/etc/resolv.conf` — see §4.4. Then `docker compose up -d ollama --force-recreate`. |
+| Documents appear in the UI but chat/RAG returns nothing relevant | Ingestion ran before `nomic-embed-text` was available, so `VectorRagService` logged `Vector store indexing skipped or failed (fallback to in-memory)` and Qdrant holds **zero** vectors. Almost always a symptom of the DNS row above. | Fix DNS, confirm all three models with `docker exec personal-library-ollama ollama list`, then re-upload the affected documents (delete them first — the seeder skips names already present). |
 | TLS/cert errors pulling npm/Maven/OS packages during `docker compose build` | `./certs/` is empty or certs aren't in `.crt`/`.pem` format | Drop the corporate root/intermediate CA bundle into `./certs/` — see §2 and [README.md](../README.md) enterprise certificate section. |
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |
 | Library is empty after `docker compose up --build` | `library-seeder` skipped or failed — it is deliberately non-fatal | `docker compose logs library-seeder`. Common causes: `SEED_ENABLED=false`, no network for the CDN download, or a TLS error needing a cert in `./certs/` (§4.3). Re-run with `docker compose up library-seeder`. |
