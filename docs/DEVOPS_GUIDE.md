@@ -129,7 +129,7 @@ Containers do **not** use the host's `/etc/resolv.conf` — they inherit whateve
 { "dns": ["8.8.8.8"] }
 ```
 
-The failure is quiet and easy to misread. Ollama logs `lookup registry.ollama.ai on 127.0.0.11:53: server misbehaving` and the entrypoint only emits a `WARNING`, so **the stack still reports healthy with zero models installed**. Ingestion then succeeds but `VectorRagService` falls back to in-memory, leaving Qdrant empty — documents are visible in the UI yet invisible to RAG.
+The failure is quiet and easy to misread, and it is usually **intermittent** rather than total — a measured ~1-in-6 lookup failure rate on one corporate network. A single `nslookup` from a container therefore usually *succeeds*, while a multi-gigabyte model pull, which performs many lookups, reliably dies partway through (observed: `mistral` failing after 2.5 GB of 4.4 GB). Ollama logs `lookup registry.ollama.ai on 127.0.0.11:53: server misbehaving` and the entrypoint only emits a `WARNING`.
 
 Set `LIBRARY_DNS` to the resolver from the host's `/etc/resolv.conf`; both services pick it up and no Docker daemon change (or `sudo`) is needed:
 
@@ -139,7 +139,20 @@ export LIBRARY_DNS=10.0.0.53              # or put it in .env
 docker compose up -d --build
 ```
 
-Leave it unset on networks with working container DNS — the default applies no override at all. Fixing the daemon's own `dns` setting is the broader cure; `LIBRARY_DNS` is the per-project escape hatch.
+**`rebuild.sh` detects this automatically.** Because the symptom is intermittent, its preflight does *not* probe connectivity (a probe usually passes and proves nothing). Instead it compares the daemon's pinned `dns` in `/etc/docker/daemon.json` against the host's own resolver; if the daemon routes container DNS somewhere the host itself does not use, the script exports `LIBRARY_DNS` for that run and says so:
+
+```
+! Docker pins container DNS to '8.8.8.8', which the host itself does not use.
+    Using the host resolver 10.255.255.254 for Ollama and the seeder this run.
+```
+
+It stays silent when the daemon pins nothing, or pins a list that already includes the host resolver. An explicit `LIBRARY_DNS` (environment or `.env`) always wins. Persist it so plain `docker compose up` — which has no preflight — benefits too:
+
+```bash
+echo "LIBRARY_DNS=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf)" >> .env
+```
+
+Fixing the daemon's own `dns` setting is the broader cure; `LIBRARY_DNS` is the per-project escape hatch.
 
 Always confirm models before trusting a RAG result:
 
@@ -274,12 +287,16 @@ Because `docker compose build` runs Maven **inside the container as root** while
 
 Deployment waits on real container health checks (`docker compose up -d --wait`) rather than a fixed sleep. Verification then checks, in order: the frontend, the Spring Boot `/actuator/health` endpoint, the documents API, the installed Ollama models, and **the Qdrant vector count**.
 
-That last check exists because container health has repeatedly been a misleading signal in this project. Indexing and retrieval failures in `VectorRagService` are caught and logged at `warn` while the HTTP layer still returns **200**. A stack can therefore report fully healthy while:
+A health check is only as honest as its probe. The `ollama` check originally ran `ollama list`, which succeeds the moment the daemon accepts connections — **even with zero models installed**. The container therefore reported healthy about six seconds after start while a ~7 GB pull was still running, and every dependent gated on `condition: service_healthy` started far too early. The backend then died during context initialization, because `QdrantVectorStore.afterPropertiesSet()` calls `EmbeddingModel.dimensions()`, which embeds a probe string:
 
-* Ollama holds **zero models** (a blocked DNS resolver made every pull fail — see §4.4), or
-* Qdrant holds **zero vectors** (a missing collection, or point IDs Qdrant rejects).
+```
+Caused by: org.springframework.ai.retry.NonTransientAiException:
+  404 - {"error":"model \"nomic-embed-text\" not found, try pulling it first"}
+```
 
-In both cases documents upload successfully and appear in the UI, but RAG answers are ungrounded — the model falls back to its own training data, which is precisely the failure mode this application exists to prevent. The two checks that cannot be faked:
+The check now asserts that **every** model in `OLLAMA_PRELOAD_MODELS` is present, with a `start_period` long enough for a cold pull. Health means "the models are usable", not "the daemon is listening", which makes the model-less deployment described in §4.4 structurally impossible rather than merely documented.
+
+The same scepticism applies to vectors. Indexing and retrieval failures in `VectorRagService` are caught and logged at `warn` while the HTTP layer still returns **200**, so a fully healthy stack can hold zero vectors and answer from the model's own training data instead of the library — the exact failure this application exists to prevent. The two checks that cannot be faked:
 
 ```bash
 docker exec personal-library-ollama ollama list                 # expect 3 models
@@ -361,7 +378,8 @@ If you expect an `npm run audit` or `npm run export` task, it does not exist —
 | `mvn clean`/`mvn compile` fails with `Operation not permitted` | `target/` is root-owned from a prior container build | See §6.1 / [BACKEND_ARCHITECTURE.md §9.2](BACKEND_ARCHITECTURE.md). `./scripts/rebuild.sh` handles this automatically. |
 | `rebuild.sh` aborts at step 3 with `rm: cannot remove 'target/...': Permission denied` | Root-owned build output from a container build | Fixed — the script now retries the delete in a root container (§6.1). If you still see this, the container fallback itself failed; check `docker info`. |
 | `docker compose up` stack never reports healthy | Ollama still pulling `OLLAMA_PRELOAD_MODELS` on first boot (~7 GB) | Wait — `start_period: 20s` plus `retries: 10` is generous but a cold pull on a slow link can still exceed it; check `docker compose logs ollama`. |
-| `ollama list` is empty and logs show `lookup registry.ollama.ai on 127.0.0.11:53: server misbehaving` | Containers inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server (e.g. `8.8.8.8`) that your network blocks, **every** model pull fails even though the host resolves fine. | Set `LIBRARY_DNS` to the resolver from the host's `/etc/resolv.conf` — see §4.4. Then `docker compose up -d ollama --force-recreate`. |
+| `ollama list` is empty and logs show `lookup registry.ollama.ai on 127.0.0.11:53: server misbehaving` | Containers inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server (e.g. `8.8.8.8`) your network degrades or blocks, model pulls fail even though the host resolves fine. Often intermittent, so a large pull dies partway. | `rebuild.sh` now detects and overrides this automatically. For plain `docker compose`, set `LIBRARY_DNS` to the host's resolver — see §4.4. |
+| App exits at startup with `404 ... model "nomic-embed-text" not found` | `ollama` reported healthy before its models finished pulling, so the app started too early; `QdrantVectorStore.afterPropertiesSet()` probes the embedding model for its dimensions. | Fixed — the `ollama` health check now requires every `OLLAMA_PRELOAD_MODELS` entry to be present (§6.2). If it persists, the pull itself is failing: `docker compose logs ollama`. |
 | Documents appear in the UI but chat/RAG returns nothing relevant | Ingestion ran before `nomic-embed-text` was available, so `VectorRagService` logged `Vector store indexing skipped or failed (fallback to in-memory)` and Qdrant holds **zero** vectors. Almost always a symptom of the DNS row above. | Fix DNS, confirm all three models with `docker exec personal-library-ollama ollama list`, then re-upload the affected documents (delete them first — the seeder skips names already present). |
 | TLS/cert errors pulling npm/Maven/OS packages during `docker compose build` | `./certs/` is empty or certs aren't in `.crt`/`.pem` format | Drop the corporate root/intermediate CA bundle into `./certs/` — see §2 and [README.md](../README.md) enterprise certificate section. |
 | Upload of a large PDF times out partway through summarization | Expected for very large documents — see the `nginx.conf` timeout rationale in §5 | Confirm `OLLAMA_LLAMA_MODEL`/`OLLAMA_MISTRAL_MODEL` are reachable and not themselves still loading; the 36-minute budget is generous but not unlimited. |

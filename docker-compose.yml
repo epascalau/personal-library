@@ -339,11 +339,33 @@ services:
       - HTTP_PROXY=${ENTERPRISE_HTTP_PROXY:-}
       - NO_PROXY=${ENTERPRISE_NO_PROXY:-localhost,127.0.0.1,qdrant,mongodb,keycloak}
     healthcheck:
-      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1"]
-      interval: 10s
-      timeout: 5s
+      # `ollama list` succeeds the moment the daemon accepts connections, even
+      # with ZERO models installed. That made this container report healthy
+      # ~6s after start while a ~7 GB pull was still running, so dependents
+      # gated on `service_healthy` started far too early. The Spring Boot app
+      # then died during context initialization: QdrantVectorStore calls
+      # EmbeddingModel.dimensions() in afterPropertiesSet(), which embeds a
+      # probe string and gets 404 "model nomic-embed-text not found".
+      #
+      # Health must therefore mean "every preloaded model is usable", not
+      # merely "the daemon is listening". Matching mirrors the entrypoint's
+      # own logic, since `ollama list` reports bare names as `name:latest`.
+      test:
+        - CMD-SHELL
+        - >-
+          for m in $${OLLAMA_PRELOAD_MODELS:-}; do
+            ollama list 2>/dev/null | awk '{print $$1}' | grep -qx "$$m\(:latest\)\?" || exit 1;
+          done
+      interval: 15s
+      timeout: 10s
       retries: 10
-      start_period: 20s
+      # Long enough for a cold ~7 GB pull on first boot (models are cached in
+      # the ollama_models volume afterwards, so later starts pass almost
+      # immediately). Failures inside start_period do not count toward
+      # retries, so a slow download is tolerated while a genuinely broken
+      # pull — blocked DNS, bad proxy, missing CA — still fails the stack
+      # loudly instead of silently producing a model-less deployment.
+      start_period: 900s
     networks:
       - library-net
 

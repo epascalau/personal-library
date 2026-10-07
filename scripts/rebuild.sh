@@ -153,6 +153,36 @@ docker compose version >/dev/null 2>&1 || fail "the 'docker compose' plugin is r
 docker info >/dev/null 2>&1 || fail "the Docker daemon is not reachable. Is it running?"
 ok "Docker $(docker version --format '{{.Server.Version}}') and Compose $(docker compose version --short)"
 
+# Containers inherit the Docker daemon's DNS resolver, not the host's. When
+# /etc/docker/daemon.json pins a public resolver the local network degrades or
+# blocks, model pulls fail with "server misbehaving" — yet the host resolves
+# names perfectly, so the cause is rarely obvious. The failure is typically
+# *intermittent* (a measured ~1-in-6 lookup failure rate on this network),
+# which is fatal across the many lookups a multi-gigabyte pull performs, and
+# leaves the stack running with no models. The backend then dies at startup,
+# because the Qdrant store probes the embedding model for its dimensions.
+#
+# A connectivity probe is useless here precisely because the fault is
+# intermittent: it usually passes, then the pull dies anyway. Instead compare
+# the daemon's pinned resolver against the host's own. If the daemon sends
+# container DNS somewhere the host itself does not use, prefer the host's
+# resolver — it demonstrably works, since the rest of this build depends on it.
+if [[ -z "${LIBRARY_DNS:-}" ]] && ! grep -qs '^LIBRARY_DNS=' "${PROJECT_ROOT}/.env"; then
+  host_dns="$(awk '/^nameserver/ {print $2; exit}' /etc/resolv.conf 2>/dev/null || true)"
+  daemon_dns=""
+  if [[ -r /etc/docker/daemon.json ]]; then
+    daemon_dns="$(tr -d ' \n' < /etc/docker/daemon.json 2>/dev/null \
+      | sed -n 's/.*"dns":\[\([^]]*\)\].*/\1/p' | tr -d '"' || true)"
+  fi
+  if [[ -n "$host_dns" && -n "$daemon_dns" && ",${daemon_dns}," != *",${host_dns},"* ]]; then
+    export LIBRARY_DNS="$host_dns"
+    warn "Docker pins container DNS to '${daemon_dns}', which the host itself does not use."
+    note "Using the host resolver ${host_dns} for Ollama and the seeder this run."
+    note "Persist it so plain 'docker compose up' works too:"
+    note "  echo 'LIBRARY_DNS=${host_dns}' >> .env"
+  fi
+fi
+
 if $PURGE_DATA || $PURGE_MODELS; then
   targets=""
   $PURGE_DATA   && targets="documents, vectors and uploaded files"

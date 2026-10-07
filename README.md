@@ -291,7 +291,9 @@ To add your own starter documents, drop files into `./initial_data/` and re-run
 
 #### Network Configuration (corporate environments)
 
-Containers do **not** use the host's `/etc/resolv.conf` — they inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server your network blocks, Ollama model pulls and the seeder's PDF download both fail while the host resolves fine. The failure is quiet: the stack still reports healthy **with no models installed**, and documents then ingest without embeddings, so they appear in the UI but return nothing from RAG.
+Containers do **not** use the host's `/etc/resolv.conf` — they inherit the Docker daemon's resolver. If `/etc/docker/daemon.json` pins a public DNS server your network degrades or blocks, Ollama model pulls and the seeder's PDF download fail while the host resolves fine. The fault is often *intermittent*, so a multi-gigabyte model pull dies partway through even though a quick connectivity test passes.
+
+`./scripts/rebuild.sh` detects this automatically (it compares the daemon's pinned resolver against the host's) and overrides it for that run. Plain `docker compose up` has no such preflight, so persist the value in `.env`:
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
