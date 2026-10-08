@@ -24,6 +24,7 @@
  */
 
 import { html, RawHtml } from '../../core/html';
+import { watch } from '../../core/store';
 import { icon, IconKey } from '../../ui5/icons';
 import { appStore } from '../../stores/appStore';
 import { DialogView } from './DialogView';
@@ -126,6 +127,25 @@ export class SystemLinksModalView extends DialogView {
    */
   constructor() {
     super(undefined, 'plib-dialog plib-dialog--system-links');
+  }
+
+  /**
+   * Registers the reactive store listener that drives dialog visibility.
+   *
+   * WHAT: Subscribes to `systemLinksModalOpen` and re-renders whenever it flips.
+   * WHY: `DialogView.afterRender()` is what pushes `isOpen()` onto the `ui5-dialog` host, and
+   * `template()` only emits the body while open — so without this subscription the store change
+   * made by the ShellBar entry never reaches the DOM and the modal silently never appears.
+   */
+  protected onMount(): void {
+    super.onMount();
+    this.track(
+      watch(
+        appStore,
+        (state) => state.systemLinksModalOpen,
+        () => this.requestRender()
+      )
+    );
   }
 
   /**
