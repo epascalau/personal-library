@@ -217,12 +217,16 @@
       <td><strong>Real signed JWT</strong>, validated when presented</td>
       </tr>
       <tr>
+      <td>Session renewal</td>
+      <td><strong>Implemented</strong> — renewed before expiry; logout revokes at the realm</td>
+      </tr>
+      <tr>
       <td>API authorization rules</td>
       <td><strong>Not enforced</strong> — <code>anyRequest().permitAll()</code></td>
       </tr>
       </tbody>
       </table></div>
-      <p>Section 9 lists what remains to close the last gap.</p>
+      <p>Section 10 lists what remains to close the last gap.</p>
       <h3>Why the backend brokers the login</h3>
       <p>The browser does <strong>not</strong> call Keycloak directly, and cannot. The backend trusts the issuer <code>http://keycloak:8080/realms/personal-library-realm</code> (see <code>application-docker.yml</code>), which only resolves inside the Docker network. A token minted through the published <code>localhost:8180</code> address carries that host in its <code>iss</code> claim and is rejected with <code>401 invalid_token</code> even though it is otherwise perfectly valid.</p>
       <p>So <code>POST /api/v1/auth/login</code> performs the password grant server-side and returns the resulting token. Both runtimes implement this identically — <code>KeycloakAuthService</code> (Java) and the equivalent handler in <code>src/main/server/server.ts</code> — so the &quot;Gateway&quot; backend mode cannot be used to bypass the credential check.</p>
@@ -538,6 +542,26 @@
       <td><code>false</code></td>
       <td>Usernames are immutable once created</td>
       </tr>
+      <tr>
+      <td>Access token lifespan</td>
+      <td><code>1800</code> (30 min)</td>
+      <td>How long an issued JWT stays valid; nothing refreshes it yet</td>
+      </tr>
+      <tr>
+      <td>SSO session idle timeout</td>
+      <td><code>1800</code> (30 min)</td>
+      <td>Session ends after 30 minutes of inactivity</td>
+      </tr>
+      <tr>
+      <td>SSO session max lifespan</td>
+      <td><code>36000</code> (10 h)</td>
+      <td>Absolute ceiling, enforced even while active</td>
+      </tr>
+      <tr>
+      <td>Client session idle timeout</td>
+      <td><code>1800</code> (30 min)</td>
+      <td>Per-client idle limit, aligned with the SSO idle timeout</td>
+      </tr>
       </tbody>
       </table></div>
       <hr>
@@ -682,25 +706,61 @@
       </table></div>
       <p>Spring Boot is already pointed at these. <code>application.yml</code> uses <code>KEYCLOAK_ISSUER_URI</code> (defaulting to the <code>localhost:8180</code> form) and <code>application-docker.yml</code> overrides it to the in-network <code>keycloak:8080</code> form, because a container cannot resolve the host's published port.</p>
       <hr>
-      <h2>9. Making the Realm Actually Authoritative</h2>
+      <h2>9. Session Renewal</h2>
+      <p>Access tokens deliberately expire after 30 minutes so a leaked one stops being useful quickly.
+      Without renewal that lifetime would also be the maximum length of a working session, signing an
+      active user out mid-task. <code>SessionService</code> (<code>src/main/frontend/services/SessionService.ts</code>) closes
+      that gap.</p>
+      <p><strong>How it works</strong></p>
+      <ol>
+      <li>On sign-in, the token bundle is persisted under three keys: <code>personal_library_token</code>,
+      <code>personal_library_refresh_token</code> and <code>personal_library_token_expires_at</code> (an absolute
+      timestamp, so a reload can tell how much life is left).</li>
+      <li>A renewal is scheduled for <strong>60 seconds before expiry</strong>, leaving room for clock skew and the
+      round trip itself.</li>
+      <li>The renewal posts to <code>/api/v1/auth/refresh</code>, which brokers an OAuth2 <code>refresh_token</code> grant and
+      returns a fresh bundle plus the realm's current profile — so a role granted or revoked
+      mid-session takes effect on the next renewal rather than at the next manual sign-in.</li>
+      <li>A page reload calls <code>appStore.initSession()</code>, which resumes the schedule. If the stored token is
+      already expired or within 30 seconds of it, renewal happens immediately instead.</li>
+      <li>Because browsers throttle, and on sleep suspend, timers in background tabs, renewal is also
+      re-checked whenever the tab regains focus or the network comes back.</li>
+      <li>Any failure is terminal: the tokens are cleared, the auth dialog opens, and the user sees
+      <em>&quot;Session expired, please sign in again.&quot;</em> Retrying would only present the same dead credential.</li>
+      </ol>
+      <p><strong>Logout revokes server-side.</strong> <code>/api/v1/auth/logout</code> now forwards the refresh token to the realm's
+      end-session endpoint. Clearing browser storage alone is not enough — a refresh token stays valid at
+      the realm until it expires, so anything that captured it could keep minting access tokens after the
+      user believed they had signed out.</p>
+      <p><strong>Refresh tokens are reusable, by choice.</strong> The realm leaves <code>revokeRefreshToken</code> at its default of
+      <code>false</code>, so a previously issued refresh token remains valid until the SSO session ends. Enabling
+      revocation would add replay detection, but every open browser tab shares one <code>localStorage</code> and
+      renews on the same absolute timestamp: two tabs waking together would race, and the loser would
+      present a just-revoked token and be signed out of a perfectly healthy session. Making that safe
+      needs cross-tab leader election, which is not worth the complexity here.</p>
+      <p><strong>Effective session length:</strong> indefinite while the user stays active, bounded by
+      <code>ssoSessionIdleTimeout</code> (30 min of inactivity) and the absolute <code>ssoSessionMaxLifespan</code> (10 hours),
+      after which re-authentication is required regardless of activity.</p>
+      <hr>
+      <h2>10. Making the Realm Actually Authoritative</h2>
       <p>Authentication is already real (section 1). Steps 1-3 below are <strong>done</strong>; what remains is authorization.</p>
       <p>Already in place:</p>
       <ol>
       <li><s>Issue genuine tokens.</s> Both <code>POST /api/v1/auth/login</code> implementations broker a real password grant and return a signed JWT.</li>
       <li><s>Send the token from the browser.</s> <code>RestBackendAdapter</code> attaches <code>Authorization: Bearer</code> for any structurally valid JWT.</li>
       <li><s>Report real roles.</s> The profile card shows <code>realm_access.roles</code> decoded from the token.</li>
+      <li><s>Handle token expiry.</s> <code>SessionService</code> renews the access token a minute before it lapses, so a session stays alive as long as the user keeps working. See <em>Session renewal</em> below.</li>
       </ol>
       <p>Still required to enforce authorization:</p>
       <ol start="4">
       <li><strong>Replace the blanket permit in <code>SecurityConfig.java</code>.</strong> Change <code>.anyRequest().permitAll()</code> to <code>.anyRequest().authenticated()</code>, keeping <code>permitAll()</code> for <code>/api/v1/auth/**</code>, <code>/actuator/health</code>, the OpenAPI spec, and static assets. The resource-server and JWT converter plumbing is already present and proven working.</li>
       <li><strong>Map realm roles to method security</strong> (for example <code>@PreAuthorize(&quot;hasRole('LIBRARY_ADMIN')&quot;)</code>) so <code>VIEWER</code> is genuinely read-only. The <code>KeycloakRealmRoleConverter</code> already applies the <code>ROLE_</code> prefix these checks expect.</li>
-      <li><strong>Handle token expiry.</strong> Access tokens live <strong>5 minutes</strong> (<code>expires_in: 300</code>, refresh 1800) and the realm sets no override. The login response already returns <code>refreshToken</code>, but nothing consumes it yet — without refresh handling, sessions will start failing after five minutes once endpoints require a token.</li>
       <li><strong>Authenticate the seeder.</strong> <code>scripts/seed-initial-documents.sh</code> calls the API unauthenticated, including a readiness loop that would spin forever against a secured endpoint. Service accounts are enabled on the client, so a client-credentials token is the natural fix.</li>
       <li><strong>Verify JWTs in the Node gateway.</strong> It currently performs no token validation of its own; with Java enforcing and the gateway not, &quot;Gateway&quot; backend mode would become an unsecured path to the data.</li>
       <li><strong>Harden the deployment</strong>: set <code>sslRequired</code> away from <code>none</code>, disable self-registration, rotate the client secret out of source control into a secret store, and change every default password including <code>KEYCLOAK_ADMIN_PASSWORD</code>.</li>
       </ol>
       <hr>
-      <h2>10. Quick Reference</h2>
+      <h2>11. Quick Reference</h2>
       <div class="table-scroll"><table>
       <thead>
       <tr>

@@ -20,6 +20,7 @@ import {
   UserProfile
 } from '../../types';
 import {
+  AuthSession,
   BackendConfig,
   BackendHealthResult,
   ChatResponseResult,
@@ -117,11 +118,22 @@ export interface BackendOperations {
 
   login: {
     request: { username: string; password?: string; realm?: string };
-    response: { accessToken: string; user: UserProfile };
+    response: AuthSession;
+  };
+
+  /**
+   * Renews an expiring session from a refresh token.
+   *
+   * Returns the same shape as `login`, because the client swaps one result for
+   * the other in place — see `AuthSession`.
+   */
+  refreshSession: {
+    request: { refreshToken: string; realm?: string };
+    response: AuthSession;
   };
 
   logout: {
-    request: Record<string, never>;
+    request: { refreshToken?: string };
     response: void;
   };
 

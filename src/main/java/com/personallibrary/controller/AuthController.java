@@ -110,28 +110,8 @@ public class AuthController {
 
         try {
             Map<String, Object> token = keycloakAuthService.passwordGrant(username, password);
-            String accessToken = String.valueOf(token.get("access_token"));
-            Map<String, Object> claims = keycloakAuthService.decodeClaims(accessToken);
-
-            // Prefer the realm's own claims over anything the client submitted, so the returned
-            // profile always reflects Keycloak's view of the identity rather than user input.
-            String preferredUsername = String.valueOf(claims.getOrDefault("preferred_username", username));
-            Map<String, Object> user = new HashMap<>();
-            user.put("id", String.valueOf(claims.getOrDefault("sub", "usr-kc-" + preferredUsername.hashCode())));
-            user.put("username", preferredUsername);
-            user.put("email", String.valueOf(claims.getOrDefault("email", preferredUsername)));
-            user.put("name", String.valueOf(claims.getOrDefault("name", preferredUsername)));
-            user.put("roles", keycloakAuthService.realmRoles(claims));
-            user.put("realm", credentials.getOrDefault("realm", "personal-library-realm"));
-            user.put("authenticatedAt", Instant.now().toString());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("accessToken", accessToken);
-            response.put("refreshToken", token.get("refresh_token"));
-            response.put("tokenType", "Bearer");
-            response.put("expiresIn", token.getOrDefault("expires_in", 300));
-            response.put("user", user);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(buildSession(
+                    token, credentials.getOrDefault("realm", "personal-library-realm"), username));
         } catch (KeycloakAuthService.InvalidCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", ex.getMessage()));
@@ -139,18 +119,106 @@ public class AuthController {
     }
 
     /**
-     * Invalidates active Keycloak authentication session.
+     * Renews an expiring session from a refresh token, without re-prompting for credentials.
      *
-     * WHAT: Signals the client that the authentication session is terminated and returns success confirmation.
+     * WHAT: Brokers an OAuth2 `refresh_token` grant and returns the same session payload shape as
+     * {@link #login(Map)} — a new access token, a new refresh token and the decoded profile.
      *
-     * WHY: Explicit logout endpoints ensure client applications can cleanly purge stored JWTs, clear
-     * session caches, and prevent unauthorized reuse of lingering tokens on shared multi-user workstations.
+     * WHY: Access tokens are short-lived on purpose, so without this endpoint an active user is
+     * forcibly signed out the moment one expires, losing whatever they were doing. The client
+     * schedules a call here shortly before expiry and swaps the tokens in place, making the
+     * session continuous for as long as the user keeps working while still bounding how long any
+     * single leaked access token remains usable.
      *
+     * <p>Returning the full profile rather than only the token keeps the client's stored identity
+     * in step with the realm: a role granted or revoked mid-session takes effect on the next
+     * refresh instead of lingering until the next manual sign-in.
+     *
+     * @param payload Map containing the refresh token under {@code refreshToken}.
+     * @return Fresh token bundle with profile, or 401 when the refresh token is no longer valid.
+     */
+    @PostMapping("/refresh")
+    @Operation(summary = "Renew an access token using a refresh token (OAuth2 refresh grant)")
+    public ResponseEntity<Map<String, Object>> refresh(@RequestBody Map<String, String> payload) {
+        String refreshToken = payload.getOrDefault("refreshToken", "").trim();
+
+        if (refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "A refresh token is required"));
+        }
+
+        try {
+            Map<String, Object> token = keycloakAuthService.refreshGrant(refreshToken);
+            return ResponseEntity.ok(buildSession(
+                    token, payload.getOrDefault("realm", "personal-library-realm"), "unknown"));
+        } catch (KeycloakAuthService.InvalidCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    /**
+     * Assembles the client-facing session payload from a raw Keycloak token response.
+     *
+     * WHAT: Decodes the access token and combines tokens, expiry and the realm's view of the
+     * identity into the single response shape both login and refresh return.
+     *
+     * WHY: Login and refresh must hand the client identical structures, because the client swaps
+     * one for the other in place. Building that payload in two places invites them to drift — a
+     * field added to login but forgotten in refresh would silently blank out after the first
+     * renewal. One builder makes that class of bug impossible.
+     *
+     * @param token              Raw Keycloak token endpoint response.
+     * @param realm              Realm name to echo back on the profile.
+     * @param fallbackUsername   Username to use when the token carries no `preferred_username`.
+     * @return Session payload with access token, refresh token, expiry and profile.
+     */
+    private Map<String, Object> buildSession(Map<String, Object> token, String realm, String fallbackUsername) {
+        String accessToken = String.valueOf(token.get("access_token"));
+        Map<String, Object> claims = keycloakAuthService.decodeClaims(accessToken);
+
+        // Prefer the realm's own claims over anything the client submitted, so the returned
+        // profile always reflects Keycloak's view of the identity rather than user input.
+        String preferredUsername = String.valueOf(claims.getOrDefault("preferred_username", fallbackUsername));
+        Map<String, Object> user = new HashMap<>();
+        user.put("id", String.valueOf(claims.getOrDefault("sub", "usr-kc-" + preferredUsername.hashCode())));
+        user.put("username", preferredUsername);
+        user.put("email", String.valueOf(claims.getOrDefault("email", preferredUsername)));
+        user.put("name", String.valueOf(claims.getOrDefault("name", preferredUsername)));
+        user.put("roles", keycloakAuthService.realmRoles(claims));
+        user.put("realm", realm);
+        user.put("authenticatedAt", Instant.now().toString());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", token.get("refresh_token"));
+        response.put("tokenType", "Bearer");
+        response.put("expiresIn", token.getOrDefault("expires_in", 1800));
+        response.put("user", user);
+        return response;
+    }
+
+    /**
+     * Invalidates the active Keycloak authentication session.
+     *
+     * WHAT: Revokes the supplied refresh token at the realm's end-session endpoint and confirms
+     * termination to the client.
+     *
+     * WHY: Explicit logout endpoints let clients cleanly purge stored JWTs and prevent reuse of
+     * lingering tokens on shared workstations. Clearing browser storage alone is no longer
+     * sufficient now that the client holds a long-lived refresh token: that token stays valid at
+     * the realm until it expires, so anything that captured it could keep minting access tokens
+     * after the user signed out. Revoking it server-side closes that window.
+     *
+     * @param payload Optional map carrying the {@code refreshToken} to revoke.
      * @return Confirmation response.
      */
     @PostMapping("/logout")
-    @Operation(summary = "Terminate Keycloak session")
-    public ResponseEntity<Map<String, Object>> logout() {
+    @Operation(summary = "Terminate Keycloak session and revoke the refresh token")
+    public ResponseEntity<Map<String, Object>> logout(@RequestBody(required = false) Map<String, String> payload) {
+        if (payload != null) {
+            keycloakAuthService.revokeRefreshToken(payload.get("refreshToken"));
+        }
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Keycloak OIDC session terminated successfully."

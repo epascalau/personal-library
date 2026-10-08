@@ -353,7 +353,7 @@ export class AuthModalView extends DialogView {
         password: this.password,
         realm: this.realm
       });
-      appStore.handleLoginSuccess(data.user, data.accessToken);
+      appStore.handleLoginSuccess(data);
       appStore.closeAuth();
     } catch (err: any) {
       this.errorMsg = err?.message || 'Authentication failed';

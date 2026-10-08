@@ -39,6 +39,9 @@ const start = async (): Promise<void> => {
 
   backendStore.start();
   appStore.start();
+  // Resume renewing the stored access token before it expires, so a reload does not abandon the
+  // schedule and leave the session to lapse silently at the next expiry.
+  appStore.initSession();
 
   const root = document.getElementById('root');
   if (!root) {

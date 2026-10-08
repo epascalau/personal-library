@@ -49,13 +49,68 @@ paths:
         '401':
           description: Unauthorized / Invalid credentials
 
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Renew an access token using a refresh token
+      description: >-
+        Brokers an OAuth2 refresh grant against the realm and returns a new access token,
+        a new refresh token and the realm's current view of the profile. Lets a working
+        session outlive the deliberately short access-token lifetime without re-prompting
+        for credentials. Returning the profile keeps stored identity in step with the
+        realm, so a role change mid-session takes effect on the next renewal.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Refresh token from the most recent sign-in or renewal.
+                realm:
+                  type: string
+                  default: personal-library-realm
+      responses:
+        '200':
+          description: Session renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: No refresh token supplied
+        '401':
+          description: >-
+            Refresh token expired, revoked by a sign-out, or its SSO session ended.
+            The client must sign in again.
+
   /auth/logout:
     post:
       tags:
         - Authentication
-      summary: Terminate user session
+      summary: Terminate user session and revoke the refresh token
+      description: >-
+        Revokes the supplied refresh token at the realm's end-session endpoint. Clearing
+        client storage alone is insufficient, because a refresh token stays valid at the
+        realm until it expires and could otherwise keep minting access tokens after
+        sign-out. The body is optional; revocation is skipped when no token is supplied.
       security:
         - KeycloakBearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  description: Refresh token to invalidate at the realm.
       responses:
         '200':
           description: Session terminated successfully
@@ -230,7 +285,12 @@ paths:
       tags:
         - Documents
       summary: Auto-extract BibTeX metadata from document preview
-      description: Utilizes Spring AI & LLM to infer document type, authors, journal, dates, and BibTeX schema fields.
+      description: >-
+        Utilizes Spring AI & LLM to infer document type, authors, journal, dates, and BibTeX schema fields.
+        Supply `contentSample` when the client can already read the document text (plain-text formats).
+        For binary formats such as PDF or DOCX, send the raw bytes as base64 in `fileData` instead and the
+        server recovers the text with Apache Tika before prompting the model. If neither yields usable text,
+        heuristic metadata derived from the file name is returned.
       requestBody:
         required: true
         content:
@@ -246,13 +306,30 @@ paths:
                 contentSample:
                   type: string
                   description: Initial text excerpt or preview extracted from document
+                fileData:
+                  type: string
+                  format: byte
+                  description: >-
+                    Base64-encoded file payload, optionally prefixed with a data URI header. Used to recover
+                    document text server-side when `contentSample` is absent or empty.
+                mimeType:
+                  type: string
+                  description: MIME type of the supplied payload
+                  example: application/pdf
       responses:
         '200':
           description: Auto-extracted BibTeX metadata suggestions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BibTeXMetadata'
+                allOf:
+                  - $ref: '#/components/schemas/BibTeXMetadata'
+                  - type: object
+                    properties:
+                      extractedText:
+                        type: string
+                        description: >-
+                          Plain text recovered from the document, empty when the file carries no text layer.
 
   /documents/{guid}:
     get:
@@ -595,18 +672,28 @@ components:
   schemas:
     AuthResponse:
       type: object
+      description: >-
+        An authenticated session. Returned by both /auth/login and /auth/refresh,
+        which share one shape because the client replaces a stored session with a
+        renewed one in place.
       properties:
         accessToken:
           type: string
+          description: Signed JWT presented as a bearer credential on subsequent calls.
+        refreshToken:
+          type: string
+          description: >-
+            Credential used to renew the session via /auth/refresh. Each renewal
+            returns a new value which should be stored in place of the one presented.
         tokenType:
           type: string
           example: Bearer
         expiresIn:
           type: integer
-          example: 3600
+          description: Lifetime of accessToken in seconds, counted from issue.
+          example: 1800
         user:
           $ref: '#/components/schemas/UserProfile'
-
     UserProfile:
       type: object
       properties:

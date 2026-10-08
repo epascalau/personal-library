@@ -50,7 +50,8 @@ const invokers: { [K in BackendOperationName]: Invoker<K> } = {
   extractMetadata: (adapter, request) =>
     adapter.extractMetadata(request.fileName, request.sampleContent, request.fileData, request.mimeType),
   login: (adapter, request) => adapter.login(request.username, request.password, request.realm),
-  logout: (adapter) => adapter.logout(),
+  refreshSession: (adapter, request) => adapter.refreshSession(request.refreshToken, request.realm),
+  logout: (adapter, request) => adapter.logout(request?.refreshToken),
   getOpenApiSpec: (adapter) => adapter.getOpenApiSpec(),
   testHealth: (adapter) => adapter.testHealth()
 };

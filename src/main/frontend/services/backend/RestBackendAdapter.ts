@@ -9,6 +9,7 @@
  */
 
 import {
+  AuthSession,
   BackendAdapter,
   BackendConfig,
   BackendHealthResult,
@@ -463,8 +464,8 @@ export class RestBackendAdapter implements BackendAdapter {
     username: string,
     password?: string,
     realm?: string
-  ): Promise<{ accessToken: string; user: UserProfile }> {
-    return this.request<{ accessToken: string; user: UserProfile }>(
+  ): Promise<AuthSession> {
+    return this.request<AuthSession>(
       '/auth/login',
       {
         method: 'POST',
@@ -476,14 +477,52 @@ export class RestBackendAdapter implements BackendAdapter {
   }
 
   /**
+   * Renews an expiring session using the stored refresh token.
+   *
+   * WHAT: Issues a POST to `/auth/refresh` and receives a new access token, a new refresh token
+   * and the realm's current view of the profile.
+   * WHY: Keeps a working session alive past the access token's short lifetime without asking for
+   * the password again. Deliberately not retried: a failure here means the refresh token is no
+   * longer accepted — expired, revoked by a sign-out elsewhere, or its SSO session ended — and
+   * retrying would present the same dead credential. The caller treats any failure as "sign in
+   * again", which is the only correct recovery.
+   *
+   * @param refreshToken Refresh token from the most recent sign-in or renewal.
+   * @param realm Target Keycloak realm.
+   * @returns Renewed session.
+   */
+  async refreshSession(refreshToken: string, realm?: string): Promise<AuthSession> {
+    return this.request<AuthSession>(
+      '/auth/refresh',
+      {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken, realm })
+      },
+      15000,
+      0
+    );
+  }
+
+  /**
    * Terminates active authentication session.
    *
-   * WHAT: Issues a POST to `/auth/logout`.
-   * WHY: Informs Keycloak session manager to invalidate the server-side session token.
+   * WHAT: Issues a POST to `/auth/logout`, passing the refresh token for revocation.
+   * WHY: Informs the Keycloak session manager to invalidate the server-side session, so the
+   * refresh token cannot continue minting access tokens after the user has signed out.
+   *
+   * @param refreshToken Refresh token to revoke at the realm, when one is held.
    */
-  async logout(): Promise<void> {
+  async logout(refreshToken?: string): Promise<void> {
     try {
-      await this.request('/auth/logout', { method: 'POST' }, 5000, 0);
+      await this.request(
+        '/auth/logout',
+        {
+          method: 'POST',
+          body: JSON.stringify({ refreshToken: refreshToken ?? null })
+        },
+        5000,
+        0
+      );
     } catch (_) {
       // ignore
     }

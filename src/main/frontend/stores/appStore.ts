@@ -10,6 +10,8 @@
 
 import { Store } from '../core/store';
 import { backendBus, requestBackend } from '../services/backend';
+import type { AuthSession } from '../services/backend/types';
+import { sessionService } from '../services/SessionService';
 import { DocumentRecord, FilterState, UserProfile } from '../types';
 
 export type AppView = 'list' | 'object';
@@ -740,35 +742,67 @@ class AppStore extends Store<AppState> {
   /**
    * Handles successful user login and session establishment.
    *
-   * WHAT: Stores user profile in memory and persists profile and JWT token into `localStorage`.
-   * WHY: Preserves user authentication across browser reloads while immediately updating
-   * user avatar, name, and role badges in the ShellBar.
+   * WHAT: Stores the user profile in memory, persists the profile to `localStorage`, and hands
+   * the token bundle to the session service, which persists it and keeps it renewed.
+   * WHY: Preserves authentication across browser reloads while immediately updating the user
+   * avatar, name and role badges in the ShellBar. Delegating the tokens means the access token is
+   * renewed silently before it expires instead of stranding the user mid-task when it lapses.
    *
-   * @param newUser Authenticated user profile.
-   * @param token OIDC Bearer token string.
+   * @param session Authenticated session carrying the profile and the token bundle.
    */
-  handleLoginSuccess(newUser: UserProfile, token: string): void {
-    this.setState({ user: newUser });
-    localStorage.setItem('personal_library_user', JSON.stringify(newUser));
-    localStorage.setItem('personal_library_token', token);
-    this.showToast(`Signed in to Keycloak realm as ${newUser.name}`);
+  handleLoginSuccess(session: AuthSession): void {
+    this.setState({ user: session.user });
+    localStorage.setItem('personal_library_user', JSON.stringify(session.user));
+    sessionService.start(session);
+    this.showToast(`Signed in to Keycloak realm as ${session.user.name}`);
+  }
+
+  /**
+   * Resumes a session persisted by an earlier page load.
+   *
+   * WHAT: Registers the handlers that react to a renewal or to an unrenewable session, then asks
+   * the session service to pick the renewal schedule back up.
+   * WHY: Without this a reload would keep the stored token but abandon its renewal timer, so the
+   * session would silently die at the next expiry despite a usable refresh token being on hand.
+   */
+  initSession(): void {
+    sessionService.configure({
+      // The realm is authoritative on identity, so a renewal is the natural moment to pick up a
+      // role change made mid-session rather than waiting for the next manual sign-in.
+      onRenewed: (user) => {
+        this.setState({ user });
+        localStorage.setItem('personal_library_user', JSON.stringify(user));
+      },
+      onExpired: () => {
+        localStorage.removeItem('personal_library_user');
+        this.setState({ user: null, authModalOpen: true });
+        this.showToast('Session expired, please sign in again', 'error');
+      }
+    });
+    sessionService.restore();
   }
 
   /**
    * Logs out the current user session and clears stored credentials.
    *
-   * WHAT: Dispatches `logout` to the backend gateway, clears `localStorage` keys,
-   * shows confirmation toast, and opens the auth modal.
-   * WHY: Fully purges tokens to prevent session hijacking and invites re-authentication.
+   * WHAT: Sends the refresh token to the backend for revocation, stops the renewal schedule,
+   * clears `localStorage`, shows a confirmation toast and opens the auth modal.
+   * WHY: Fully purges tokens to prevent session hijacking and invites re-authentication. The
+   * refresh token is revoked at the realm rather than merely dropped locally, because it stays
+   * valid server-side until it expires and could otherwise keep minting access tokens after the
+   * user believed they had signed out.
    */
   async logout(): Promise<void> {
+    // Read before clearing: this token is the only means of revoking the server-side session.
+    const refreshToken = sessionService.getRefreshToken();
+
     try {
-      await requestBackend('logout', {});
+      await requestBackend('logout', { refreshToken });
     } catch {
       // ignore
     }
     localStorage.removeItem('personal_library_user');
-    localStorage.removeItem('personal_library_token');
+    sessionService.clear();
     // Drop the identity as well, so the ShellBar stops showing the signed-out user.
     this.setState({ user: null, authModalOpen: true });
     this.showToast('Signed out from Keycloak realm', 'success');

@@ -75,6 +75,32 @@ export interface BackendHealthResult {
 }
 
 /**
+ * An authenticated session as returned by both sign-in and token renewal.
+ *
+ * Login and refresh deliberately share one shape: the client replaces a stored
+ * session with a renewed one in place, so any field present on one but missing
+ * from the other would silently blank out after the first renewal.
+ */
+export interface AuthSession {
+  /** Signed JWT presented as a bearer credential on subsequent API calls */
+  accessToken: string;
+  /**
+   * Credential used to obtain a new access token once the current one expires.
+   *
+   * Each renewal returns a new refresh token, which should be stored in place
+   * of the one presented. The realm does not revoke the previous token on
+   * renewal, so this is good hygiene rather than a hard requirement.
+   */
+  refreshToken?: string;
+  /** Lifetime of `accessToken` in seconds, counted from issue */
+  expiresIn?: number;
+  /** Bearer scheme identifier, always `Bearer` for this realm */
+  tokenType?: string;
+  /** Realm's own view of the authenticated identity and its roles */
+  user: UserProfile;
+}
+
+/**
  * Paginated document query results.
  */
 export interface DocumentListResult {
@@ -263,17 +289,34 @@ export interface BackendAdapter {
     username: string,
     password?: string,
     realm?: string
-  ): Promise<{ accessToken: string; user: UserProfile }>;
+  ): Promise<AuthSession>;
+
+  /**
+   * Renews an expiring session without re-prompting for credentials.
+   *
+   * WHAT: Exchanges a refresh token for a new access token, refresh token and profile.
+   * WHY: Access tokens are short-lived by design so a leaked one is quickly useless, but that
+   * would otherwise sign an active user out mid-task. Renewing silently keeps the session
+   * continuous while preserving the short access-token lifetime.
+   *
+   * @param refreshToken Refresh token from the most recent sign-in or renewal.
+   * @param realm Optional tenant realm.
+   * @returns Promise resolving to the renewed session.
+   */
+  refreshSession(refreshToken: string, realm?: string): Promise<AuthSession>;
 
   /**
    * Terminates active Keycloak session.
    *
-   * WHAT: Clears access tokens and notifies auth provider of session termination.
-   * WHY: Clean session invalidation prevents credential reuse on shared workstations.
+   * WHAT: Clears access tokens and asks the identity provider to revoke the refresh token.
+   * WHY: Clean session invalidation prevents credential reuse on shared workstations. Purging
+   * local storage is not enough on its own, because a refresh token stays valid at the realm
+   * until it expires and could otherwise keep minting access tokens after sign-out.
    *
+   * @param refreshToken Refresh token to revoke at the realm, when one is held.
    * @returns Promise resolving once logout complete.
    */
-  logout(): Promise<void>;
+  logout(refreshToken?: string): Promise<void>;
 
   /**
    * Generates download URL for document asset.

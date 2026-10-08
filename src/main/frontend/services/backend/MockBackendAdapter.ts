@@ -8,6 +8,7 @@
  */
 
 import {
+  AuthSession,
   BackendAdapter,
   BackendConfig,
   BackendHealthResult,
@@ -593,9 +594,12 @@ export class MockBackendAdapter implements BackendAdapter {
    * @param username Login identifier.
    * @returns Mock auth token and profile.
    */
-  async login(username: string): Promise<{ accessToken: string; user: UserProfile }> {
+  async login(username: string): Promise<AuthSession> {
     return {
       accessToken: 'mock_jwt_token',
+      refreshToken: 'mock_refresh_token',
+      expiresIn: 1800,
+      tokenType: 'Bearer',
       user: {
         id: 'usr-offline',
         username: username.split('@')[0],
@@ -606,6 +610,20 @@ export class MockBackendAdapter implements BackendAdapter {
         authenticatedAt: new Date().toISOString()
       }
     };
+  }
+
+  /**
+   * Simulates silent session renewal in offline standalone mode.
+   *
+   * WHAT: Returns a fresh mock session, reusing the stored offline profile.
+   * WHY: Satisfies the adapter contract so the session scheduler behaves identically offline,
+   * which keeps the renewal path exercised during local development instead of only against a
+   * live realm. The offline session never genuinely expires, so this always succeeds.
+   *
+   * @returns Mock renewed session.
+   */
+  async refreshSession(): Promise<AuthSession> {
+    return this.login('offline.user@personal-library.local');
   }
 
   /**

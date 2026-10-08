@@ -113,6 +113,91 @@ public class KeycloakAuthService {
     }
 
     /**
+     * Exchanges a refresh token for a freshly minted access token.
+     *
+     * WHAT: Posts a `refresh_token` grant to the realm token endpoint and returns Keycloak's JSON
+     * body verbatim, exactly as {@link #passwordGrant(String, String)} does.
+     * WHY: Access tokens deliberately expire quickly so a leaked one has a short blast radius, but
+     * that would log an active user out mid-task. The refresh token lets the session be renewed
+     * silently without re-prompting for the password, which is the whole point of the OAuth2
+     * refresh flow. It must be brokered here for the same reason the password grant is: the token
+     * has to carry the in-network issuer (`http://keycloak:8080/...`) the resource server trusts.
+     *
+     * <p>Keycloak issues a <em>new</em> refresh token alongside each renewal, and callers should
+     * store it in place of the one they presented. The realm keeps `revokeRefreshToken` at its
+     * default of false, so a previously issued refresh token stays usable until the SSO session
+     * itself ends; enabling revocation would add replay detection but would break concurrent
+     * browser tabs, which renew on the same schedule from shared storage and would race.
+     *
+     * @param refreshToken Refresh token issued by a previous password or refresh grant.
+     * @return Keycloak token response.
+     * @throws InvalidCredentialsException When the refresh token is expired, revoked or malformed.
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> refreshGrant(String refreshToken) {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        form.add("grant_type", "refresh_token");
+        form.add("refresh_token", refreshToken);
+
+        try {
+            Map<String, Object> body = restClient.post()
+                    .uri(issuerUri + "/protocol/openid-connect/token")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(form)
+                    .retrieve()
+                    .body(Map.class);
+
+            if (body == null || body.get("access_token") == null) {
+                throw new InvalidCredentialsException("Keycloak returned no access token");
+            }
+            return body;
+        } catch (RestClientResponseException ex) {
+            // A refresh token that has expired, been revoked by logout, or whose SSO session has
+            // ended is reported as 400 invalid_grant in every case. The client's only correct
+            // response to any of them is to sign in again, so collapsing them loses nothing.
+            log.info("Keycloak refused refresh token: {}", ex.getStatusCode());
+            throw new InvalidCredentialsException("Session expired, please sign in again");
+        }
+    }
+
+    /**
+     * Ends the Keycloak-side session backing a refresh token.
+     *
+     * WHAT: Posts the refresh token to the realm's end-session endpoint.
+     * WHY: Clearing browser storage on logout only removes the client's copy. The refresh token
+     * stays valid at the realm for its full lifetime, so anything that captured it could keep
+     * minting access tokens long after the user believed they had signed out. Now that the
+     * application genuinely holds long-lived refresh tokens, revoking them server-side is what
+     * makes logout mean something. Failures are swallowed: the user has signed out regardless, and
+     * surfacing an identity-provider error would only block the local cleanup that matters most.
+     *
+     * @param refreshToken Refresh token to invalidate; ignored when blank.
+     */
+    public void revokeRefreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return;
+        }
+
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        form.add("refresh_token", refreshToken);
+
+        try {
+            restClient.post()
+                    .uri(issuerUri + "/protocol/openid-connect/logout")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(form)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception ex) {
+            log.warn("Unable to revoke refresh token at the realm: {}", ex.getMessage());
+        }
+    }
+
+    /**
      * Decodes the unverified payload of a JWT issued moments earlier by this service.
      *
      * WHAT: Base64url-decodes the second segment and parses its claims.

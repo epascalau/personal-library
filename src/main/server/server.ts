@@ -1133,7 +1133,7 @@ app.post('/api/v1/auth/login', async (req: Request, res: Response) => {
       accessToken,
       refreshToken: token.refresh_token,
       tokenType: 'Bearer',
-      expiresIn: token.expires_in ?? 300,
+      expiresIn: token.expires_in ?? 1800,
       user: currentSessionUser
     });
   } catch (error) {
@@ -1143,12 +1143,105 @@ app.post('/api/v1/auth/login', async (req: Request, res: Response) => {
 });
 
 /**
+ * Renews an expiring session from a refresh token.
+ *
+ * WHAT: Brokers an OAuth2 `refresh_token` grant against the realm and returns a new token bundle
+ * with the same shape as `/auth/login`.
+ * WHY: Mirrors the Java `AuthController` so both backend modes behave identically — the frontend
+ * is free to switch between "Integrated Gateway" and "Direct Spring Boot" without the session
+ * silently losing its ability to renew. Each renewal returns a new refresh token which the client
+ * should store in place of the one it presented.
+ */
+app.post('/api/v1/auth/refresh', async (req: Request, res: Response) => {
+  const { refreshToken, realm } = req.body;
+  if (!refreshToken) {
+    return res.status(400).json({ error: 'A refresh token is required' });
+  }
+
+  const issuer = process.env.KEYCLOAK_ISSUER_URI
+    || `${process.env.KEYCLOAK_AUTH_SERVER_URL || 'http://keycloak:8080'}/realms/${process.env.KEYCLOAK_REALM || 'personal-library-realm'}`;
+
+  try {
+    const tokenRes = await fetch(`${issuer}/protocol/openid-connect/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: process.env.KEYCLOAK_CLIENT_ID || 'personal-library-client',
+        client_secret: process.env.KEYCLOAK_CLIENT_SECRET || 'enterprise-library-secret',
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      })
+    });
+
+    if (!tokenRes.ok) {
+      // An expired token, one revoked by a sign-out elsewhere, and an ended SSO session are all
+      // reported as invalid_grant, and the client's only correct response to any of them is to
+      // sign in again.
+      return res.status(401).json({ error: 'Session expired, please sign in again' });
+    }
+
+    const token = (await tokenRes.json()) as Record<string, unknown>;
+    const accessToken = String(token.access_token || '');
+    const segments = accessToken.split('.');
+    const claims: Record<string, any> = segments.length === 3
+      ? JSON.parse(Buffer.from(segments[1], 'base64url').toString('utf8'))
+      : {};
+
+    currentSessionUser = {
+      id: String(claims.sub || currentSessionUser?.id || `usr-${Date.now().toString(36)}`),
+      username: String(claims.preferred_username || ''),
+      email: String(claims.email || ''),
+      name: String(claims.name || claims.preferred_username || ''),
+      roles: Array.isArray(claims.realm_access?.roles) ? claims.realm_access.roles : [],
+      realm: realm || process.env.KEYCLOAK_REALM || 'personal-library-realm',
+      authenticatedAt: new Date().toISOString()
+    };
+
+    return res.json({
+      accessToken,
+      refreshToken: token.refresh_token,
+      tokenType: 'Bearer',
+      expiresIn: token.expires_in ?? 1800,
+      user: currentSessionUser
+    });
+  } catch (error) {
+    console.error('[auth] Keycloak token refresh failed:', error);
+    return res.status(503).json({ error: 'Identity provider unreachable' });
+  }
+});
+
+/**
  * Logs out the active user session.
  *
- * WHAT: Terminates user credentials context and returns success acknowledgement.
- * WHY: Conforms to Keycloak logout specifications, allowing clean client-side token revocation.
+ * WHAT: Revokes the supplied refresh token at the realm's end-session endpoint and returns a
+ * success acknowledgement.
+ * WHY: Clearing the client's storage alone leaves the refresh token valid at the realm for its
+ * full lifetime, so anything that captured it could keep minting access tokens after sign-out.
+ * Revocation is what makes logout actually end the session. Failures are swallowed because the
+ * user has signed out regardless, and an identity-provider error must not block local cleanup.
  */
-app.post('/api/v1/auth/logout', (_req: Request, res: Response) => {
+app.post('/api/v1/auth/logout', async (req: Request, res: Response) => {
+  const refreshToken = req.body?.refreshToken;
+
+  if (refreshToken) {
+    const issuer = process.env.KEYCLOAK_ISSUER_URI
+      || `${process.env.KEYCLOAK_AUTH_SERVER_URL || 'http://keycloak:8080'}/realms/${process.env.KEYCLOAK_REALM || 'personal-library-realm'}`;
+
+    try {
+      await fetch(`${issuer}/protocol/openid-connect/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: process.env.KEYCLOAK_CLIENT_ID || 'personal-library-client',
+          client_secret: process.env.KEYCLOAK_CLIENT_SECRET || 'enterprise-library-secret',
+          refresh_token: refreshToken
+        })
+      });
+    } catch (error) {
+      console.warn('[auth] Unable to revoke refresh token at the realm:', error);
+    }
+  }
+
   return res.json({ success: true, message: 'User session logged out from Keycloak realm' });
 });
 
