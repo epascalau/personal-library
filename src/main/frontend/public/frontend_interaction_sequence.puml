@@ -1,0 +1,84 @@
+@startuml Frontend_Interaction_Sequence
+!theme plain
+skinparam roundCorner 8
+skinparam defaultFontName Inter
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 12
+skinparam BoxPadding 14
+
+title Personal Library — Frontend Interaction Sequence\nUser gesture to re-rendered DOM, through the typed event bus
+
+actor User
+
+box "View layer" #EEF6FF
+participant "ListReportView\n<<Component>>" as View
+end box
+
+box "State layer" #F0FDF4
+participant "appStore\n<<Store<AppState>>>" as Store
+end box
+
+box "Messaging layer" #FAF5FF
+participant "requestBackend()" as Req
+participant "backendBus\n<<TypedEventBus>>" as Bus
+participant "BackendGateway" as GW
+end box
+
+box "Adapter layer" #FFF7ED
+participant "RestBackendAdapter" as Adapter
+end box
+
+participant "Spring Boot / Express" as API
+
+User -> View : click "Search"
+View -> Store : applyFilters(filters)
+
+group Optimistic busy state (no network I/O yet)
+  Store -> Store : setState({ loadingDocs: true })
+  Store --> View : listener(state) via queueMicrotask
+  View -> View : requestRender() -> render()
+  note right of View : Spinner is on screen before\nthe request is even published
+end
+
+Store -> Req : requestBackend('getDocuments', {...})
+Req -> Bus : subscribe(':success' / ':failure')\nkeyed by requestId
+Req -> Bus : publish('backend:getDocuments:request')
+
+note right of Bus
+  Dispatch is synchronous.
+  The bus is a detached Comment
+  node used as an EventTarget,
+  so events cannot leak into
+  the document.
+end note
+
+Bus -> GW : handler(envelope)
+GW -> Bus : publish('backend:request:started')
+GW -> Adapter : invoke(operation, resolveAdapter(), request)
+Adapter -> API : GET /api/v1/documents
+API --> Adapter : 200 PaginatedResponse
+Adapter --> GW : result
+
+alt request succeeded
+  GW -> Bus : publish(':success', { requestId, result, durationMs })
+  Bus --> Req : envelope (ignored unless requestId matches)
+  Req --> Store : resolve(result)
+  Store -> Store : setState({ documents, total, loadingDocs: false })
+else adapter threw / HTTP error
+  GW -> Bus : publish(':failure', { requestId, error, durationMs })
+  Bus --> Req : envelope (ignored unless requestId matches)
+  Req --> Store : reject(Error)
+  Store -> Store : setState({ fetchError: msg, loadingDocs: false })
+end
+
+GW -> Bus : publish('backend:request:settled', { ok, durationMs })
+Store --> View : listener(state) — coalesced into one microtask
+View -> View : render() — focus and scroll restored
+
+note over View, Store
+  The view never awaits the adapter. It reacts only to
+  store state, which is why the Mock and REST adapters
+  are interchangeable at runtime.
+end note
+
+@enduml

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1740 1180" width="1740" height="1180" style="background:#0f172a; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="cmp-hdr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <marker id="cmp-arrow-sky" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" /></marker>
+    <marker id="cmp-arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#34d399" /></marker>
+    <marker id="cmp-arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#c084fc" /></marker>
+    <marker id="cmp-arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#fbbf24" /></marker>
+    <filter id="cmp-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Title banner -->
+  <rect x="26" y="20" width="1688" height="66" rx="8" fill="url(#cmp-hdr)" stroke="#334155" stroke-width="1.5" />
+  <text x="50" y="52" font-size="20" font-weight="800" fill="#f8fafc">Personal Library — Frontend Component Interaction</text>
+  <text x="50" y="72" font-size="12" font-weight="500" fill="#94a3b8">Hand-rolled runtime: Component views &#8226; observable Stores &#8226; typed event bus &#8226; swappable adapters &#8212; no framework</text>
+  <rect x="1534" y="38" width="180" height="28" rx="6" fill="#0070f2" />
+  <text x="1624" y="56" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Component / Data Flow</text>
+
+  <rect x="34" y="118" width="1672" height="108" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="50" y="139" font-size="12" font-weight="800" fill="#38bdf8">VIEW LAYER — Component subclasses (core/component.ts)</text>
+  <rect x="34" y="310" width="1672" height="108" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#34d399" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1046" y="331" font-size="12" font-weight="800" fill="#34d399">STATE LAYER — Store&lt;S&gt; subclasses (core/store.ts)</text>
+  <rect x="34" y="500" width="1672" height="120" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1300" y="521" font-size="12" font-weight="800" fill="#c084fc">MESSAGING LAYER — services/backend (core/eventBus.ts)</text>
+  <rect x="34" y="702" width="1672" height="108" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1150" y="723" font-size="12" font-weight="800" fill="#fbbf24">ADAPTER LAYER — exactly one active at a time</text>
+  <rect x="34" y="894" width="1672" height="108" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#f87171" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1430" y="915" font-size="12" font-weight="800" fill="#f87171">BACKEND TIER</text>
+
+  <g>
+    <rect x="70" y="154" width="190" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="165" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">AppView</text>
+    <text x="165" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">root floorplan</text>
+  </g>
+  <g>
+    <rect x="280" y="154" width="180" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="370" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">ShellBarView</text>
+    <text x="370" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">search, theme, auth</text>
+  </g>
+  <g>
+    <rect x="480" y="154" width="190" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="575" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">ListReportView</text>
+    <text x="575" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">table, filters</text>
+  </g>
+  <g>
+    <rect x="690" y="154" width="190" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="785" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">ObjectPageView</text>
+    <text x="785" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">detail, versions</text>
+  </g>
+  <g>
+    <rect x="900" y="154" width="230" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="1015" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">Dialog views ×8</text>
+    <text x="1015" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">Upload, Overwrite, Auth…</text>
+  </g>
+  <g>
+    <rect x="1150" y="154" width="150" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="1225" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">ToastView</text>
+    <text x="1225" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">notifications</text>
+  </g>
+  <g>
+    <rect x="1320" y="154" width="150" height="54" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="1395" y="179" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">FooterView</text>
+    <text x="1395" y="195" font-size="9.5" font-weight="500" fill="#38bdf8" text-anchor="middle">status</text>
+  </g>
+  <g>
+    <rect x="70" y="346" width="230" height="54" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="185" y="371" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">appStore</text>
+    <text x="185" y="387" font-size="9.5" font-weight="500" fill="#34d399" text-anchor="middle">documents, filters, dialogs</text>
+  </g>
+  <g>
+    <rect x="320" y="346" width="220" height="54" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="430" y="371" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">backendStore</text>
+    <text x="430" y="387" font-size="9.5" font-weight="500" fill="#34d399" text-anchor="middle">adapter config, health</text>
+  </g>
+  <g>
+    <rect x="560" y="346" width="170" height="54" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="645" y="371" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">themeStore</text>
+    <text x="645" y="387" font-size="9.5" font-weight="500" fill="#34d399" text-anchor="middle">dark mode</text>
+  </g>
+  <g>
+    <rect x="750" y="346" width="170" height="54" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="835" y="371" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">i18nStore</text>
+    <text x="835" y="387" font-size="9.5" font-weight="500" fill="#34d399" text-anchor="middle">5 locales</text>
+  </g>
+  <g>
+    <rect x="70" y="540" width="230" height="60" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="185" y="568" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">requestBackend()</text>
+    <text x="185" y="587" font-size="9.5" font-weight="500" fill="#c084fc" text-anchor="middle">promise ⇄ event bridge</text>
+  </g>
+  <g>
+    <rect x="360" y="540" width="280" height="60" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="500" y="568" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">backendBus</text>
+    <text x="500" y="587" font-size="9.5" font-weight="500" fill="#c084fc" text-anchor="middle">TypedEventBus&lt;BackendEvents&gt;</text>
+  </g>
+  <g>
+    <rect x="700" y="540" width="230" height="60" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="815" y="568" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">BackendGateway</text>
+    <text x="815" y="587" font-size="9.5" font-weight="500" fill="#c084fc" text-anchor="middle">consumes every :request</text>
+  </g>
+  <g>
+    <rect x="70" y="738" width="230" height="54" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="185" y="763" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">MockBackendAdapter</text>
+    <text x="185" y="779" font-size="9.5" font-weight="500" fill="#fbbf24" text-anchor="middle">in-browser fixtures</text>
+  </g>
+  <g>
+    <rect x="320" y="738" width="230" height="54" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="435" y="763" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">RestBackendAdapter</text>
+    <text x="435" y="779" font-size="9.5" font-weight="500" fill="#fbbf24" text-anchor="middle">fetch + timeout + retry</text>
+  </g>
+  <g>
+    <rect x="570" y="738" width="210" height="54" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="675" y="763" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">SessionService</text>
+    <text x="675" y="779" font-size="9.5" font-weight="500" fill="#fbbf24" text-anchor="middle">token renewal</text>
+  </g>
+  <g>
+    <rect x="70" y="930" width="180" height="54" rx="7" fill="#450a0a" stroke="#f87171" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="160" y="955" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">nginx :8088</text>
+    <text x="160" y="971" font-size="9.5" font-weight="500" fill="#f87171" text-anchor="middle">ingress</text>
+  </g>
+  <g>
+    <rect x="270" y="930" width="200" height="54" rx="7" fill="#450a0a" stroke="#f87171" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="370" y="955" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">Spring Boot :18080</text>
+    <text x="370" y="971" font-size="9.5" font-weight="500" fill="#f87171" text-anchor="middle">JDK 21 / Boot 4.1</text>
+  </g>
+  <g>
+    <rect x="490" y="930" width="190" height="54" rx="7" fill="#450a0a" stroke="#f87171" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="585" y="955" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">Express gateway</text>
+    <text x="585" y="971" font-size="9.5" font-weight="500" fill="#f87171" text-anchor="middle">Node adapter</text>
+  </g>
+  <g>
+    <rect x="700" y="930" width="180" height="54" rx="7" fill="#450a0a" stroke="#f87171" stroke-width="1.5" filter="url(#cmp-shadow)" />
+    <text x="790" y="955" font-size="11.5" font-weight="700" fill="#f8fafc" text-anchor="middle">Keycloak :8180</text>
+    <text x="790" y="971" font-size="9.5" font-weight="500" fill="#f87171" text-anchor="middle">OIDC realm</text>
+  </g>
+
+  <!-- ===== Views -> Stores: intent calls ===== -->
+  <line x1="160" y1="208" x2="160" y2="340" stroke="#38bdf8" stroke-width="2.4" marker-end="url(#cmp-arrow-sky)" />
+  <line x1="370" y1="208" x2="430" y2="340" stroke="#38bdf8" stroke-width="2" marker-end="url(#cmp-arrow-sky)" />
+  <line x1="575" y1="208" x2="300" y2="340" stroke="#38bdf8" stroke-width="2" marker-end="url(#cmp-arrow-sky)" />
+  <g>
+    <rect x="599.9" y="239.0" width="400.2" height="46" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#38bdf8" stroke-width="1.2" />
+    <text x="800" y="261.0" font-size="10.5" font-weight="700" fill="#38bdf8" text-anchor="middle">INTENT CALLS — plain method invocation</text>
+    <text x="800" y="276.0" font-size="9.5" font-weight="500" fill="#cbd5e1" text-anchor="middle">applyFilters() · openDocument() · openUpload() · logout()</text>
+  </g>
+
+  <!-- ===== Stores -> Views: the only path back up ===== -->
+  <line x1="1672" y1="342" x2="1672" y2="212" stroke="#34d399" stroke-width="2.4" stroke-dasharray="7 4" marker-end="url(#cmp-arrow-green)" />
+  <g>
+    <rect x="1146.5" y="230.0" width="387.0" height="76" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#34d399" stroke-width="1.2" />
+    <text x="1340" y="252.0" font-size="10.5" font-weight="700" fill="#34d399" text-anchor="middle">SUBSCRIBE / NOTIFY — the only path back up</text>
+    <text x="1340" y="267.0" font-size="9.5" font-weight="500" fill="#cbd5e1" text-anchor="middle">store.subscribe(() =&gt; this.requestRender())</text>
+    <text x="1340" y="282.0" font-size="9.5" font-weight="500" fill="#cbd5e1" text-anchor="middle">coalesced into one microtask; setState() short-circuits</text>
+    <text x="1340" y="297.0" font-size="9.5" font-weight="500" fill="#cbd5e1" text-anchor="middle">when nothing actually changed</text>
+  </g>
+
+  <!-- ===== Stores -> Messaging ===== -->
+  <line x1="170" y1="400" x2="170" y2="534" stroke="#c084fc" stroke-width="2.4" marker-end="url(#cmp-arrow-purple)" />
+  <line x1="104" y1="534" x2="104" y2="404" stroke="#34d399" stroke-width="2.2" stroke-dasharray="7 4" marker-end="url(#cmp-arrow-green)" />
+  <g>
+    <rect x="328.9" y="424.5" width="202.2" height="31" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#c084fc" stroke-width="1.2" />
+    <text x="430" y="446.5" font-size="10.5" font-weight="700" fill="#c084fc" text-anchor="middle">requestBackend(op, payload)</text>
+  </g>
+  <g>
+    <rect x="322.3" y="460.5" width="215.4" height="31" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#34d399" stroke-width="1.2" />
+    <text x="430" y="482.5" font-size="10.5" font-weight="700" fill="#34d399" text-anchor="middle">resolve / reject &#8594; setState()</text>
+  </g>
+
+  <!-- ===== Inside the messaging band ===== -->
+  <line x1="302" y1="570" x2="354" y2="570" stroke="#c084fc" stroke-width="2.2" marker-end="url(#cmp-arrow-purple)" />
+  <line x1="642" y1="570" x2="694" y2="570" stroke="#c084fc" stroke-width="2.2" marker-end="url(#cmp-arrow-purple)" />
+  <g>
+    <rect x="67.6" y="628.5" width="604.8" height="31" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#c084fc" stroke-width="1.2" />
+    <text x="370" y="650.5" font-size="10.5" font-weight="700" fill="#c084fc" text-anchor="middle">publish ':request' &#8594; handler &#8594; publish ':success' / ':failure' (correlated by requestId)</text>
+  </g>
+
+  <!-- ===== Gateway -> Adapters ===== -->
+  <line x1="800" y1="602" x2="440" y2="734" stroke="#fbbf24" stroke-width="2.4" marker-end="url(#cmp-arrow-amber)" />
+  <line x1="760" y1="602" x2="240" y2="734" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#cmp-arrow-amber)" />
+  <g>
+    <rect x="790.1" y="645.0" width="439.8" height="46" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#fbbf24" stroke-width="1.2" />
+    <text x="1010" y="667.0" font-size="10.5" font-weight="700" fill="#fbbf24" text-anchor="middle">invoke(op, resolveAdapter(), request)</text>
+    <text x="1010" y="682.0" font-size="9.5" font-weight="500" fill="#cbd5e1" text-anchor="middle">the dashed path is the Mock adapter — same contract, no network</text>
+  </g>
+
+  <!-- ===== Adapters -> Backend ===== -->
+  <line x1="420" y1="794" x2="170" y2="926" stroke="#f87171" stroke-width="2.2" marker-end="url(#cmp-arrow-amber)" />
+  <line x1="660" y1="794" x2="210" y2="926" stroke="#f87171" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#cmp-arrow-amber)" />
+  <g>
+    <rect x="690.0" y="837.0" width="420.0" height="46" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#f87171" stroke-width="1.2" />
+    <text x="900" y="859.0" font-size="10.5" font-weight="700" fill="#f87171" text-anchor="middle">fetch() through the nginx ingress</text>
+    <text x="900" y="874.0" font-size="9.5" font-weight="500" fill="#cbd5e1" text-anchor="middle">SessionService renews on the dashed path: POST /auth/refresh</text>
+  </g>
+  <line x1="252" y1="957" x2="266" y2="957" stroke="#f87171" stroke-width="2" marker-end="url(#cmp-arrow-amber)" />
+  <line x1="472" y1="957" x2="486" y2="957" stroke="#f87171" stroke-width="2" marker-end="url(#cmp-arrow-amber)" />
+  <line x1="682" y1="957" x2="696" y2="957" stroke="#f87171" stroke-width="2" marker-end="url(#cmp-arrow-amber)" />
+
+  <!-- ===== Cross-cutting topics ===== -->
+  <rect x="960" y="536" width="460" height="68" rx="7" fill="#3b1f52" fill-opacity="0.5" stroke="#c084fc" stroke-width="1.2" />
+  <text x="976" y="555" font-size="10.5" font-weight="700" fill="#d8b4fe">CROSS-CUTTING TOPICS</text>
+  <text x="976" y="571" font-size="9.5" font-weight="500" fill="#e9d5ff">'backend:adapter:changed' &#8594; appStore.scheduleFetch()</text>
+  <text x="976" y="585" font-size="9.5" font-weight="500" fill="#e9d5ff">'backend:health:changed' &#8226; ':request:started' / ':settled'</text>
+  <text x="976" y="599" font-size="9.5" font-weight="500" fill="#c4b5fd">Swapping the adapter needs no listener rebuild.</text>
+
+  <!-- ===== Explanatory notes ===== -->
+  <rect x="40" y="1024" width="540" height="124" rx="8" fill="#1e293b" fill-opacity="0.7" stroke="#38bdf8" stroke-width="1.3" />
+  <text x="58" y="1046" font-size="11.5" font-weight="800" fill="#7dd3fc">WHY AN EVENT BUS AT ALL</text>
+  <text x="58" y="1066" font-size="10" font-weight="500" fill="#cbd5e1">A direct store &#8594; adapter call would work, but every request would</text>
+  <text x="58" y="1081" font-size="10" font-weight="500" fill="#cbd5e1">then be invisible. Routing through topics makes the whole</text>
+  <text x="58" y="1096" font-size="10" font-weight="500" fill="#cbd5e1">conversation observable, lets the gateway time and normalise</text>
+  <text x="58" y="1111" font-size="10" font-weight="500" fill="#cbd5e1">errors in one place, and lets the adapter be swapped at runtime</text>
+  <text x="58" y="1126" font-size="10" font-weight="500" fill="#cbd5e1">without rebuilding a single subscription.</text>
+  <text x="58" y="1142" font-size="9.5" font-weight="600" fill="#7dd3fc">BackendGateway.execute() &#8226; services/backend/BackendGateway.ts</text>
+
+  <rect x="600" y="1024" width="540" height="124" rx="8" fill="#1e293b" fill-opacity="0.7" stroke="#c084fc" stroke-width="1.3" />
+  <text x="618" y="1046" font-size="11.5" font-weight="800" fill="#d8b4fe">PROMISES OVER AN EVENT BUS</text>
+  <text x="618" y="1066" font-size="10" font-weight="500" fill="#cbd5e1">requestBackend() generates a requestId, subscribes to the</text>
+  <text x="618" y="1081" font-size="10" font-weight="500" fill="#cbd5e1">matching :success and :failure topics, publishes the request,</text>
+  <text x="618" y="1096" font-size="10" font-weight="500" fill="#cbd5e1">then resolves or rejects and disposes both listeners. Callers</text>
+  <text x="618" y="1111" font-size="10" font-weight="500" fill="#cbd5e1">write plain await; the message still crosses the bus. Envelopes</text>
+  <text x="618" y="1126" font-size="10" font-weight="500" fill="#cbd5e1">whose requestId does not match are ignored.</text>
+  <text x="618" y="1142" font-size="9.5" font-weight="600" fill="#d8b4fe">requestBackend() &#8226; services/backend/BackendGateway.ts</text>
+
+  <rect x="1160" y="1024" width="540" height="124" rx="8" fill="#1e293b" fill-opacity="0.7" stroke="#34d399" stroke-width="1.3" />
+  <text x="1178" y="1046" font-size="11.5" font-weight="800" fill="#6ee7b7">LIFECYCLE AND LEAK SAFETY</text>
+  <text x="1178" y="1066" font-size="10" font-weight="500" fill="#cbd5e1">Every subscription is registered through Component.track(),</text>
+  <text x="1178" y="1081" font-size="10" font-weight="500" fill="#cbd5e1">so destroy() disposes store listeners, bus listeners and timers</text>
+  <text x="1178" y="1096" font-size="10" font-weight="500" fill="#cbd5e1">together. render() replaces innerHTML wholesale, then restores</text>
+  <text x="1178" y="1111" font-size="10" font-weight="500" fill="#cbd5e1">focus and scroll from a snapshot &#8212; which is what keeps typing</text>
+  <text x="1178" y="1126" font-size="10" font-weight="500" fill="#cbd5e1">in a filter field from losing the caret on a background refresh.</text>
+  <text x="1178" y="1142" font-size="9.5" font-weight="600" fill="#6ee7b7">core/component.ts &#8226; track() / render() / destroy()</text>
+</svg>

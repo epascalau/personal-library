@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1860 1310" width="1860" height="1310" style="background:#0f172a; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="seq-hdr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <marker id="seq-arrow-38bdf8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" /></marker>
+    <marker id="seq-arrow-34d399" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#34d399" /></marker>
+    <marker id="seq-arrow-c084fc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#c084fc" /></marker>
+    <marker id="seq-arrow-fbbf24" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#fbbf24" /></marker>
+    <marker id="seq-arrow-f87171" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#f87171" /></marker>
+    <filter id="seq-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Title banner -->
+  <rect x="26" y="20" width="1808" height="66" rx="8" fill="url(#seq-hdr)" stroke="#334155" stroke-width="1.5" />
+  <text x="50" y="52" font-size="20" font-weight="800" fill="#f8fafc">Personal Library — Frontend Interaction Sequence</text>
+  <text x="50" y="72" font-size="12" font-weight="500" fill="#94a3b8">One round trip: user gesture &#8594; view &#8594; store &#8594; typed event bus &#8594; gateway &#8594; adapter &#8594; HTTP &#8594; store &#8594; re-render</text>
+  <rect x="1664" y="38" width="170" height="28" rx="6" fill="#0070f2" />
+  <text x="1749" y="56" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">UML Sequence</text>
+
+  <!-- Phase band: optimistic busy state -->
+  <rect x="286" y="266" width="446" height="164" rx="7" fill="#38bdf8" fill-opacity="0.07" stroke="#38bdf8" stroke-width="1.1" stroke-dasharray="5 4" />
+  <text x="298" y="283" font-size="10.5" font-weight="700" fill="#7dd3fc">OPTIMISTIC BUSY STATE — painted before any network I/O</text>
+
+  <!-- Phase band: bus round trip -->
+  <rect x="768" y="572" width="856" height="282" rx="7" fill="#c084fc" fill-opacity="0.06" stroke="#c084fc" stroke-width="1.1" stroke-dasharray="5 4" />
+  <text x="780" y="590" font-size="10.5" font-weight="700" fill="#d8b4fe">CORRELATED REQUEST / REPLY — requestId pairs the publish with its envelope</text>
+
+  <g>
+    <rect x="35" y="104" width="170" height="52" rx="7" fill="#334155" stroke="#64748b" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="120" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">User</text>
+    <text x="120" y="143" font-size="10.5" font-weight="500" fill="#64748b" text-anchor="middle">actor</text>
+  </g>
+  <g>
+    <rect x="263" y="104" width="170" height="52" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="348" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">ListReportView</text>
+    <text x="348" y="143" font-size="10.5" font-weight="500" fill="#38bdf8" text-anchor="middle">Component</text>
+  </g>
+  <g>
+    <rect x="513" y="104" width="170" height="52" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="598" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">appStore</text>
+    <text x="598" y="143" font-size="10.5" font-weight="500" fill="#34d399" text-anchor="middle">Store&lt;AppState&gt;</text>
+  </g>
+  <g>
+    <rect x="740" y="104" width="196" height="52" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="838" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">requestBackend()</text>
+    <text x="838" y="143" font-size="10.5" font-weight="500" fill="#c084fc" text-anchor="middle">helper</text>
+  </g>
+  <g>
+    <rect x="993" y="104" width="170" height="52" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="1078" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">backendBus</text>
+    <text x="1078" y="143" font-size="10.5" font-weight="500" fill="#c084fc" text-anchor="middle">TypedEventBus</text>
+  </g>
+  <g>
+    <rect x="1233" y="104" width="170" height="52" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="1318" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">BackendGateway</text>
+    <text x="1318" y="143" font-size="10.5" font-weight="500" fill="#c084fc" text-anchor="middle">consumer</text>
+  </g>
+  <g>
+    <rect x="1460" y="104" width="196" height="52" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="1558" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">RestBackendAdapter</text>
+    <text x="1558" y="143" font-size="10.5" font-weight="500" fill="#fbbf24" text-anchor="middle">BackendAdapter</text>
+  </g>
+  <g>
+    <rect x="1687" y="104" width="170" height="52" rx="7" fill="#450a0a" stroke="#f87171" stroke-width="1.6" filter="url(#seq-shadow)" />
+    <text x="1772" y="126" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">REST API</text>
+    <text x="1772" y="143" font-size="10.5" font-weight="500" fill="#f87171" text-anchor="middle">:18080 / :8088</text>
+  </g>
+
+  <line x1="120" y1="156" x2="120" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="348" y1="156" x2="348" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="598" y1="156" x2="598" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="838" y1="156" x2="838" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="1078" y1="156" x2="1078" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="1318" y1="156" x2="1318" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="1558" y1="156" x2="1558" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+  <line x1="1772" y1="156" x2="1772" y2="1206" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 5" />
+
+  <g>
+    <line x1="124" y1="196" x2="343" y2="196" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#seq-arrow-38bdf8)" />
+    <rect x="162.6" y="173" width="141.8" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="233.5" y="185" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">1. click "Search"</text>
+  </g>
+  <g>
+    <line x1="352" y1="238" x2="593" y2="238" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#seq-arrow-38bdf8)" />
+    <rect x="375.7" y="215" width="193.6" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="472.5" y="227" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">2. applyFilters(filters)</text>
+  </g>
+  <g>
+    <path d="M 598 302 L 624 302 L 624 324 L 603 324" fill="none" stroke="#34d399" stroke-width="1.8" marker-end="url(#seq-arrow-34d399)" />
+    <rect x="631.0" y="300" width="267.6" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="638" y="312" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="start">3. setState({ loadingDocs: true })</text>
+  </g>
+  <g>
+    <line x1="594" y1="360" x2="353" y2="360" stroke="#34d399" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-34d399)" />
+    <rect x="336.0" y="337" width="275.0" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="473.5" y="349" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">4. listener(state) — queueMicrotask</text>
+  </g>
+  <g>
+    <path d="M 348 392 L 374 392 L 374 414 L 353 414" fill="none" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#seq-arrow-38bdf8)" />
+    <rect x="381.0" y="390" width="230.6" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="388" y="402" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="start">5. requestRender() → render()</text>
+  </g>
+  <g>
+    <line x1="602" y1="450" x2="833" y2="450" stroke="#c084fc" stroke-width="1.8" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="568.9" y="427" width="297.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="717.5" y="439" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">6. requestBackend('getDocuments', {…})</text>
+  </g>
+  <g>
+    <line x1="842" y1="492" x2="1073" y2="492" stroke="#c084fc" stroke-width="1.8" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="764.5" y="469" width="386.0" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="957.5" y="481" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">7. subscribe(':success' / ':failure') by requestId</text>
+  </g>
+  <g>
+    <line x1="842" y1="534" x2="1073" y2="534" stroke="#c084fc" stroke-width="1.8" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="794.1" y="511" width="326.8" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="957.5" y="523" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">8. publish('backend:getDocuments:request')</text>
+  </g>
+  <g>
+    <line x1="1082" y1="620" x2="1313" y2="620" stroke="#c084fc" stroke-width="1.8" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="1030.4" y="597" width="334.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1197.5" y="609" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">9. handler(envelope) — synchronous dispatch</text>
+  </g>
+  <g>
+    <line x1="1314" y1="662" x2="1083" y2="662" stroke="#c084fc" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="1049.9" y="639" width="297.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1198.5" y="651" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">10. publish('backend:request:started')</text>
+  </g>
+  <g>
+    <line x1="1322" y1="704" x2="1553" y2="704" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#seq-arrow-fbbf24)" />
+    <rect x="1251.9" y="681" width="371.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1437.5" y="693" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">11. invoke(operation, resolveAdapter(), request)</text>
+  </g>
+  <g>
+    <line x1="1562" y1="746" x2="1767" y2="746" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#seq-arrow-fbbf24)" />
+    <rect x="1530.7" y="723" width="267.6" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1664.5" y="735" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">12. GET /api/v1/documents?page=1&amp;…</text>
+  </g>
+  <g>
+    <line x1="1768" y1="788" x2="1563" y2="788" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-fbbf24)" />
+    <rect x="1565.0" y="765" width="201.0" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1665.5" y="777" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">13. 200 PaginatedResponse</text>
+  </g>
+  <g>
+    <line x1="1554" y1="828" x2="1323" y2="828" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-fbbf24)" />
+    <rect x="1393.5" y="805" width="90.0" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1438.5" y="817" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">14. result</text>
+  </g>
+  <g>
+    <line x1="1314" y1="884" x2="1083" y2="884" stroke="#c084fc" stroke-width="1.8" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="975.9" y="861" width="445.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1198.5" y="873" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">15. publish(':success', { requestId, result, durationMs })</text>
+  </g>
+  <g>
+    <line x1="1074" y1="926" x2="843" y2="926" stroke="#c084fc" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="776.6" y="903" width="363.8" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="958.5" y="915" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">16. envelope — dropped unless requestId matches</text>
+  </g>
+  <g>
+    <line x1="834" y1="968" x2="603" y2="968" stroke="#c084fc" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="640.2" y="945" width="156.6" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="718.5" y="957" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">17. resolve(result)</text>
+  </g>
+  <g>
+    <path d="M 598 1002 L 624 1002 L 624 1024 L 603 1024" fill="none" stroke="#34d399" stroke-width="1.8" marker-end="url(#seq-arrow-34d399)" />
+    <rect x="631.0" y="1000" width="415.6" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="638" y="1012" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="start">18. setState({ documents, total, loadingDocs: false })</text>
+  </g>
+  <g>
+    <line x1="1314" y1="1060" x2="1083" y2="1060" stroke="#c084fc" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-c084fc)" />
+    <rect x="975.9" y="1037" width="445.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="1198.5" y="1049" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">19. publish('backend:request:settled', { ok, durationMs })</text>
+  </g>
+  <g>
+    <line x1="594" y1="1102" x2="353" y2="1102" stroke="#34d399" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#seq-arrow-34d399)" />
+    <rect x="280.5" y="1079" width="386.0" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="473.5" y="1091" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="middle">20. listener(state) — coalesced into one microtask</text>
+  </g>
+  <g>
+    <path d="M 348 1134 L 374 1134 L 374 1156 L 353 1156" fill="none" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#seq-arrow-38bdf8)" />
+    <rect x="381.0" y="1132" width="297.2" height="17" rx="3" fill="#0f172a" fill-opacity="0.92" />
+    <text x="388" y="1144" font-size="11.5" font-weight="600" fill="#e2e8f0" text-anchor="start">21. render() — focus &amp; scroll restored</text>
+  </g>
+
+  <!-- Failure path note -->
+  <rect x="640" y="1218" width="560" height="62" rx="7" fill="#450a0a" fill-opacity="0.55" stroke="#f87171" stroke-width="1.3" />
+  <text x="656" y="1238" font-size="11" font-weight="700" fill="#fca5a5">FAILURE PATH</text>
+  <text x="656" y="1254" font-size="10.5" font-weight="500" fill="#fecaca">The adapter throwing publishes ':failure' instead, so requestBackend()</text>
+  <text x="656" y="1270" font-size="10.5" font-weight="500" fill="#fecaca">rejects and the store lands on setState({ fetchError, loadingDocs: false }).</text>
+
+  <!-- Key insight note -->
+  <rect x="40" y="1218" width="560" height="62" rx="7" fill="#14402c" fill-opacity="0.55" stroke="#34d399" stroke-width="1.3" />
+  <text x="56" y="1238" font-size="11" font-weight="700" fill="#6ee7b7">WHY IT IS BUILT THIS WAY</text>
+  <text x="56" y="1254" font-size="10.5" font-weight="500" fill="#bbf7d0">The view never awaits the adapter — it only reacts to store state.</text>
+  <text x="56" y="1270" font-size="10.5" font-weight="500" fill="#bbf7d0">Mock and REST adapters are therefore swappable at runtime.</text>
+
+  <!-- Legend -->
+  <g transform="translate(1232, 1218)">
+    <rect x="0" y="0" width="588" height="62" rx="7" fill="#1e293b" fill-opacity="0.75" stroke="#334155" stroke-width="1.2" />
+    <text x="14" y="20" font-size="11" font-weight="700" fill="#cbd5e1">LEGEND</text>
+    <line x1="14" y1="34" x2="46" y2="34" stroke="#38bdf8" stroke-width="2" /><text x="52" y="38" font-size="10" fill="#94a3b8">view call</text>
+    <line x1="120" y1="34" x2="152" y2="34" stroke="#34d399" stroke-width="2" /><text x="158" y="38" font-size="10" fill="#94a3b8">state change</text>
+    <line x1="246" y1="34" x2="278" y2="34" stroke="#c084fc" stroke-width="2" /><text x="284" y="38" font-size="10" fill="#94a3b8">event bus</text>
+    <line x1="366" y1="34" x2="398" y2="34" stroke="#fbbf24" stroke-width="2" /><text x="404" y="38" font-size="10" fill="#94a3b8">network</text>
+    <line x1="14" y1="52" x2="46" y2="52" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 4" /><text x="52" y="56" font-size="10" fill="#94a3b8">asynchronous / reply</text>
+  </g>
+</svg>

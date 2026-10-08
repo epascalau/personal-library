@@ -626,6 +626,54 @@
         </div>
       </div>
 
+      <!-- 8b. Frontend Interaction Sequence Diagram -->
+      <div class="card" style="border-color: #c084fc; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(192, 132, 252, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🔄</div>
+          <h2>Frontend Interaction Sequence</h2>
+          <p>
+            UML sequence diagram tracing one complete round trip &mdash; user gesture &rarr; view &rarr; store &rarr;
+            typed event bus &rarr; <code>BackendGateway</code> &rarr; adapter &rarr; HTTP &rarr; store &rarr; re-render.
+            Shows the optimistic busy state painted before any network I/O, the <code>requestId</code> correlation that
+            turns bus events back into an awaited promise, and the failure branch.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; PlantUML (.puml) &bull; Mermaid (.mmd) &bull; 3600px PNG &bull; PDF
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/frontend_interaction_sequence.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/frontend_interaction_sequence.mmd" download="frontend_interaction_sequence.mmd" class="btn" style="flex: 1; background: #7c3aed;">Mermaid &rarr;</a>
+          <a href="diagrams/frontend_interaction_sequence.puml" download="frontend_interaction_sequence.puml" class="btn" style="flex: 1; background: #0284c7;">PlantUML &rarr;</a>
+          <a href="diagrams/frontend_interaction_sequence.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+          <a href="diagrams/frontend_interaction_sequence.pdf" target="_blank" class="btn btn-secondary" style="flex: 1;">PDF &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 8c. Frontend Component Interaction / Data Flow -->
+      <div class="card" style="border-color: #34d399; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(52, 211, 153, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🧩</div>
+          <h2>Frontend Component Interaction</h2>
+          <p>
+            Structural counterpart to the sequence diagram: the five layers of the hand-rolled runtime
+            (<code>Component</code> views, observable <code>Store</code>s, the typed <code>backendBus</code> and
+            <code>BackendGateway</code>, swappable adapters, backend tier) and the unidirectional loop between them.
+            Views call stores directly; the only path back up is <code>subscribe</code>/<code>notify</code>.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; PlantUML (.puml) &bull; Mermaid (.mmd) &bull; 3600px PNG &bull; PDF
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/frontend_component_flow.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/frontend_component_flow.mmd" download="frontend_component_flow.mmd" class="btn" style="flex: 1; background: #7c3aed;">Mermaid &rarr;</a>
+          <a href="diagrams/frontend_component_flow.puml" download="frontend_component_flow.puml" class="btn" style="flex: 1; background: #0284c7;">PlantUML &rarr;</a>
+          <a href="diagrams/frontend_component_flow.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+          <a href="diagrams/frontend_component_flow.pdf" target="_blank" class="btn btn-secondary" style="flex: 1;">PDF &rarr;</a>
+        </div>
+      </div>
+
       <!-- 9. Domain Entity Relationship Diagram (ERD) & Database Schemas -->
       <div class="card" style="border-color: #38bdf8; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(56, 189, 248, 0.04) 100%);">
         <div>

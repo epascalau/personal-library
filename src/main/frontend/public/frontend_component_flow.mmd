@@ -1,0 +1,79 @@
+%% Personal Library — Frontend Component Interaction
+%% Structural counterpart to frontend_interaction_sequence.
+%% Shows the unidirectional loop: views call stores, stores dispatch through the
+%% bus, replies land as state, state notifies views.
+flowchart TB
+    User([User gesture])
+
+    subgraph VIEWS["VIEW LAYER — Component subclasses (core/component.ts)"]
+        direction LR
+        AppView["AppView<br/><i>root floorplan</i>"]
+        ShellBar["ShellBarView"]
+        ListReport["ListReportView"]
+        ObjectPage["ObjectPageView"]
+        Dialogs["Dialog views ×8<br/><i>Upload, VersionOverwrite,<br/>Delete, Auth, OpenAPI…</i>"]
+        Toast["ToastView"]
+    end
+
+    subgraph STORES["STATE LAYER — Store&lt;S&gt; subclasses (core/store.ts)"]
+        direction LR
+        AppStore["appStore<br/><i>documents, filters,<br/>dialogs, toast</i>"]
+        BackendStore["backendStore<br/><i>adapter config, health</i>"]
+        ThemeStore["themeStore"]
+        I18nStore["i18nStore"]
+    end
+
+    subgraph MSG["MESSAGING LAYER — services/backend"]
+        direction LR
+        ReqFn["requestBackend()<br/><i>promise ⇄ event bridge</i>"]
+        Bus{{"backendBus<br/>TypedEventBus&lt;BackendEvents&gt;<br/><i>detached Comment node</i>"}}
+        Gateway["BackendGateway<br/><i>subscribes to every<br/>:request topic</i>"]
+    end
+
+    subgraph ADAPTERS["ADAPTER LAYER — one active at a time"]
+        direction LR
+        Mock["MockBackendAdapter<br/><i>in-browser fixtures</i>"]
+        Rest["RestBackendAdapter<br/><i>fetch + timeout + retry</i>"]
+        Session["SessionService<br/><i>token renewal</i>"]
+    end
+
+    subgraph BACKEND["BACKEND"]
+        direction LR
+        Nginx["nginx :8088"]
+        Spring["Spring Boot :18080"]
+        Express["Express gateway"]
+        KC["Keycloak :8180"]
+    end
+
+    User -->|"DOM event"| VIEWS
+    VIEWS -->|"intent calls<br/>applyFilters, openUpload, logout"| STORES
+    STORES -.->|"subscribe(listener)<br/>notify on microtask"| VIEWS
+
+    STORES -->|"requestBackend(op, payload)"| ReqFn
+    ReqFn -->|"publish :request<br/>+ await correlated reply"| Bus
+    Bus -->|"handler(envelope)"| Gateway
+    Gateway -->|"invoke(op, resolveAdapter(), req)"| ADAPTERS
+    Gateway -.->|"publish :success / :failure<br/>keyed by requestId"| Bus
+    Bus -.->|"resolve / reject"| ReqFn
+    ReqFn -.->|"await returns"| STORES
+
+    Rest -->|"HTTPS"| Nginx
+    Nginx --> Spring
+    Nginx --> Express
+    Session -->|"POST /auth/refresh"| Nginx
+    Spring --> KC
+
+    BackendStore -.->|"'backend:adapter:changed'"| Bus
+    Bus -.->|"triggers scheduleFetch()"| AppStore
+
+    classDef view fill:#1e3a5f,stroke:#38bdf8,color:#f8fafc
+    classDef store fill:#14402c,stroke:#34d399,color:#f8fafc
+    classDef msg fill:#3b1f52,stroke:#c084fc,color:#f8fafc
+    classDef adapter fill:#4a2f10,stroke:#fbbf24,color:#f8fafc
+    classDef backend fill:#450a0a,stroke:#f87171,color:#f8fafc
+
+    class AppView,ShellBar,ListReport,ObjectPage,Dialogs,Toast view
+    class AppStore,BackendStore,ThemeStore,I18nStore store
+    class ReqFn,Bus,Gateway msg
+    class Mock,Rest,Session adapter
+    class Nginx,Spring,Express,KC backend

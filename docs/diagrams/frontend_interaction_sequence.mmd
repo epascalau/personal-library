@@ -1,0 +1,61 @@
+%% Personal Library — Frontend Interaction Sequence
+%% One complete round trip: user gesture -> view -> store -> event bus -> gateway
+%% -> adapter -> HTTP -> store -> re-render.
+%%
+%% Source of truth:
+%%   core/component.ts, core/store.ts, core/eventBus.ts,
+%%   stores/appStore.ts, services/backend/BackendGateway.ts
+%% NOTE: participant aliases must not contain HTML entities. Mermaid's sequence
+%% parser rejects &lt;/&gt; in an alias ("expecting ARROW, got NEWLINE"), even though
+%% the flowchart parser accepts them — hence "Store of AppState" rather than Store<AppState>.
+sequenceDiagram
+    autonumber
+    actor User
+    participant View as ListReportView<br/>(Component)
+    participant Store as appStore<br/>Store of AppState
+    participant Req as requestBackend()
+    participant Bus as backendBus<br/>(TypedEventBus)
+    participant GW as BackendGateway
+    participant Adapter as RestBackendAdapter
+    participant API as Spring Boot / Express
+
+    User->>View: click "Search"
+    View->>Store: applyFilters(filters)
+
+    rect rgb(238, 246, 255)
+    Note over Store,View: Optimistic busy state — painted before any network I/O
+    Store->>Store: setState({ loadingDocs: true, fetchError: null })
+    Store-->>View: listener(state) via queueMicrotask
+    View->>View: requestRender() -> render() — spinner visible
+    end
+
+    Store->>Req: requestBackend('getDocuments', { filters, page, sortBy })
+    Req->>Bus: subscribe(':success' / ':failure') keyed by requestId
+    Req->>Bus: publish('backend:getDocuments:request', envelope)
+
+    Note right of Bus: Dispatch is synchronous —<br/>a detached Comment node is the EventTarget
+
+    Bus->>GW: handler(envelope)
+    GW->>Bus: publish('backend:request:started')
+    GW->>Adapter: invoke(operation, resolveAdapter(), request)
+    Adapter->>API: GET /api/v1/documents?page=1&...
+    API-->>Adapter: 200 PaginatedResponse
+    Adapter-->>GW: result
+
+    alt request succeeded
+        GW->>Bus: publish(':success', { requestId, result, durationMs })
+        Bus-->>Req: envelope — discarded unless requestId matches
+        Req-->>Store: resolve(result)
+        Store->>Store: setState({ documents, total, loadingDocs: false })
+    else adapter threw / HTTP error
+        GW->>Bus: publish(':failure', { requestId, error, durationMs })
+        Bus-->>Req: envelope — discarded unless requestId matches
+        Req-->>Store: reject(Error)
+        Store->>Store: setState({ fetchError: msg, loadingDocs: false })
+    end
+
+    GW->>Bus: publish('backend:request:settled', { ok, durationMs })
+    Store-->>View: listener(state) — coalesced into one microtask
+    View->>View: render() — focus and scroll restored
+
+    Note over View,Store: The view never awaits the adapter. It only ever reacts<br/>to store state, so mock and REST backends are indistinguishable.

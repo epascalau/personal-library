@@ -1,0 +1,92 @@
+@startuml Frontend_Component_Interaction
+!theme plain
+skinparam roundCorner 8
+skinparam defaultFontName Inter
+skinparam componentStyle rectangle
+skinparam packageStyle frame
+
+title Personal Library — Frontend Component Interaction\nUnidirectional loop across the hand-rolled runtime (no framework)
+
+package "VIEW LAYER — Component subclasses" #EEF6FF {
+  [AppView\n<<root floorplan>>] as AppView
+  [ShellBarView] as ShellBar
+  [ListReportView] as ListReport
+  [ObjectPageView] as ObjectPage
+  [Dialog views x8] as Dialogs
+  [ToastView] as Toast
+}
+
+package "STATE LAYER — Store<S> subclasses" #F0FDF4 {
+  [appStore] as AppStore
+  [backendStore] as BackendStore
+  [themeStore] as ThemeStore
+  [i18nStore] as I18nStore
+}
+
+package "MESSAGING LAYER — services/backend" #FAF5FF {
+  [requestBackend()\n<<promise/event bridge>>] as ReqFn
+  [backendBus\n<<TypedEventBus>>] as Bus
+  [BackendGateway] as Gateway
+}
+
+package "ADAPTER LAYER — one active at a time" #FFF7ED {
+  [MockBackendAdapter] as Mock
+  [RestBackendAdapter] as Rest
+  [SessionService] as Session
+}
+
+package "BACKEND" #FEF2F2 {
+  [nginx :8088] as Nginx
+  [Spring Boot :18080] as Spring
+  [Express gateway] as Express
+  [Keycloak :8180] as KC
+}
+
+AppView --> ShellBar : owns
+AppView --> ListReport : mounts floorplan
+AppView --> ObjectPage : mounts floorplan
+AppView --> Dialogs : owns
+AppView --> Toast : owns
+
+ListReport --> AppStore : applyFilters() / openDocument()
+Dialogs --> AppStore : openUpload() / submit()
+ShellBar --> BackendStore : switch adapter
+
+AppStore ..> ListReport : subscribe(listener)\nnotify on microtask
+AppStore ..> Dialogs : subscribe(listener)
+I18nStore ..> ShellBar : subscribe(listener)
+ThemeStore ..> AppView : applyToDocument()
+
+AppStore --> ReqFn : requestBackend(op, payload)
+ReqFn --> Bus : publish('backend:<op>:request')
+Bus --> Gateway : handler(envelope)
+Gateway --> Rest : invoke(op, resolveAdapter(), req)
+Gateway --> Mock : invoke(op, resolveAdapter(), req)
+Gateway ..> Bus : publish(':success' / ':failure')
+Bus ..> ReqFn : correlated by requestId
+ReqFn ..> AppStore : resolve / reject
+
+Rest --> Nginx : fetch
+Session --> Nginx : POST /auth/refresh
+Nginx --> Spring
+Nginx --> Express
+Spring --> KC : token introspection
+
+BackendStore ..> Bus : 'backend:adapter:changed'
+Bus ..> AppStore : scheduleFetch()
+
+note right of Bus
+  A detached Comment node is the
+  EventTarget, so dispatch is
+  synchronous and events cannot
+  bubble into the document.
+end note
+
+note bottom of AppStore
+  setState() short-circuits when nothing
+  changed and coalesces listeners into a
+  single microtask, so repeated health
+  probes never cause a re-render.
+end note
+
+@enduml
