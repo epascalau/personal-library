@@ -7,6 +7,18 @@
  * is rendered.
  */
 
+// Opt out of UI5's built-in font loading. By default UI5 injects a <style>
+// block whose @font-face rules fetch the SAP "72" font from
+// cdn.jsdelivr.net at runtime. We keep everything first-party, so the CDN
+// fetch is disabled here and the same font is self-hosted from the locally
+// installed @sap-theming/theming-base-content package (see sapFonts.css).
+// This must run before any component renders, hence the import order.
+import { setDefaultFontLoading } from '@ui5/webcomponents-base/dist/config/Fonts.js';
+
+setDefaultFontLoading(false);
+
+import './sapFonts.css';
+
 // Theme parameters for sap_horizon AND sap_horizon_dark. Without this only the
 // default theme is registered and `setTheme('sap_horizon_dark')` is a no-op.
 import '@ui5/webcomponents/dist/Assets.js';
