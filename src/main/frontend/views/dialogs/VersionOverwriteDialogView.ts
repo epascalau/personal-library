@@ -41,6 +41,15 @@ export class VersionOverwriteDialogView extends DialogView {
 
   private bibtex: BibTeXMetadata = { ...EMPTY_BIBTEX };
 
+  /**
+   * The document's metadata as it stood when the dialog opened.
+   *
+   * Kept so an actual edit can be told apart from an untouched form: without a
+   * baseline the dialog cannot tell whether the user changed anything, and would
+   * happily submit a revision identical to the one already stored.
+   */
+  private pristineBibtex: BibTeXMetadata = { ...EMPTY_BIBTEX };
+
   private submitting = false;
 
   private errorMsg = '';
@@ -126,6 +135,51 @@ export class VersionOverwriteDialogView extends DialogView {
     this.errorMsg = '';
     this.submitting = false;
     this.bibtex = doc ? { ...doc.bibtex } : { ...EMPTY_BIBTEX };
+    this.pristineBibtex = { ...this.bibtex };
+  }
+
+  /**
+   * Reports whether the user has actually altered any metadata field.
+   *
+   * WHAT: Compares the working draft against the snapshot taken when the dialog opened, over the
+   * union of both key sets, treating absent, null and whitespace-only values as equivalent.
+   * WHY: Re-seeding the form from the document means every field starts pre-filled, so "has a
+   * value" says nothing about whether the user changed anything. Comparing against the baseline is
+   * the only way to distinguish a real edit from an untouched form. Whitespace is normalised
+   * because clicking into a field and back out can introduce incidental differences that are not
+   * edits, and the union of keys is used so a field the document never carried still counts once
+   * the user fills it in.
+   *
+   * @returns True when at least one field differs from the loaded document.
+   */
+  private hasMetadataChanges(): boolean {
+    const draft = this.bibtex as unknown as Record<string, unknown>;
+    const pristine = this.pristineBibtex as unknown as Record<string, unknown>;
+    const keys = new Set([...Object.keys(draft), ...Object.keys(pristine)]);
+    const normalise = (value: unknown): string => String(value ?? '').trim();
+
+    for (const key of keys) {
+      if (normalise(draft[key]) !== normalise(pristine[key])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Reports whether there is anything worth submitting.
+   *
+   * WHAT: Requires either a replacement file or a genuine metadata edit.
+   * WHY: Without this the overwrite button was live the moment the dialog opened, so a stray click
+   * advanced the document to a new version whose content, filename and size were identical to the
+   * previous one — a meaningless entry in the version history that still cost a full re-index and
+   * summary regeneration. A file alone is enough, and so is a metadata-only edit, which the dialog
+   * explicitly supports; what is rejected is submitting neither.
+   *
+   * @returns True when a file is selected or metadata has been edited.
+   */
+  private canSubmit(): boolean {
+    return this.selectedFile !== null || this.hasMetadataChanges();
   }
 
   /**
@@ -279,7 +333,10 @@ export class VersionOverwriteDialogView extends DialogView {
             class="plib-button plib-button--accent"
             design="Emphasized"
             data-action="overwrite"
-            ${this.submitting ? raw('disabled') : ''}
+            tooltip="${this.canSubmit()
+              ? 'Advance this document to the next version'
+              : 'Select a replacement file, or edit a metadata field, before overwriting'}"
+            ${this.submitting || !this.canSubmit() ? raw('disabled') : ''}
           >
             ${icon(this.submitting ? 'Loader2' : 'GitBranch', {
               className: this.submitting ? 'w-4 h-4 animate-spin mr-1.5' : 'w-4 h-4 mr-1.5'
@@ -339,7 +396,15 @@ export class VersionOverwriteDialogView extends DialogView {
     this.onAll('ui5-input[data-bibtex]', 'input', (event) => {
       const input = event.currentTarget as Input;
       const key = input.dataset.bibtex as keyof BibTeXMetadata;
+      const couldSubmit = this.canSubmit();
       this.bibtex = { ...this.bibtex, [key]: input.value };
+
+      // Re-render only when the submit button's enabled state actually flips, not on every
+      // keystroke. The button must come alive as soon as the first edit is made, but rendering
+      // per character would churn the whole dialog and lean on focus restoration continuously.
+      if (this.canSubmit() !== couldSubmit) {
+        this.render();
+      }
     });
 
     this.on('[data-action="overwrite"]', 'click', () => void this.submit());
@@ -401,6 +466,14 @@ export class VersionOverwriteDialogView extends DialogView {
   private async submit(): Promise<void> {
     const doc = appStore.state.activeDocument;
     if (!doc || this.submitting) {
+      return;
+    }
+
+    // The button is disabled in this state, but a programmatic or keyboard-driven click can still
+    // arrive, and submitting here would bump the version with content identical to the current one.
+    if (!this.canSubmit()) {
+      this.errorMsg = 'Select a replacement file, or edit a metadata field, before overwriting.';
+      this.render();
       return;
     }
 
