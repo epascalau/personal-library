@@ -213,15 +213,15 @@
 * "Engineering estimates, not audited accounting."
 
 ### 29 · Financial Ledger — `36:20`
-* **~$210** total = $70 direct + ~14,000 credits ($140).
-* **45.5–47.6M tokens** — *derived*, scaled from the revised credit baseline.
+* **~$270** total = $70 direct + ~20,000 credits ($200).
+* **65–68M tokens** — *derived*, scaled from the revised credit baseline.
 * **102,870 tokens** runtime inference — deliberately kept separate.
-* 284 agent actions · **14–22 hrs** · $2.14 hosting.
+* 284 agent actions · **22–30 hrs** · $2.14 hosting.
 * 🔑 **"Dollars and credits are solid; token volume is derived. I'd rather show the derivation."**
 
 ### 30 · ROI — `39:00`
-* Manual 120–165 hrs → $12k–16.5k · Senior+copilot 55–70 hrs → $5.5k–7k · This build 14–22 hrs → **~$210**.
-* ~98–99% savings.
+* Manual 120–165 hrs → $12k–16.5k · Senior+copilot 55–70 hrs → $5.5k–7k · This build 22–30 hrs → **~$270**.
+* ~98% savings.
 * **Say the 90% line out loud** — if you skip it, it's the first Q&A question.
 * 🔑 **"A defensible order of magnitude, not a business case. ~90% confident as an engineering estimate."**
 

@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -113,6 +115,33 @@ public class StorageService {
         } catch (Exception e) {
             log.warn("Apache Tika could not parse text from {}: {}", filePath, e.getMessage());
             return "Content extraction fallback for " + filePath.getFileName();
+        }
+    }
+
+    /**
+     * Extracts plain text from an in-memory byte payload that has not been persisted to disk.
+     *
+     * WHAT: Streams the supplied bytes through Apache Tika to obtain plain text, returning an empty
+     * string when the payload is unparseable or carries no text layer.
+     * WHY: Pre-upload metadata extraction operates on a transient base64 payload that never reaches the
+     * storage root, so the {@link #extractTextContent(Path)} overload cannot be used. Returning an empty
+     * string rather than a placeholder lets callers reliably distinguish "no text available" from real
+     * content, which matters because the BibTeX extractor skips the LLM when the sample is too short.
+     *
+     * @param data     Raw file bytes.
+     * @param fileName Original filename, used only for diagnostic logging.
+     * @return Extracted plain text, or an empty string when no text could be recovered.
+     */
+    public String extractTextContent(byte[] data, String fileName) {
+        if (data == null || data.length == 0) {
+            return "";
+        }
+        try (InputStream stream = new ByteArrayInputStream(data)) {
+            String text = tika.parseToString(stream);
+            return text == null ? "" : text.trim();
+        } catch (Exception e) {
+            log.warn("Apache Tika could not parse in-memory payload for {}: {}", fileName, e.getMessage());
+            return "";
         }
     }
 

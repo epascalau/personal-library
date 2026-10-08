@@ -60,6 +60,20 @@ const ensureStyleTagCallback = function (this: UI5Element) {
   }
 };
 
+/**
+ * Adopts the shared stylesheet into a component's shadow root.
+ *
+ * WHAT: Splices `globalStylesheet` to the front of `shadowRoot.adoptedStyleSheets` when absent.
+ * WHY: Inserting first keeps UI5's own sheets later in cascade order, so equal-specificity UI5 rules
+ * still win by default and application overrides must opt in with higher specificity — which keeps
+ * accidental global regressions out of vendor component internals.
+ */
+const adoptGlobalStylesheet = function (this: UI5Element) {
+  if (this.shadowRoot?.adoptedStyleSheets && !this.shadowRoot.adoptedStyleSheets.includes(globalStylesheet)) {
+    this.shadowRoot.adoptedStyleSheets.splice(0, 0, globalStylesheet);
+  }
+};
+
 let patchApplied = false;
 
 /**
@@ -67,7 +81,7 @@ let patchApplied = false;
  *
  * WHAT:
  * 1. Adopts `globalStylesheet` into `document.adoptedStyleSheets`.
- * 2. Intercepts `onAfterRendering` to adopt `globalStylesheet` into each component's `shadowRoot.adoptedStyleSheets`.
+ * 2. Intercepts `_render` to adopt `globalStylesheet` into each component's `shadowRoot.adoptedStyleSheets`.
  * 3. Patches `_initShadowRoot`, `onEnterDOM`, and `onExitDOM` to safely inject and clean up style tags for edge-case elements.
  *
  * WHY:
@@ -87,19 +101,26 @@ export const applyGlobalStylesheetPatch = (): void => {
     document.adoptedStyleSheets.splice(0, 0, globalStylesheet);
   }
 
-  // apply this onAfterRendering
-  const origOnAfterRendering = UI5Element.prototype.onAfterRendering;
-  UI5Element.prototype.onAfterRendering = function (...args) {
-    origOnAfterRendering.apply(this, args);
+  // Re-adopt after every render.
+  //
+  // Two constraints force this exact hook. First, UI5's `updateShadowRoot()` *reassigns*
+  // `shadowRoot.adoptedStyleSheets` wholesale on each render, so anything adopted earlier
+  // (`connectedCallback`, `_initShadowRoot`) is discarded before first paint. Second, the obvious
+  // post-render hook `onAfterRendering` is redeclared by 30+ components (ui5-file-uploader,
+  // ui5-table, ui5-tokenizer, ...) whose subclass prototype shadows the patched base method, so
+  // those shadow roots silently never received the sheet.
+  //
+  // `_render` sits above both: it calls `updateShadowRoot()` and then `onAfterRendering()`, and no
+  // component overrides it.
+  const origRender = UI5Element.prototype._render;
+  UI5Element.prototype._render = function (...args) {
+    const result = origRender.apply(this, args);
     // a component can still render after it left the DOM, re-adopting the sheet there would undo
     // the cleanup in onExitDOM and let the global sheet pin the detached shadow root
-    if (!this.isConnected) {
-      return;
+    if (this.isConnected) {
+      adoptGlobalStylesheet.call(this);
     }
-    // append this instance to all adoptedStyleSheets if not already existing
-    if (this.shadowRoot?.adoptedStyleSheets && !this.shadowRoot.adoptedStyleSheets.includes(globalStylesheet)) {
-      this.shadowRoot.adoptedStyleSheets.splice(0, 0, globalStylesheet);
-    }
+    return result;
   };
 
   // _initShadowRoot fires before UI5Element's first render, so the style must already be attached at that point

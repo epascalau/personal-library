@@ -28,6 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -132,21 +133,55 @@ public class DocumentController {
     /**
      * AI extraction preview helper endpoint.
      *
-     * WHAT: Accepts a file name and content sample and infers structured BibTeX metadata fields.
+     * WHAT: Accepts a file name plus either a plain-text sample or the base64 file payload, recovers the
+     * document text server-side when needed, and infers structured BibTeX metadata fields.
      *
      * WHY: Running extraction on a lightweight preview endpoint allows the frontend upload modal
      * to pre-populate form fields for user review before committing physical file storage or Qdrant embeddings.
+     * The browser can only read text from plain-text formats, so for PDF, DOCX, and other binary documents it
+     * sends the raw bytes and relies on Apache Tika here to produce the sample the LLM needs.
      *
-     * @param payload Map containing fileName and contentSample.
-     * @return Extracted {@link BibTeXMetadata}.
+     * @param payload Map containing fileName and either contentSample or base64 fileData.
+     * @return Extracted {@link BibTeXMetadata} together with the recovered document text.
      */
     @PostMapping("/extract-metadata")
     @Operation(summary = "Auto-extract BibTeX metadata suggestions using Spring AI")
-    public ResponseEntity<BibTeXMetadata> extractMetadata(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<MetadataExtractionResponse> extractMetadata(@RequestBody Map<String, String> payload) {
         String fileName = payload.getOrDefault("fileName", "document.txt");
         String sampleContent = payload.getOrDefault("contentSample", "");
+
+        if (sampleContent == null || sampleContent.isBlank()) {
+            sampleContent = extractTextFromPayload(payload.get("fileData"), fileName);
+        }
+
         BibTeXMetadata extracted = extractionService.extractMetadata(fileName, sampleContent);
-        return ResponseEntity.ok(extracted);
+        return ResponseEntity.ok(new MetadataExtractionResponse(extracted, sampleContent));
+    }
+
+    /**
+     * Recovers plain text from a base64-encoded file payload supplied by the upload dialog.
+     *
+     * WHAT: Decodes the base64 string, tolerating an optional {@code data:} URI prefix, and runs the bytes
+     * through Apache Tika. Returns an empty string when the payload is absent or cannot be decoded.
+     * WHY: Isolating the decode step keeps the endpoint readable and guarantees that a malformed payload
+     * degrades to heuristic metadata rather than returning a 500 to the upload dialog.
+     *
+     * @param fileData Base64 file payload, optionally prefixed with a data URI header.
+     * @param fileName Original filename, used for diagnostic logging.
+     * @return Extracted plain text, or an empty string when unavailable.
+     */
+    private String extractTextFromPayload(String fileData, String fileName) {
+        if (fileData == null || fileData.isBlank()) {
+            return "";
+        }
+        try {
+            String base64 = fileData.contains(",") ? fileData.substring(fileData.indexOf(',') + 1) : fileData;
+            byte[] decoded = Base64.getDecoder().decode(base64);
+            return storageService.extractTextContent(decoded, fileName);
+        } catch (IllegalArgumentException e) {
+            log.warn("Could not decode base64 payload for metadata extraction of {}: {}", fileName, e.getMessage());
+            return "";
+        }
     }
 
     /**

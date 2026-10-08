@@ -591,11 +591,11 @@ return chatClient.prompt()
   const s = pptx.addSlide('MASTER'); title(s, 'Financial ledger', 'Unified Financial & Consumption Ledger', 'Engineering estimate for educational and comparative analysis; values are not audited accounting.');
   const headers = ['Metric / Parameter', 'Consolidated Total', 'Measurement Basis & Technical Details'];
   const rows = [
-    ['Total Out-of-Pocket Compute Cost', '~$210 USD', 'Direct prepaid balance deductions ($70 USD) + ~14,000 AI developer credits ($140.00 standard valuation)'],
-    ['Gross AI Processing Volume', '~45.5M – 47.6M Tokens (estimated)', 'Prior ~32.5M–34.0M estimate scaled by revised ~14,000-credit usage versus the former 10,000-credit baseline; includes coding-agent context windows, AST refactorings, multi-file inspections, and prompt iteration'],
+    ['Total Out-of-Pocket Compute Cost', '~$270 USD', 'Direct prepaid balance deductions ($70 USD) + ~20,000 AI developer credits ($200.00 standard valuation)'],
+    ['Gross AI Processing Volume', '~65.0M – 68.0M Tokens (estimated)', 'Prior ~32.5M–34.0M estimate scaled by revised ~20,000-credit usage versus the former 10,000-credit baseline; includes coding-agent context windows, AST refactorings, multi-file inspections, and prompt iteration'],
     ['Application Runtime Inference', '102,870 Tokens', 'In-app user document chat, embeddings (text-embedding-004), and dual-model summarization cascades'],
     ['Total Autonomous Agent Actions', '284 Invocations', 'Compiles, multi-file atomic edits, TypeScript linter executions, AST inspections, and container restarts'],
-    ['Active Engineering Turnaround', '~14 – 22 Hours', 'Revised estimate covering total hands-on prompt turns, refactoring cycles, and full integration across sessions'],
+    ['Active Engineering Turnaround', '~22 – 30 Hours', 'Revised estimate covering total hands-on prompt turns, refactoring cycles, and full integration across sessions'],
     ['Container & Hosting Overhead', '$2.14 USD', 'Dual Cloud Run instances (dev & preview applets), 4 Docker images, 6.8 GB Artifact Registry storage'],
   ];
   const widths = [2.55, 2.35, 7.35];
@@ -615,9 +615,9 @@ return chatClient.prompt()
 {
   const s = pptx.addSlide('MASTER'); title(s, 'Financial ledger', 'Commercial Valuation & Real-World ROI Analysis', 'Engineering estimate for educational and comparative analysis; values are not audited accounting.');
   const rows = [
-    ['Traditional Manual Build (No AI)', '120 – 165 hrs', '$100 / hr', '$12,000 – $16,500 USD', '~100x – 140x Cheaper'],
-    ['Senior Engineer (with AI Copilot)', '55 – 70 hrs', '$100 / hr', '$5,500 – $7,000 USD', '~45x – 60x Cheaper'],
-    ['Autonomous Agent Build (This Project)', '~14 – 22 hrs', 'Direct Compute', '~$210 USD', 'Baseline Direct Cost'],
+    ['Traditional Manual Build (No AI)', '120 – 165 hrs', '$100 / hr', '$12,000 – $16,500 USD', '~44x – 61x Cheaper'],
+    ['Senior Engineer (with AI Copilot)', '55 – 70 hrs', '$100 / hr', '$5,500 – $7,000 USD', '~20x – 26x Cheaper'],
+    ['Autonomous Agent Build (This Project)', '~22 – 30 hrs', 'Direct Compute', '~$270 USD', 'Baseline Direct Cost'],
   ];
   const headers = ['Development Workflow Model', 'Estimated Hours', 'Market Labor Rate', 'Total Commercial Value', 'Net Savings / Multiplier'];
   const xs = [0.55, 3.35, 5.15, 6.95, 9.55];
@@ -629,7 +629,7 @@ return chatClient.prompt()
     r.forEach((value, j) => text(s, value, xs[j] + 0.1, y + 0.15, widths[j] - 0.15, 0.38, { fontSize: 11, bold: i === 2 || j === 0, color: j === 4 ? C.slate : (j === 0 ? C.navy : C.blue), breakLine: true }));
   });
   box(s, 0.9, 5.55, 11.5, 0.72, C.amberPale, C.amber);
-  text(s, 'Capital Efficiency: ~$210 USD represents approximately 98%–99% savings compared with conventional contractor or agency rates.', 1.2, 5.77, 10.9, 0.25, { fontSize: 14, bold: true, color: C.amber, align: 'center' });
+  text(s, 'Capital Efficiency: ~$270 USD represents approximately 98% savings compared with conventional contractor or agency rates.', 1.2, 5.77, 10.9, 0.25, { fontSize: 14, bold: true, color: C.amber, align: 'center' });
   text(s, 'Overall confidence: approximately 90% accurate as an engineering estimate; direct costs and recorded credits are stronger than reconstructed ROI and time figures.', 0.9, 6.48, 11.5, 0.28, { fontSize: 11, bold: true, color: C.muted, align: 'center' });
   note(s, '39:00–42:00', 'Walk through the exact commercial-valuation table from the synchronized ledger. Explain that the manual and senior-engineer values are market benchmarks, while the autonomous-agent row uses the revised engineering estimate.');
 }

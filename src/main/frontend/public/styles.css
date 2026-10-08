@@ -215,6 +215,32 @@ ui5-input.plib-input--semantic > [slot='icon'],
   background-color: var(--plib-row-action-bg-hover, #e5e7eb);
 }
 
+/* ui5-file-uploader used as a full-width drag-and-drop zone.
+
+   The uploader is rendered with `hide-input`, so its shadow root is just a
+   transparent native <input type="file"> stretched over the host plus a <slot>
+   for our dashed drop zone. That transparent input is what makes both gestures
+   work: clicking it opens the OS picker natively, and UI5's own `_ondrop`
+   handler on the shadow root accepts dropped files.
+
+   By default the host is styled as a text input (inline-block, fixed height,
+   border, background, min-width) which would both clip the slotted content and
+   paint a box around it. The attribute selector is repeated so this beats UI5's
+   own `:host([hide-input])` rule, which has equal specificity and is adopted
+   after this stylesheet. */
+:host(.plib-file-drop[hide-input]) {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  vertical-align: top;
+}
+
 /* The emphasized "primary action" look used by the Object Page header */
 :host(.plib-button--accent) .ui5-button-root {
   background-color: var(--sap-brand, #0070f2);

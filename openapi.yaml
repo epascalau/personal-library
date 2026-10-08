@@ -230,7 +230,12 @@ paths:
       tags:
         - Documents
       summary: Auto-extract BibTeX metadata from document preview
-      description: Utilizes Spring AI & LLM to infer document type, authors, journal, dates, and BibTeX schema fields.
+      description: >-
+        Utilizes Spring AI & LLM to infer document type, authors, journal, dates, and BibTeX schema fields.
+        Supply `contentSample` when the client can already read the document text (plain-text formats).
+        For binary formats such as PDF or DOCX, send the raw bytes as base64 in `fileData` instead and the
+        server recovers the text with Apache Tika before prompting the model. If neither yields usable text,
+        heuristic metadata derived from the file name is returned.
       requestBody:
         required: true
         content:
@@ -246,13 +251,30 @@ paths:
                 contentSample:
                   type: string
                   description: Initial text excerpt or preview extracted from document
+                fileData:
+                  type: string
+                  format: byte
+                  description: >-
+                    Base64-encoded file payload, optionally prefixed with a data URI header. Used to recover
+                    document text server-side when `contentSample` is absent or empty.
+                mimeType:
+                  type: string
+                  description: MIME type of the supplied payload
+                  example: application/pdf
       responses:
         '200':
           description: Auto-extracted BibTeX metadata suggestions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BibTeXMetadata'
+                allOf:
+                  - $ref: '#/components/schemas/BibTeXMetadata'
+                  - type: object
+                    properties:
+                      extractedText:
+                        type: string
+                        description: >-
+                          Plain text recovered from the document, empty when the file carries no text layer.
 
   /documents/{guid}:
     get:

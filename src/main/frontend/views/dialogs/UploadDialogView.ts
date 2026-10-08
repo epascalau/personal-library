@@ -254,40 +254,38 @@ export class UploadDialogView extends DialogView {
     return html`
       <div>
         <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-200 mb-1.5">${dragDropLabel}</ui5-label>
-        <div
-          data-action="pick-file"
-          role="button"
-          tabindex="0"
-          class="${cx(
-            'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all',
-            this.selectedFile
-              ? 'border-emerald-400 dark:border-emerald-500/80 bg-emerald-50/50 dark:bg-emerald-950/30'
-              : 'border-gray-300 dark:border-[#38495f] hover:border-[#0070f2] dark:hover:border-[#4796ff] bg-[#f8fafc] dark:bg-[#232c37] hover:bg-[#f0f9ff]/50 dark:hover:bg-[#283442]'
-          )}"
+        <ui5-file-uploader
+          data-input="file"
+          accept="${ACCEPT_ATTRIBUTE}"
+          hide-input
+          class="plib-file-drop"
+          ${this.submitting ? raw('disabled') : ''}
         >
-          <ui5-file-uploader
-            data-input="file"
-            accept="${ACCEPT_ATTRIBUTE}"
-            hide-input
-            class="hidden"
-            ${this.submitting ? raw('disabled') : ''}
-          ></ui5-file-uploader>
-          ${this.selectedFile
-            ? html`<div class="flex items-center justify-center gap-3 text-emerald-800 dark:text-emerald-200">
-                ${icon('FileCheck', { className: 'w-8 h-8 text-emerald-600 dark:text-emerald-400 shrink-0' })}
-                <div class="text-left">
-                  <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">${this.selectedFile.name}</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">
-                    ${(this.selectedFile.size / 1024).toFixed(1)} KB • Click to choose a different file
+          <div
+            class="${cx(
+              'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all',
+              this.selectedFile
+                ? 'border-emerald-400 dark:border-emerald-500/80 bg-emerald-50/50 dark:bg-emerald-950/30'
+                : 'border-gray-300 dark:border-[#38495f] hover:border-[#0070f2] dark:hover:border-[#4796ff] bg-[#f8fafc] dark:bg-[#232c37] hover:bg-[#f0f9ff]/50 dark:hover:bg-[#283442]'
+            )}"
+          >
+            ${this.selectedFile
+              ? html`<div class="flex items-center justify-center gap-3 text-emerald-800 dark:text-emerald-200">
+                  ${icon('FileCheck', { className: 'w-8 h-8 text-emerald-600 dark:text-emerald-400 shrink-0' })}
+                  <div class="text-left">
+                    <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">${this.selectedFile.name}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                      ${(this.selectedFile.size / 1024).toFixed(1)} KB • Click or drop to choose a different file
+                    </div>
                   </div>
-                </div>
-              </div>`
-            : html`<div class="flex flex-col items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
-                ${icon('Upload', { className: 'w-8 h-8 text-gray-400 dark:text-gray-400' })}
-                <span class="font-semibold text-gray-800 dark:text-gray-200">${dragDropLabel}</span>
-                <span class="text-[11px] text-gray-400 dark:text-gray-400">${supportedFormats}</span>
-              </div>`}
-        </div>
+                </div>`
+              : html`<div class="flex flex-col items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
+                  ${icon('Upload', { className: 'w-8 h-8 text-gray-400 dark:text-gray-400' })}
+                  <span class="font-semibold text-gray-800 dark:text-gray-200">${dragDropLabel}</span>
+                  <span class="text-[11px] text-gray-400 dark:text-gray-400">${supportedFormats}</span>
+                </div>`}
+          </div>
+        </ui5-file-uploader>
       </div>
     `;
   }
@@ -698,12 +696,6 @@ export class UploadDialogView extends DialogView {
    * WHY: Direct delegated binding ensures clean interaction with UI5 Web Components and native inputs.
    */
   protected bind(): void {
-    this.on('[data-action="pick-file"]', 'click', () => {
-      if (!this.submitting) {
-        this.$<FileUploader>('ui5-file-uploader[data-input="file"]')?.click();
-      }
-    });
-
     this.on('ui5-file-uploader[data-input="file"]', 'change', (event) => {
       event.stopPropagation();
       void this.handleFileSelect(event.currentTarget as FileUploader);

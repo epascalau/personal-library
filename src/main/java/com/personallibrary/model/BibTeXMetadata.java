@@ -4,6 +4,8 @@
  */
 package com.personallibrary.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -56,7 +58,17 @@ public class BibTeXMetadata {
     private String doi;
     /** Canonical web link. */
     private String url;
-    /** Summary abstract text. */
+    /**
+     * Summary abstract text.
+     *
+     * Serialized as {@code abstract} to match the published OpenAPI contract and the frontend model.
+     * The Java field cannot be named {@code abstract} because that is a reserved keyword, and without this
+     * mapping the value was silently dropped in both directions: AI-extracted abstracts never reached the
+     * upload form, and abstracts typed by the user were discarded on submit. {@code @JsonAlias} keeps the
+     * previous {@code abstractText} spelling readable for any payload still using it.
+     */
+    @JsonProperty("abstract")
+    @JsonAlias("abstractText")
     private String abstractText;
     /** Comma-separated keyword list. */
     private String keywords;

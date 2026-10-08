@@ -8,14 +8,14 @@
 
 ## 1. Unified Financial & Consumption Ledger
 
-| Metric / Parameter | Consolidated Total         | Measurement Basis & Technical Details                                                                                          |
-| ----- |----------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| **Total Out-of-Pocket Compute Cost** | **~\$210 USD**             | Direct prepaid balance deductions (\$70 United States Dollars) + ~14,000 AI developer credits (\$140.00 standard valuation)    |
-| **Gross AI Processing Volume** | **\~45.5M – 47.6M Tokens (estimated)** | Prior \~32.5M–34.0M estimate scaled by the revised \~14,000-credit usage versus the former 10,000-credit baseline; includes coding-agent context windows, AST refactorings, multi-file inspections, and prompt iteration |
-| **Application Runtime Inference** | **102,870 Tokens**         | In-app user document chat, embeddings (`text-embedding-004`), and dual-model summarization cascades                            |
-| **Total Autonomous Agent Actions** | **284 Invocations**        | Compiles, multi-file atomic edits, TypeScript linter executions, AST inspections, and container restarts                       |
-| **Active Engineering Turnaround** | **\~14 – 22 Hours**        | Revised estimate covering total hands-on prompt turns, refactoring cycles, and full integration across sessions                                          |
-| **Container & Hosting Overhead** | **\$2.14 USD**             | Dual Cloud Run instances (dev & preview applets), 4 Docker images, 6.8 GB Artifact Registry storage                            |
+| Metric / Parameter | Consolidated Total                     | Measurement Basis & Technical Details                                                                                                                                                                                    |
+| ----- |----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Total Out-of-Pocket Compute Cost** | **~\$270 USD**                         | Direct prepaid balance deductions (\$70 United States Dollars) + ~20,000 AI developer credits (\$200.00 standard valuation)                                                                                              |
+| **Gross AI Processing Volume** | **\~65.0M – 68.0M Tokens (estimated)** | Prior \~32.5M–34.0M estimate scaled by the revised \~20,000-credit usage versus the former 10,000-credit baseline; includes coding-agent context windows, AST refactorings, multi-file inspections, and prompt iteration |
+| **Application Runtime Inference** | **102,870 Tokens**                     | In-app user document chat, embeddings (`text-embedding-004`), and dual-model summarization cascades                                                                                                                      |
+| **Total Autonomous Agent Actions** | **284 Invocations**                    | Compiles, multi-file atomic edits, TypeScript linter executions, AST inspections, and container restarts                                                                                                                 |
+| **Active Engineering Turnaround** | **\~22 – 30 Hours**                    | Revised estimate covering total hands-on prompt turns, refactoring cycles, and full integration across sessions                                                                                                          |
+| **Container & Hosting Overhead** | **\$2.14 USD**                         | Dual Cloud Run instances (dev & preview applets), 4 Docker images, 6.8 GB Artifact Registry storage                                                                                                                      |
 
 ---
 
@@ -25,14 +25,14 @@ To quantify the economic value of the generated application—comprising a 2,309
 
 | Development Workflow Model | Estimated Hours   | Market Labor Rate | Total Commercial Value      | Net Savings / Multiplier |
 | ----- |-------------------| ----- |-----------------------------| ----- |
-| **Traditional Manual Build (No AI)** | 120 – 165 hrs     | \$100 / hr | **\$12,000 – \$16,500 USD** | **\~100x – 140x Cheaper** |
-| **Senior Engineer (with AI Copilot)** | 55 – 70 hrs       | \$100 / hr | **\$5,500 – \$7,000 USD**   | **\~45x – 60x Cheaper** |
-| **Autonomous Agent Build (This Project)** | **\~14 – 22 hrs** | **Direct Compute** | **~\$210 USD**              | **Baseline Direct Cost** |
+| **Traditional Manual Build (No AI)** | 120 – 165 hrs     | \$100 / hr | **\$12,000 – \$16,500 USD** | **\~44x – 61x Cheaper** |
+| **Senior Engineer (with AI Copilot)** | 55 – 70 hrs       | \$100 / hr | **\$5,500 – \$7,000 USD**   | **\~20x – 26x Cheaper** |
+| **Autonomous Agent Build (This Project)** | **\~22 – 30 hrs** | **Direct Compute** | **~\$270 USD**              | **Baseline Direct Cost** |
 
 ### Financial Leverage Summary
 
-* **Labor Displacement:** Writing over 3,000 lines of functional full-stack code, dual-model pipelines, and container configuration from scratch was compressed from roughly a month of full-time engineering work into **\~14 to 22 active hours**.
-* **Capital Efficiency:** Achieving complete end-to-end functionality for an all-in compute expenditure of **~\$210 USD** represents a **\~98% to 99% financial savings** compared to conventional contractor or agency rates.
+* **Labor Displacement:** Writing over 3,000 lines of functional full-stack code, dual-model pipelines, and container configuration from scratch was compressed from roughly a month of full-time engineering work into **\~22 to 30 active hours**.
+* **Capital Efficiency:** Achieving complete end-to-end functionality for an all-in compute expenditure of **~\$270 USD** represents a **\~98% financial savings** compared to conventional contractor or agency rates.
 
 ---
 
@@ -43,8 +43,8 @@ To quantify the economic value of the generated application—comprising a 2,309
 * Because autonomous agents re-submit the conversation history, workspace directory tree, and large files (`server.ts` alone exceeds 2,300 lines) with every tool execution step, prompt lengths rapidly surpassed the 128,000-token threshold into Google Cloud's long-context pricing tier (\$0.15 / 1M prompt tokens).
 
 ### 2. Time Compression Outweighed Iteration Glitches
-* Despite platform resets and the necessity of recreating versions in AI Studio, total active engineering time is estimated at **14–22 hours**.
-* Traditional manual development would have required **120–165 hours** to hand-craft the 23 Java microservice classes, vector schemas, and frontend design specifications. The autonomous build delivered an approximate **5.5x–11.8x speedup** in delivery velocity.
+* Despite platform resets and the necessity of recreating versions in AI Studio, total active engineering time is estimated at **22–30 hours**.
+* Traditional manual development would have required **120–165 hours** to hand-craft the 23 Java microservice classes, vector schemas, and frontend design specifications. The autonomous build delivered an approximate **4.0x–7.5x speedup** in delivery velocity.
 
 ### 3. Production Runtime Remains Negligible Compared to Development
 * The completed application runtime accounted for only **102,870 tokens** and **\~\$0.51 USD** in inference costs.

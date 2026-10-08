@@ -520,13 +520,13 @@
 * **Visual anchor:** Six-row ledger table (verbatim from `docs/unified_financial_ledger_roi_key_takeaways.md`).
 
 #### Verbatim Script
-> *"Total out-of-pocket compute: about **$210**. That is $70 of direct prepaid balance plus roughly 14,000 AI developer credits valued at $140.*
+> *"Total out-of-pocket compute: about **$270**. That is $70 of direct prepaid balance plus roughly 20,000 AI developer credits valued at $200.*
 >
-> *Gross AI processing: an estimated **45.5 to 47.6 million tokens**. Be clear on how that number was produced — it is a prior estimate scaled against the revised credit usage. It covers coding-agent context windows, AST refactorings, multi-file inspections, and a great deal of prompt iteration.*
+> *Gross AI processing: an estimated **65 to 68 million tokens**. Be clear on how that number was produced — it is a prior estimate scaled against the revised credit usage. It covers coding-agent context windows, AST refactorings, multi-file inspections, and a great deal of prompt iteration.*
 >
 > *Separately, application runtime inference: **102,870 tokens**. That is the actual in-app document chat, embeddings, and the dual-model summarization. I deliberately do not fold that into the figure above — it is a different measurement of a different thing.*
 >
-> *284 autonomous agent actions. Roughly **14 to 22 hours** of active engineering turnaround. And $2.14 of container and hosting overhead.*
+> *284 autonomous agent actions. Roughly **22 to 30 hours** of active engineering turnaround. And $2.14 of container and hosting overhead.*
 >
 > *Note the asymmetry: the dollar figures and the recorded credits are solid. The token volume is derived. I would rather show you the derivation than present an estimate as a measurement."*
 
@@ -539,9 +539,9 @@
 #### Verbatim Script
 > *"Three ways to have built this.*
 >
-> *Traditional manual build, no AI: 120 to 165 hours, at $100 an hour, so $12,000 to $16,500 of commercial value. Senior engineer with an AI copilot: 55 to 70 hours, $5,500 to $7,000. Autonomous agent build — this project: roughly 14 to 22 hours and about $210 of direct compute.*
+> *Traditional manual build, no AI: 120 to 165 hours, at $100 an hour, so $12,000 to $16,500 of commercial value. Senior engineer with an AI copilot: 55 to 70 hours, $5,500 to $7,000. Autonomous agent build — this project: roughly 22 to 30 hours and about $270 of direct compute.*
 >
-> *That is on the order of 98 to 99 percent savings against conventional contractor or agency rates.*
+> *That is on the order of 98 percent savings against conventional contractor or agency rates.*
 >
 > *And now the sentence that makes this credible rather than a marketing slide: **overall confidence is approximately 90 percent as an engineering estimate.** The direct costs and the recorded credits are strong. The reconstructed ROI and the time figures are weaker — they were rebuilt from session history, not from a timesheet.*
 >

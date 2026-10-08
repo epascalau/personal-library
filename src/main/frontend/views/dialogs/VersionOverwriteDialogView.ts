@@ -19,6 +19,7 @@ import type { BibTeXMetadata } from '../../types';
 import type Input from '@ui5/webcomponents/dist/Input.js';
 import type FileUploader from '@ui5/webcomponents/dist/FileUploader.js';
 
+const ALLOWED_EXTENSIONS = ['pdf', 'docx', 'doc', 'md', 'txt', 'xls', 'xlsx', 'ppt', 'pptx'];
 const ACCEPTED_FILES = '.pdf,.docx,.doc,.md,.txt,.xls,.xlsx,.ppt,.pptx';
 
 const EMPTY_BIBTEX: BibTeXMetadata = {
@@ -209,40 +210,38 @@ export class VersionOverwriteDialogView extends DialogView {
             <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-200 mb-1.5 text-xs">
               Select Replacement File (Optional if only modifying metadata)
             </ui5-label>
-            <div
-              data-action="pick-file"
-              role="button"
-              tabindex="0"
-              class="${cx(
-                'border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-all',
-                this.selectedFile
-                  ? 'border-emerald-400 dark:border-emerald-500/80 bg-emerald-50/50 dark:bg-emerald-950/30'
-                  : 'border-gray-300 dark:border-[#38495f] hover:border-[#0070f2] dark:hover:border-[#4796ff] bg-[#f8fafc] dark:bg-[#232c37] hover:bg-[#f0f9ff]/50 dark:hover:bg-[#283442]'
-              )}"
+            <ui5-file-uploader
+              data-input="file"
+              accept="${ACCEPTED_FILES}"
+              hide-input
+              class="plib-file-drop"
+              ${this.submitting ? raw('disabled') : ''}
             >
-              <ui5-file-uploader
-                data-input="file"
-                accept="${ACCEPTED_FILES}"
-                hide-input
-                class="hidden"
-                ${this.submitting ? raw('disabled') : ''}
-              ></ui5-file-uploader>
-              ${this.selectedFile
-                ? html`<div class="flex items-center justify-center gap-2.5 text-emerald-800 dark:text-emerald-200">
-                    ${icon('FileCheck', { className: 'w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0' })}
-                    <div class="text-left">
-                      <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">${this.selectedFile.name}</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">
-                        ${(this.selectedFile.size / 1024).toFixed(1)} KB • Click to choose a different file
+              <div
+                class="${cx(
+                  'border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-all',
+                  this.selectedFile
+                    ? 'border-emerald-400 dark:border-emerald-500/80 bg-emerald-50/50 dark:bg-emerald-950/30'
+                    : 'border-gray-300 dark:border-[#38495f] hover:border-[#0070f2] dark:hover:border-[#4796ff] bg-[#f8fafc] dark:bg-[#232c37] hover:bg-[#f0f9ff]/50 dark:hover:bg-[#283442]'
+                )}"
+              >
+                ${this.selectedFile
+                  ? html`<div class="flex items-center justify-center gap-2.5 text-emerald-800 dark:text-emerald-200">
+                      ${icon('FileCheck', { className: 'w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0' })}
+                      <div class="text-left">
+                        <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">${this.selectedFile.name}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          ${(this.selectedFile.size / 1024).toFixed(1)} KB • Click or drop to choose a different file
+                        </div>
                       </div>
-                    </div>
-                  </div>`
-                : html`<div class="flex flex-col items-center justify-center gap-1.5 text-gray-500 dark:text-gray-400">
-                    ${icon('Upload', { className: 'w-7 h-7 text-gray-400 dark:text-gray-400' })}
-                    <span class="font-semibold text-gray-800 dark:text-gray-200">Click to choose a new physical file revision</span>
-                    <span class="text-[11px] text-gray-400 dark:text-gray-400">PDF, DOCX, DOC, MD, TXT, XLS, XLSX, PPT, PPTX</span>
-                  </div>`}
-            </div>
+                    </div>`
+                  : html`<div class="flex flex-col items-center justify-center gap-1.5 text-gray-500 dark:text-gray-400">
+                      ${icon('Upload', { className: 'w-7 h-7 text-gray-400 dark:text-gray-400' })}
+                      <span class="font-semibold text-gray-800 dark:text-gray-200">Drag and drop, or click to choose a new physical file revision</span>
+                      <span class="text-[11px] text-gray-400 dark:text-gray-400">PDF, DOCX, DOC, MD, TXT, XLS, XLSX, PPT, PPTX</span>
+                    </div>`}
+              </div>
+            </ui5-file-uploader>
           </div>
 
           <div class="space-y-3 pt-3 border-t border-gray-100 dark:border-[#2e3b4a]">
@@ -332,12 +331,6 @@ export class VersionOverwriteDialogView extends DialogView {
    * WHY: Centralized delegated event binding ensures proper lifecycle management without memory leaks.
    */
   protected bind(): void {
-    this.on('[data-action="pick-file"]', 'click', () => {
-      if (!this.submitting) {
-        this.$<FileUploader>('ui5-file-uploader[data-input="file"]')?.click();
-      }
-    });
-
     this.on('ui5-file-uploader[data-input="file"]', 'change', (event) => {
       event.stopPropagation();
       this.handleFileChange(event.currentTarget as FileUploader);
@@ -365,6 +358,17 @@ export class VersionOverwriteDialogView extends DialogView {
     if (!file) {
       return;
     }
+
+    // UI5's FileUploader validates `maxFileSize` only — `accept` is enforced by the native
+    // picker but NOT for drag-and-dropped files, so the extension is re-checked here.
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+      this.errorMsg = `Unsupported file type (.${extension}). Supported: ${ALLOWED_EXTENSIONS.join(', ')}`;
+      this.render();
+      return;
+    }
+
+    this.errorMsg = '';
     this.selectedFile = file;
 
     const base64Reader = new FileReader();
