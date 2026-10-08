@@ -29,7 +29,13 @@ export interface AppState {
   activeDocument: DocumentRecord | null;
 
   // Authentication (Keycloak / OIDC)
-  user: UserProfile;
+  /**
+   * Authenticated profile, or `null` once the session is terminated.
+   *
+   * WHY nullable: logging out must clear the identity, otherwise the ShellBar keeps
+   * advertising the previous user after their session is gone.
+   */
+  user: UserProfile | null;
   authModalOpen: boolean;
 
   // Documents catalog & List Report
@@ -763,8 +769,9 @@ class AppStore extends Store<AppState> {
     }
     localStorage.removeItem('personal_library_user');
     localStorage.removeItem('personal_library_token');
+    // Drop the identity as well, so the ShellBar stops showing the signed-out user.
+    this.setState({ user: null, authModalOpen: true });
     this.showToast('Signed out from Keycloak realm', 'success');
-    this.setState({ authModalOpen: true });
   }
 }
 

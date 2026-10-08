@@ -223,7 +223,7 @@ export class AuthModalView extends DialogView {
         design="Transparent"
         data-quick-profile="${profile.email}"
         class="${cx(
-          'plib-button p-2 rounded border text-left transition-colors cursor-pointer',
+          'plib-button plib-quick-profile rounded border text-left transition-colors cursor-pointer',
           active
             ? 'border-[#0070f2] bg-blue-50/70 text-[#0070f2]'
             : 'border-gray-200 hover:border-gray-300 text-gray-700 bg-gray-50'
@@ -246,14 +246,16 @@ export class AuthModalView extends DialogView {
    * @param key State key ('username' | 'password' | 'realm').
    * @param value Current string value.
    * @param options Styling and input type parameters.
-   * @returns HTML string.
+   * @returns `RawHtml` field markup. Returning the template token (rather than a plain string)
+   *          is required: `html` escapes interpolated strings, so handing back `.toString()`
+   *          here would render the entire field as visible markup text.
    */
   private field(
     label: string,
     key: 'username' | 'password' | 'realm',
     value: string,
     options: { iconKey: Parameters<typeof icon>[0]; placeholder?: string; type?: string; inputClass?: string }
-  ): string {
+  ): RawHtml {
     return html`
       <div>
         <ui5-label class="plib-label block font-semibold text-gray-700 mb-1">${label}</ui5-label>
@@ -273,7 +275,7 @@ export class AuthModalView extends DialogView {
           </ui5-input>
         </div>
       </div>
-    `.toString();
+    `;
   }
 
   /**

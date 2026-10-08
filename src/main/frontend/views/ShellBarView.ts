@@ -237,6 +237,10 @@ export class ShellBarView extends Component<void> {
    */
   protected template(): RawHtml {
     const { user, totalCount } = appStore.state;
+    // After logout `user` is null; fall back to a neutral signed-out identity so the
+    // ShellBar stays renderable without advertising the previous session.
+    const displayName = user ? user.name : 'Signed out';
+    const initials = user ? user.name.charAt(0) : '?';
     const { config } = backendStore.state;
     const { theme, isDark } = themeStore.state;
     const t = i18nStore.state.t;
@@ -282,11 +286,11 @@ export class ShellBarView extends Component<void> {
         </div>
         <ui5-shellbar-spacer slot="content"></ui5-shellbar-spacer>
         <div slot="content" data-hide-order="2" data-slot="language-selector"></div>
-        <div slot="content" data-hide-order="3" class="plib-shellbar-user">${user.name}</div>
+        <div slot="content" data-hide-order="3" class="plib-shellbar-user">${displayName}</div>
         <ui5-avatar
           slot="profile"
           id="${PROFILE_TRIGGER_ID}"
-          initials="${user.name.charAt(0)}"
+          initials="${initials}"
           accessible-name="Open User Profile and Enterprise Tools"
         ></ui5-avatar>
       </ui5-shellbar>
@@ -310,26 +314,26 @@ export class ShellBarView extends Component<void> {
             <div class="flex items-center gap-2.5 min-w-0">
               <ui5-avatar
                 size="S"
-                initials="${user.name.charAt(0)}"
+                initials="${initials}"
                 class="w-9 h-9 rounded-full bg-[#0070f2] text-white shadow-sm ring-2 ring-blue-100 dark:ring-blue-900/40 shrink-0"
               ></ui5-avatar>
               <div class="min-w-0 flex-1">
                 <div
                   class="font-semibold text-xs text-gray-900 dark:text-white leading-tight truncate"
                 >
-                  ${user.name}
+                  ${displayName}
                 </div>
                 <div
                   class="text-[11px] text-gray-500 dark:text-gray-400 font-mono mt-0.5 truncate"
                 >
-                  ${user.email}
+                  ${user ? user.email : 'No active session'}
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1 shrink-0">
                 <span
                   class="px-1.5 py-0.5 text-[9px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-[#0070f2] dark:text-[#38bdf8] rounded-full border border-blue-200 dark:border-blue-800/60"
                 >
-                  ${user.realm}
+                  ${user ? user.realm : 'unauthenticated'}
                 </span>
                 <span
                   class="px-1.5 py-0.5 text-[9px] font-medium bg-slate-100 dark:bg-[#253240] text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-[#354556]"
@@ -340,7 +344,7 @@ export class ShellBarView extends Component<void> {
             </div>
 
             <div class="mt-2.5 flex flex-wrap gap-1">
-              ${user.roles.map(
+              ${(user ? user.roles : []).map(
                 (role) => html`
                   <span
                     class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-medium bg-slate-100 dark:bg-[#253240] text-slate-700 dark:text-slate-300 rounded border border-slate-200 dark:border-[#354556]"

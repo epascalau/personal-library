@@ -51,7 +51,8 @@ const PAGES: DocPage[] = [
   { source: 'COMMUNICATION_ARCHITECTURE.md', output: 'communication-architecture.html', eyebrow: 'Architecture Decision Record' },
   { source: 'ENTITY_RELATIONSHIP_SPEC.md', output: 'entity-relationship-spec.html', eyebrow: 'Data Model Specification' },
   { source: 'ONTOLOGY_SPECIFICATION.md', output: 'ontology-specification.html', eyebrow: 'Knowledge Graph Specification' },
-  { source: 'SPEAKER_NOTES_CUE_CARDS.md', output: 'speaker-notes-cue-cards.html', eyebrow: 'Presentation Material' }
+  { source: 'SPEAKER_NOTES_CUE_CARDS.md', output: 'speaker-notes-cue-cards.html', eyebrow: 'Presentation Material' },
+  { source: 'IDENTITY_AND_ACCESS.md', output: 'identity-and-access.html', eyebrow: 'Identity & Access Reference' }
 ];
 
 const md = new MarkdownIt({
