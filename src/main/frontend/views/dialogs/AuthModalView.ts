@@ -23,6 +23,14 @@ interface QuickProfile {
   subtitle: string;
   /** Substring used to mark the profile as active, as in the React version. */
   match: string;
+  /**
+   * Sandbox password for this realm user.
+   *
+   * WHY: The backend now brokers a real Keycloak password grant, so a placeholder would simply be
+   * rejected. These are the throwaway credentials provisioned in `config/keycloak-realm.json`,
+   * carried here only to keep one-click demo sign-in working.
+   */
+  password: string;
 }
 
 const QUICK_PROFILES: QuickProfile[] = [
@@ -30,17 +38,19 @@ const QUICK_PROFILES: QuickProfile[] = [
     email: 'emilian.pascalau@gmail.com',
     name: 'Emilian Pascalau',
     subtitle: 'Administrator & Researcher',
-    match: 'emilian'
+    match: 'emilian',
+    password: 'emilian123'
   },
   {
     email: 'alan.turing@cambridge.ac.uk',
     name: 'Dr. Alan Turing',
     subtitle: 'Academic Fellow',
-    match: 'turing'
+    match: 'turing',
+    password: 'turing123'
   }
 ];
 
-const DEFAULT_PASSWORD = '••••••••••••';
+const DEFAULT_PASSWORD = QUICK_PROFILES[0].password;
 
 export class AuthModalView extends DialogView {
   private username = 'emilian.pascalau@gmail.com';
@@ -288,8 +298,11 @@ export class AuthModalView extends DialogView {
   protected bind(): void {
     this.onAll('[data-quick-profile]', 'click', (event) => {
       const button = event.currentTarget as HTMLElement;
-      this.username = button.dataset.quickProfile as string;
-      this.password = DEFAULT_PASSWORD;
+      const email = button.dataset.quickProfile as string;
+      const profile = QUICK_PROFILES.find((candidate) => candidate.email === email);
+      this.username = email;
+      // Carry the matching realm password: the backend performs a real password grant now.
+      this.password = profile ? profile.password : '';
       this.render();
     });
 

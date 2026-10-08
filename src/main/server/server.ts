@@ -1081,28 +1081,65 @@ function chunkText(text: string, chunkSize = 350): DocumentChunk[] {
  * WHAT: Parses user credentials, mints an OIDC-compliant bearer token, and establishes a user session.
  * WHY: Provides enterprise SSO authentication simulating Keycloak realm integration with RBAC roles.
  */
-app.post('/api/v1/auth/login', (req: Request, res: Response) => {
+app.post('/api/v1/auth/login', async (req: Request, res: Response) => {
   const { username, password, realm } = req.body;
-  if (!username) {
-    return res.status(400).json({ error: 'Username or email required' });
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
   }
 
-  currentSessionUser = {
-    id: `usr-${Date.now().toString(36)}`,
-    username: username.split('@')[0],
-    email: username.includes('@') ? username : `${username}@enterprise.local`,
-    name: username.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
-    roles: ['LIBRARY_ADMIN', 'RESEARCHER'],
-    realm: realm || 'personal-library-realm',
-    authenticatedAt: new Date().toISOString()
-  };
+  // Broker a genuine OAuth2 password grant, mirroring the Java AuthController. The issuer must be
+  // the in-network address the resource server trusts, which is also why the browser cannot call
+  // Keycloak directly: a token minted via the published host port carries the wrong `iss` claim.
+  const issuer = process.env.KEYCLOAK_ISSUER_URI
+    || `${process.env.KEYCLOAK_AUTH_SERVER_URL || 'http://keycloak:8080'}/realms/${process.env.KEYCLOAK_REALM || 'personal-library-realm'}`;
 
-  return res.json({
-    accessToken: `kc_jwt_${Buffer.from(JSON.stringify(currentSessionUser)).toString('base64')}`,
-    tokenType: 'Bearer',
-    expiresIn: 3600,
-    user: currentSessionUser
-  });
+  try {
+    const tokenRes = await fetch(`${issuer}/protocol/openid-connect/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: process.env.KEYCLOAK_CLIENT_ID || 'personal-library-client',
+        client_secret: process.env.KEYCLOAK_CLIENT_SECRET || 'enterprise-library-secret',
+        grant_type: 'password',
+        username,
+        password
+      })
+    });
+
+    if (!tokenRes.ok) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const token = (await tokenRes.json()) as Record<string, unknown>;
+    const accessToken = String(token.access_token || '');
+    // The token was just received over a trusted server-to-server call, so reading the payload
+    // without signature verification is safe here; every later API call is verified properly.
+    const segments = accessToken.split('.');
+    const claims: Record<string, any> = segments.length === 3
+      ? JSON.parse(Buffer.from(segments[1], 'base64url').toString('utf8'))
+      : {};
+
+    currentSessionUser = {
+      id: String(claims.sub || `usr-${Date.now().toString(36)}`),
+      username: String(claims.preferred_username || username),
+      email: String(claims.email || username),
+      name: String(claims.name || username),
+      roles: Array.isArray(claims.realm_access?.roles) ? claims.realm_access.roles : [],
+      realm: realm || process.env.KEYCLOAK_REALM || 'personal-library-realm',
+      authenticatedAt: new Date().toISOString()
+    };
+
+    return res.json({
+      accessToken,
+      refreshToken: token.refresh_token,
+      tokenType: 'Bearer',
+      expiresIn: token.expires_in ?? 300,
+      user: currentSessionUser
+    });
+  } catch (error) {
+    console.error('[auth] Keycloak token exchange failed:', error);
+    return res.status(503).json({ error: 'Identity provider unreachable' });
+  }
 });
 
 /**

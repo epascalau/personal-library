@@ -1041,7 +1041,7 @@ export class ObjectPageView extends Component {
                     <ui5-table-header-cell>File Asset</ui5-table-header-cell>
                     <ui5-table-header-cell>Bibliographic Metadata</ui5-table-header-cell>
                     <ui5-table-header-cell>AI Summaries</ui5-table-header-cell>
-                    <ui5-table-header-cell>Actions</ui5-table-header-cell>
+                    <ui5-table-header-cell min-width="240px">Actions</ui5-table-header-cell>
                   </ui5-table-header-row>
                   ${raw(
                     snapshots
@@ -1092,18 +1092,19 @@ export class ObjectPageView extends Component {
                                   <div class="flex items-center justify-end gap-1.5">
                                     <a
                                       href="${backendStore.adapter.getHistoricalDownloadUrl(doc.guid, s.versionNumber)}"
-                                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-[#2e3b4a] hover:bg-gray-200 dark:hover:bg-[#38495f] text-gray-700 dark:text-gray-200 transition-colors border border-gray-200 dark:border-[#38495f]"
+                                      class="inline-flex items-center gap-1 h-7 px-2.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-[#2e3b4a] hover:bg-gray-200 dark:hover:bg-[#38495f] text-gray-700 dark:text-gray-200 transition-colors border border-gray-200 dark:border-[#38495f]"
                                       title="Download historical asset for version ${s.versionNumber}"
                                     >
                                       ${icon('Download', { className: 'w-3 h-3' })} Download (v${s.versionNumber})
                                     </a>
                                     <ui5-button
-                                      class="plib-button"
+                                      class="plib-button plib-button-sm plib-button--row-action"
                                       data-action="rollback-version"
                                       data-guid="${doc.guid}"
                                       data-version="${s.versionNumber}"
                                       icon="history"
-                                      design="Emphasized"
+                                      design="Default"
+                                      tooltip="Restore version ${s.versionNumber} as the active revision"
                                     >
                                       Rollback
                                     </ui5-button>
@@ -1136,7 +1137,10 @@ export class ObjectPageView extends Component {
    */
   protected afterRender(): void {
     this.on('[data-action="back"]', 'click', () => appStore.backToList());
-    this.on('[data-action="open-version"]', 'click', () => appStore.openVersionModal());
+    // onAll, not on: the Version History tab renders its own "Upload New Revision" button
+    // alongside the one in the page header, and on() would bind only the first match,
+    // leaving the in-tab button inert.
+    this.onAll('[data-action="open-version"]', 'click', () => appStore.openVersionModal());
     this.on('[data-action="download-asset"]', 'click', () => this.downloadAsset());
     this.on('[data-action="export-bibtex"]', 'click', () => this.exportBibtexFile());
     this.on('[data-action="delete"]', 'click', () => {

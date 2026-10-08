@@ -1,26 +1,46 @@
 # Identity & Access: Keycloak Realm, Users, Roles and Passwords
 
-Every account that can reach the Personal Library sandbox, where each one is defined, which roles it carries, and exactly where to find and change it in the Keycloak admin console. This document also records an important and easily-missed fact: the realm below is fully provisioned, but the running application does **not** currently enforce it.
+Every account that can reach the Personal Library sandbox, where each one is defined, which roles it carries, and exactly where to find and change it in the Keycloak admin console. This document also records precisely how far enforcement currently goes: **authentication is real, authorization is not**.
 
 ---
 
-## 1. Read This First: Provisioned vs. Enforced
+## 1. Read This First: What Is and Is Not Enforced
 
-The project ships a complete, working Keycloak realm — users, roles, a confidential client, and an OIDC resource-server configuration on the Spring Boot side. That realm is real and you can log into it directly at the Keycloak admin console.
+The project ships a complete Keycloak realm — users, roles, a confidential client — and the Spring Boot side is configured as an OIDC resource server.
 
-However, **the application's own login dialog does not authenticate against Keycloak**, and **no API endpoint requires a token**. Three independent places make this true:
+**Authentication is genuine.** Signing in performs a real OAuth2 password grant against the realm. A wrong password is rejected with `401`, and the roles shown in the profile card are the actual `realm_access.roles` claims decoded from the issued token. Signing in as `viewer` really does yield only `VIEWER`.
 
-| Location | What it actually does |
+**Authorization is not yet enforced.** `SecurityConfig` still ends with `.anyRequest().permitAll()`, so every API endpoint remains reachable *without* a token. A `VIEWER` is therefore not actually prevented from calling a write endpoint — the role is reported truthfully but not acted upon.
+
+| Layer | Status |
 | --- | --- |
-| `src/main/java/com/personallibrary/config/SecurityConfig.java` | Ends with `.anyRequest().permitAll()`. CSRF is disabled and sessions are `STATELESS`. The OAuth2 resource server is wired up, but because every request is permitted, a JWT is never required. |
-| `src/main/server/server.ts` → `POST /api/v1/auth/login` | Accepts **any** username, **ignores the password field entirely**, and always returns a session carrying `LIBRARY_ADMIN` and `RESEARCHER`. The "token" is just the user profile base64-encoded behind a `kc_jwt_` prefix. |
-| `src/main/java/com/personallibrary/controller/AuthController.java` → `POST /api/v1/auth/login` | Returns `"kc_jwt_" + System.currentTimeMillis()` and hardcodes the roles `LIBRARY_ADMIN` and `CHIEF_RESEARCHER`. No credential check occurs. |
+| Realm, users, roles, client | Provisioned and working |
+| Login credential check | **Enforced** — real password grant, wrong passwords fail |
+| Roles reported to the UI | **Real** — decoded from the Keycloak token |
+| Token issued to the browser | **Real signed JWT**, validated when presented |
+| API authorization rules | **Not enforced** — `anyRequest().permitAll()` |
 
-**Consequence:** signing in through the application's ShellBar dialog with `viewer` / `viewer123` will *not* give you a read-only session — it grants administrator roles, exactly like every other username. The realm roles in section 4 describe *intent*, not currently enforced authorization.
+Section 9 lists what remains to close the last gap.
 
-This is deliberate for an educational sandbox (it keeps the stack usable without an OIDC redirect dance), but it must be understood before anyone treats this deployment as secured. See section 9 for what to change to make the realm authoritative.
+### Why the backend brokers the login
 
-> **Sandbox credentials only.** Every password in this document is a local development value already committed to `config/keycloak-realm.json` and `docker-compose.yml`. They exist so the sandbox boots unattended on a laptop. Never reuse them, and never expose this stack to an untrusted network as-is.
+The browser does **not** call Keycloak directly, and cannot. The backend trusts the issuer `http://keycloak:8080/realms/personal-library-realm` (see `application-docker.yml`), which only resolves inside the Docker network. A token minted through the published `localhost:8180` address carries that host in its `iss` claim and is rejected with `401 invalid_token` even though it is otherwise perfectly valid.
+
+So `POST /api/v1/auth/login` performs the password grant server-side and returns the resulting token. Both runtimes implement this identically — `KeycloakAuthService` (Java) and the equivalent handler in `src/main/server/server.ts` — so the "Gateway" backend mode cannot be used to bypass the credential check.
+
+### The trap: a malformed token is worse than no token
+
+`permitAll()` does **not** mean "ignore the Authorization header". Spring Security's bearer-token filter runs *before* authorization rules, so a request carrying a credential the resource server cannot decode is rejected outright:
+
+```text
+no token                  -> 200 OK
+Bearer kc_jwt_1791…       -> 401 invalid_token ("Malformed token")
+Bearer <real Keycloak JWT> -> 200 OK
+```
+
+This caused a real defect: the login endpoints used to mint opaque markers (`kc_jwt_<millis>`), so **signing in broke every subsequent API call while signing out restored it** — the app appeared to "lose the backend connection" right after a successful login. Two changes fixed it: logins now return genuine JWTs, and `RestBackendAdapter.isJwt()` forwards a credential only when it is structurally a JWT, so any future opaque marker is held locally rather than sent.
+
+> **Sandbox credentials only.** Every password in this document is a local development value committed to `config/keycloak-realm.json`. They exist so the sandbox boots unattended on a laptop. Never reuse them, and never expose this stack to an untrusted network as-is.
 
 ---
 
@@ -28,7 +48,7 @@ This is deliberate for an educational sandbox (it keeps the stack usable without
 
 | Concern | File / source of truth |
 | --- | --- |
-| Realm, users, roles, client | `config/keycloak-realm.json` (110 lines, imported at container start) |
+| Realm, users, roles, client | `config/keycloak-realm.json` (imported at container start) |
 | Keycloak container & admin account | `docker-compose.yml`, service `keycloak` |
 | Spring Boot resource-server wiring | `src/main/resources/application.yml`, `application-docker.yml` |
 | Spring Boot authorization rules | `src/main/java/com/personallibrary/config/SecurityConfig.java` |
@@ -50,15 +70,19 @@ Because the import is driven from a file in source control, **changes made by ha
 
 ## 3. Realm Users (Who Can Log Into Keycloak)
 
-Three users are imported into the `personal-library-realm` realm. All are enabled, and all passwords are **non-temporary** (`"temporary": false`), so Keycloak will not force a password change on first login.
+Five users are imported into the `personal-library-realm` realm. All are enabled, and all passwords are **non-temporary** (`"temporary": false`), so Keycloak will not force a password change on first login.
 
 | Username | Password | Email | Full name | Realm roles |
 | --- | --- | --- | --- | --- |
 | `admin` | `admin` | `admin@personallibrary.local` | Library Administrator | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` |
 | `researcher` | `researcher123` | `researcher@personallibrary.local` | Chief Researcher | `CHIEF_RESEARCHER` |
 | `viewer` | `viewer123` | `viewer@personallibrary.local` | Academic Viewer | `VIEWER` |
+| `emilian.pascalau` | `emilian123` | `emilian.pascalau@gmail.com` | Emilian Pascalau | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` |
+| `alan.turing` | `turing123` | `alan.turing@cambridge.ac.uk` | Alan Turing | `CHIEF_RESEARCHER` |
 
-These three are **realm users** — they are valid at the Keycloak login page and in any OIDC flow against the realm.
+All five are **real realm users** — valid at the Keycloak login page, in any OIDC flow, and in the application's own login dialog. The last two back the "Quick Connect" buttons described below.
+
+Because `loginWithEmailAllowed` is `true`, either the username or the email address can be supplied as the login identifier.
 
 ### The Keycloak master admin (a different account)
 
@@ -71,16 +95,16 @@ The account that administers the Keycloak server itself is **not** a realm user.
 
 It lives in the `master` realm and is what you use to reach the admin console. The name collision with the realm user `admin` is coincidental — they are separate accounts in separate realms.
 
-### Identities the application shows (not Keycloak users)
+### Quick Connect buttons
 
-The frontend login dialog offers two "Quick Connect" profiles, defined in `AuthModalView.ts`. These are **UI conveniences only** and do not exist in the realm:
+The frontend login dialog offers two "Quick Connect" buttons, defined in `AuthModalView.ts`. Each one fills in a **real realm account** and its sandbox password, so one-click sign-in still works now that credentials are genuinely checked:
 
-| Email | Display name | Subtitle |
-| --- | --- | --- |
-| `emilian.pascalau@gmail.com` | Emilian Pascalau | Administrator & Researcher |
-| `alan.turing@cambridge.ac.uk` | Dr. Alan Turing | Academic Fellow |
+| Email | Display name | Fills password | Resulting roles |
+| --- | --- | --- | --- |
+| `emilian.pascalau@gmail.com` | Emilian Pascalau | `emilian123` | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` |
+| `alan.turing@cambridge.ac.uk` | Dr. Alan Turing | `turing123` | `CHIEF_RESEARCHER` |
 
-The password field is pre-filled with a bullet placeholder and, as established in section 1, is never validated. The realm field defaults to `personal-library-realm`.
+The realm field defaults to `personal-library-realm`. Editing the password to anything else and submitting now fails with "Invalid username or password" — the dialog stays open and no token is stored.
 
 Before anyone logs in, the application also boots with a default identity (`emilian.pascalau`, roles `LIBRARY_ADMIN` + `CHIEF_RESEARCHER`), restored from `localStorage` key `personal_library_user` when present.
 
@@ -192,6 +216,18 @@ curl -s -X POST \
 
 A correct password returns an `access_token`; a wrong one returns `401` with `invalid_grant`. Decode the token's payload to see the `realm_access.roles` claim carrying `CHIEF_RESEARCHER`.
 
+> **The issuer must match, or the token is rejected.** A token minted through `localhost:8180` carries `"iss": "http://localhost:8180/..."`, but the containerized backend is configured for `http://keycloak:8080/...` (`application-docker.yml`). Presenting the former yields `401` even though the token is perfectly valid. To obtain a token the running backend will accept, request it from inside the Docker network:
+>
+> ```bash
+> docker exec personal-library-app sh -lc 'curl -s -X POST \
+>   "http://keycloak:8080/realms/personal-library-realm/protocol/openid-connect/token" \
+>   -d client_id=personal-library-client \
+>   -d client_secret=enterprise-library-secret \
+>   -d grant_type=password -d username=researcher -d password=researcher123'
+> ```
+>
+> That token returns `200` against `/api/v1/documents`, confirming the realm, the client, the password, and the resource-server wiring are all genuinely functional — only the authorization rules are open.
+
 Useful endpoints:
 
 | Purpose | URL |
@@ -209,13 +245,22 @@ Spring Boot is already pointed at these. `application.yml` uses `KEYCLOAK_ISSUER
 
 ## 9. Making the Realm Actually Authoritative
 
-If you want enforcement rather than simulation, these are the changes required — listed so the gap is explicit, not as a recommendation to make them blindly:
+Authentication is already real (section 1). Steps 1-3 below are **done**; what remains is authorization.
 
-1. **Replace the blanket permit in `SecurityConfig.java`.** Change `.anyRequest().permitAll()` to `.anyRequest().authenticated()`, keeping `permitAll()` only for `/actuator/health`, the OpenAPI spec, and static assets. The resource-server and JWT converter plumbing is already present.
-2. **Delete or gate the simulated login endpoints.** Both `POST /api/v1/auth/login` implementations mint fake tokens and must not survive into an enforced configuration.
-3. **Make the frontend obtain a real token**, either via the authorization-code flow against the client's registered redirect URIs or via direct access grants, and attach it as an `Authorization: Bearer` header.
-4. **Map realm roles to method security** (for example `@PreAuthorize("hasRole('LIBRARY_ADMIN')")`) so `VIEWER` is genuinely read-only.
-5. **Harden the deployment**: set `sslRequired` away from `none`, disable self-registration, rotate the client secret out of source control into a secret store, and change every default password including `KEYCLOAK_ADMIN_PASSWORD`.
+Already in place:
+
+1. ~~Issue genuine tokens.~~ Both `POST /api/v1/auth/login` implementations broker a real password grant and return a signed JWT.
+2. ~~Send the token from the browser.~~ `RestBackendAdapter` attaches `Authorization: Bearer` for any structurally valid JWT.
+3. ~~Report real roles.~~ The profile card shows `realm_access.roles` decoded from the token.
+
+Still required to enforce authorization:
+
+4. **Replace the blanket permit in `SecurityConfig.java`.** Change `.anyRequest().permitAll()` to `.anyRequest().authenticated()`, keeping `permitAll()` for `/api/v1/auth/**`, `/actuator/health`, the OpenAPI spec, and static assets. The resource-server and JWT converter plumbing is already present and proven working.
+5. **Map realm roles to method security** (for example `@PreAuthorize("hasRole('LIBRARY_ADMIN')")`) so `VIEWER` is genuinely read-only. The `KeycloakRealmRoleConverter` already applies the `ROLE_` prefix these checks expect.
+6. **Handle token expiry.** Access tokens live **5 minutes** (`expires_in: 300`, refresh 1800) and the realm sets no override. The login response already returns `refreshToken`, but nothing consumes it yet — without refresh handling, sessions will start failing after five minutes once endpoints require a token.
+7. **Authenticate the seeder.** `scripts/seed-initial-documents.sh` calls the API unauthenticated, including a readiness loop that would spin forever against a secured endpoint. Service accounts are enabled on the client, so a client-credentials token is the natural fix.
+8. **Verify JWTs in the Node gateway.** It currently performs no token validation of its own; with Java enforcing and the gateway not, "Gateway" backend mode would become an unsecured path to the data.
+9. **Harden the deployment**: set `sslRequired` away from `none`, disable self-registration, rotate the client secret out of source control into a secret store, and change every default password including `KEYCLOAK_ADMIN_PASSWORD`.
 
 ---
 
@@ -224,9 +269,13 @@ If you want enforcement rather than simulation, these are the changes required �
 | Account | Password | Where it is valid | Roles |
 | --- | --- | --- | --- |
 | `admin` (master realm) | `admin` | Keycloak admin console | Keycloak server administrator |
-| `admin` (library realm) | `admin` | Realm login / OIDC flows | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` |
-| `researcher` | `researcher123` | Realm login / OIDC flows | `CHIEF_RESEARCHER` |
-| `viewer` | `viewer123` | Realm login / OIDC flows | `VIEWER` |
-| Any username at all | *(ignored)* | The application's own login dialog | Granted admin roles regardless — see section 1 |
+| `admin` (library realm) | `admin` | Everywhere | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` |
+| `researcher` | `researcher123` | Everywhere | `CHIEF_RESEARCHER` |
+| `viewer` | `viewer123` | Everywhere | `VIEWER` |
+| `emilian.pascalau` | `emilian123` | Everywhere (Quick Connect #1) | `LIBRARY_ADMIN`, `CHIEF_RESEARCHER` |
+| `alan.turing` | `turing123` | Everywhere (Quick Connect #2) | `CHIEF_RESEARCHER` |
+| Anything else | — | Rejected with `401` | none |
+
+"Everywhere" means the Keycloak login page, any OIDC flow, and the application's own login dialog — all three now validate against the same realm.
 
 Related reading: [Backend Architecture](BACKEND_ARCHITECTURE.md) for the Spring Boot layering, [DevOps Guide](DEVOPS_GUIDE.md) for the Compose stack and ports, and [Frontend Architecture](FRONTEND_ARCHITECTURE.md) for how the ShellBar and dialogs are built.

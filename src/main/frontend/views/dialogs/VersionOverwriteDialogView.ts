@@ -268,6 +268,11 @@ export class VersionOverwriteDialogView extends DialogView {
         <div
           class="px-6 py-3.5 border-t border-gray-100 dark:border-[#2e3b4a] bg-white dark:bg-[#1c232b] flex items-center justify-end gap-2.5 text-xs"
         >
+          ${this.submitting
+            ? raw(
+                '<span class="mr-auto text-[11px] text-gray-500 dark:text-gray-400">Re-indexing content and regenerating the summary &mdash; this can take up to a minute.</span>'
+              )
+            : ''}
           <ui5-button class="plib-button" data-action="close" ${this.submitting ? raw('disabled') : ''}
             >Cancel</ui5-button
           >
@@ -280,7 +285,7 @@ export class VersionOverwriteDialogView extends DialogView {
             ${icon(this.submitting ? 'Loader2' : 'GitBranch', {
               className: this.submitting ? 'w-4 h-4 animate-spin mr-1.5' : 'w-4 h-4 mr-1.5'
             })}
-            ${this.submitting ? 'Generating New Version GUID...' : 'Overwrite Active View'}
+            ${this.submitting ? 'Uploading & Re-indexing...' : 'Overwrite Active View'}
           </ui5-button>
         </div>
       </div>

@@ -64,7 +64,8 @@ export class RestBackendAdapter implements BackendAdapter {
     };
 
     const token = this.config.authToken || localStorage.getItem('personal_library_token');
-    if (token) {
+    // Opaque simulated-login markers must not be forwarded as credentials: see isJwt().
+    if (token && RestBackendAdapter.isJwt(token)) {
       headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
 
@@ -73,6 +74,29 @@ export class RestBackendAdapter implements BackendAdapter {
     }
 
     return headers;
+  }
+
+  /**
+   * Determines whether a token is structurally a JWT and therefore safe to send as a bearer credential.
+   *
+   * WHAT: Checks for the three dot-separated, non-empty segments (header.payload.signature) that
+   * RFC 7519 requires, after stripping any `Bearer ` prefix.
+   * WHY: The simulated login endpoints mint opaque development markers rather than signed JWTs
+   * (`kc_jwt_<millis>` from the Java AuthController, `kc_jwt_<base64 profile>` from the Node
+   * gateway). Spring Security's bearer-token filter runs *before* authorization rules, so any
+   * request carrying an Authorization header it cannot decode is rejected with `401 invalid_token`
+   * — even on endpoints mapped to `permitAll()`. Forwarding those markers therefore broke every
+   * API call the moment a user signed in, while signing out restored access. Sending only real
+   * JWTs keeps anonymous (permitted) access working today and stays correct once the realm is
+   * genuinely enforced, because tokens issued by Keycloak satisfy this check.
+   *
+   * @param token Candidate credential from config or localStorage.
+   * @returns True when the value could be decoded as a JWT by a resource server.
+   */
+  private static isJwt(token: string): boolean {
+    const bare = token.startsWith('Bearer ') ? token.slice(7) : token;
+    const segments = bare.split('.');
+    return segments.length === 3 && segments.every((segment) => segment.length > 0);
   }
 
   /**

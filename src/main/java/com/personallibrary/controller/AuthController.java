@@ -6,12 +6,15 @@ package com.personallibrary.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.personallibrary.service.KeycloakAuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +30,17 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication", description = "Keycloak / OIDC client session and profile endpoints")
 public class AuthController {
+
+    private final KeycloakAuthService keycloakAuthService;
+
+    /**
+     * Creates the controller.
+     *
+     * @param keycloakAuthService Service brokering the realm password grant.
+     */
+    public AuthController(KeycloakAuthService keycloakAuthService) {
+        this.keycloakAuthService = keycloakAuthService;
+    }
 
     /**
      * Retrieves the profile and roles of the currently authenticated Keycloak user.
@@ -68,35 +82,60 @@ public class AuthController {
     }
 
     /**
-     * Direct authentication or mock token exchange for development workflows.
+     * Authenticates a user against the Keycloak realm and issues a genuine access token.
      *
-     * WHAT: Accepts username/password credentials and issues a signed or development bearer JWT
-     * with associated user identity and role scopes.
+     * WHAT: Brokers an OAuth2 password grant to the realm, then returns the real access token
+     * together with the identity and realm roles decoded from it.
      *
-     * WHY: Provides a seamless authentication endpoint for single-page applications and CLI scripts
-     * that prefer direct token issuance over browser redirect-based authorization code flows during
-     * local sandbox evaluation.
+     * WHY: This endpoint previously accepted any password and returned an opaque marker
+     * (`kc_jwt_<millis>`) with hardcoded administrator roles, so the realm's users, passwords and
+     * role assignments had no effect at all. Brokering the grant server-side makes credentials
+     * genuinely authoritative and yields a token the resource server can validate. It must happen
+     * here rather than in the browser, because the token has to carry the in-network issuer
+     * (`http://keycloak:8080/...`) that the backend trusts and the browser cannot reach.
      *
      * @param credentials Map containing username, password, and realm.
-     * @return Bearer token response bundle.
+     * @return Token bundle with access token, refresh token and profile, or 401 when rejected.
      */
     @PostMapping("/login")
-    @Operation(summary = "Direct authentication or OIDC token exchange")
+    @Operation(summary = "Authenticate against the Keycloak realm (OAuth2 password grant)")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials) {
-        String username = credentials.getOrDefault("username", "emilian.pascalau@gmail.com");
-        return ResponseEntity.ok(Map.of(
-                "accessToken", "kc_jwt_" + System.currentTimeMillis(),
-                "tokenType", "Bearer",
-                "expiresIn", 3600,
-                "user", Map.of(
-                        "id", "usr-kc-" + username.hashCode(),
-                        "username", username.split("@")[0],
-                        "email", username,
-                        "name", username.split("@")[0].replace(".", " "),
-                        "roles", List.of("LIBRARY_ADMIN", "CHIEF_RESEARCHER"),
-                        "realm", credentials.getOrDefault("realm", "personal-library-realm")
-                )
-        ));
+        String username = credentials.getOrDefault("username", "").trim();
+        String password = credentials.getOrDefault("password", "");
+
+        if (username.isEmpty() || password.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Username and password are required"));
+        }
+
+        try {
+            Map<String, Object> token = keycloakAuthService.passwordGrant(username, password);
+            String accessToken = String.valueOf(token.get("access_token"));
+            Map<String, Object> claims = keycloakAuthService.decodeClaims(accessToken);
+
+            // Prefer the realm's own claims over anything the client submitted, so the returned
+            // profile always reflects Keycloak's view of the identity rather than user input.
+            String preferredUsername = String.valueOf(claims.getOrDefault("preferred_username", username));
+            Map<String, Object> user = new HashMap<>();
+            user.put("id", String.valueOf(claims.getOrDefault("sub", "usr-kc-" + preferredUsername.hashCode())));
+            user.put("username", preferredUsername);
+            user.put("email", String.valueOf(claims.getOrDefault("email", preferredUsername)));
+            user.put("name", String.valueOf(claims.getOrDefault("name", preferredUsername)));
+            user.put("roles", keycloakAuthService.realmRoles(claims));
+            user.put("realm", credentials.getOrDefault("realm", "personal-library-realm"));
+            user.put("authenticatedAt", Instant.now().toString());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", token.get("refresh_token"));
+            response.put("tokenType", "Bearer");
+            response.put("expiresIn", token.getOrDefault("expires_in", 300));
+            response.put("user", user);
+            return ResponseEntity.ok(response);
+        } catch (KeycloakAuthService.InvalidCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", ex.getMessage()));
+        }
     }
 
     /**

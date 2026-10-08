@@ -13,6 +13,11 @@
 /* ------------------------------------------------------------------ */
 
 :root {
+  --plib-row-action-bg: #f3f4f6;
+  --plib-row-action-bg-hover: #e5e7eb;
+  --plib-row-action-border: #e5e7eb;
+  --plib-row-action-text: #374151;
+
   --sapFontFamily: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --sapFontHeaderFamily: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --sapContent_MonospaceFontFamily: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -147,6 +152,13 @@ ui5-input.plib-input--semantic > [slot='icon'],
   letter-spacing: 0.01em;
 }
 
+/* Compact row-level actions sized to sit beside 28px link pills in tables.
+   The host needs its own height: styling only .ui5-button-root shrinks the
+   inner box while the host keeps the default 2.25rem, misaligning the row. */
+:host(.plib-button-sm) {
+  height: 1.75rem;
+}
+
 :host(.plib-button-sm) .ui5-button-root {
   height: 1.75rem;
   font-size: 0.6875rem;
@@ -184,6 +196,23 @@ ui5-input.plib-input--semantic > [slot='icon'],
   outline: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
+}
+
+/* Neutral bordered pill for per-row table actions, matching the sibling
+   anchor-based "Download" pill. The app's global button reset strips borders
+   and backgrounds, so a row action needs them restored explicitly to avoid
+   reading as plain blue link text next to a bordered control.
+   Theming goes through custom properties rather than :host-context(), which
+   does not match reliably for these slotted table buttons; custom properties
+   inherit across the shadow boundary and track the theme automatically. */
+:host(.plib-button--row-action) .ui5-button-root {
+  background-color: var(--plib-row-action-bg, #f3f4f6);
+  border: 1px solid var(--plib-row-action-border, #e5e7eb);
+  color: var(--plib-row-action-text, #374151);
+}
+
+:host(.plib-button--row-action) .ui5-button-root:hover {
+  background-color: var(--plib-row-action-bg-hover, #e5e7eb);
 }
 
 /* The emphasized "primary action" look used by the Object Page header */
@@ -976,6 +1005,11 @@ ui5-label.plib-label {
 /* ------------------------------------------------------------------ */
 
 [data-sap-theme='sap_horizon_dark'] {
+  --plib-row-action-bg: #2e3b4a;
+  --plib-row-action-bg-hover: #38495f;
+  --plib-row-action-border: #38495f;
+  --plib-row-action-text: #e5e7eb;
+
   --sapBackgroundColor: var(--sap-bg, #12171c);
   --sapTile_Background: var(--sap-surface, #1c232b);
   --sapGroup_ContentBackground: var(--sap-surface, #1c232b);

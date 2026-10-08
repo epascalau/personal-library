@@ -105,6 +105,45 @@
       "realmRoles": [
         "VIEWER"
       ]
+    },
+    {
+      "id": "usr-keycloak-104",
+      "username": "emilian.pascalau",
+      "email": "emilian.pascalau@gmail.com",
+      "firstName": "Emilian",
+      "lastName": "Pascalau",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "emilian123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "LIBRARY_ADMIN",
+        "CHIEF_RESEARCHER"
+      ]
+    },
+    {
+      "id": "usr-keycloak-105",
+      "username": "alan.turing",
+      "email": "alan.turing@cambridge.ac.uk",
+      "firstName": "Alan",
+      "lastName": "Turing",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "turing123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "CHIEF_RESEARCHER"
+      ]
     }
   ]
 }
