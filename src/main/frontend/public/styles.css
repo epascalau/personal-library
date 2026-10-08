@@ -81,12 +81,18 @@
   font-family: var(--sapContent_MonospaceFontFamily);
 }
 
-/* Filter fields that carry a leading semantic icon slot */
-:host(.plib-input--semantic) .ui5-input-root {
-  padding-inline-start: 0.25rem;
-}
-
-:host(.plib-input--semantic) [ui5-icon][slot='icon'] {
+/*
+ * The semantic (vector search) filter field carries a brand-coloured icon in
+ * the `icon` slot. UI5 renders that slot after the inner input, so the field
+ * keeps its default leading padding and only the icon itself is restyled.
+ *
+ * Slotted icons stay in the light DOM, so they are matched from the document
+ * side with a plain descendant selector and from inside the shadow root with
+ * `::slotted()` — a descendant selector in the component's own sheet cannot
+ * reach them.
+ */
+ui5-input.plib-input--semantic > [slot='icon'],
+:host(.plib-input--semantic) ::slotted([slot='icon']) {
   color: var(--sap-brand, #0070f2);
   width: 0.875rem;
   height: 0.875rem;
@@ -373,6 +379,26 @@ ui5-table-cell.plib-table-cell[_popin] {
   padding-inline-end: 0;
 }
 
+/*
+ * `ui5-table-cell` draws the row separator as its own `border-top`, so the line
+ * between two rows belongs to the lower row's cells.
+ *
+ * The authored cells live in the light DOM, where the Tailwind preflight reset
+ * (`*, ::before, ::after { border-width: 0 }`) zeroes that border. The actions
+ * cell, however, is generated inside the row's shadow root, which the reset
+ * cannot reach, so it kept its separator and drew a stub line under the row
+ * action button only.
+ *
+ * The shared stylesheet cannot reach that cell either: it is adopted from a
+ * patched `UI5Element.prototype.onAfterRendering`, and `TableRowBase` declares
+ * its own `onAfterRendering`, which shadows the patched base method. A theming
+ * custom property is used instead — custom properties inherit through shadow
+ * boundaries, so the declaration below reaches the generated cell.
+ */
+ui5-table-row.plib-table-row {
+  --sapList_BorderColor: transparent;
+}
+
 :host(.plib-table-header-cell) {
   font-weight: 600;
   color: var(--sapContent_LabelColor, #556b82);
@@ -451,6 +477,387 @@ ui5-table-cell.plib-table-cell[_popin] {
 .plib-cell-mono {
   font-family: var(--sapContent_MonospaceFontFamily, monospace);
   color: var(--sapTextColor, #1d2d3e);
+}
+
+/* ------------------------------------------------------------------ */
+/* ShellBar                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Restores the application's original dark-slate Fiori shell on top of the
+ * stock Horizon ShellBar: a 3rem bar, the centred max-w-7xl content rail, and
+ * the white-on-slate palette.
+ *
+ * ShellBar's shadow root never receives this stylesheet. The shared sheet is
+ * adopted from a patched `UI5Element.prototype.onAfterRendering`, and ShellBar
+ * declares its own `onAfterRendering`, which shadows the patched base method.
+ * Only two mechanisms therefore reach the control: document-side rules against
+ * the light-DOM host, and custom properties, which inherit across the shadow
+ * boundary. Both are used below; no `:host(...)` rule would have any effect.
+ */
+.plib-shell-header {
+  background-color: var(--sap-shell-bg, #354a5f);
+}
+
+ui5-shellbar.plib-shellbar {
+  /* Inherits into the shadow root and drives the internal root height. */
+  --_ui5_shellbar_root_height: 3rem;
+  color: var(--sap-shell-text, #ffffff);
+  /*
+   * The slate fill lives on the sticky `<header>` wrapper so it still spans the
+   * full viewport width once the bar itself is constrained to the content rail.
+   */
+  background-color: transparent;
+  /*
+   * Reproduces the `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8` rail used by the
+   * page content, so the brand lock-up and the profile avatar line up with the
+   * List Report and Object Page columns underneath.
+   */
+  display: block;
+  box-sizing: border-box;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  /*
+   * ShellBar draws its own light-grey inset rule along the bottom edge
+   * (`box-shadow: 0 -1px 0 0 inset`), which reads as a stray white line against
+   * the slate shell. The sticky header already supplies the divider.
+   */
+  box-shadow: none;
+}
+
+@media (min-width: 640px) {
+  ui5-shellbar.plib-shellbar {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  ui5-shellbar.plib-shellbar {
+    padding-inline: 2rem;
+  }
+}
+
+/* The brand lock-up: 2rem gradient tile plus the semibold product title. */
+:host(.plib-shellbar-branding) .ui5-shellbar-branding-root {
+  gap: 0.75rem;
+  color: var(--sap-shell-text, #ffffff);
+}
+
+:host(.plib-shellbar-branding) .ui5-shellbar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--sap-shell-text, #ffffff);
+}
+
+:host(.plib-shellbar-branding) ::slotted([slot='logo']) {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+}
+
+/*
+ * The logo wrapper and the strapline are authored in this application's markup,
+ * so they sit in the light DOM where the Tailwind preflight reset applies;
+ * plain class selectors keep them styled from the document side.
+ *
+ * The brand mark is wrapped in a <span> rather than slotted as a bare <svg>:
+ * the branding `logo` slot is typed `Slot<HTMLElement>`, and an SVGElement is
+ * not an HTMLElement, so UI5 rejects it and aborts the branding render.
+ */
+.plib-shellbar-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.plib-shellbar-logo > svg {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.plib-shellbar-branding:hover .plib-shellbar-logo {
+  transform: scale(1.05);
+}
+
+/* The strapline keeps its divider rule and only appears on wide viewports. */
+.plib-shellbar-subtitle {
+  display: none;
+  align-items: center;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--sap-shell-subtle, #b0c4de);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 0.625rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .plib-shellbar-subtitle {
+    display: inline-flex;
+  }
+}
+
+/*
+ * The signed-in user name sits immediately left of the profile avatar, as it
+ * did in the bespoke header. The ShellBar profile slot renders the avatar on
+ * its own, so the name is carried as the trailing content item instead.
+ */
+.plib-shellbar-user {
+  display: none;
+  align-items: center;
+  max-width: 8.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--sap-shell-text, #ffffff);
+}
+
+@media (min-width: 768px) {
+  .plib-shellbar-user {
+    display: inline-flex;
+  }
+}
+
+/*
+ * Profile popover tool rows.
+ *
+ * These rows carry rich two-line content (icon tile, title, subtitle, chevron)
+ * that the stock button centres and vertically compresses. Neutralising the
+ * button root turns `ui5-button` into a transparent, full-width row container
+ * so the light-DOM Tailwind layout on the host governs the result again.
+ */
+:host(.plib-tool-row) {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  background: transparent;
+  /*
+   * UI5 pins `line-height: normal` on its host, which beats the inherited
+   * document value and leaves these rows 3px shorter than the anchor rows next
+   * to them. Restoring the inherited ratio keeps both row types identical.
+   */
+  line-height: 1.5;
+}
+
+:host(.plib-tool-row) .ui5-button-root {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  text-align: inherit;
+  line-height: inherit;
+}
+
+/*
+ * On desktop UI5 draws the button focus ring from `:focus-within` rather than
+ * `:focus-visible`, so a mouse click leaves the blue outline behind until focus
+ * moves elsewhere. Suppressing the ring only while the button is *not*
+ * `:focus-visible` hides it for pointer interaction while keeping it intact for
+ * keyboard navigation.
+ *
+ * `!important` is required: the shared sheet is spliced in at index 0, so UI5's
+ * own sheets are adopted after it and win every specificity tie.
+ */
+:host(.plib-tool-row) .ui5-button-root:focus-within:not(:focus-visible)::before,
+:host(.plib-tool-row) .ui5-button-root:focus-within:not(:focus-visible)::after {
+  content: none !important;
+}
+
+/*
+ * The row content is slotted into a `<bdi>` nested inside `.ui5-button-text`,
+ * so the host-level flex utilities never reach it and the trailing chevron
+ * wraps onto its own line. The wrapper is given `display: contents` so the
+ * `<bdi>` itself becomes the flex row that keeps the leading icon, the label
+ * block and the chevron on a single baseline.
+ */:host(.plib-tool-row) .ui5-button-text {
+  display: contents;
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+:host(.plib-tool-row) .ui5-button-text > bdi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------ */
+/* Object Page tab strip                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The floorplan tab strip is an underline tab bar, not a row of filled
+ * buttons. Stripping the button chrome and re-adding the bottom rule keeps the
+ * original Fiori look while the control stays a real `ui5-button`.
+ */
+:host(.plib-tab) {
+  display: inline-flex;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+}
+
+:host(.plib-tab) .ui5-button-root {
+  height: auto;
+  padding: 0.75rem 0;
+  gap: 0.375rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--sapContent_LabelColor, #64748b);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+:host(.plib-tab) .ui5-button-root:hover {
+  color: var(--sapTextColor, #1d2d3e);
+}
+
+:host(.plib-tab[data-selected='true']) .ui5-button-root {
+  border-bottom-color: var(--sap-brand, #0070f2);
+  color: var(--sap-brand, #0070f2);
+  font-weight: 600;
+}
+
+:host(.plib-tab) .ui5-button-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Quick-prompt chips                                                  */
+/* ------------------------------------------------------------------ */
+
+:host(.plib-chip) {
+  height: auto;
+  border-radius: 0.25rem;
+}
+
+:host(.plib-chip) .ui5-button-root {
+  height: auto;
+  min-height: 0;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--sap-border, #e2e8f0);
+  background-color: var(--sap-surface-secondary, #f1f5f9);
+  color: var(--sapTextColor, #1d2d3e);
+  font-size: 0.6875rem;
+  font-weight: 400;
+}
+
+:host(.plib-chip) .ui5-button-root:hover {
+  background-color: var(--sap-surface-hover, #e2e8f0);
+}
+
+/* ------------------------------------------------------------------ */
+/* Inline link-style buttons                                           */
+/* ------------------------------------------------------------------ */
+
+:host(.plib-link-button) {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+:host(.plib-link-button) .ui5-button-root {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  text-align: right;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--sap-brand, #0070f2);
+}
+
+:host(.plib-link-button) .ui5-button-root:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------------------ */
+/* Labels                                                              */
+/* ------------------------------------------------------------------ */
+
+/*
+ * `ui5-label` defaults to an inline, truncating box. The form layouts in this
+ * application stack a block label above its field, so the label must be able
+ * to occupy the full row and inherit the Tailwind typography on the host.
+ */
+:host(.plib-label),
+ui5-label.plib-label {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sapContent_LabelColor, #475569);
+}
+
+:host(.plib-label) .ui5-label-root {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  font-family: var(--sapFontFamily);
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+:host(.plib-label) .ui5-label-text-wrapper {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+/*
+ * The split variant spreads a leading caption and a trailing hint to opposite
+ * edges. The label's own children are slotted into `.ui5-label-text-wrapper`
+ * inside the shadow root, so the flex container has to be declared there —
+ * `display: flex` on the host would only lay out that single wrapper.
+ */
+:host(.plib-label--split) .ui5-label-root,
+:host(.plib-label--split) .ui5-label-text-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 /* ------------------------------------------------------------------ */
@@ -574,6 +981,39 @@ ui5-table-cell.plib-table-cell[_popin] {
 :host-context([data-sap-theme='sap_horizon_dark']) .ui5-block-layer,
 [data-sap-theme='sap_horizon_dark'] .ui5-block-layer {
   background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Object Page tab strip and quick-prompt chips in the dark theme. */
+:host-context([data-sap-theme='sap_horizon_dark']).plib-tab .ui5-button-root {
+  color: var(--sap-text-secondary, #9cb0c5);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']).plib-tab .ui5-button-root:hover {
+  color: var(--sap-text-primary, #f0f4f8);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']).plib-tab[data-selected='true'] .ui5-button-root {
+  border-bottom-color: var(--sap-brand, #4796ff);
+  color: var(--sap-brand, #4796ff);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']).plib-chip .ui5-button-root {
+  background-color: var(--sap-surface-secondary, #232c37);
+  border-color: var(--sap-border, #2e3b4a);
+  color: var(--sap-text-secondary, #cbd5e1);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']).plib-chip .ui5-button-root:hover {
+  background-color: var(--sap-surface-hover, #2c3846);
+  color: var(--sap-text-primary, #ffffff);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']).plib-tool-row .ui5-button-root {
+  color: var(--sap-text-primary, #f0f4f8);
+}
+
+:host-context([data-sap-theme='sap_horizon_dark']).plib-label {
+  color: var(--sap-text-secondary, #9cb0c5);
 }
 
 [data-sap-theme='sap_horizon_dark'] ::-webkit-scrollbar-track,

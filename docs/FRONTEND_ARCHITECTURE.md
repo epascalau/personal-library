@@ -10,7 +10,7 @@ This document is the authoritative technical reference for the **Personal Librar
 
 | Layer | Technology | Rationale |
 | :--- | :--- | :--- |
-| UI Component Library | `@ui5/webcomponents`, `-fiori`, `-icons`, `-base` v2.27 | Native `customElements` (Shadow DOM), zero framework runtime, SAP Fiori design language (List Report / Object Page floorplans) out of the box. |
+| UI Component Library | `@ui5/webcomponents`, `-fiori`, `-icons`, `-base` v2.27 | Native `customElements` (Shadow DOM), zero framework runtime, SAP Fiori controls composed into application-owned List Report and Object Page floorplans. |
 | Language | TypeScript 6.0 (strict, `isolatedModules`, `noEmit`) | Type-checked without a framework-specific compiler; `tsc --noEmit` is the lint gate (`npm run lint`). |
 | Build Tool | Vite 8 | Native ESM dev server, Rolldown-based production bundling, first-class TypeScript support with zero config transforms. |
 | CSS | Tailwind CSS 4 (`@tailwindcss/vite` plugin) | Utility-first styling layered on top of UI5's own component styling; JIT compiled directly inside Vite's pipeline — no separate PostCSS CLI step. |
@@ -54,7 +54,7 @@ src/main/frontend/
 │                             #   BackendSettingsModalView, DeleteConfirmDialogView, OpenApiModalView, BpmnModalView)
 │
 ├── ui5/                 # UI5 runtime bootstrap (NOT business logic)
-│   ├── bootstrap.ts        # Side-effect imports registering every UI5 custom element used by the app
+│   ├── bootstrap.ts        # Side-effect imports registering the UI5 custom elements used by the app
 │   ├── icons.ts            # Registers only the specific `@ui5/webcomponents-icons` glyphs actually used
 │   ├── globalStylesheet.ts # Injects the compiled Tailwind stylesheet into UI5's Shadow DOM boundary
 │   └── flags.ts            # Feature-flag constants
@@ -74,7 +74,7 @@ src/main/frontend/
 The app deliberately does **not** use React, Vue, or Angular. Three small primitives in `core/` reproduce just enough of a component model to build SAP Fiori floorplans on top of native UI5 Web Components:
 
 1. **`Component` (`core/component.ts`)** — a base class each view extends. It owns one light-DOM host element, renders by producing an HTML string from current state, and **re-renders wholesale** on every state change (the same mental model as a React `render()`, minus the virtual DOM diffing — UI5's own Shadow DOM custom elements handle their own internal reactivity). Two details make this viable for a real app:
-   - **`data-focus-key`**: elements carrying this attribute keep keyboard focus and text-selection range across a re-render (critical for the live filter bar and RAG chat input, which re-render on every keystroke).
+   - **`data-focus-key`**: UI5 input and textarea elements carrying this attribute keep keyboard focus and text-selection range across a re-render (critical for the live filter bar and RAG chat input, which re-render on every keystroke).
    - **`data-scroll-key`**: elements carrying this attribute keep their scroll offset across a re-render (the document table and chat transcript).
 2. **`Store<S>` (`core/store.ts`)** — a minimal observable state container (`getState()`, `setState(partial)`, `subscribe(listener)`). It replaces what used to be React `Context` + `useState` pairs. Each of the four stores in `stores/` is a `Store<S>` subclass with typed state and imperative mutation methods (no reducers/actions boilerplate).
 3. **`eventBus.ts`** — a typed pub/sub broker anchored to a **detached DOM `Comment` node** (`document.createComment('app-bus')`, never appended to `document.body`). This gives genuine `EventTarget` semantics (`dispatchEvent`/`addEventListener`) with zero risk of leaking events onto `window` or polluting the real DOM tree. See [docs/COMMUNICATION_ARCHITECTURE.md](COMMUNICATION_ARCHITECTURE.md) for the full ADR comparing this against WebSockets.

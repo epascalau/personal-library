@@ -87,14 +87,15 @@ export class FooterView extends Component {
         <span class="font-semibold text-gray-700 dark:text-gray-200">${t.footer.libraryTitle}</span>
         <span class="text-gray-400 dark:text-gray-500">• Educational Sandbox</span>
         <span class="text-gray-300 dark:text-gray-600">•</span>
-        <button
-          type="button"
+        <ui5-button
+          design="Transparent"
           data-action="toggle-theme"
-          class="text-[#0070f2] dark:text-[#4796ff] hover:underline cursor-pointer flex items-center gap-1 font-medium"
+          class="plib-button"
+          icon="${isDark ? 'dark-mode' : 'light-mode'}"
           title="Click to toggle light/dark theme"
         >
-          <span>${themeLabel}</span>
-        </button>
+          ${themeLabel}
+        </ui5-button>
         <span class="text-gray-300 dark:text-gray-600">•</span>
         <span class="font-mono text-[11px]"
           >${t.footer.backendLabel}: ${backendStore.config.name}</span

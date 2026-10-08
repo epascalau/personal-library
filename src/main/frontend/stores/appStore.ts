@@ -54,6 +54,8 @@ export interface AppState {
   deleting: boolean;
   openApiModalOpen: boolean;
   bpmnModalOpen: boolean;
+  /** Which panel the BPMN/mindmap viewer opens on; the ShellBar exposes two entry points into the same dialog. */
+  bpmnModalTab: 'mindmap' | 'diagram';
   backendSettingsOpen: boolean;
   systemLinksModalOpen: boolean;
   summarizingModel: SummaryModel | null;
@@ -139,6 +141,7 @@ class AppStore extends Store<AppState> {
       deleting: false,
       openApiModalOpen: false,
       bpmnModalOpen: false,
+      bpmnModalTab: 'mindmap',
       backendSettingsOpen: false,
       systemLinksModalOpen: false,
       summarizingModel: null,
@@ -485,12 +488,16 @@ class AppStore extends Store<AppState> {
   /**
    * Opens the interactive BPMN 2.0 process model viewer modal.
    *
-   * WHAT: Sets `bpmnModalOpen: true` in application state.
+   * WHAT: Sets `bpmnModalOpen: true` and selects the panel the viewer should open on.
    * WHY: Provides process engineers and architects with direct access to the BPMN 2.0 ingestion model,
-   * task delegates, diagram visualizer, and export download.
+   * task delegates, diagram visualizer, and export download. The ShellBar offers two entry points into
+   * this one dialog — "Full Capability Mindmap" and "BPMN 2.0 Workflow Model" — so the caller selects
+   * which panel is shown instead of both landing on the same default.
+   *
+   * @param tab Panel to activate on open; defaults to the mindmap overview.
    */
-  openBpmnModal(): void {
-    this.setState({ bpmnModalOpen: true });
+  openBpmnModal(tab: AppState['bpmnModalTab'] = 'mindmap'): void {
+    this.setState({ bpmnModalOpen: true, bpmnModalTab: tab });
   }
 
   /**

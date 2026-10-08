@@ -2440,7 +2440,9 @@ app.get(['/api/v1/diagrams/ontology.puml', '/system_ontology_diagram.puml'], (_r
  * WHY: Provides instant license auditing and legal compliance confirmation.
  */
 app.get('/LICENSE', (_req: Request, res: Response) => {
-  const licensePath = path.resolve(projectRoot, 'LICENSE');
+  const licensePath = fs.existsSync(path.resolve(projectRoot, 'LICENSE'))
+    ? path.resolve(projectRoot, 'LICENSE')
+    : path.resolve(projectRoot, 'dist/LICENSE');
   if (fs.existsSync(licensePath)) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     return res.sendFile(licensePath);

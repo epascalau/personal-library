@@ -5,10 +5,10 @@
  * Vanilla + UI5 replacement for `components/ListReport.tsx`.
  *
  * The SAP Fiori "List Report" floorplan is preserved 1:1: filter bar with
- * collapse + active-filter counter, sortable eight-column table, the three
+ * collapse + active-filter counter, sortable seven-column table, the three
  * error-recovery actions and the pagination bar. Native `<input>`/`<select>`
- * controls are replaced by `ui5-input` / `ui5-select`, and the hand-rolled
- * spinner by `ui5-busy-indicator`; all Tailwind layout classes are unchanged.
+ * controls are replaced by `ui5-input` / `ui5-select`, and the filter-bar
+ * toggle and field labels use their UI5 Web Component equivalents.
  */
 
 import { Component } from '../core/component';
@@ -281,17 +281,15 @@ export class ListReportView extends Component {
           </div>
 
           <div class="flex items-center gap-2">
-            <button
-              type="button"
+            <ui5-button
+              design="Transparent"
               data-action="toggle-filter-bar"
-              aria-expanded="${this.filterBarExpanded ? 'true' : 'false'}"
-              class="text-xs text-gray-500 hover:text-gray-800 flex items-center gap-1 px-2.5 py-1 rounded hover:bg-gray-200/60 transition-colors cursor-pointer"
+              class="plib-button"
+              icon="${this.filterBarExpanded ? 'slim-arrow-up' : 'slim-arrow-down'}"
+              accessible-name="${this.filterBarExpanded ? t.listReport.hideFilters : t.listReport.showFilters}"
             >
               ${this.filterBarExpanded ? t.listReport.hideFilters : t.listReport.showFilters}
-              ${icon(this.filterBarExpanded ? 'ChevronUp' : 'ChevronDown', {
-                className: 'w-3.5 h-3.5'
-              })}
-            </button>
+            </ui5-button>
           </div>
         </div>
 
@@ -306,8 +304,8 @@ export class ListReportView extends Component {
                   )}
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1"
-                      >${t.listReport.format}</label
+                    <ui5-label class="plib-label"
+                      >${t.listReport.format}</ui5-label
                     >
                     <ui5-select
                       class="plib-input w-full text-xs"
@@ -330,25 +328,22 @@ export class ListReportView extends Component {
                   </div>
 
                   <div>
-                    <label
-                      class="block text-xs font-semibold text-gray-600 mb-1 flex items-center justify-between"
-                    >
+                    <ui5-label class="plib-label plib-label--split">
                       <span class="flex items-center gap-1 text-[#0070f2]">
                         ${icon('Sparkles', { className: 'w-3.5 h-3.5' })}
                         ${t.listReport.contentKeywords}
                       </span>
                       <span class="text-[10px] text-gray-400">Qdrant Vector DB</span>
-                    </label>
+                    </ui5-label>
                     <ui5-input
                       class="plib-input plib-input--semantic w-full text-xs"
                       data-filter="content"
                       data-focus-key="filter-content"
-                      icon-name-placement="start"
                       placeholder="${t.listReport.contentPlaceholder}"
                       value="${filters.content}"
                       accessible-name="${t.listReport.contentKeywords}"
                     >
-                      ${icon('Search', { className: 'w-3.5 h-3.5 text-[#0070f2]' })}
+                      ${icon('Search', { slot: 'icon', className: 'w-3.5 h-3.5 text-[#0070f2]' })}
                     </ui5-input>
                   </div>
                 </div>
@@ -385,7 +380,9 @@ export class ListReportView extends Component {
   private textFilterField(spec: TextFilterSpec, value: string): string {
     return html`
       <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1">${spec.label}</label>
+        <ui5-label class="plib-label"
+          >${spec.label}</ui5-label
+        >
         <ui5-input
           class="plib-input w-full text-xs"
           data-filter="${spec.key}"
@@ -654,7 +651,7 @@ export class ListReportView extends Component {
   private documentRow(doc: DocumentRecord): string {
     const t = i18nStore.state.t;
     return html`
-      <ui5-table-row row-key="${doc.guid}" data-guid="${doc.guid}" interactive>
+      <ui5-table-row class="plib-table-row" row-key="${doc.guid}" data-guid="${doc.guid}" interactive>
         <ui5-table-row-action
           slot="actions"
           icon="delete"

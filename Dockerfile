@@ -104,6 +104,8 @@ RUN npm ci --omit=dev
 
 # Copy Frontend artifacts
 COPY --from=frontend-builder /app/dist ./dist
+# Keep the repository license available to the runtime license endpoint.
+COPY LICENSE ./LICENSE
 
 # Copy Spring Boot Backend JAR
 COPY --from=backend-builder /app/target/*.jar ./app.jar
@@ -111,6 +113,11 @@ COPY --from=backend-builder /app/target/*.jar ./app.jar
 COPY src/main/server ./src/main/server
 COPY tsconfig.json ./
 COPY openapi.yaml ./
+# Static assets streamed by the gateway: the architecture/mindmap diagram set
+# (/api/v1/diagrams/*), the presentation decks, and the BPMN 2.0 process model
+# (/api/v1/bpmn/*). Without these the routes resolve but 404 on the filesystem.
+COPY docs ./docs
+COPY src/main/resources/bpmn ./src/main/resources/bpmn
 COPY docker-entrypoint.sh ./
 
 # Source snapshot served by /export.zip (built in the frontend-builder stage).

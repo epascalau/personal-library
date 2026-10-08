@@ -30,3 +30,5 @@ spring:
 app:
   storage:
     upload-dir: /app/storage/documents
+  openapi:
+    spec-path: /app/openapi.yaml

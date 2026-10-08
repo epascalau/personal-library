@@ -75,6 +75,9 @@ export class BpmnModalView extends DialogView {
         appStore,
         (state) => state.bpmnModalOpen,
         (open) => {
+          if (open) {
+            this.activeTab = appStore.state.bpmnModalTab;
+          }
           this.requestRender();
           if (open) {
             void this.loadBpmnXml();
@@ -153,32 +156,45 @@ export class BpmnModalView extends DialogView {
   }
 
   /**
-   * Renders the header title and metadata badges.
+   * Renders the header title, metadata badges and the dismiss control.
    *
-   * WHAT: Emits modal title, subtitle, and Camunda 7 / Camunda 8 compatibility tags.
-   * WHY: Frames the dialog with enterprise architectural context and standards compliance.
+   * WHAT: Emits modal title, subtitle, Camunda 7 / Camunda 8 compatibility tags and the close button.
+   * WHY: Frames the dialog with enterprise architectural context and standards compliance, and gives
+   *      the user an explicit dismiss affordance alongside Escape and backdrop clicks.
    *
    * @returns RawHtml header block.
    */
   protected header(): RawHtml {
     return html`
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-teal-600 dark:bg-teal-500 flex items-center justify-center text-white shrink-0 shadow-xs">
-          ${icon('GitBranch', { className: 'w-5 h-5' })}
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">
-              Camunda BPMN 2.0 Process Model
-            </h2>
-            <span class="px-2 py-0.5 text-[10px] font-semibold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 rounded border border-teal-200 dark:border-teal-800/60 font-mono">
-              Process_DocumentIngestionRAG
-            </span>
+      <div
+        class="flex items-center justify-between gap-3 px-4 py-3 bg-white dark:bg-[#1c232b] border-b border-gray-200 dark:border-[#2e3b4a] shrink-0"
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-teal-600 dark:bg-teal-500 flex items-center justify-center text-white shrink-0 shadow-xs">
+            ${icon('GitBranch', { className: 'w-5 h-5' })}
           </div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Enterprise Document Ingestion, Parallel Dual AI Summarization & Qdrant RAG Orchestration
-          </p>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-gray-900 dark:text-white">
+                Camunda BPMN 2.0 Process Model
+              </h2>
+              <span class="px-2 py-0.5 text-[10px] font-semibold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 rounded border border-teal-200 dark:border-teal-800/60 font-mono">
+                Process_DocumentIngestionRAG
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              Enterprise Document Ingestion, Parallel Dual AI Summarization & Qdrant RAG Orchestration
+            </p>
+          </div>
         </div>
+
+        <ui5-button
+          class="plib-button plib-button--icon ml-1"
+          design="Transparent"
+          data-action="close"
+          icon="decline"
+          accessible-name="Close"
+        ></ui5-button>
       </div>
     `;
   }
@@ -194,54 +210,45 @@ export class BpmnModalView extends DialogView {
   protected body(): RawHtml {
     return html`
       <div class="flex flex-col h-[75vh] max-h-[820px] text-xs">
+        ${this.header()}
         <!-- Top Toolbar & Tabs -->
         <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-gray-50 dark:bg-[#202934] border-b border-gray-200 dark:border-[#2e3b4a] shrink-0">
           <div class="flex flex-wrap items-center gap-1 bg-white dark:bg-[#182029] p-1 rounded-lg border border-gray-200 dark:border-[#2e3b4a]">
-            <button
-              type="button"
+            <ui5-button
+              design="${this.activeTab === 'mindmap' ? 'Emphasized' : 'Transparent'}"
               data-action="tab-mindmap"
-              class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'mindmap'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
+              class="plib-button"
             >
               🧠 Full Functionality Mindmap
-            </button>
-            <button
-              type="button"
+            </ui5-button>
+            <ui5-button
+              design="${this.activeTab === 'diagram' ? 'Emphasized' : 'Transparent'}"
               data-action="tab-diagram"
-              class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'diagram'
-                ? 'bg-teal-600 text-white shadow-xs'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
+              class="plib-button"
             >
               BPMN Diagram
-            </button>
-            <button
-              type="button"
+            </ui5-button>
+            <ui5-button
+              design="${this.activeTab === 'pipeline' ? 'Emphasized' : 'Transparent'}"
               data-action="tab-pipeline"
-              class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'pipeline'
-                ? 'bg-teal-600 text-white shadow-xs'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
+              class="plib-button"
             >
               Task Breakdown
-            </button>
-            <button
-              type="button"
+            </ui5-button>
+            <ui5-button
+              design="${this.activeTab === 'xml' ? 'Emphasized' : 'Transparent'}"
               data-action="tab-xml"
-              class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'xml'
-                ? 'bg-teal-600 text-white shadow-xs'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
+              class="plib-button"
             >
               BPMN 2.0 XML
-            </button>
-            <button
-              type="button"
+            </ui5-button>
+            <ui5-button
+              design="${this.activeTab === 'deployment' ? 'Emphasized' : 'Transparent'}"
               data-action="tab-deployment"
-              class="px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${this.activeTab === 'deployment'
-                ? 'bg-teal-600 text-white shadow-xs'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#263342]'}"
+              class="plib-button"
             >
               Camunda Guide
-            </button>
+            </ui5-button>
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5">

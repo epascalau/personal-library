@@ -6,6 +6,7 @@
   --sap-bg: #f5f6f8;
   --sap-shell-bg: #354a5f;
   --sap-shell-text: #ffffff;
+  --sap-shell-subtle: #b0c4de;
   --sap-surface: #ffffff;
   --sap-surface-secondary: #f8fafc;
   --sap-surface-hover: #f1f5f9;
@@ -27,6 +28,7 @@
   --sap-bg: #12171c;
   --sap-shell-bg: #161f28;
   --sap-shell-text: #f0f4f8;
+  --sap-shell-subtle: #8ba2be;
   --sap-surface: #1c232b;
   --sap-surface-secondary: #232c37;
   --sap-surface-hover: #293543;

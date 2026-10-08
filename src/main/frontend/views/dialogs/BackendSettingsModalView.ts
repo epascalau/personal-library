@@ -432,9 +432,9 @@ export class BackendSettingsModalView extends DialogView {
           </div>
 
           <div class="space-y-3">
-            <label class="block font-semibold text-gray-800 dark:text-gray-200 text-xs">
+            <ui5-label class="plib-label block font-semibold text-gray-800 dark:text-gray-200 text-xs">
               Select Target Backend Engine:
-            </label>
+            </ui5-label>
             <!--
               Each card below is one ENGINE_OPTIONS entry. Clicking a card with a
               preset snaps all four draft fields (URL/name/token/timeout) to
@@ -457,7 +457,7 @@ export class BackendSettingsModalView extends DialogView {
                   URL to reach a different host (Spring Boot direct, a remote cluster, etc.).
                   Disabled for the Mock engine since it never issues a network request.
                 -->
-                <label class="block text-gray-600 dark:text-gray-300 font-semibold mb-1">Backend Base URL</label>
+                <ui5-label class="plib-label block text-gray-600 dark:text-gray-300 font-semibold mb-1">Backend Base URL</ui5-label>
                 <ui5-input
                   class="plib-input w-full font-mono text-xs"
                   data-field="customUrl"
@@ -475,7 +475,7 @@ export class BackendSettingsModalView extends DialogView {
                   dialog's footer and in the ShellBar once applied. Does not affect
                   routing or authentication in any way.
                 -->
-                <label class="block text-gray-600 dark:text-gray-300 font-semibold mb-1">Display Label</label>
+                <ui5-label class="plib-label block text-gray-600 dark:text-gray-300 font-semibold mb-1">Display Label</ui5-label>
                 <ui5-input
                   class="plib-input w-full text-xs"
                   data-field="customName"
@@ -496,9 +496,9 @@ export class BackendSettingsModalView extends DialogView {
                   Keycloak OIDC instead, so this is typically left blank for them.
                   Disabled for the Mock engine (no network calls to authenticate).
                 -->
-                <label class="block text-gray-600 dark:text-gray-300 font-semibold mb-1"
+                <ui5-label class="plib-label block text-gray-600 dark:text-gray-300 font-semibold mb-1"
                   >API Key / Token (Optional)</label
-                >
+                ></ui5-label>
                 <div class="relative">
                   <ui5-input
                     class="plib-input w-full font-mono text-xs"
@@ -527,7 +527,7 @@ export class BackendSettingsModalView extends DialogView {
                   you see client-side timeout errors on a slower machine or larger
                   documents; lowering it risks aborting a request that was still working.
                 -->
-                <label class="block text-gray-600 dark:text-gray-300 font-semibold mb-1">Request Timeout (ms)</label>
+                <ui5-label class="plib-label block text-gray-600 dark:text-gray-300 font-semibold mb-1">Request Timeout (ms)</ui5-label>
                 <ui5-input
                   class="plib-input w-full text-xs"
                   data-field="customTimeout"

@@ -266,16 +266,14 @@ export class ObjectPageView extends Component {
         <div
           class="px-6 py-3.5 border-b border-gray-100 dark:border-[#2e3b4a] flex flex-wrap items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#232c37]"
         >
-          <button
-            type="button"
+          <ui5-button
+            design="Transparent"
             data-action="back"
-            class="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2 rounded-md text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-[#0070f2] dark:hover:text-[#4796ff] hover:bg-white dark:hover:bg-[#1a222c] border border-transparent hover:border-gray-200/80 dark:hover:border-[#38495f] hover:shadow-2xs active:scale-[0.98] transition-all duration-150 group cursor-pointer"
+            class="plib-button"
+            icon="nav-back"
           >
-            ${icon('NavBack', {
-              className: 'w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-[#0070f2] dark:group-hover:text-[#4796ff] group-hover:-translate-x-0.5 transition-all duration-150'
-            })}
-            <span>${t.objectPage.backToLibrary}</span>
-          </button>
+            ${t.objectPage.backToLibrary}
+          </ui5-button>
 
           <div class="flex items-center gap-2">
             <ui5-button
@@ -361,13 +359,13 @@ export class ObjectPageView extends Component {
                   </div>`
                 : ''}
               ${doc.versionHistory && doc.versionHistory.length > 0
-                ? html`<button
-                    type="button"
+                ? html`<ui5-button
+                    design="Transparent"
                     data-tab="history"
-                    class="mt-1 pt-1 border-t border-gray-200 dark:border-[#2e3b4a] text-[10px] text-[#0070f2] dark:text-[#4796ff] font-semibold hover:underline block text-right w-full cursor-pointer"
+                    class="plib-link-button mt-1 pt-1 border-t border-gray-200 dark:border-[#2e3b4a] block text-right w-full"
                   >
                     ${doc.versionHistory.length} historical snapshot${doc.versionHistory.length === 1 ? '' : 's'} available →
-                  </button>`
+                  </ui5-button>`
                 : ''}
             </div>
           </div>
@@ -406,20 +404,15 @@ export class ObjectPageView extends Component {
               { id: 'history' as const, label: 'Version History & Rollback', iconKey: 'History' as const, iconClass: 'w-3.5 h-3.5 text-rose-500' }
             ]
               .map((tab) =>
-                html`<button
-                  type="button"
-                  role="tab"
+                html`<ui5-button
+                  design="Transparent"
                   data-tab="${tab.id}"
+                  class="plib-tab"
                   aria-selected="${this.activeTab === tab.id ? 'true' : 'false'}"
-                  class="${cx(
-                    'py-3 border-b-2 flex items-center gap-1.5 cursor-pointer transition-colors',
-                    this.activeTab === tab.id
-                      ? 'border-[#0070f2] text-[#0070f2] dark:text-[#4796ff]'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-                  )}"
+                  data-selected="${this.activeTab === tab.id ? 'true' : 'false'}"
                 >
                   ${icon(tab.iconKey, { className: tab.iconClass })} ${tab.label}
-                </button>`.toString()
+                </ui5-button>`.toString()
               )
               .join('')
           )}
@@ -822,13 +815,13 @@ export class ObjectPageView extends Component {
           ${raw(
             prompts
               .map((prompt) =>
-                html`<button
-                  type="button"
+                html`<ui5-button
+                  design="Transparent"
                   data-prompt="${prompt}"
-                  class="px-2.5 py-1 rounded bg-[#f1f5f9] dark:bg-[#232c37] hover:bg-[#e2e8f0] dark:hover:bg-[#2b3746] text-gray-700 dark:text-gray-200 text-[11px] transition-colors cursor-pointer border border-gray-200 dark:border-[#38495f]"
+                  class="plib-chip"
                 >
                   ${prompt}
-                </button>`.toString()
+                </ui5-button>`.toString()
               )
               .join('')
           )}
@@ -1041,55 +1034,51 @@ export class ObjectPageView extends Component {
                 </div>
               `
             : html`
-                <div class="overflow-x-auto">
-                  <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr class="border-b border-gray-200 dark:border-[#2e3b4a] bg-gray-50 dark:bg-[#232c37] text-gray-600 dark:text-gray-300 font-semibold">
-                        <th class="py-2.5 px-3">Revision</th>
-                        <th class="py-2.5 px-3">Archived Date</th>
-                        <th class="py-2.5 px-3">File Asset</th>
-                        <th class="py-2.5 px-3">Bibliographic Metadata</th>
-                        <th class="py-2.5 px-3">AI Summaries</th>
-                        <th class="py-2.5 px-3 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-[#2e3b4a]">
-                      ${raw(
-                        snapshots
-                          .map(
-                            (s) => html`
-                              <tr class="hover:bg-gray-50/60 dark:hover:bg-[#232c37]/60 transition-colors">
-                                <td class="py-3 px-3 align-top font-mono">
+                <ui5-table class="plib-table" overflow-mode="Popin">
+                  <ui5-table-header-row slot="headerRow" sticky>
+                    <ui5-table-header-cell>Revision</ui5-table-header-cell>
+                    <ui5-table-header-cell>Archived Date</ui5-table-header-cell>
+                    <ui5-table-header-cell>File Asset</ui5-table-header-cell>
+                    <ui5-table-header-cell>Bibliographic Metadata</ui5-table-header-cell>
+                    <ui5-table-header-cell>AI Summaries</ui5-table-header-cell>
+                    <ui5-table-header-cell>Actions</ui5-table-header-cell>
+                  </ui5-table-header-row>
+                  ${raw(
+                    snapshots
+                      .map(
+                        (s) => html`
+                              <ui5-table-row>
+                                <ui5-table-cell class="font-mono">
                                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-bold text-xs bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
                                     v${s.versionNumber}
                                   </span>
                                   <div class="text-[10px] text-gray-400 mt-1 truncate max-w-[90px]" title="${s.snapshotGuid}">
                                     ${s.snapshotGuid.slice(0, 14)}...
                                   </div>
-                                </td>
-                                <td class="py-3 px-3 align-top text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                </ui5-table-cell>
+                                <ui5-table-cell class="text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                   <div>${formatDateTime(s.savedAt)}</div>
                                   <div class="text-[10px] text-gray-400 mt-0.5 italic max-w-[150px] truncate" title="${s.note || 'Prior revision snapshot'}">
                                     ${s.note || 'Prior revision snapshot'}
                                   </div>
-                                </td>
-                                <td class="py-3 px-3 align-top">
+                                </ui5-table-cell>
+                                <ui5-table-cell>
                                   <div class="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[180px]" title="${s.fileName}">
                                     ${s.fileName}
                                   </div>
                                   <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                                     ${s.fileSizeFormatted} • <span class="uppercase font-mono">${s.format}</span>
                                   </div>
-                                </td>
-                                <td class="py-3 px-3 align-top max-w-[220px]">
+                                </ui5-table-cell>
+                                <ui5-table-cell class="max-w-[220px]">
                                   <div class="font-medium text-gray-800 dark:text-gray-200 truncate" title="${s.bibtex.title || 'Untitled'}">
                                     ${s.bibtex.title || 'Untitled'}
                                   </div>
                                   <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
                                     ${s.bibtex.author || '—'} ${s.bibtex.year ? `(${s.bibtex.year})` : ''}
                                   </div>
-                                </td>
-                                <td class="py-3 px-3 align-top whitespace-nowrap">
+                                </ui5-table-cell>
+                                <ui5-table-cell class="whitespace-nowrap">
                                   <div class="flex flex-col gap-1 text-[10px]">
                                     <span class="inline-flex items-center gap-1 ${s.summaries?.llama ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-gray-400'}">
                                       ${icon('Sparkles', { className: 'w-3 h-3' })} Llama 3.3 ${s.summaries?.llama ? '✓' : '—'}
@@ -1098,11 +1087,11 @@ export class ObjectPageView extends Component {
                                       ${icon('Sparkles', { className: 'w-3 h-3' })} Mistral Large ${s.summaries?.mistral ? '✓' : '—'}
                                     </span>
                                   </div>
-                                </td>
-                                <td class="py-3 px-3 align-top text-right whitespace-nowrap">
+                                </ui5-table-cell>
+                                <ui5-table-cell class="text-right whitespace-nowrap">
                                   <div class="flex items-center justify-end gap-1.5">
                                     <a
-                                      href="/api/v1/documents/${doc.guid}/versions/${s.versionNumber}/download"
+                                      href="${backendStore.adapter.getHistoricalDownloadUrl(doc.guid, s.versionNumber)}"
                                       class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-[#2e3b4a] hover:bg-gray-200 dark:hover:bg-[#38495f] text-gray-700 dark:text-gray-200 transition-colors border border-gray-200 dark:border-[#38495f]"
                                       title="Download historical asset for version ${s.versionNumber}"
                                     >
@@ -1119,15 +1108,13 @@ export class ObjectPageView extends Component {
                                       Rollback
                                     </ui5-button>
                                   </div>
-                                </td>
-                              </tr>
+                                </ui5-table-cell>
+                              </ui5-table-row>
                             `.toString()
                           )
                           .join('')
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                  )}
+                </ui5-table>
               `}
         </div>
       </div>

@@ -17,6 +17,7 @@ import { icon } from '../../ui5/icons';
 import { DialogView } from './DialogView';
 import type { BibTeXMetadata } from '../../types';
 import type Input from '@ui5/webcomponents/dist/Input.js';
+import type FileUploader from '@ui5/webcomponents/dist/FileUploader.js';
 
 const ACCEPTED_FILES = '.pdf,.docx,.doc,.md,.txt,.xls,.xlsx,.ppt,.pptx';
 
@@ -205,9 +206,9 @@ export class VersionOverwriteDialogView extends DialogView {
             : ''}
 
           <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-200 mb-1.5 text-xs">
+            <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-200 mb-1.5 text-xs">
               Select Replacement File (Optional if only modifying metadata)
-            </label>
+            </ui5-label>
             <div
               data-action="pick-file"
               role="button"
@@ -219,13 +220,13 @@ export class VersionOverwriteDialogView extends DialogView {
                   : 'border-gray-300 dark:border-[#38495f] hover:border-[#0070f2] dark:hover:border-[#4796ff] bg-[#f8fafc] dark:bg-[#232c37] hover:bg-[#f0f9ff]/50 dark:hover:bg-[#283442]'
               )}"
             >
-              <input
-                type="file"
+              <ui5-file-uploader
                 data-input="file"
                 accept="${ACCEPTED_FILES}"
+                hide-input
                 class="hidden"
                 ${this.submitting ? raw('disabled') : ''}
-              />
+              ></ui5-file-uploader>
               ${this.selectedFile
                 ? html`<div class="flex items-center justify-center gap-2.5 text-emerald-800 dark:text-emerald-200">
                     ${icon('FileCheck', { className: 'w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0' })}
@@ -306,7 +307,7 @@ export class VersionOverwriteDialogView extends DialogView {
   ): string {
     return html`
       <div>
-        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1 text-xs">${label}</label>
+        <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-300 mb-1 text-xs">${label}</ui5-label>
         <ui5-input
           class="plib-input w-full text-xs"
           data-bibtex="${String(key)}"
@@ -328,13 +329,13 @@ export class VersionOverwriteDialogView extends DialogView {
   protected bind(): void {
     this.on('[data-action="pick-file"]', 'click', () => {
       if (!this.submitting) {
-        this.$<HTMLInputElement>('input[data-input="file"]')?.click();
+        this.$<FileUploader>('ui5-file-uploader[data-input="file"]')?.click();
       }
     });
 
-    this.on('input[data-input="file"]', 'change', (event) => {
+    this.on('ui5-file-uploader[data-input="file"]', 'change', (event) => {
       event.stopPropagation();
-      this.handleFileChange(event.currentTarget as HTMLInputElement);
+      this.handleFileChange(event.currentTarget as FileUploader);
     });
 
     this.onAll('ui5-input[data-bibtex]', 'input', (event) => {
@@ -354,7 +355,7 @@ export class VersionOverwriteDialogView extends DialogView {
    *
    * @param input HTML file input element.
    */
-  private handleFileChange(input: HTMLInputElement): void {
+  private handleFileChange(input: FileUploader): void {
     const file = input.files?.[0];
     if (!file) {
       return;

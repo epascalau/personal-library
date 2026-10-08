@@ -60,6 +60,10 @@ app:
   models:
     llama: ${OLLAMA_LLAMA_MODEL:llama3.2}
     mistral: ${OLLAMA_MISTRAL_MODEL:mistral}
+  openapi:
+    # Contract-first specification served at /api/v1/openapi.yaml, resolved
+    # against the application working directory.
+    spec-path: ${OPENAPI_SPEC_PATH:./openapi.yaml}
 
 # SpringDoc OpenAPI Documentation
 springdoc:

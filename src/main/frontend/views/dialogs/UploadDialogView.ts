@@ -20,6 +20,7 @@ import type { BibTeXMetadata, BibTeXType } from '../../types';
 import type Input from '@ui5/webcomponents/dist/Input.js';
 import type Select from '@ui5/webcomponents/dist/Select.js';
 import type TextArea from '@ui5/webcomponents/dist/TextArea.js';
+import type FileUploader from '@ui5/webcomponents/dist/FileUploader.js';
 
 const ALLOWED_EXTENSIONS = ['pdf', 'docx', 'doc', 'md', 'txt', 'xls', 'xlsx', 'ppt', 'pptx'];
 const ACCEPT_ATTRIBUTE = '.pdf,.docx,.doc,.md,.txt,.xls,.xlsx,.ppt,.pptx';
@@ -252,7 +253,7 @@ export class UploadDialogView extends DialogView {
   private fileDropZone(dragDropLabel: string, supportedFormats: string): RawHtml {
     return html`
       <div>
-        <label class="block font-semibold text-gray-700 dark:text-gray-200 mb-1.5">${dragDropLabel}</label>
+        <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-200 mb-1.5">${dragDropLabel}</ui5-label>
         <div
           data-action="pick-file"
           role="button"
@@ -264,13 +265,13 @@ export class UploadDialogView extends DialogView {
               : 'border-gray-300 dark:border-[#38495f] hover:border-[#0070f2] dark:hover:border-[#4796ff] bg-[#f8fafc] dark:bg-[#232c37] hover:bg-[#f0f9ff]/50 dark:hover:bg-[#283442]'
           )}"
         >
-          <input
-            type="file"
+          <ui5-file-uploader
             data-input="file"
             accept="${ACCEPT_ATTRIBUTE}"
+            hide-input
             class="hidden"
             ${this.submitting ? raw('disabled') : ''}
-          />
+          ></ui5-file-uploader>
           ${this.selectedFile
             ? html`<div class="flex items-center justify-center gap-3 text-emerald-800 dark:text-emerald-200">
                 ${icon('FileCheck', { className: 'w-8 h-8 text-emerald-600 dark:text-emerald-400 shrink-0' })}
@@ -315,14 +316,14 @@ export class UploadDialogView extends DialogView {
             year, journal, citation key)...
           </span>
         </div>
-        <button
-          type="button"
+        <ui5-button
+          design="Transparent"
           data-action="skip-extraction"
-          class="text-[11px] font-semibold text-[#0070f2] dark:text-[#38bdf8] hover:text-[#0854a0] hover:bg-blue-100/60 dark:hover:bg-blue-900/60 px-2.5 py-1 rounded bg-white dark:bg-[#1c232b] border border-[#bfdbfe] dark:border-blue-800 transition cursor-pointer shrink-0 shadow-2xs"
+          class="plib-button shrink-0"
           title="Skip automated extraction and proceed with manual entry"
         >
           Skip &amp; Fill Manually
-        </button>
+        </ui5-button>
       </div>
     `;
   }
@@ -352,9 +353,9 @@ export class UploadDialogView extends DialogView {
         </div>
 
         <div class="bg-[#f8fafc] dark:bg-[#232c37] p-3.5 rounded-lg border border-gray-200 dark:border-[#2e3b4a]">
-          <label class="block font-semibold text-gray-700 dark:text-gray-200 mb-1.5 text-xs">
+          <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-200 mb-1.5 text-xs">
             BibTeX Publication Type (@type)
-          </label>
+          </ui5-label>
           <ui5-select
             class="plib-input w-full font-mono text-xs"
             data-action="entry-type"
@@ -423,7 +424,7 @@ export class UploadDialogView extends DialogView {
         )}
 
         <div>
-          <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Abstract</label>
+          <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-300 mb-1">Abstract</ui5-label>
           <ui5-textarea
             class="plib-input w-full text-xs"
             data-bibtex="abstract"
@@ -570,9 +571,9 @@ export class UploadDialogView extends DialogView {
     } = {}
   ): string {
     const control = html`
-      <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1 text-xs">
+      <ui5-label class="plib-label block font-semibold text-gray-700 dark:text-gray-300 mb-1 text-xs">
         ${label}${options.required ? html`<span class="text-red-500"> *</span>` : ''}
-      </label>
+      </ui5-label>
       <ui5-input
         class="${cx('plib-input w-full text-xs', options.inputClass)}"
         data-bibtex="${String(key)}"
@@ -699,13 +700,13 @@ export class UploadDialogView extends DialogView {
   protected bind(): void {
     this.on('[data-action="pick-file"]', 'click', () => {
       if (!this.submitting) {
-        this.$<HTMLInputElement>('input[data-input="file"]')?.click();
+        this.$<FileUploader>('ui5-file-uploader[data-input="file"]')?.click();
       }
     });
 
-    this.on('input[data-input="file"]', 'change', (event) => {
+    this.on('ui5-file-uploader[data-input="file"]', 'change', (event) => {
       event.stopPropagation();
-      void this.handleFileSelect(event.currentTarget as HTMLInputElement);
+      void this.handleFileSelect(event.currentTarget as FileUploader);
     });
 
     this.on('[data-action="skip-extraction"]', 'click', () => this.skipExtraction());
@@ -810,7 +811,7 @@ export class UploadDialogView extends DialogView {
    *
    * @param input File input element.
    */
-  private async handleFileSelect(input: HTMLInputElement): Promise<void> {
+  private async handleFileSelect(input: FileUploader): Promise<void> {
     const file = input.files?.[0];
     if (!file) {
       return;

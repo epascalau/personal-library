@@ -79,7 +79,7 @@ The system operates across a C4 container deployment topology:
 
 ## 3. Strict Non-Negotiable Implementation Constraints
 
-1. **Pure Vanilla TypeScript & UI5 Web Components**: No React, Vue, Angular, or external UI widget libraries. All views must inherit from `Component<P>` or declare pure DOM nodes.
+1. **Pure Vanilla TypeScript & UI5 Web Components**: No React, Vue, Angular, or external UI widget libraries. All views must inherit from `Component<P>` and compose official UI5 Web Components with semantic HTML layout/content elements.
 2. **Directory Isolation**: All frontend source files reside under `src/main/frontend/`. Java backend code resides under `src/main/java/com/personallibrary/`. Gateway server resides in `src/main/server/server.ts` (bootloaded by root `server.ts`).
 3. **Decoupled Gateway Pattern**: Views MUST NOT execute direct `fetch` or HTTP REST calls. All data mutations and queries must route through `BackendGateway.dispatch()` via strongly typed event contracts.
 4. **UI5 Shadow DOM Style Injection**: All global styling and Tailwind utilities must be injected into UI5 Web Component Shadow DOM roots using `applyGlobalStylesheetPatch` in `src/main/frontend/ui5/globalStylesheet.ts`.
@@ -262,11 +262,9 @@ personal-library/
 ### 5.3 SAP Fiori Views & Floorplans (`views/`)
 
 #### 1. `ShellBarView.ts`
-- **Pattern**: SAP Fiori ShellBar header.
+- **Pattern**: Official SAP UI5 `<ui5-shellbar>` with a UI5 popover for profile and enterprise tools.
 - **Features**:
   - Brand identity: Logo, title *"Personal Library"*.
-  - Global Search Field with instant filtering.
-  - Backend Mode Badge showing connected status (`Integrated REST` vs `Mock Browser`).
   - Integrated `LanguageSelectorView` slot.
   - User Avatar Popover:
     - User name and assigned Keycloak roles (`LIBRARY_ADMIN`, `CHIEF_RESEARCHER`).
@@ -275,37 +273,30 @@ personal-library/
     - Sign-out button triggering Keycloak OIDC end-session flow.
 
 #### 2. `ListReportView.ts`
-- **Pattern**: SAP Fiori Analytical List Report Floorplan.
+- **Pattern**: Application-owned SAP Fiori List Report floorplan composed from UI5 Web Components.
 - **Features**:
-  - **FilterBar**: Collapsible toolbar with inputs for Title, Author, File Format (`PDF`, `DOCX`, `TXT`, `MD`, `PPTX`), Date From/To, and Tags.
-  - **Action Toolbar**: Ingest Document button, Refresh button, Clear Filters button, and document counter KPI.
-  - **Data Table**: UI5 `<ui5-table>` or customized high-density table featuring:
-    - Sortable columns: Title, Author, File Format, Size, Version, Updated Date.
-    - Badges: Format badges with color codes, version tags (`v1.0`, `v2.1`).
+  - **FilterBar**: Collapsible UI5 filter area with text inputs for file name, title, author, edition, and content keywords, plus a UI5 format select.
+  - **Actions**: UI5 upload, reset, apply, retry, backend-switch, and pagination buttons.
+  - **Data Table**: Official UI5 `<ui5-table>` with sortable columns for file name, title, author, edition, format, size, and upload date.
+    - Badges: Format badges with color codes.
     - Navigation: Clicking a row selects the document and navigates to the Object Page.
 
 #### 3. `ObjectPageView.ts`
-- **Pattern**: SAP Fiori Adaptive Object Page Floorplan.
+- **Pattern**: Application-owned SAP Fiori Object Page floorplan composed from UI5 Web Components.
 - **Features**:
   - **Header Area**: Breadcrumb back-link to List Report, title, subtitle, author, and primary action buttons (Edit Metadata, In-Place Version Overwrite, Export BibTeX, Delete).
   - **KPI Facets**: Metrics for Document Version, Chunk Count, File Size, and Ingestion Date.
   - **Tab 1: Overview & BibTeX**:
-    - Metadata summary table (Journal, Volume, Number, Pages, Publisher, Year, DOI, ISBN, ISSN).
-    - Interactive BibTeX Citation Editor with copy button and formatting options.
-  - **Tab 2: Document Content**:
-    - Raw text viewer with search within document, scrollable preview, and format indicators.
-  - **Tab 3: Dual AI Summaries**:
+    - Metadata summary and formatted BibTeX entry with a UI5 copy button.
+  - **Tab 2: Dual AI Summaries**:
     - Two parallel panels comparing **Llama 3.3 (70B Instruct)** and **Mistral Large (2411)**.
     - Status indicators (`Ready`, `Generating...`, `Error`).
-    - Metric chips displaying generation latency in milliseconds, prompt tokens, and completion tokens.
-  - **Tab 4: Conversational RAG Chat**:
+  - **Tab 3: Conversational RAG Chat**:
     - Interactive conversation history with user questions and assistant answers.
     - Grounding citations displaying matched chunk extracts, similarity percentage, page numbers, and chunk IDs.
     - Input box with submit action and suggested starter questions.
-  - **Tab 5: Version History & Lineage**:
-    - Chronological timeline of all document versions.
-    - Mutation details (Timestamp, modified by user, change description, file hash).
-    - One-click non-destructive rollback button restoring historical state into a new version.
+  - **Tab 4: Version History & Lineage**:
+    - UI5 table of archived versions with file, metadata, summary status, download, and rollback actions.
 
 ---
 

@@ -156,9 +156,9 @@ export class AuthModalView extends DialogView {
           : ''}
 
         <div class="space-y-1.5">
-          <label class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+          <ui5-label class="plib-label block text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
             Quick Connect Profiles
-          </label>
+          </ui5-label>
           <div class="grid grid-cols-2 gap-2">
             ${raw(QUICK_PROFILES.map((profile) => this.quickProfileButton(profile)).join(''))}
           </div>
@@ -219,11 +219,11 @@ export class AuthModalView extends DialogView {
   private quickProfileButton(profile: QuickProfile): string {
     const active = this.username.includes(profile.match);
     return html`
-      <button
-        type="button"
+      <ui5-button
+        design="Transparent"
         data-quick-profile="${profile.email}"
         class="${cx(
-          'p-2 rounded border text-left transition-colors cursor-pointer',
+          'plib-button p-2 rounded border text-left transition-colors cursor-pointer',
           active
             ? 'border-[#0070f2] bg-blue-50/70 text-[#0070f2]'
             : 'border-gray-200 hover:border-gray-300 text-gray-700 bg-gray-50'
@@ -231,7 +231,7 @@ export class AuthModalView extends DialogView {
       >
         <div class="font-semibold text-xs truncate">${profile.name}</div>
         <div class="text-[10px] text-gray-500 truncate">${profile.subtitle}</div>
-      </button>
+      </ui5-button>
     `.toString();
   }
 
@@ -256,7 +256,7 @@ export class AuthModalView extends DialogView {
   ): string {
     return html`
       <div>
-        <label class="block font-semibold text-gray-700 mb-1">${label}</label>
+        <ui5-label class="plib-label block font-semibold text-gray-700 mb-1">${label}</ui5-label>
         <div class="relative">
           <ui5-input
             class="${cx('plib-input w-full text-xs', options.inputClass)}"

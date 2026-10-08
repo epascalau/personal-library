@@ -178,6 +178,12 @@ export interface IconOptions {
   className?: string;
   /** Rendered as `accessible-name`; omit for purely decorative icons. */
   label?: string;
+  /**
+   * Target slot on the hosting UI5 component, e.g. `icon` on `ui5-input`.
+   * Without it the icon lands in the host's default slot, which for
+   * `ui5-input` is `suggestionItems` rather than the decorative icon area.
+   */
+  slot?: string;
 }
 
 /**
@@ -197,10 +203,11 @@ export interface IconOptions {
  * @returns RawHtml markup representing the UI5 icon.
  */
 export const icon = (key: IconKey, options: IconOptions = {}): RawHtml => {
-  const { className = 'w-4 h-4', label } = options;
+  const { className = 'w-4 h-4', label, slot } = options;
   return html`<ui5-icon
     name="${Icons[key]}"
     class="${className}"
+    ${slot ? html`slot="${slot}"` : ''}
     ${label ? html`accessible-name="${label}"` : html`aria-hidden="true"`}
   ></ui5-icon>`;
 };

@@ -4,9 +4,8 @@
  *
  * Vanilla + UI5 replacement for `components/ShellBar.tsx`.
  *
- * The bespoke Fiori shell markup and its Tailwind styling are preserved; the
- * interactive parts are now UI5 Web Components (`ui5-popover`, `ui5-avatar`,
- * `ui5-icon`), which removes the manual "click outside" listener entirely.
+ * The application shell is built on the official `ui5-shellbar`; the profile
+ * tools remain in a UI5 popover opened from the ShellBar profile slot.
  */
 
 import { Component } from '../core/component';
@@ -38,19 +37,24 @@ interface ToolEntry {
 
 const PROFILE_POPOVER_ID = 'plib-profile-popover';
 const PROFILE_TRIGGER_ID = 'plib-profile-trigger';
+const SHELLBAR_ID = 'plib-shellbar';
 
 export class ShellBarView extends Component<void> {
   private readonly languageSelector = this.own(new LanguageSelectorView({ variant: 'shellbar' }));
 
   /**
-   * Constructs the SAP Fiori ShellBar header component.
+   * Constructs the application shell header.
    *
-   * WHAT: Initializes the Component base with a `<header>` element and sticky SAP Fiori brand styling.
-   * WHY: Pins the top navigation shell across all floorplans while keeping elevation and theme transitions consistent.
+   * WHAT: Uses a sticky `<header>` host that wraps the official `ui5-shellbar`.
+   * WHY: `ui5-shellbar` only renders children assigned to its declared slots
+   * (`startButton`, `branding`, `content`, `searchField`, `assistant`, `profile`)
+   * and treats unslotted children as `ui5-shellbar-item` entries. The profile
+   * popover therefore has to live as a sibling of the ShellBar rather than
+   * inside it, which the wrapper host provides.
    */
   constructor() {
     super(undefined as void, 'header',
-      'sticky top-0 z-40 bg-[#354a5f] dark:bg-[#161f28] text-white shadow-sm border-b border-[#283848] dark:border-[#24303f] transition-colors duration-200');
+      'plib-shell-header sticky top-0 z-40 shadow-sm border-b border-[#283848] dark:border-[#24303f]');
   }
 
   /**
@@ -114,7 +118,7 @@ export class ShellBarView extends Component<void> {
         tile: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 border-blue-100 dark:border-blue-900/50',
         title: 'Full Capability Mindmap',
         subtitle: '8 Pillars: Ingestion, BibTeX, Dual AI, Qdrant RAG, UI5, Security',
-        action: () => appStore.openBpmnModal()
+        action: () => appStore.openBpmnModal('mindmap')
       },
       {
         id: 'camunda-bpmn',
@@ -122,7 +126,7 @@ export class ShellBarView extends Component<void> {
         tile: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 border-teal-100 dark:border-teal-900/50',
         title: 'BPMN 2.0 Workflow Model',
         subtitle: 'Document Ingestion, Dual AI & Qdrant RAG Process',
-        action: () => appStore.openBpmnModal()
+        action: () => appStore.openBpmnModal('diagram')
       },
       {
         id: 'system-links',
@@ -173,7 +177,7 @@ export class ShellBarView extends Component<void> {
    */
   private renderTool(entry: ToolEntry): RawHtml {
     const rowClasses =
-      'w-full flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-[#253240] transition-colors border border-transparent hover:border-gray-200 dark:hover:border-[#2e3b4a] text-left cursor-pointer group';
+      'plib-tool-row w-full flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-[#253240] transition-colors border border-transparent hover:border-gray-200 dark:hover:border-[#2e3b4a] text-left cursor-pointer group';
 
     const body = html`
       <div class="flex items-center gap-2.5 min-w-0 flex-1">
@@ -218,7 +222,7 @@ export class ShellBarView extends Component<void> {
       >`;
     }
 
-    return html`<button type="button" data-tool="${entry.id}" class="${rowClasses}">${body}</button>`;
+    return html`<ui5-button design="Transparent" data-tool="${entry.id}" class="${rowClasses}">${body}</ui5-button>`;
   }
 
   /**
@@ -238,79 +242,54 @@ export class ShellBarView extends Component<void> {
     const t = i18nStore.state.t;
 
     return html`
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
-        <!-- Left: Vectorial Logo & Title -->
-        <div
-          class="flex items-center gap-3 cursor-pointer group select-none"
-          data-action="home"
-          role="button"
-          tabindex="0"
-        >
-          <div
-            class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0070f2] to-[#00b4d8] p-1 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-150"
-          >
-            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+      <ui5-shellbar
+        id="${SHELLBAR_ID}"
+        class="plib-shellbar"
+        accessible-name="Personal Library application shell"
+      >
+        <ui5-shellbar-branding slot="branding" class="plib-shellbar-branding">
+          <span slot="logo" class="plib-shellbar-logo" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="7" fill="url(#plib-brand-gradient)" />
               <path
-                d="M4 23C8 21 13 21 16 24C19 21 24 21 28 23V8C24 6 19 6 16 9C13 6 8 6 4 8V23Z"
-                fill="white"
-                fill-opacity="0.9"
+                d="M6 23.5C9.5 21.6 13.5 21.6 16 24.2C18.5 21.6 22.5 21.6 26 23.5V9.5C22.5 7.6 18.5 7.6 16 10.2C13.5 7.6 9.5 7.6 6 9.5V23.5Z"
+                fill="#ffffff"
+                fill-opacity="0.92"
               />
-              <path d="M16 9V24" stroke="#0070f2" stroke-width="1.5" stroke-linecap="round" />
-              <circle cx="16" cy="14" r="2.2" fill="#0070f2" />
+              <path d="M16 10.2V24.2" stroke="#0070f2" stroke-width="1.4" stroke-linecap="round" />
+              <circle cx="16" cy="14.4" r="2" fill="#0070f2" />
               <path
-                d="M11 12L14 13.5M21 12L18 13.5M16 11V7"
+                d="M11.6 12.6L14.3 13.9M20.4 12.6L17.7 13.9M16 11.6V8"
                 stroke="#0070f2"
-                stroke-width="1.2"
+                stroke-width="1.1"
                 stroke-linecap="round"
               />
-              <circle cx="11" cy="12" r="1" fill="#0070f2" />
-              <circle cx="21" cy="12" r="1" fill="#0070f2" />
+              <circle cx="11.6" cy="12.6" r="0.9" fill="#0070f2" />
+              <circle cx="20.4" cy="12.6" r="0.9" fill="#0070f2" />
+              <defs>
+                <linearGradient id="plib-brand-gradient" x1="0" y1="0" x2="32" y2="32">
+                  <stop stop-color="#0070f2" />
+                  <stop offset="1" stop-color="#00b4d8" />
+                </linearGradient>
+              </defs>
             </svg>
-          </div>
+          </span>
+          Personal Library
+        </ui5-shellbar-branding>
 
-          <div class="flex items-center gap-2.5">
-            <span
-              class="font-semibold text-lg tracking-tight text-white flex items-center gap-1.5"
-            >
-              Personal Library
-            </span>
-            <span
-              class="hidden lg:inline-flex items-center text-[11px] text-[#b0c4de] dark:text-[#8ba2be] font-normal border-l border-white/20 pl-2.5 leading-tight tracking-normal"
-            >
-              Educational Sandbox for Enterprise Document Management & RAG
-            </span>
-          </div>
+        <div slot="content" data-hide-order="1" class="plib-shellbar-subtitle">
+          Educational Sandbox for Enterprise Document Management &amp; RAG
         </div>
-
-        <!-- Center: Spacer -->
-        <div class="flex-1"></div>
-
-        <!-- Right: Language Selector & User Profile Popover -->
-        <div class="flex items-center gap-2 sm:gap-2.5">
-          <div data-slot="language-selector"></div>
-
-          <div class="relative">
-            <button
-              id="${PROFILE_TRIGGER_ID}"
-              type="button"
-              class="flex items-center gap-2 px-2.5 py-1 rounded transition-colors text-xs text-white border cursor-pointer bg-transparent hover:bg-[#465c73] border-transparent hover:border-[#5a728a] aria-expanded:bg-[#465c73] aria-expanded:border-[#5a728a]"
-              title="Open User Profile & Enterprise Tools"
-              aria-expanded="false"
-              aria-haspopup="dialog"
-            >
-              <ui5-avatar
-                size="XS"
-                initials="${user.name.charAt(0)}"
-                class="w-7 h-7 rounded-full bg-[#0070f2] text-white border border-white/40 shadow-xs"
-              ></ui5-avatar>
-              <span class="hidden md:inline font-medium max-w-[130px] truncate">${user.name}</span>
-              ${icon('ChevronDown', {
-                className: 'w-3.5 h-3.5 text-[#9ab3cc] transition-transform duration-150'
-              })}
-            </button>
-          </div>
-        </div>
-      </div>
+        <ui5-shellbar-spacer slot="content"></ui5-shellbar-spacer>
+        <div slot="content" data-hide-order="2" data-slot="language-selector"></div>
+        <div slot="content" data-hide-order="3" class="plib-shellbar-user">${user.name}</div>
+        <ui5-avatar
+          slot="profile"
+          id="${PROFILE_TRIGGER_ID}"
+          initials="${user.name.charAt(0)}"
+          accessible-name="Open User Profile and Enterprise Tools"
+        ></ui5-avatar>
+      </ui5-shellbar>
 
       <ui5-popover
         id="${PROFILE_POPOVER_ID}"
@@ -479,8 +458,8 @@ export class ShellBarView extends Component<void> {
               </span>
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <button
-                type="button"
+              <ui5-button
+                design="${theme === 'light' ? 'Emphasized' : 'Transparent'}"
                 data-theme-option="light"
                 class="${cx(
                   'flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer',
@@ -491,9 +470,9 @@ export class ShellBarView extends Component<void> {
               >
                 ${icon('Sun', { className: 'w-3.5 h-3.5 text-[#f59e0b] shrink-0' })}
                 <span class="truncate">${t.shellBar.themeMorning}</span>
-              </button>
-              <button
-                type="button"
+              </ui5-button>
+              <ui5-button
+                design="${theme === 'dark' ? 'Emphasized' : 'Transparent'}"
                 data-theme-option="dark"
                 class="${cx(
                   'flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer',
@@ -504,7 +483,7 @@ export class ShellBarView extends Component<void> {
               >
                 ${icon('Moon', { className: 'w-3.5 h-3.5 text-[#38bdf8] shrink-0' })}
                 <span class="truncate">${t.shellBar.themeEvening}</span>
-              </button>
+              </ui5-button>
             </div>
           </div>
 
@@ -515,14 +494,14 @@ export class ShellBarView extends Component<void> {
               <span class="font-mono text-gray-600 dark:text-gray-300">Keycloak OIDC (JWT)</span>
             </div>
 
-            <button
-              type="button"
+            <ui5-button
+              design="Transparent"
               data-action="logout"
               class="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg border border-red-200 dark:border-red-900/50 transition-colors cursor-pointer"
             >
               ${icon('LogOut', { className: 'w-3.5 h-3.5' })}
               <span>${t.shellBar.signOut}</span>
-            </button>
+            </ui5-button>
           </div>
         </div>
       </ui5-popover>
@@ -542,22 +521,17 @@ export class ShellBarView extends Component<void> {
     this.adopt('[data-slot="language-selector"]', this.languageSelector);
 
     const popover = this.$<Popover>(`#${PROFILE_POPOVER_ID}`);
-    const trigger = this.$(`#${PROFILE_TRIGGER_ID}`);
-    const chevron = trigger?.querySelector('ui5-icon');
+    const shellbar = this.$(`#${SHELLBAR_ID}`);
 
-    if (popover && trigger) {
-      popover.opener = trigger;
-
-      trigger.addEventListener('click', () => {
+    if (popover && shellbar) {
+      // The ShellBar renders its own internal profile button and only exposes it
+      // through `profile-click`; the slotted avatar never receives the click, so
+      // `targetRef` is the only reliable opener for the popover.
+      shellbar.addEventListener('profile-click', (event: Event) => {
+        const { targetRef } = (event as CustomEvent<{ targetRef: HTMLElement }>).detail;
+        popover.opener = targetRef ?? shellbar;
         popover.open = !popover.open;
       });
-
-      const syncTriggerState = (): void => {
-        trigger.setAttribute('aria-expanded', String(popover.open));
-        chevron?.classList.toggle('rotate-180', popover.open);
-      };
-      popover.addEventListener('open', syncTriggerState);
-      popover.addEventListener('close', syncTriggerState);
     }
 
     const closePopover = (): void => {
@@ -573,6 +547,8 @@ export class ShellBarView extends Component<void> {
         appStore.goHome();
       }
     });
+    this.el.addEventListener('logo-click', () => appStore.goHome());
+    this.el.addEventListener('branding-click', () => appStore.goHome());
 
     const toolsById = new Map(this.tools.map((entry) => [entry.id, entry]));
     this.onAll('[data-tool]', 'click', (_event, element) => {
