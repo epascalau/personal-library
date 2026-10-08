@@ -1,0 +1,90 @@
+@startuml Backend_RAG_Sequence
+!theme plain
+skinparam defaultFontName Inter
+skinparam roundCorner 8
+skinparam sequenceMessageAlign center
+
+title Personal Library — Backend RAG Sequence (Ollama + Qdrant)\nIngestion and query, both strictly sequential inside a single HTTP request
+
+box "Spring Boot :18080" #EEF6FF
+  participant "Document /\nChat Controller" as Ctrl
+  participant "DocumentService" as DocSvc
+  participant "StorageService\n(Apache Tika)" as Storage
+  participant "BibTeXExtractionService" as BibTeX
+  participant "VectorRagService" as Rag
+end box
+
+box "Inference & Vectors" #FFF7ED
+  participant "Ollama\n:11434" as Ollama
+  participant "Qdrant\n:6334 gRPC" as Qdrant
+end box
+
+box "Persistence" #F0FDF4
+  participant "MongoDB" as Mongo
+end box
+
+actor "Browser\nvia nginx :8088" as Client
+
+== INGESTION — DocumentService.uploadDocument() ==
+
+Client -> Ctrl : POST /api/v1/documents (multipart)
+Ctrl -> DocSvc : uploadDocument(file, userBibtex)
+DocSvc -> Storage : storeFile(file, guid, v1)
+Storage --> DocSvc : extractTextContent() via Tika
+
+alt no user-supplied BibTeX title
+  DocSvc -> BibTeX : extractMetadata(fileName, text)
+  BibTeX -> Ollama : llamaChatClient.prompt()  [Ollama 1 of 4]
+  Ollama --> BibTeX : JSON metadata
+else user supplied BibTeX
+  DocSvc -> DocSvc : trust submitted metadata
+end
+
+DocSvc -> Rag : indexDocumentChunks(guid, text)
+Rag -> Rag : split ~400 chars; toPointId = UUIDv3(chunkId)
+Rag -> Ollama : vectorStore.add() embeds chunks  [Ollama 2 of 4]
+Ollama --> Rag : 768-dim vectors (nomic-embed-text)
+Rag -> Qdrant : upsert personal_library_embeddings
+note right of Rag
+  Indexing failure is caught and logged as a warning.
+  The upload still returns 200 with an empty index.
+end note
+
+DocSvc -> Ollama : Llama summary, temperature 0.2  [Ollama 3 of 4]
+DocSvc -> Ollama : Mistral summary, temperature 0.3  [Ollama 4 of 4]
+DocSvc -> Mongo : save(DocumentEntity + chunks + summaries)
+Ctrl --> Client : 200 DocumentResponse
+
+== QUERY — VectorRagService.chatWithDocument() ==
+
+Client -> Ctrl : POST /api/v1/chat { documentGuid, question }
+Ctrl -> Mongo : load DocumentEntity by GUID
+Ctrl -> Rag : chatWithDocument(docEntity, request)
+Rag -> Ollama : embed(question) via nomic-embed-text
+Rag -> Qdrant : similaritySearch topK=4, threshold=0.5,\nfilter documentGuid
+Qdrant --> Rag : ranked chunks (chunkIndex as Long)
+
+alt passages found
+  Rag -> Rag : join passages into grounded system prompt
+else search failed or empty
+  Rag -> Rag : fall back to docEntity.contentExcerpt
+end
+
+Rag -> Ollama : system(prompt).user(question).call()
+
+alt model responded
+  Ollama --> Rag : answer text
+else model unavailable
+  Ollama --> Rag : exception replaced by apology string
+end
+
+Rag --> Ctrl : ChatResponse { answer, modelUsed, citations }
+Ctrl --> Client : 200 ChatResponse
+
+legend right
+  Every Ollama call is bounded by OLLAMA_READ_TIMEOUT = 10 minutes.
+  Upload chains up to four of them, so the proxy and client budgets
+  (nginx 2160s, LLM_TIMEOUT_MS 35 min) must cover the SUM, not one call.
+endlegend
+
+@enduml

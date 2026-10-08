@@ -674,6 +674,55 @@
         </div>
       </div>
 
+      <!-- 8d. Backend RAG Sequence (Ollama + Qdrant) -->
+      <div class="card" style="border-color: #fbbf24; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(251, 191, 36, 0.04) 100%);">
+        <div>
+          <div class="card-icon">🧠</div>
+          <h2>Backend RAG Sequence</h2>
+          <p>
+            Both halves of the Ollama + Qdrant lifecycle, read straight from the Java source. Ingestion runs
+            <strong>strictly sequentially</strong> inside one HTTP request and makes <strong>four</strong> Ollama round
+            trips &mdash; BibTeX extraction, chunk embedding, then the Llama and Mistral summaries. Query embeds the
+            question, searches Qdrant with <code>topK 4</code>, then generates a grounded answer. Annotated with the
+            three fail-soft fallbacks and the timeout budget those four calls actually consume.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; PlantUML (.puml) &bull; Mermaid (.mmd) &bull; 3600px PNG &bull; PDF
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/backend_rag_sequence.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/backend_rag_sequence.mmd" download="backend_rag_sequence.mmd" class="btn" style="flex: 1; background: #7c3aed;">Mermaid &rarr;</a>
+          <a href="diagrams/backend_rag_sequence.puml" download="backend_rag_sequence.puml" class="btn" style="flex: 1; background: #0284c7;">PlantUML &rarr;</a>
+          <a href="diagrams/backend_rag_sequence.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+          <a href="diagrams/backend_rag_sequence.pdf" target="_blank" class="btn btn-secondary" style="flex: 1;">PDF &rarr;</a>
+        </div>
+      </div>
+
+      <!-- 8e. Backend RAG Component Interaction -->
+      <div class="card" style="border-color: #a855f7; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(168, 85, 247, 0.04) 100%);">
+        <div>
+          <div class="card-icon">⚙️</div>
+          <h2>Backend RAG Components</h2>
+          <p>
+            Structural counterpart: controllers, the five services in true pipeline order, the Spring AI beans built in
+            <code>OllamaConfig</code> (<code>llamaChatClient</code>, <code>mistralChatClient</code>,
+            <code>EmbeddingModel</code>, <code>QdrantVectorStore</code>) and the Docker infrastructure beneath them.
+            Spring AI is the seam &mdash; swapping a model or a vector store is configuration, not code.
+          </p>
+        </div>
+        <div class="card-meta">
+          Formats: Vector SVG &bull; PlantUML (.puml) &bull; Mermaid (.mmd) &bull; 3600px PNG &bull; PDF
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="diagrams/backend_rag_component.svg" target="_blank" class="btn" style="flex: 1;">Vector SVG &rarr;</a>
+          <a href="diagrams/backend_rag_component.mmd" download="backend_rag_component.mmd" class="btn" style="flex: 1; background: #7c3aed;">Mermaid &rarr;</a>
+          <a href="diagrams/backend_rag_component.puml" download="backend_rag_component.puml" class="btn" style="flex: 1; background: #0284c7;">PlantUML &rarr;</a>
+          <a href="diagrams/backend_rag_component.png" target="_blank" class="btn btn-secondary" style="flex: 1;">PNG Image &rarr;</a>
+          <a href="diagrams/backend_rag_component.pdf" target="_blank" class="btn btn-secondary" style="flex: 1;">PDF &rarr;</a>
+        </div>
+      </div>
+
       <!-- 9. Domain Entity Relationship Diagram (ERD) & Database Schemas -->
       <div class="card" style="border-color: #38bdf8; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(56, 189, 248, 0.04) 100%);">
         <div>

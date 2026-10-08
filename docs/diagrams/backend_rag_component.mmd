@@ -1,0 +1,67 @@
+%% Personal Library — Backend RAG Component Interaction
+%% ---
+%% How the Spring Boot services reach Ollama and Qdrant through Spring AI's
+%% abstractions, and which concrete bean serves which purpose.
+%% ---
+%% Source of truth: config/OllamaConfig.java, service/*.java, application.yml
+flowchart TB
+    subgraph API["API LAYER — controllers"]
+        DC["DocumentController<br/>upload, overwrite, versions"]
+        CC["ChatController<br/>POST /api/v1/chat"]
+        HC["HealthController<br/>probes Ollama and Qdrant"]
+    end
+
+    subgraph SVC["SERVICE LAYER — orchestration"]
+        DS["DocumentService<br/>drives the whole pipeline"]
+        SS["StorageService<br/>Apache Tika extraction"]
+        BX["BibTeXExtractionService<br/>LLM-backed metadata"]
+        AS["AiSummarizationService<br/>dual-model summaries"]
+        VR["VectorRagService<br/>chunk, index, retrieve"]
+    end
+
+    subgraph AI["SPRING AI ABSTRACTION — swappable beans"]
+        LC["llamaChatClient<br/>temperature 0.2"]
+        MC["mistralChatClient<br/>temperature 0.3"]
+        EM["EmbeddingModel<br/>nomic-embed-text, 768d"]
+        VS["VectorStore<br/>QdrantVectorStore"]
+    end
+
+    subgraph INFRA["INFRASTRUCTURE — containers"]
+        OL["Ollama :11434<br/>llama3.2 + mistral"]
+        QD["Qdrant :6334 gRPC<br/>personal_library_embeddings"]
+        MG["MongoDB :27017<br/>DocumentEntity"]
+        FS["Filesystem<br/>storage/documents"]
+    end
+
+    DC --> DS
+    CC --> VR
+    HC -.probe.-> OL
+    HC -.probe.-> QD
+
+    DS --> SS
+    DS --> BX
+    DS --> AS
+    DS --> VR
+    DS --> MG
+
+    SS --> FS
+    BX --> LC
+    AS --> LC
+    AS --> MC
+    VR --> VS
+    VR --> LC
+
+    LC --> OL
+    MC --> OL
+    VS --> EM
+    EM --> OL
+    VS --> QD
+
+    classDef api fill:#1e3a5f,stroke:#38bdf8,color:#e2e8f0
+    classDef svc fill:#14402c,stroke:#34d399,color:#e2e8f0
+    classDef ai fill:#3b1f52,stroke:#c084fc,color:#e2e8f0
+    classDef infra fill:#4a2f10,stroke:#fbbf24,color:#e2e8f0
+    class DC,CC,HC api
+    class DS,SS,BX,AS,VR svc
+    class LC,MC,EM,VS ai
+    class OL,QD,MG,FS infra

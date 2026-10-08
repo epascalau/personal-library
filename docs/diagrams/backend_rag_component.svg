@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1820 1210" width="1820" height="1210" style="background:#0f172a; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="cmp-hdr2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <marker id="cmp2-arrow-sky" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" /></marker>
+    <marker id="cmp2-arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#34d399" /></marker>
+    <marker id="cmp2-arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#c084fc" /></marker>
+    <marker id="cmp2-arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#fbbf24" /></marker>
+    <filter id="cmp-shadow2" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Title banner -->
+  <rect x="26" y="20" width="1768" height="66" rx="8" fill="url(#cmp-hdr2)" stroke="#334155" stroke-width="1.5" />
+  <text x="52" y="52" font-size="23" font-weight="800" fill="#f8fafc">Personal Library — Backend RAG Component Interaction</text>
+  <text x="52" y="74" font-size="12" font-weight="500" fill="#94a3b8">Spring AI sits between the services and the engines, so models and vector stores swap by configuration alone</text>
+  <rect x="1594" y="38" width="200" height="28" rx="6" fill="#0070f2" />
+  <text x="1694" y="57" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="middle">Component / Data Flow</text>
+
+  <rect x="34" y="118" width="1752" height="120" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="50" y="139" font-size="12" font-weight="800" fill="#38bdf8">API LAYER — controllers</text>
+  <rect x="34" y="300" width="1752" height="150" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#34d399" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1180" y="321" font-size="12" font-weight="800" fill="#34d399">SERVICE LAYER — orchestration (no concurrency in the upload path)</text>
+  <rect x="34" y="530" width="1752" height="150" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1240" y="551" font-size="12" font-weight="800" fill="#c084fc">SPRING AI ABSTRACTION — swappable beans from OllamaConfig</text>
+  <rect x="34" y="760" width="1752" height="178" rx="9" fill="#1e293b" fill-opacity="0.38" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="7 4" />
+  <text x="1380" y="781" font-size="12" font-weight="800" fill="#fbbf24">INFRASTRUCTURE — docker compose services</text>
+
+  <g>
+    <rect x="80" y="154" width="250" height="62" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="205" y="181" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">DocumentController</text>
+    <text x="205" y="200" font-size="10.5" fill="#38bdf8" text-anchor="middle">upload · overwrite · versions</text>
+  </g>
+  <g>
+    <rect x="360" y="154" width="230" height="62" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="475" y="181" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">ChatController</text>
+    <text x="475" y="200" font-size="10.5" fill="#38bdf8" text-anchor="middle">POST /api/v1/chat</text>
+  </g>
+  <g>
+    <rect x="620" y="154" width="250" height="62" rx="7" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="745" y="181" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">HealthController</text>
+    <text x="745" y="200" font-size="10.5" fill="#38bdf8" text-anchor="middle">probes Ollama and Qdrant</text>
+  </g>
+  <g>
+    <rect x="80" y="340" width="230" height="62" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="195" y="367" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">DocumentService</text>
+    <text x="195" y="386" font-size="10.5" fill="#34d399" text-anchor="middle">drives the pipeline</text>
+  </g>
+  <g>
+    <rect x="340" y="340" width="210" height="62" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="445" y="367" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">StorageService</text>
+    <text x="445" y="386" font-size="10.5" fill="#34d399" text-anchor="middle">Apache Tika</text>
+  </g>
+  <g>
+    <rect x="580" y="340" width="250" height="62" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="705" y="367" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">BibTeXExtraction</text>
+    <text x="705" y="386" font-size="10.5" fill="#34d399" text-anchor="middle">LLM-backed metadata</text>
+  </g>
+  <g>
+    <rect x="860" y="340" width="240" height="62" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="980" y="367" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">VectorRagService</text>
+    <text x="980" y="386" font-size="10.5" fill="#34d399" text-anchor="middle">chunk · index · retrieve</text>
+  </g>
+  <g>
+    <rect x="1130" y="340" width="250" height="62" rx="7" fill="#14402c" stroke="#34d399" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="1255" y="367" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">AiSummarization</text>
+    <text x="1255" y="386" font-size="10.5" fill="#34d399" text-anchor="middle">dual-model summaries</text>
+  </g>
+  <g>
+    <rect x="80" y="570" width="250" height="62" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="205" y="597" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">llamaChatClient</text>
+    <text x="205" y="616" font-size="10.5" fill="#c084fc" text-anchor="middle">temperature 0.2</text>
+  </g>
+  <g>
+    <rect x="360" y="570" width="250" height="62" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="485" y="597" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">mistralChatClient</text>
+    <text x="485" y="616" font-size="10.5" fill="#c084fc" text-anchor="middle">temperature 0.3</text>
+  </g>
+  <g>
+    <rect x="640" y="570" width="280" height="62" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="780" y="597" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">EmbeddingModel</text>
+    <text x="780" y="616" font-size="10.5" fill="#c084fc" text-anchor="middle">nomic-embed-text · 768d</text>
+  </g>
+  <g>
+    <rect x="950" y="570" width="260" height="62" rx="7" fill="#3b1f52" stroke="#c084fc" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="1080" y="597" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">VectorStore</text>
+    <text x="1080" y="616" font-size="10.5" fill="#c084fc" text-anchor="middle">QdrantVectorStore</text>
+  </g>
+  <g>
+    <rect x="80" y="800" width="260" height="62" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="210" y="827" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">Ollama :11434</text>
+    <text x="210" y="846" font-size="10.5" fill="#fbbf24" text-anchor="middle">llama3.2 + mistral</text>
+  </g>
+  <g>
+    <rect x="370" y="800" width="300" height="62" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="520" y="827" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">Qdrant :6334 gRPC</text>
+    <text x="520" y="846" font-size="10.5" fill="#fbbf24" text-anchor="middle">personal_library_embeddings</text>
+  </g>
+  <g>
+    <rect x="700" y="800" width="240" height="62" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="820" y="827" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">MongoDB :27017</text>
+    <text x="820" y="846" font-size="10.5" fill="#fbbf24" text-anchor="middle">DocumentEntity</text>
+  </g>
+  <g>
+    <rect x="970" y="800" width="240" height="62" rx="7" fill="#4a2f10" stroke="#fbbf24" stroke-width="1.5" filter="url(#cmp-shadow2)" />
+    <text x="1090" y="827" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle">Filesystem</text>
+    <text x="1090" y="846" font-size="10.5" fill="#fbbf24" text-anchor="middle">storage/documents</text>
+  </g>
+
+  <!-- API -> service -->
+  <line x1="205" y1="216" x2="195" y2="338" stroke="#38bdf8" stroke-width="2.2" marker-end="url(#cmp2-arrow-sky)" />
+  <line x1="475" y1="216" x2="965" y2="338" stroke="#38bdf8" stroke-width="2" marker-end="url(#cmp2-arrow-sky)" />
+
+  <!-- Pipeline chain across the service band. Drawn only in the gaps between
+       boxes so nothing is struck through, and left-to-right because that is
+       literally the execution order inside uploadDocument(). -->
+  <line x1="313" y1="371" x2="335" y2="371" stroke="#34d399" stroke-width="2.4" marker-end="url(#cmp2-arrow-green)" />
+  <line x1="553" y1="371" x2="575" y2="371" stroke="#34d399" stroke-width="2.4" marker-end="url(#cmp2-arrow-green)" />
+  <line x1="833" y1="371" x2="855" y2="371" stroke="#34d399" stroke-width="2.4" marker-end="url(#cmp2-arrow-green)" />
+  <line x1="1103" y1="371" x2="1125" y2="371" stroke="#34d399" stroke-width="2.4" marker-end="url(#cmp2-arrow-green)" />
+  <text x="324" y="340" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">1</text>
+  <text x="564" y="340" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">2</text>
+  <text x="844" y="340" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">3</text>
+  <text x="1114" y="340" font-size="10" font-weight="700" fill="#34d399" text-anchor="middle">4</text>
+
+  <!-- service -> spring ai (diagonals run through the empty inter-band gutter) -->
+  <line x1="705" y1="404" x2="215" y2="566" stroke="#c084fc" stroke-width="2" marker-end="url(#cmp2-arrow-purple)" />
+  <line x1="1255" y1="404" x2="225" y2="566" stroke="#c084fc" stroke-width="1.6" marker-end="url(#cmp2-arrow-purple)" />
+  <line x1="1255" y1="404" x2="495" y2="566" stroke="#c084fc" stroke-width="2" marker-end="url(#cmp2-arrow-purple)" />
+  <line x1="980" y1="404" x2="1075" y2="566" stroke="#c084fc" stroke-width="2.2" marker-end="url(#cmp2-arrow-purple)" />
+  <line x1="960" y1="404" x2="235" y2="566" stroke="#c084fc" stroke-width="1.6" marker-end="url(#cmp2-arrow-purple)" />
+
+  <!-- VectorStore delegates embedding to the EmbeddingModel -->
+  <line x1="946" y1="601" x2="926" y2="601" stroke="#c084fc" stroke-width="2.2" marker-end="url(#cmp2-arrow-purple)" />
+
+  <!-- spring ai -> infrastructure -->
+  <line x1="205" y1="632" x2="205" y2="796" stroke="#fbbf24" stroke-width="2.2" marker-end="url(#cmp2-arrow-amber)" />
+  <line x1="485" y1="632" x2="250" y2="796" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#cmp2-arrow-amber)" />
+  <line x1="780" y1="632" x2="295" y2="796" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#cmp2-arrow-amber)" />
+  <line x1="1080" y1="632" x2="520" y2="796" stroke="#fbbf24" stroke-width="2.2" marker-end="url(#cmp2-arrow-amber)" />
+
+  <!-- Persistence, routed down the left margin so it never crosses a box -->
+  <path d="M 120 404 L 58 404 L 58 890 L 820 890 L 820 868" fill="none" stroke="#f87171" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#cmp2-arrow-amber)" />
+  <path d="M 360 404 L 72 404 L 72 908 L 1090 908 L 1090 868" fill="none" stroke="#f87171" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#cmp2-arrow-amber)" />
+  <rect x="508" y="879" width="185" height="16" rx="3" fill="#0f172a" fill-opacity="0.94" />
+  <text x="600" y="891" font-size="10.5" font-weight="600" fill="#fca5a5" text-anchor="middle">DocumentService → MongoDB</text>
+  <rect x="902" y="897" width="197" height="16" rx="3" fill="#0f172a" fill-opacity="0.94" />
+  <text x="1000" y="909" font-size="10.5" font-weight="600" fill="#fca5a5" text-anchor="middle">StorageService → Filesystem</text>
+
+  <!-- Health probes, routed down the right margin -->
+  <path d="M 958 180 L 1750 180 L 1750 872 L 210 872" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="6 4" />
+  <line x1="520" y1="872" x2="520" y2="868" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#cmp2-arrow-sky)" />
+  <line x1="210" y1="872" x2="210" y2="868" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#cmp2-arrow-sky)" />
+  <text x="1742" y="520" font-size="10.5" font-weight="600" fill="#7dd3fc" text-anchor="end">health probes</text>
+
+  <g>
+    <rect x="1396.3" y="361.0" width="267.5" height="86" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#34d399" stroke-width="1.2" />
+    <text x="1530" y="385.0" font-size="11" font-weight="700" fill="#34d399" text-anchor="middle">INGESTION ORDER (sequential)</text>
+    <text x="1530" y="402.0" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">Tika → BibTeX(Llama) → embed+upsert</text>
+    <text x="1530" y="419.0" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">→ Llama summary → Mistral summary</text>
+    <text x="1530" y="436.0" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">→ Mongo save. No CompletableFuture.</text>
+  </g>
+  <g>
+    <rect x="1332.5" y="585.5" width="295.1" height="69" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#c084fc" stroke-width="1.2" />
+    <text x="1480" y="609.5" font-size="11" font-weight="700" fill="#c084fc" text-anchor="middle">RETRIEVAL SETTINGS</text>
+    <text x="1480" y="626.5" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">topK 4 · similarityThreshold 0.5</text>
+    <text x="1480" y="643.5" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">filterExpression scopes to documentGuid</text>
+  </g>
+  <g>
+    <rect x="1315.2" y="793.0" width="329.6" height="86" rx="6" fill="#0f172a" fill-opacity="0.94" stroke="#fbbf24" stroke-width="1.2" />
+    <text x="1480" y="817.0" font-size="11" font-weight="700" fill="#fbbf24" text-anchor="middle">initialize-schema: true</text>
+    <text x="1480" y="834.0" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">Nothing else provisions the collection.</text>
+    <text x="1480" y="851.0" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">Disabled, every index call failed and was</text>
+    <text x="1480" y="868.0" font-size="11" font-weight="500" fill="#cbd5e1" text-anchor="middle">swallowed — 200 OK, but Qdrant stayed empty.</text>
+  </g>
+
+  <!-- Bottom explainer panels -->
+  <rect x="40" y="950" width="570" height="212" rx="8" fill="#1e293b" fill-opacity="0.7" stroke="#38bdf8" stroke-width="1.3" />
+  <text x="62" y="978" font-size="12.5" font-weight="800" fill="#7dd3fc">WHY SPRING AI IS IN THE MIDDLE</text>
+  <text x="62" y="1004" font-size="11" fill="#cbd5e1">The services never speak HTTP to Ollama or gRPC to Qdrant.</text>
+  <text x="62" y="1023" font-size="11" fill="#cbd5e1">They depend on ChatClient, EmbeddingModel and VectorStore,</text>
+  <text x="62" y="1042" font-size="11" fill="#cbd5e1">all built as beans in OllamaConfig. Swapping llama3.2 for a</text>
+  <text x="62" y="1061" font-size="11" fill="#cbd5e1">different model, or Qdrant for another store, is a config</text>
+  <text x="62" y="1080" font-size="11" fill="#cbd5e1">change rather than a code change.</text>
+  <text x="62" y="1106" font-size="10.5" fill="#7dd3fc">config/OllamaConfig.java · resources/application.yml</text>
+
+  <rect x="630" y="950" width="570" height="212" rx="8" fill="#1e293b" fill-opacity="0.7" stroke="#fbbf24" stroke-width="1.3" />
+  <text x="652" y="978" font-size="12.5" font-weight="800" fill="#fcd34d">WHY UPLOADS ARE SLOW</text>
+  <text x="652" y="1004" font-size="11" fill="#cbd5e1">One upload makes up to four Ollama round trips in series:</text>
+  <text x="652" y="1023" font-size="11" fill="#cbd5e1">BibTeX extraction, chunk embedding, then two summaries.</text>
+  <text x="652" y="1042" font-size="11" fill="#cbd5e1">Each is bounded by a 10-minute read timeout, and local</text>
+  <text x="652" y="1061" font-size="11" fill="#cbd5e1">CPU inference has been observed at ~2.5 minutes for a</text>
+  <text x="652" y="1080" font-size="11" fill="#cbd5e1">single call. The budget that matters is the SUM.</text>
+  <text x="652" y="1106" font-size="10.5" fill="#fcd34d">OllamaConfig.OLLAMA_READ_TIMEOUT · nginx 2160s · 35 min fetch</text>
+
+  <rect x="1220" y="950" width="560" height="212" rx="8" fill="#1e293b" fill-opacity="0.7" stroke="#34d399" stroke-width="1.3" />
+  <text x="1242" y="978" font-size="12.5" font-weight="800" fill="#6ee7b7">FAILING SOFT, AND ITS COST</text>
+  <text x="1242" y="1004" font-size="11" fill="#cbd5e1">Every external call is wrapped in try/catch, so a dead</text>
+  <text x="1242" y="1023" font-size="11" fill="#cbd5e1">Ollama or Qdrant never produces a 5xx. That keeps the UI</text>
+  <text x="1242" y="1042" font-size="11" fill="#cbd5e1">usable, but it also means a broken index looks exactly</text>
+  <text x="1242" y="1061" font-size="11" fill="#cbd5e1">like a healthy one from the browser — which is precisely</text>
+  <text x="1242" y="1080" font-size="11" fill="#cbd5e1">how the empty-collection bug stayed hidden.</text>
+  <text x="1242" y="1106" font-size="10.5" fill="#6ee7b7">VectorRagService · HealthController exposes the real state</text>
+</svg>

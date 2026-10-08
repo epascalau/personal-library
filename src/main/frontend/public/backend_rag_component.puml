@@ -1,0 +1,75 @@
+@startuml Backend_RAG_Component
+!theme plain
+skinparam roundCorner 8
+skinparam defaultFontName Inter
+skinparam componentStyle rectangle
+skinparam packageStyle frame
+
+title Personal Library — Backend RAG Component Interaction\nSpring AI sits between the services and the two engines, so models and stores swap by configuration
+
+package "API LAYER" #EEF6FF {
+  [DocumentController] as DC
+  [ChatController] as CC
+  [HealthController] as HC
+}
+
+package "SERVICE LAYER" #F0FDF4 {
+  [DocumentService] as DS
+  [StorageService\n(Apache Tika)] as SS
+  [BibTeXExtractionService] as BX
+  [AiSummarizationService] as AS
+  [VectorRagService] as VR
+}
+
+package "SPRING AI ABSTRACTION" #FAF5FF {
+  [llamaChatClient\ntemperature 0.2] as LC
+  [mistralChatClient\ntemperature 0.3] as MC
+  [EmbeddingModel\nnomic-embed-text 768d] as EM
+  [VectorStore\nQdrantVectorStore] as VS
+}
+
+package "INFRASTRUCTURE" #FFF7ED {
+  [Ollama :11434] as OL
+  [Qdrant :6334 gRPC] as QD
+  [MongoDB :27017] as MG
+  [Filesystem storage] as FS
+}
+
+DC --> DS
+CC --> VR
+HC ..> OL : health probe
+HC ..> QD : health probe
+
+DS --> SS
+DS --> BX
+DS --> AS
+DS --> VR
+DS --> MG
+
+SS --> FS
+BX --> LC
+AS --> LC
+AS --> MC
+VR --> VS
+VR --> LC
+
+LC --> OL
+MC --> OL
+VS --> EM
+EM --> OL
+VS --> QD
+
+note bottom of VS
+  initialize-schema: true — nothing else provisions the
+  collection. With it disabled every index call failed and
+  was swallowed as a warning, so uploads returned 200
+  while Qdrant stayed empty.
+end note
+
+note bottom of DS
+  The pipeline is strictly sequential: Tika, then BibTeX
+  via Llama, then embed + upsert, then two summaries,
+  then the Mongo save. No CompletableFuture anywhere.
+end note
+
+@enduml

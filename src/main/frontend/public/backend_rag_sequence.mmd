@@ -1,0 +1,84 @@
+%% Personal Library — Backend RAG Sequence (Ollama + Qdrant)
+%% ---
+%% Both halves of the lifecycle in order:
+%%   INGESTION  file -> Tika -> BibTeX(LLM) -> chunk -> embed -> Qdrant -> summaries -> Mongo
+%%   QUERY      question -> embed -> Qdrant search -> grounded prompt -> Llama -> cited answer
+%% ---
+%% Source of truth:
+%%   service/DocumentService.java, service/VectorRagService.java,
+%%   service/AiSummarizationService.java, service/BibTeXExtractionService.java,
+%%   config/OllamaConfig.java, resources/application.yml
+%% ---
+%% NOTE: participant aliases must not contain HTML entities. Mermaid's sequence
+%% parser rejects &lt;/&gt; in an alias ("expecting SOLID_ARROW, got NEWLINE"), even
+%% though the flowchart parser accepts them. Keep these aliases plain text.
+%% NOTE: ';' is a statement separator in Mermaid, so it must never appear in
+%% message text - the tail is then parsed as a bare actor and raises the same
+%% "got NEWLINE" error. Use a comma instead. A bare '%%' line is likewise
+%% rejected by the flowchart parser, so comment separators carry a '---'.
+sequenceDiagram
+    autonumber
+    participant Client as nginx :8088<br/>browser
+    participant Ctrl as Document / Chat<br/>Controller
+    participant DocSvc as DocumentService
+    participant Storage as StorageService<br/>Apache Tika
+    participant BibTeX as BibTeXExtraction<br/>Service
+    participant RagSvc as VectorRagService
+    participant Ollama as Ollama :11434
+    participant Qdrant as Qdrant :6334<br/>gRPC
+    participant Mongo as MongoDB
+
+    rect rgb(22, 42, 62)
+    note over Client, Mongo: INGESTION — uploadDocument() runs these strictly in sequence, in one HTTP request
+    Client->>Ctrl: POST /api/v1/documents (multipart/form-data)
+    Ctrl->>DocSvc: uploadDocument(file, userBibtex)
+    DocSvc->>Storage: storeFile(file, guid, v1)
+    Storage-->>DocSvc: extractTextContent() via Apache Tika
+
+    alt user supplied no BibTeX title
+        DocSvc->>BibTeX: extractMetadata(fileName, text)
+        BibTeX->>Ollama: llamaChatClient.prompt() [Ollama 1 of 4]
+        Ollama-->>BibTeX: JSON metadata (title, author, year, DOI)
+    else user supplied BibTeX
+        DocSvc->>DocSvc: skip extraction, trust the submitted metadata
+    end
+
+    DocSvc->>RagSvc: indexDocumentChunks(guid, text)
+    RagSvc->>RagSvc: paragraph split at ~400 chars, toPointId = UUIDv3(chunkId)
+    RagSvc->>Ollama: vectorStore.add() embeds chunks [Ollama 2 of 4]
+    Ollama-->>RagSvc: 768-dim vectors (nomic-embed-text)
+    RagSvc->>Qdrant: upsert into personal_library_embeddings
+    note right of RagSvc: Indexing failure is caught and logged as a warning.<br/>The upload still returns 200 with an empty index.
+
+    DocSvc->>Ollama: Llama summary, temperature 0.2 [Ollama 3 of 4]
+    DocSvc->>Ollama: Mistral summary, temperature 0.3 [Ollama 4 of 4]
+    DocSvc->>Mongo: save(DocumentEntity + chunks + dual summaries)
+    Ctrl-->>Client: 200 DocumentResponse
+    end
+
+    rect rgb(40, 28, 56)
+    note over Client, Mongo: QUERY — chatWithDocument(), grounded retrieval then generation
+    Client->>Ctrl: POST /api/v1/chat { documentGuid, question }
+    Ctrl->>Mongo: load DocumentEntity by GUID
+    Ctrl->>RagSvc: chatWithDocument(docEntity, request)
+    RagSvc->>Ollama: embed(question) via nomic-embed-text
+    RagSvc->>Qdrant: similaritySearch topK=4, threshold=0.5, filter documentGuid
+    Qdrant-->>RagSvc: ranked chunks (chunkIndex arrives as Long)
+
+    alt passages found
+        RagSvc->>RagSvc: join passages into grounded system prompt
+    else search failed or returned nothing
+        RagSvc->>RagSvc: fall back to docEntity.contentExcerpt
+    end
+
+    RagSvc->>Ollama: llamaChatClient.system(prompt).user(question).call()
+
+    alt model responded
+        Ollama-->>RagSvc: answer text
+    else model unavailable
+        Ollama-->>RagSvc: exception, replaced by an apology string
+    end
+
+    RagSvc-->>Ctrl: ChatResponse { answer, modelUsed, citations }
+    Ctrl-->>Client: 200 ChatResponse
+    end

@@ -23,7 +23,7 @@
     "docs:java": "tsx scripts/generate-javadoc.ts",
     "docs:pages": "tsx scripts/generate-doc-pages.ts",
     "docs": "typedoc && tsx scripts/generate-javadoc.ts && tsx scripts/generate-doc-pages.ts",
-    "diagrams": "tsx scripts/generate-diagrams.ts && tsx scripts/generate-architecture-diagrams.ts && tsx scripts/generate-uml-diagrams.ts && tsx scripts/generate-architecture-from-mmd.ts && tsx scripts/generate-mindmap.ts && tsx scripts/generate-entity-diagrams.ts && tsx scripts/generate-ontology-diagrams.ts && tsx scripts/generate-rag-diagrams.ts && tsx scripts/generate-frontend-interaction-diagrams.ts",
+    "diagrams": "tsx scripts/generate-diagrams.ts && tsx scripts/generate-architecture-diagrams.ts && tsx scripts/generate-uml-diagrams.ts && tsx scripts/generate-architecture-from-mmd.ts && tsx scripts/generate-mindmap.ts && tsx scripts/generate-entity-diagrams.ts && tsx scripts/generate-ontology-diagrams.ts && tsx scripts/generate-rag-diagrams.ts && tsx scripts/generate-frontend-interaction-diagrams.ts && tsx scripts/generate-backend-rag-diagrams.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
